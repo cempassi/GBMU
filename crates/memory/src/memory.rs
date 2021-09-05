@@ -1,9 +1,9 @@
 mod area;
 mod consts;
 
-use shared::{traits::Bus, Error};
 use area::rom::{Mbc, NoMbc};
 use area::{Area, Wram};
+use shared::{traits::Bus, Error};
 
 type Rom = Box<dyn Bus<usize, Item = u8, Result = Result<(), Error>, Data = u8>>;
 
@@ -64,8 +64,8 @@ impl Default for Memory {
 
 #[cfg(test)]
 mod test_memory {
-    use shared::traits::Bus;
     use super::Memory;
+    use shared::traits::Bus;
 
     #[test]
     fn test_invalid_read() {

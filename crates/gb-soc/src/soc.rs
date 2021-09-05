@@ -1,5 +1,5 @@
-use gb_memory::memory::Memory;
 use gb_cpu::cpu::Cpu;
+use gb_memory::memory::Memory;
 
 pub struct SOC {
     clock: u32,

@@ -1,9 +1,9 @@
 use super::super::area::Bits8;
 use super::super::pc::NextPc;
-use shared::{traits::Bus, Error};
-use memory::Memory;
 use crate::cpu::Registers;
+use memory::Memory;
 use num_enum::TryFromPrimitive;
+use shared::{traits::Bus, Error};
 
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u8)]
@@ -17,7 +17,11 @@ pub enum LoadRegNum8bit {
 }
 
 impl<'a> LoadRegNum8bit {
-    pub fn proceed(self, registers: &'a mut Registers, memory: &'a mut Memory) -> Result<u32, Error> {
+    pub fn proceed(
+        self,
+        registers: &'a mut Registers,
+        memory: &'a mut Memory,
+    ) -> Result<u32, Error> {
         if let Ok(byte) = registers.pc.next(memory) {
             let result = match self {
                 LoadRegNum8bit::B => memory.set(byte.into(), registers.get(Bits8::B)),
@@ -31,8 +35,7 @@ impl<'a> LoadRegNum8bit {
                 Ok(_) => Ok(8),
                 Err(e) => Err(e),
             }
-        }
-        else {
+        } else {
             Err(Error::InvalidPC(registers.pc))
         }
     }

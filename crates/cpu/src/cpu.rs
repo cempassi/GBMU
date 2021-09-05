@@ -4,11 +4,11 @@ mod opcodes;
 mod pc;
 mod registers;
 
-use shared::Error;
 use memory::Memory;
 use opcodes::LoadRegNum8bit;
 use pc::NextPc;
 pub use registers::Registers;
+use shared::Error;
 use std::convert::TryFrom;
 
 #[derive(Debug, Default)]
