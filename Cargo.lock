@@ -176,6 +176,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "derivative"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fcc3dd5e9e9c0b295d6e1e4d811fb6f157d5ffd784b8d202fc62eac8035a770b"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "dispatch"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -257,7 +268,9 @@ dependencies = [
 name = "gb-cpu"
 version = "0.1.0"
 dependencies = [
+ "gb-memory",
  "modular-bitfield",
+ "num_enum",
  "rand",
 ]
 
@@ -270,6 +283,10 @@ dependencies = [
  "gl",
  "sdl2",
 ]
+
+[[package]]
+name = "gb-memory"
+version = "0.1.0"
 
 [[package]]
 name = "gb-ppu"
@@ -290,12 +307,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "gb-soc"
+version = "0.1.0"
+dependencies = [
+ "gb-memory",
+]
+
+[[package]]
 name = "gbmu"
 version = "0.1.0"
 dependencies = [
  "egui",
+ "gb-cpu",
  "gb-lcd",
+ "gb-memory",
  "gb-ppu",
+ "gb-soc",
  "rfd",
  "sdl2",
 ]
@@ -530,6 +557,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "num_enum"
+version = "0.5.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3f9bd055fb730c4f8f4f57d45d35cd6b3f0980535b056dc7ff119cee6a66ed6f"
+dependencies = [
+ "derivative",
+ "num_enum_derive",
+]
+
+[[package]]
+name = "num_enum_derive"
+version = "0.5.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "486ea01961c4a818096de679a8b740b26d9033146ac5291b1c98557658f8cdd9"
+dependencies = [
+ "proc-macro-crate",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "numtoa"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -617,6 +666,16 @@ name = "ppv-lite86"
 version = "0.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ac74c624d6b2d21f425f752262f42188365d7b8ff1aff74c82e45136510a4857"
+
+[[package]]
+name = "proc-macro-crate"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41fdbd1df62156fbc5945f4762632564d7d038153091c3fcf1067f6aef7cff92"
+dependencies = [
+ "thiserror",
+ "toml",
+]
 
 [[package]]
 name = "proc-macro-error"

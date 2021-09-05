@@ -1,4 +1,7 @@
-pub mod bus;
-pub mod soc;
-pub mod memory;
-pub mod error;
+mod bus;
+mod error;
+mod cpu;
+
+pub use cpu::Cpu;
+pub use error::Error;
+pub use bus::Bus;
