@@ -1,4 +1,4 @@
-use gb_shared::{traits::Bus, Error};
+use shared::{traits::Bus, Error};
 
 pub const NOMBC_MAX_SIZE: usize = 32_768;
 
@@ -35,7 +35,7 @@ impl Default for NoMbc {
 #[cfg(test)]
 mod test_nombc {
     use super::NoMbc;
-    use gb_shared::traits::Bus;
+    use shared::traits::Bus;
 
     #[test]
     fn test_read_nombc() {

@@ -4,8 +4,8 @@ mod opcodes;
 mod pc;
 mod registers;
 
-use gb_shared::Error;
-use gb_memory::Memory;
+use shared::Error;
+use memory::Memory;
 use opcodes::LoadRegNum8bit;
 use pc::NextPc;
 pub use registers::Registers;

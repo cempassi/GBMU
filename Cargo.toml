@@ -1,11 +1,4 @@
 [workspace]
 members = [
-  "gb-roms",
-  "gb-ppu",
-  "gb-lcd",
-  "gb-cpu",
-  "gb-memory",
-  "gb-soc",
-  "gb-shared",
-  "gbmu"
+  "crates/*"
 ]

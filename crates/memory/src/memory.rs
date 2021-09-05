@@ -1,7 +1,7 @@
 mod area;
 mod consts;
 
-use gb_shared::{traits::Bus, Error};
+use shared::{traits::Bus, Error};
 use area::rom::{Mbc, NoMbc};
 use area::{Area, Wram};
 
@@ -64,7 +64,7 @@ impl Default for Memory {
 
 #[cfg(test)]
 mod test_memory {
-    use gb_shared::traits::Bus;
+    use shared::traits::Bus;
     use super::Memory;
 
     #[test]

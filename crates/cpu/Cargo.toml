@@ -1,7 +1,7 @@
 [package]
-name = "gb-cpu"
+name = "cpu"
 version = "0.1.0"
-authors = ["firelight.flagboy <firelight.flagboy@gmail.com>"]
+authors = ["Cedric M'Passi <cempassi@student.42.fr>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -10,5 +10,5 @@ edition = "2018"
 rand = { version = "0.8.4", features = ["small_rng"] }
 modular-bitfield = "0.11.2"
 num_enum = "0.5.3"
-gb-memory = { path = "../gb-memory" }
-gb-shared = { path = "../gb-shared" }
+memory = { path = "../memory" }
+shared = { path = "../shared" }

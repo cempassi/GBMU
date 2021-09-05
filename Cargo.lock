@@ -167,6 +167,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "cpu"
+version = "0.1.0"
+dependencies = [
+ "memory",
+ "modular-bitfield",
+ "num_enum",
+ "rand",
+ "shared",
+]
+
+[[package]]
 name = "crc32fast"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -265,17 +276,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gb-cpu"
-version = "0.1.0"
-dependencies = [
- "gb-memory",
- "gb-shared",
- "modular-bitfield",
- "num_enum",
- "rand",
-]
-
-[[package]]
 name = "gb-lcd"
 version = "0.1.0"
 dependencies = [
@@ -283,13 +283,6 @@ dependencies = [
  "egui_sdl2_gl",
  "gl",
  "sdl2",
-]
-
-[[package]]
-name = "gb-memory"
-version = "0.1.0"
-dependencies = [
- "gb-shared",
 ]
 
 [[package]]
@@ -306,20 +299,16 @@ name = "gb-roms"
 version = "0.1.0"
 dependencies = [
  "clap",
- "gb-cpu",
+ "cpu",
  "modular-bitfield",
 ]
-
-[[package]]
-name = "gb-shared"
-version = "0.1.0"
 
 [[package]]
 name = "gb-soc"
 version = "0.1.0"
 dependencies = [
- "gb-cpu",
- "gb-memory",
+ "cpu",
+ "memory",
 ]
 
 [[package]]
@@ -521,6 +510,13 @@ name = "memchr"
 version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b16bd47d9e329435e309c58469fe0791c2d0d1ba96ec0954152a5ae2b04387dc"
+
+[[package]]
+name = "memory"
+version = "0.1.0"
+dependencies = [
+ "shared",
+]
 
 [[package]]
 name = "miniz_oxide"
@@ -864,6 +860,10 @@ name = "serde"
 version = "1.0.127"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f03b9878abf6d14e6779d3f24f07b2cfa90352cfec4acc5aab8f1ac7f146fae8"
+
+[[package]]
+name = "shared"
+version = "0.1.0"
 
 [[package]]
 name = "static_assertions"
