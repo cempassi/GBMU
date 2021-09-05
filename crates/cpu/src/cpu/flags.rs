@@ -1,6 +1,6 @@
 use super::area::Flag;
-use shared::traits::Bus;
 use modular_bitfield::{bitfield, specifiers::B4};
+use shared::traits::Bus;
 
 #[bitfield]
 #[derive(Debug, Copy, Clone)]

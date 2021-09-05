@@ -6,18 +6,17 @@ use shared::{traits::Bus, Error};
 pub type Pc = u16;
 
 impl NextPc for Pc {
-     fn next(&mut self, memory:&Memory) -> Result<u8, Error>{
+    fn next(&mut self, memory: &Memory) -> Result<u8, Error> {
         match memory.get(*self) {
             Ok(byte) => {
                 *self = self.wrapping_add(1);
                 Ok(byte)
             }
-            Err(_) => Err(Error::InvalidPC(*self))
+            Err(_) => Err(Error::InvalidPC(*self)),
         }
     }
 }
 
-
 pub trait NextPc {
-     fn next(&mut self, memory:&Memory) -> Result<u8, Error>;
+    fn next(&mut self, memory: &Memory) -> Result<u8, Error>;
 }
