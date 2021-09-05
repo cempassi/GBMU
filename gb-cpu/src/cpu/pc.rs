@@ -1,6 +1,5 @@
 use gb_memory::Memory;
-use crate::error::Error;
-use crate::bus::Bus;
+use gb_shared::{traits::Bus, Error};
 
 //If successfull, the next function returns the byte at PC address and advances PC by one
 

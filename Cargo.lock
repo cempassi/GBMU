@@ -269,6 +269,7 @@ name = "gb-cpu"
 version = "0.1.0"
 dependencies = [
  "gb-memory",
+ "gb-shared",
  "modular-bitfield",
  "num_enum",
  "rand",
@@ -287,6 +288,9 @@ dependencies = [
 [[package]]
 name = "gb-memory"
 version = "0.1.0"
+dependencies = [
+ "gb-shared",
+]
 
 [[package]]
 name = "gb-ppu"
@@ -307,9 +311,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "gb-shared"
+version = "0.1.0"
+
+[[package]]
 name = "gb-soc"
 version = "0.1.0"
 dependencies = [
+ "gb-cpu",
  "gb-memory",
 ]
 
@@ -318,11 +327,8 @@ name = "gbmu"
 version = "0.1.0"
 dependencies = [
  "egui",
- "gb-cpu",
  "gb-lcd",
- "gb-memory",
  "gb-ppu",
- "gb-soc",
  "rfd",
  "sdl2",
 ]

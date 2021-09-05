@@ -1,7 +1,6 @@
 use super::super::area::Bits8;
 use super::super::pc::NextPc;
-use crate::Bus;
-use crate::Error;
+use gb_shared::{traits::Bus, Error};
 use gb_memory::Memory;
 use crate::cpu::Registers;
 use num_enum::TryFromPrimitive;

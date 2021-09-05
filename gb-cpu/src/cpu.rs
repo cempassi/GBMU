@@ -4,7 +4,7 @@ mod opcodes;
 mod pc;
 mod registers;
 
-use crate::error::Error;
+use gb_shared::Error;
 use gb_memory::Memory;
 use opcodes::LoadRegNum8bit;
 use pc::NextPc;

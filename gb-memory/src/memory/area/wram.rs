@@ -1,4 +1,4 @@
-use crate::bus::Bus;
+use gb_shared::traits::Bus;
 const WRAM_SIZE: usize = 8192;
 
 #[derive(Debug)]
@@ -37,7 +37,7 @@ impl Wram {
 #[cfg(test)]
 mod test_wram {
     use super::Wram;
-    use crate::bus::Bus;
+    use gb_shared::traits::Bus;
 
     #[test]
     fn test_read_wram() {
