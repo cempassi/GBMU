@@ -1,5 +1,5 @@
 use super::area::Flag;
-use gb_shared::traits::Bus;
+use shared::traits::Bus;
 use modular_bitfield::{bitfield, specifiers::B4};
 
 #[bitfield]
@@ -47,10 +47,7 @@ impl Bus<Flag> for Flags {
 mod test_flags {
     use super::Flag;
     use super::Flags;
-    use gb_shared::traits::Bus;
-
-
-
+    use shared::traits::Bus;
 
     #[test]
     fn test_valid_flag_set_get() {
