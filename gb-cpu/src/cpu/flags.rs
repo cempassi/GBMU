@@ -47,7 +47,10 @@ impl Bus<Flag> for Flags {
 mod test_flags {
     use super::Flag;
     use super::Flags;
-    use crate::bus::Bus;
+    use gb_shared::traits::Bus;
+
+
+    
 
     #[test]
     fn test_valid_flag_set_get() {
