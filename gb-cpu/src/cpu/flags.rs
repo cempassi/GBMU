@@ -1,5 +1,5 @@
 use super::area::Flag;
-use crate::bus::Bus;
+use gb_shared::traits::Bus;
 use modular_bitfield::{bitfield, specifiers::B4};
 
 #[bitfield]
@@ -50,7 +50,7 @@ mod test_flags {
     use gb_shared::traits::Bus;
 
 
-    
+
 
     #[test]
     fn test_valid_flag_set_get() {

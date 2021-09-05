@@ -1,6 +1,6 @@
 use super::area::{Bits16, Bits8, Flag};
 use super::flags::Flags;
-use crate::bus::Bus;
+use gb_shared::traits::Bus;
 
 #[derive(Debug, Default)]
 pub struct Registers {
@@ -114,7 +114,7 @@ impl Registers {
 mod test_registers {
     use super::Registers;
     use super::{Bits16, Bits8};
-    use crate::bus::Bus;
+    use gb_shared::traits::Bus;
 
     #[test]
     fn test_valid_write_read_8bits() {

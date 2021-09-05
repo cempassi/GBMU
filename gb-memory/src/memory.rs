@@ -1,8 +1,7 @@
 mod area;
 mod consts;
 
-use crate::bus::Bus;
-use crate::error::Error;
+use gb_shared::{traits::Bus, Error};
 use area::rom::{Mbc, NoMbc};
 use area::{Area, Wram};
 
@@ -65,7 +64,7 @@ impl Default for Memory {
 
 #[cfg(test)]
 mod test_memory {
-    use super::Bus;
+    use gb_shared::traits::Bus;
     use super::Memory;
 
     #[test]
