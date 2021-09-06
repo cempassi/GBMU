@@ -1,6 +1,6 @@
 use std::fmt;
-use std::string::FromUtf8Error;
 use std::num::ParseIntError;
+use std::string::FromUtf8Error;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Error {
@@ -30,8 +30,7 @@ impl fmt::Display for Error {
             Error::InvalidUtf8(v) => {
                 write!(f, "invalid utf8 for {:?}: {}", v.as_bytes(), v.utf8_error())
             }
-            Error::InvalidParse(v) =>
-                write!(f, "invalid parse for {:?}", v),
+            Error::InvalidParse(v) => write!(f, "invalid parse for {:?}", v),
         }
     }
 }

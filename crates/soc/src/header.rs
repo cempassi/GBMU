@@ -76,7 +76,7 @@ impl TryFrom<Vec<u8>> for Header {
             old_license,
             rom_version,
             header_checksum,
-            global_checksum
+            global_checksum,
         })
     }
 }

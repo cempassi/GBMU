@@ -1,6 +1,6 @@
-use super::flag::Cgb;
 use super::consts::TITLE_LEN;
 use super::error::Error;
+use super::flag::Cgb;
 use std::convert::TryFrom;
 
 #[derive(Debug, PartialEq, Eq)]

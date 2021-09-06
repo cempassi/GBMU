@@ -4,5 +4,5 @@ use num_enum::TryFromPrimitive;
 #[repr(u8)]
 pub enum Destination {
     Jap = 0x00,
-    Other = 0x01
+    Other = 0x01,
 }

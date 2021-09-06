@@ -1,6 +1,6 @@
-use num_enum::TryFromPrimitive;
 use super::consts::NEW_LICENSE_LEN;
 use super::error::Error;
+use num_enum::TryFromPrimitive;
 use std::convert::TryFrom;
 use std::u8;
 
@@ -81,7 +81,7 @@ impl TryFrom<[u8; NEW_LICENSE_LEN]> for NewLicense {
         if let Ok(code) = NewLicense::try_from(license) {
             Ok(code)
         } else {
-           Err(Error::InvalidNewLicense(s))
+            Err(Error::InvalidNewLicense(s))
         }
     }
 }
