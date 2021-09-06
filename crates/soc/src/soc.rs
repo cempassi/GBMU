@@ -48,9 +48,8 @@ impl SOC {
     }
 
     pub fn run(&mut self) {
-        match self.cpu.step(&mut self.memory) {
-            Ok(cycles) => self.clock += cycles,
-            Err(_) => (),
+        if let Ok(cycles) = self.cpu.step(&mut self.memory) {
+            self.clock += cycles
         }
     }
 }

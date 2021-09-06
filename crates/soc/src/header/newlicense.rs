@@ -5,6 +5,7 @@ use std::convert::TryFrom;
 use std::u8;
 
 #[derive(Debug, PartialEq, Eq, TryFromPrimitive)]
+#[deny(clippy::upper_case_acronyms)]
 #[repr(u8)]
 pub enum NewLicense {
     None = 0x00,
@@ -81,7 +82,7 @@ impl TryFrom<[u8; NEW_LICENSE_LEN]> for NewLicense {
         if let Ok(code) = NewLicense::try_from(license) {
             Ok(code)
         } else {
-            Err(Error::InvalidNewLicense(s))
+            Err(Error::NewLicense(s))
         }
     }
 }

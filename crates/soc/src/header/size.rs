@@ -15,6 +15,7 @@ pub enum Rom {
 }
 
 #[derive(Debug, PartialEq, Eq, TryFromPrimitive)]
+#[allow(clippy::enum_variant_names)]
 #[repr(u8)]
 pub enum Ram {
     #[num_enum(alternatives = [0x01])]
