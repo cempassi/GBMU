@@ -1,4 +1,3 @@
-mod soc;
 use rfd::FileDialog;
 use sdl2::{event::Event, keyboard::Keycode};
 
