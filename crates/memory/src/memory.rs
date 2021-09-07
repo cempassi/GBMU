@@ -1,12 +1,14 @@
 pub mod area;
 mod bios;
 mod consts;
+mod state;
 
 use area::rom::Cartridge;
 use area::rom::NoMbc;
 use area::{Area, Wram};
 use bios::Bios;
 use shared::{traits::Bus, Error};
+use state::State;
 
 type Rom = Box<dyn Bus<usize, Item = u8, Result = Result<(), Error>, Data = u8>>;
 
