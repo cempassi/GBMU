@@ -14,7 +14,7 @@ type Rom = Box<dyn Bus<usize, Item = u8, Result = Result<(), Error>, Data = u8>>
 
 pub struct Memory {
     state: State,
-    bios: Bios,
+    bios: Bios<'static>,
     wram: Wram,
     rom: Rom,
 }
@@ -26,8 +26,12 @@ impl Bus<u16> for Memory {
 
     fn get(&self, address: u16) -> Self::Item {
         match address {
-            consts::BIOS_MIN..consts::BIOS_MAX if self.state == State::Bios => {
-                Ok(self.bios.get(Area::Rom.relative(address)))
+            consts::BIOS_MIN..=consts::BIOS_MAX if self.state == State::Bios => {
+                if let Some(data) = self.bios.get(Area::Rom.relative(address)) {
+                    Ok(*data)
+                } else {
+                    Err(Error::SegmentationFault(address))
+                }
             }
             consts::ROM_MIN..=consts::ROM_MAX => Ok(self.rom.get(Area::Rom.relative(address))),
             consts::WRAM_MIN..=consts::WRAM_MAX => Ok(self.wram.get(Area::Wram.relative(address))),
