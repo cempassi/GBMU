@@ -7,11 +7,11 @@ mod oldlicense;
 mod size;
 mod title;
 
-use memory::Cartridge;
 use consts::{ENTRY_LEN, LOGO_LEN, NEW_LICENSE_LEN, TITLE_LEN};
 use destination::Destination;
 use error::Error;
 use flag::Sgb;
+use memory::Cartridge;
 use newlicense::NewLicense;
 use oldlicense::OldLicense;
 use std::convert::{TryFrom, TryInto};
