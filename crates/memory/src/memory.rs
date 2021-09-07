@@ -1,7 +1,8 @@
 mod area;
 mod consts;
 
-use area::rom::{Mbc, NoMbc};
+use area::rom::Cartridge;
+use area::rom::NoMbc;
 use area::{Area, Wram};
 use shared::{traits::Bus, Error};
 
@@ -41,9 +42,10 @@ impl Bus<u16> for Memory {
 }
 
 impl Memory {
-    pub fn new(mbc: Mbc, data: Vec<u8>) -> Self {
+    pub fn new(mbc: Cartridge, data: Vec<u8>) -> Self {
         let rom: Rom = match mbc {
-            Mbc::NoMbc => Box::new(NoMbc::new(data)),
+            Cartridge::NoMbc => Box::new(NoMbc::new(data)),
+            _ => unimplemented!(),
         };
 
         Memory {

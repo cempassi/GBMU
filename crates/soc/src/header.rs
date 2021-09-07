@@ -1,4 +1,3 @@
-mod cartridge;
 mod consts;
 mod destination;
 mod error;
@@ -8,7 +7,7 @@ mod oldlicense;
 mod size;
 mod title;
 
-use cartridge::Cartridge;
+use memory::Cartridge;
 use consts::{ENTRY_LEN, LOGO_LEN, NEW_LICENSE_LEN, TITLE_LEN};
 use destination::Destination;
 use error::Error;
