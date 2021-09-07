@@ -1,16 +1,20 @@
-mod area;
+pub mod area;
+mod bios;
 mod consts;
 
 use area::rom::Cartridge;
 use area::rom::NoMbc;
 use area::{Area, Wram};
+use bios::Bios;
 use shared::{traits::Bus, Error};
 
 type Rom = Box<dyn Bus<usize, Item = u8, Result = Result<(), Error>, Data = u8>>;
 
 pub struct Memory {
-    pub wram: Wram,
-    pub rom: Rom,
+    state: State,
+    bios: Bios,
+    wram: Wram,
+    rom: Rom,
 }
 
 impl Bus<u16> for Memory {
@@ -20,6 +24,9 @@ impl Bus<u16> for Memory {
 
     fn get(&self, address: u16) -> Self::Item {
         match address {
+            consts::BIOS_MIN..consts::BIOS_MAX if self.state == State::Bios => {
+                Ok(self.bios.get(Area::Rom.relative(address)))
+            }
             consts::ROM_MIN..=consts::ROM_MAX => Ok(self.rom.get(Area::Rom.relative(address))),
             consts::WRAM_MIN..=consts::WRAM_MAX => Ok(self.wram.get(Area::Wram.relative(address))),
             _ => Err(Error::SegmentationFault(address)),
@@ -49,6 +56,8 @@ impl Memory {
         };
 
         Memory {
+            state: State::Bios,
+            bios: bios::DMG,
             rom,
             wram: Wram::default(),
         }
@@ -58,6 +67,8 @@ impl Memory {
 impl Default for Memory {
     fn default() -> Self {
         Memory {
+            state: State::Bios,
+            bios: bios::DMG,
             wram: Wram::default(),
             rom: Box::new(NoMbc::default()),
         }
