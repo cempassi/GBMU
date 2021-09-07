@@ -1,5 +1,5 @@
-pub mod mbc;
+pub mod cartridge;
 pub mod nombc;
 
-pub use mbc::Mbc;
+pub use cartridge::Cartridge;
 pub use nombc::NoMbc;
