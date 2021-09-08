@@ -158,7 +158,7 @@ mod mbc1_test {
 
 	#[test]
 	fn test_mbc1_get()  {
-		let rom_file = fs::read("Metroid.gb").unwrap();
+		let rom_file = fs::read("toto.txt").unwrap();
 		// let rom_file = fs::read("roms/Metroid.gb").unwrap();
 		let mbc = Mbc1::new(rom_file);
 		let data = mbc.get(0x01c0);
