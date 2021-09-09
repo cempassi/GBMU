@@ -30,16 +30,10 @@ impl Bus<usize> for Mbc2 {
             MBC_BANK1_START..=MBC_BANK1_END => {
                 self.data[(self.rom_bank as usize * MBC_BANK1_START) + (address - MBC_BANK1_START)]
             }
-            MBC_RAM_START..=MBC_RAM_END => {
+            MBC_RAM_START..=MBC2_ERAM_END => {
                 if self.ram_lock {
-                    self.data[address - MBC_RAM_START] & 0xf
-                } else {
-                    0
-                }
-            }
-            MBC2_ERAM_START..=MBC2_ERAM_END => {
-                if self.ram_lock {
-                    self.data[address - MBC2_ERAM_START] & 0xf
+                    let offset = self.get_ram_offset(address);
+                    self.data[address - offset] & 0xf
                 } else {
                     0
                 }
@@ -51,14 +45,10 @@ impl Bus<usize> for Mbc2 {
     fn set(&mut self, address: usize, data: Self::Data) -> Self::Result {
         match address {
             MBC2_REG_START..=MBC2_REG_END => self.mbc2_register(address, data),
-            MBC_RAM_START..=MBC_RAM_END => {
+            MBC_RAM_START..=MBC2_ERAM_END => {
                 if self.ram_lock {
-                    self.data[address - MBC_RAM_START] = data & 0xf
-                }
-            }
-            MBC2_ERAM_START..=MBC2_ERAM_END => {
-                if self.ram_lock {
-                    self.data[address - MBC2_ERAM_START] = data & 0xf
+                    let offset = self.get_ram_offset(address);
+                    self.data[address - offset] = data & 0xf
                 }
             }
             _ => return Err(shared::Error::IllegalSet(address, data)),
@@ -83,6 +73,14 @@ impl Mbc2 {
             self.ram_lock = (data & 0x0f) == MBC2_MAGIC_LOCK as u8;
         }
     }
+
+    fn get_ram_offset(&self, address: usize) -> usize {
+        match address {
+            MBC_RAM_START..=MBC_RAM_END => MBC_RAM_START,
+            MBC2_ERAM_START..=MBC2_ERAM_END => MBC2_ERAM_START,
+            _ => unreachable!(),
+        }
+    }
 }
 
 impl Default for Mbc2 {
@@ -96,7 +94,6 @@ mod mbc2_test {
     use super::Mbc2;
     use shared::traits::Bus;
     const FILE: &[u8; 65536] = include_bytes!("../../../../../../roms/Ayakashi.gb");
-
 
     #[test]
     fn test_is_mbc2_rom() {
