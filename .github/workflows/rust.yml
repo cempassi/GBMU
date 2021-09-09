@@ -41,6 +41,9 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
 
+    - name: Get dependencies
+      run: make
+
     - name: Check code format
       run: cargo fmt --verbose -- --check
 
