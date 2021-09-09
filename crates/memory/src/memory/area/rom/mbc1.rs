@@ -156,11 +156,12 @@ impl Default for Mbc1 {
 mod mbc1_test {
     use super::Mbc1;
     use shared::traits::Bus;
-    use std::fs;
+
+    const FILE: &[u8; 262144] = include_bytes!("../../../../../../roms/Metroid II - Return of Samus.gb");
 
     #[test]
     fn test_mbc1_get() {
-        let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap();
+        let rom_file = FILE.to_vec();
         let mbc = Mbc1::new(rom_file);
         let data = mbc.get(0x00000000);
         assert_eq!(data, 0xc3);
@@ -168,7 +169,7 @@ mod mbc1_test {
 
     #[test]
     fn test_mbc1_set_lock() {
-        let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
+        let rom_file = FILE.to_vec(); // MBC1 + RAM + BATTERY
         let mut mbc = Mbc1::new(rom_file);
 
         // assert_eq!(mbc.data[0x149], 0x02);
@@ -184,7 +185,7 @@ mod mbc1_test {
 
     #[test]
     fn test_mbc1_bank_mod() {
-        let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
+        let rom_file = FILE.to_vec(); // MBC1 + RAM + BATTERY
         let mut mbc = Mbc1::new(rom_file);
 
         mbc.set(0x6abc, 4).unwrap();
@@ -196,7 +197,7 @@ mod mbc1_test {
 
     #[test]
     fn test_mbc1_reg1_0() {
-        let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
+        let rom_file = FILE.to_vec(); // MBC1 + RAM + BATTERY
         let mut mbc = Mbc1::new(rom_file);
 
         mbc.set(0x2156, 0x00).unwrap();
@@ -205,7 +206,7 @@ mod mbc1_test {
 
     #[test]
     fn test_mbc1_reg1_1a() {
-        let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
+        let rom_file = FILE.to_vec(); // MBC1 + RAM + BATTERY
         let mut mbc = Mbc1::new(rom_file);
 
         mbc.set(0x2156, 0x1a).unwrap();
@@ -214,7 +215,7 @@ mod mbc1_test {
 
     #[test]
     fn test_mbc1_reg1_14() {
-        let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
+        let rom_file = FILE.to_vec(); // MBC1 + RAM + BATTERY
         let mut mbc = Mbc1::new(rom_file);
 
         mbc.set(0x2fff, 0x14).unwrap();
@@ -223,7 +224,7 @@ mod mbc1_test {
 
     #[test]
     fn test_mbc1_reg2_1_28() {
-        let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
+        let rom_file = FILE.to_vec(); // MBC1 + RAM + BATTERY
         let mut mbc = Mbc1::new(rom_file);
 
         mbc.set(0x4f4f, 0x01).unwrap();
@@ -234,7 +235,7 @@ mod mbc1_test {
 
     #[test]
     fn test_mbc1_reg2_1_3c() {
-        let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
+        let rom_file = FILE.to_vec(); // MBC1 + RAM + BATTERY
         let mut mbc = Mbc1::new(rom_file);
 
         mbc.set(0x4f4f, 0x01).unwrap();
@@ -245,7 +246,7 @@ mod mbc1_test {
 
     #[test]
     fn test_mbc1_reg2_1_14() {
-        let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
+        let rom_file = FILE.to_vec(); // MBC1 + RAM + BATTERY
         let mut mbc = Mbc1::new(rom_file);
 
         mbc.set(0x4f4f, 0x03).unwrap();
@@ -256,7 +257,7 @@ mod mbc1_test {
 
     #[test]
     fn test_mbc1_get_last_rom_bank() {
-        let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
+        let rom_file = FILE.to_vec(); // MBC1 + RAM + BATTERY
         let mut mbc = Mbc1::new(rom_file);
 
         mbc.set(0x4f4f, 0x03).unwrap();
@@ -269,7 +270,7 @@ mod mbc1_test {
 
     #[test]
     fn test_mbc1_write_in_ram() {
-        let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
+        let rom_file = FILE.to_vec(); // MBC1 + RAM + BATTERY
         let mut mbc = Mbc1::new(rom_file);
 
         mbc.set(0x01f5, 0x0a).unwrap();
@@ -293,7 +294,7 @@ mod mbc1_test {
     #[test]
     fn test_mbc1_change_ram_bank() {
         // LA RAM EST INIT A 0 FAIRE UN TRUC QUI LOAD LA RAM DLA CART A PARTIR DE LA BONNE @
-        let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
+        let rom_file = FILE.to_vec(); // MBC1 + RAM + BATTERY
         let mut mbc = Mbc1::new(rom_file);
 
         mbc.set(0x01f5, 0x0a).unwrap();

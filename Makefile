@@ -23,7 +23,7 @@ $(BIOS_DIR):
 	mkdir -p $@
 
 roms: roms.zip
-	unzip -f $< 'roms/*' -x '*/.DS_Store'
+	tar -xzf $< 'roms/*'
 
 roms.zip:
 	curl -L $(ROMS_URL) > $@
