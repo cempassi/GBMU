@@ -1,22 +1,5 @@
+use super::consts;
 use shared::{traits::Bus, Error};
-pub const MBC1_MAX_SIZE: usize = 65_536; // / 8;
-pub const MBC_BANK0_START: usize = 0x0000;
-pub const MBC_BANK0_END: usize = 0x3fff;
-pub const MBC_BANK1_START: usize = 0x4000;
-pub const MBC_BANK1_END: usize = 0x7fff;
-pub const MBC_RAM_START: usize = 0xa000;
-pub const MBC_RAM_END: usize = 0xbfff;
-pub const MBC1_RAM_BASE: usize = 0x2000;
-pub const MBC1_RAM_OFFSET: usize = 0x1fff;
-pub const MBC1_MAGIC_LOCK: u8 = 0x0a;
-pub const MBC1_REG0_START: usize = 0x0;
-pub const MBC1_REG0_END: usize = 0x1fff;
-pub const MBC1_REG1_START: usize = 0x2000;
-pub const MBC1_REG1_END: usize = 0x3fff;
-pub const MBC1_REG2_START: usize = 0x4000;
-pub const MBC1_REG2_END: usize = 0x5fff;
-pub const MBC1_REG3_START: usize = 0x6000;
-pub const MBC1_REG3_END: usize = 0x7fff;
 
 pub struct Mbc1 {
     ram_lock: bool,
@@ -33,18 +16,18 @@ impl Bus<usize> for Mbc1 {
 
     fn get(&self, address: usize) -> Self::Item {
         match address {
-            MBC_BANK0_START..=MBC_BANK0_END => self.data[address],
-            MBC_BANK1_START..=MBC_RAM_END => self.swap_bank_nbr(address),
-            _ => panic!("Invalid Address {:04X}", address),
+            consts::MBC_BANK0_START..=consts::MBC_BANK0_END => self.data[address],
+            consts::MBC_BANK1_START..=consts::MBC_RAM_END => self.swap_bank_nbr(address),
+            _ => unreachable!(),
         }
     }
 
     fn set(&mut self, address: usize, data: Self::Data) -> Self::Result {
         match address {
-            MBC1_REG0_START..=MBC1_REG0_END => self.update_ram_lock(data), // enable RAM REG0
-            MBC1_REG1_START..=MBC1_REG2_END => self.update_bank_nbr(address, data), // change bank nbr REG1 REG2
-            MBC1_REG3_START..=MBC1_REG3_END => self.update_bank_mode(data), // change RAM bank nbr if  REG3
-            MBC_RAM_START..=MBC_RAM_END => self.write_ram_bank(address, data),
+            consts::MBC1_REG0_START..=consts::MBC1_REG0_END => self.update_ram_lock(data), // enable RAM REG0
+            consts::MBC1_REG1_START..=consts::MBC1_REG2_END => self.update_bank_nbr(address, data), // change bank nbr REG1 REG2
+            consts::MBC1_REG3_START..=consts::MBC1_REG3_END => self.update_bank_mode(data), // change RAM bank nbr if  REG3
+            consts::MBC_RAM_START..=consts::MBC_RAM_END => self.write_ram_bank(address, data),
             _ => Err(shared::Error::IllegalSet(address, data)),
         }
     }
@@ -70,28 +53,28 @@ impl Mbc1 {
         } else {
             0
         };
-        let index = (bank_nbr * MBC1_RAM_BASE) | (address & MBC1_RAM_OFFSET);
+        let index = (bank_nbr * consts::MBC1_RAM_BASE) | (address & consts::MBC1_RAM_OFFSET);
         self.data[index] = data;
         Ok(())
     }
 
     fn swap_bank_nbr(&self, address: usize) -> u8 {
         let (bank_nbr, start_off, end_off) = match address {
-            MBC_BANK1_START..=MBC_BANK1_END => {
+            consts::MBC_BANK1_START..=consts::MBC_BANK1_END => {
                 let bank_nbr = if self.rom_bank != 0 {
                     self.rom_bank as usize
                 } else {
                     1
                 };
-                (bank_nbr, MBC_BANK1_START, MBC_BANK1_START)
+                (bank_nbr, consts::MBC_BANK1_START, consts::MBC_BANK1_START)
             }
-            MBC_RAM_START..=MBC_RAM_END => {
+            consts::MBC_RAM_START..=consts::MBC_RAM_END => {
                 let bank_nbr = if self.ram_lock && self.bank_mode {
                     self.ram_bank as usize
                 } else {
                     0
                 };
-                (bank_nbr, MBC1_RAM_BASE, MBC_RAM_START)
+                (bank_nbr, consts::MBC1_RAM_BASE, consts::MBC_RAM_START)
             }
             _ => unreachable!(),
         };
@@ -111,7 +94,7 @@ impl Mbc1 {
 
     fn update_bank_nbr(&mut self, address: usize, data: u8) -> Result<(), Error> {
         match address {
-            MBC1_REG1_START..=MBC1_REG1_END => {
+            consts::MBC1_REG1_START..=consts::MBC1_REG1_END => {
                 self.rom_bank = match (self.rom_bank & !0x1f) | (data & 0x1f) {
                     // ROM bank cannot be $00/$20/$40/$60 => that's why there is 125 banks
                     0 => 1,
@@ -121,11 +104,10 @@ impl Mbc1 {
                     _nbr => _nbr,
                 }
             }
-            MBC1_REG2_START..=MBC1_REG2_END => {
+            consts::MBC1_REG2_START..=consts::MBC1_REG2_END => {
                 if !self.bank_mode {
                     // upper bit of rom bank nbr
                     self.rom_bank = (self.rom_bank & !0x60) | ((data & 0x03) << 5);
-                    // mask on 1001_1111 & mask with the last 3b of data
                 } else {
                     // RAM bank nbr 00-11
                     self.ram_bank = data & 0x03
@@ -137,14 +119,14 @@ impl Mbc1 {
     }
 
     fn update_ram_lock(&mut self, data: u8) -> Result<(), Error> {
-        self.ram_lock = data == MBC1_MAGIC_LOCK;
+        self.ram_lock = data == consts::MBC1_MAGIC_LOCK;
         Ok(())
     }
 }
 
 impl Default for Mbc1 {
     fn default() -> Self {
-        Mbc1::new(vec![0; MBC1_MAX_SIZE])
+        Mbc1::new(vec![0; consts::MBC1_MAX_SIZE])
     }
 }
 
@@ -290,7 +272,6 @@ mod mbc1_test {
 
     #[test]
     fn test_mbc1_change_ram_bank() {
-        // LA RAM EST INIT A 0 FAIRE UN TRUC QUI LOAD LA RAM DLA CART A PARTIR DE LA BONNE @
         let rom_file = FILE.to_vec(); // MBC1 + RAM + BATTERY
         let mut mbc = Mbc1::new(rom_file);
 
