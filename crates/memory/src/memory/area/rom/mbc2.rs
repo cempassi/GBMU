@@ -1,17 +1,5 @@
+use super::consts;
 use shared::{traits::Bus, Error};
-pub const MBC2_MAX_SIZE: usize = 262_144; // Controller for up to 2 Mbits (256 Kbytes) of ROM with built-in backup RAM (512 x 4 bits).
-pub const MBC_BANK0_START: usize = 0x0000;
-pub const MBC_BANK0_END: usize = 0x3fff;
-pub const MBC_BANK1_START: usize = 0x4000;
-pub const MBC_BANK1_END: usize = 0x7fff;
-pub const MBC_RAM_START: usize = 0xa000;
-pub const MBC_RAM_END: usize = 0xa1ff;
-pub const MBC2_ERAM_START: usize = 0xa200;
-pub const MBC2_ERAM_END: usize = 0xbfff;
-pub const MBC2_MAGIC_LOCK: usize = 0x0a;
-pub const MBC2_MAGIC_BYTE: usize = 0x100;
-pub const MBC2_REG_START: usize = 0x0;
-pub const MBC2_REG_END: usize = 0x3fff;
 
 pub struct Mbc2 {
     ram_lock: bool,
@@ -26,11 +14,12 @@ impl Bus<usize> for Mbc2 {
 
     fn get(&self, address: usize) -> Self::Item {
         match address {
-            MBC_BANK0_START..=MBC_BANK0_END => self.data[address],
-            MBC_BANK1_START..=MBC_BANK1_END => {
-                self.data[(self.rom_bank as usize * MBC_BANK1_START) + (address - MBC_BANK1_START)]
+            consts::MBC_BANK0_START..=consts::MBC_BANK0_END => self.data[address],
+            consts::MBC_BANK1_START..=consts::MBC_BANK1_END => {
+                self.data[(self.rom_bank as usize * consts::MBC_BANK1_START)
+                    + (address - consts::MBC_BANK1_START)]
             }
-            MBC_RAM_START..=MBC2_ERAM_END => {
+            consts::MBC_RAM_START..=consts::MBC2_ERAM_END => {
                 if self.ram_lock {
                     let offset = self.get_ram_offset(address);
                     self.data[address - offset] & 0xf
@@ -38,14 +27,14 @@ impl Bus<usize> for Mbc2 {
                     0
                 }
             }
-            _ => panic!("Invalid Address {:04X}", address),
+            _ => unreachable!(),
         }
     }
 
     fn set(&mut self, address: usize, data: Self::Data) -> Self::Result {
         match address {
-            MBC2_REG_START..=MBC2_REG_END => self.mbc2_register(address, data),
-            MBC_RAM_START..=MBC2_ERAM_END => {
+            consts::MBC2_REG_START..=consts::MBC2_REG_END => self.mbc2_register(address, data),
+            consts::MBC_RAM_START..=consts::MBC2_ERAM_END => {
                 if self.ram_lock {
                     let offset = self.get_ram_offset(address);
                     self.data[address - offset] = data & 0xf
@@ -67,17 +56,17 @@ impl Mbc2 {
     }
 
     fn mbc2_register(&mut self, address: usize, data: u8) {
-        if address & MBC2_MAGIC_BYTE != 0 {
+        if address & consts::MBC2_MAGIC_BYTE != 0 {
             self.rom_bank = if data == 0 { 1 } else { data & 0xf };
         } else {
-            self.ram_lock = (data & 0x0f) == MBC2_MAGIC_LOCK as u8;
+            self.ram_lock = (data & 0x0f) == consts::MBC2_MAGIC_LOCK as u8;
         }
     }
 
     fn get_ram_offset(&self, address: usize) -> usize {
         match address {
-            MBC_RAM_START..=MBC_RAM_END => MBC_RAM_START,
-            MBC2_ERAM_START..=MBC2_ERAM_END => MBC2_ERAM_START,
+            consts::MBC_RAM_START..=consts::MBC2_RAM_END => consts::MBC_RAM_START,
+            consts::MBC2_ERAM_START..=consts::MBC2_ERAM_END => consts::MBC2_ERAM_START,
             _ => unreachable!(),
         }
     }
@@ -85,7 +74,7 @@ impl Mbc2 {
 
 impl Default for Mbc2 {
     fn default() -> Self {
-        Mbc2::new(vec![0; MBC2_MAX_SIZE])
+        Mbc2::new(vec![0; consts::MBC2_MAX_SIZE])
     }
 }
 
