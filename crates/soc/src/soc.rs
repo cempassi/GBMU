@@ -1,6 +1,6 @@
 use crate::header::Header;
 use cpu::cpu::Cpu;
-use memory::{Cartridge, Memory};
+use memory::Memory;
 use pretty_hex::*;
 use std::convert::TryFrom;
 use std::fs;
