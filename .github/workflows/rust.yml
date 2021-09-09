@@ -44,11 +44,11 @@ jobs:
     - name: Get dependencies
       run: make
 
-    - name: Check code format
-      run: cargo fmt --verbose -- --check
+    - name: Check format
+      run: make format.check
 
-    - name: Lint code
-      run: cargo clippy --workspace --verbose -- -D warnings
+    - name: Check lint
+      run: make lint
 
     - name: Build
       run: cargo build --verbose --workspace

@@ -28,6 +28,15 @@ roms: roms.zip
 roms.zip:
 	curl -L $(ROMS_URL) > $@
 
+lint:
+	cargo clippy --workspace --verbose -- -D warnings
+
+format.check:
+	cargo fmt --verbose -- --check
+
+format:
+	cargo fmt --all
+
 clean:
 	rm -rf roms roms.zip ressources
 
