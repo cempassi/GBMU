@@ -106,7 +106,7 @@ impl Mbc1 {
         self.data[index]
     }
 
-    fn update_bank_mode(&mut self, data: u8) -> Result <(), Error> {
+    fn update_bank_mode(&mut self, data: u8) -> Result<(), Error> {
         self.bank_mode = match data & 0x01 {
             // only lsb matter
             0 => false,
@@ -116,7 +116,7 @@ impl Mbc1 {
         Ok(())
     }
 
-    fn update_bank_nbr(&mut self, address: usize, data: u8) -> Result <(), Error> {
+    fn update_bank_nbr(&mut self, address: usize, data: u8) -> Result<(), Error> {
         match address {
             MBC1_REG1_START..=MBC1_REG1_END => {
                 self.rom_bank = match (self.rom_bank & !0x1f) | (data & 0x1f) {
@@ -143,7 +143,7 @@ impl Mbc1 {
         Ok(())
     }
 
-    fn update_ram_lock(&mut self, data: u8) -> Result <(), Error> {
+    fn update_ram_lock(&mut self, data: u8) -> Result<(), Error> {
         self.ram_lock = data == MBC1_MAGIC_LOCK;
         Ok(())
     }
