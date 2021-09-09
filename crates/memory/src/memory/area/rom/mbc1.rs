@@ -48,9 +48,9 @@ impl Bus<usize> for Mbc1 {
 
     fn set(&mut self, address: usize, data: Self::Data) -> Self::Result {
         match address {
-            0..=MBC1_REG0_END => Ok(Mbc1::update_ram_lock(self, data)), // enable RAM REG0
-            MBC1_REG1_START..=MBC1_REG2_END => Ok(Mbc1::update_bank_nbr(self, address, data)), // change bank nbr REG1 REG2
-            MBC1_REG3_START..=MBC1_REG3_END => Ok(Mbc1::update_bank_mode(self, data)), // change RAM bank nbr if  REG3
+            0..=MBC1_REG0_END => Mbc1::update_ram_lock(self, data), // enable RAM REG0
+            MBC1_REG1_START..=MBC1_REG2_END => Mbc1::update_bank_nbr(self, address, data), // change bank nbr REG1 REG2
+            MBC1_REG3_START..=MBC1_REG3_END => Mbc1::update_bank_mode(self, data), // change RAM bank nbr if  REG3
             MBC_RAM_START..=MBC_RAM_END => Mbc1::write_ram_bank(self, address, data),
             _ => Err(shared::Error::IllegalSet(address, data)),
         }
@@ -92,7 +92,7 @@ impl Mbc1 {
                 }
             }
             MBC_RAM_START..=MBC_RAM_END => {
-                if self.bank_mode == true {
+                if self.bank_mode {
                     self.ram_bank as usize
                 } else {
                     0
@@ -106,16 +106,17 @@ impl Mbc1 {
         self.data[index]
     }
 
-    fn update_bank_mode(&mut self, data: u8) {
+    fn update_bank_mode(&mut self, data: u8) -> Result <(), Error> {
         self.bank_mode = match data & 0x01 {
             // only lsb matter
             0 => false,
             1 => true,
             _ => unreachable!(),
-        }
+        };
+        Ok(())
     }
 
-    fn update_bank_nbr(&mut self, address: usize, data: u8) {
+    fn update_bank_nbr(&mut self, address: usize, data: u8) -> Result <(), Error> {
         match address {
             MBC1_REG1_START..=MBC1_REG1_END => {
                 self.rom_bank = match (self.rom_bank & !0x1f) | (data & 0x1f) {
@@ -138,11 +139,13 @@ impl Mbc1 {
                 }
             }
             _ => unreachable!(),
-        }
+        };
+        Ok(())
     }
 
-    fn update_ram_lock(&mut self, data: u8) {
-        self.ram_lock = if data == MBC1_MAGIC_LOCK { true } else { false }
+    fn update_ram_lock(&mut self, data: u8) -> Result <(), Error> {
+        self.ram_lock = data == MBC1_MAGIC_LOCK;
+        Ok(())
     }
 }
 
@@ -157,7 +160,8 @@ mod mbc1_test {
     use super::Mbc1;
     use shared::traits::Bus;
 
-    const FILE: &[u8; 262144] = include_bytes!("../../../../../../roms/Metroid II - Return of Samus.gb");
+    const FILE: &[u8; 262144] =
+        include_bytes!("../../../../../../roms/Metroid II - Return of Samus.gb");
 
     #[test]
     fn test_mbc1_get() {
