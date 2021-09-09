@@ -1,5 +1,6 @@
 use shared::{traits::Bus, Error};
 pub const MBC1_MAX_SIZE: usize = 65_536; // / 8;
+pub const MBC_BANK0_START: usize = 0x0000;
 pub const MBC_BANK0_END: usize = 0x3fff;
 pub const MBC_BANK1_START: usize = 0x4000;
 pub const MBC_BANK1_END: usize = 0x7fff;
@@ -8,6 +9,7 @@ pub const MBC_RAM_END: usize = 0xbfff;
 pub const MBC1_RAM_BASE: usize = 0x2000;
 pub const MBC1_RAM_OFFSET: usize = 0x1fff;
 pub const MBC1_MAGIC_LOCK: u8 = 0x0a;
+pub const MBC1_REG0_START: usize = 0x0;
 pub const MBC1_REG0_END: usize = 0x1fff;
 pub const MBC1_REG1_START: usize = 0x2000;
 pub const MBC1_REG1_END: usize = 0x3fff;
@@ -31,7 +33,7 @@ impl Bus<usize> for Mbc1 {
 
     fn get(&self, address: usize) -> Self::Item {
         match address {
-            0..=MBC_BANK0_END => self.data[address],
+            MBC_BANK0_START..=MBC_BANK0_END => self.data[address],
             MBC_BANK1_START..=MBC_BANK1_END => {
                 Mbc1::swap_bank_nbr(self, MBC_BANK1_START, MBC_BANK1_START, address)
             }
@@ -48,7 +50,7 @@ impl Bus<usize> for Mbc1 {
 
     fn set(&mut self, address: usize, data: Self::Data) -> Self::Result {
         match address {
-            0..=MBC1_REG0_END => Mbc1::update_ram_lock(self, data), // enable RAM REG0
+            MBC1_REG0_START..=MBC1_REG0_END => Mbc1::update_ram_lock(self, data), // enable RAM REG0
             MBC1_REG1_START..=MBC1_REG2_END => Mbc1::update_bank_nbr(self, address, data), // change bank nbr REG1 REG2
             MBC1_REG3_START..=MBC1_REG3_END => Mbc1::update_bank_mode(self, data), // change RAM bank nbr if  REG3
             MBC_RAM_START..=MBC_RAM_END => Mbc1::write_ram_bank(self, address, data),
