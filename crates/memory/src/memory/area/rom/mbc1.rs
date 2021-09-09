@@ -1,6 +1,5 @@
 use shared::{traits::Bus, Error};
-// pub const MBC1_MAX_SIZE: usize = 16_384; // / 8;
-// pub const BANK_SIZE: usize = 8 * 16 * 1024;
+pub const MBC1_MAX_SIZE: usize = 65_536; // / 8;
 
 pub struct Mbc1 {
 	ram_lock: bool,
@@ -18,17 +17,8 @@ impl Bus<usize> for Mbc1 {
     fn get(&self, address: usize) -> Self::Item {
 		match address {
 			0x0000 ..= 0x3fff => self.data[address],
-			0x4000 ..= 0x7fff => {
-				let bank_nbr = if self.rom_bank == 0{ 1 } else { self.rom_bank as usize }; //generic //flag usize usize et 2 offset
-				let index = (bank_nbr as usize * 0x4000) | (address & 0x3FFF);
-				self.data[index]
-			},
-			0xa000 ..= 0xbfff => {
-				if !self.ram_lock { return 0 }
-				let bank_nbr = if self.bank_mode { self.ram_bank as usize} else { 0 }; //generic
-				let index = (bank_nbr as usize * 0x2000) | (address & 0x1FFF);
-				self.data[index as usize]
-			},
+			0x4000 ..= 0x7fff => Mbc1::swap_bank_nbr(self, 0x4000, 0x4000, address),
+			0xa000 ..= 0xbfff => { if self.ram_lock { Mbc1::swap_bank_nbr(self, 0x2000, 0xa000, address) } else { 0 }},
 			_ => panic!("Invalid Address {:04X}", address),
 		}
     }
@@ -61,6 +51,19 @@ impl Mbc1 {
 		}
 	}
 
+	fn swap_bank_nbr(&self, start_off: usize, end_off: usize, address: usize) -> u8 {
+
+		let bank_nbr = match address {
+			0x4000 ..= 0x7fff => if self.rom_bank != 0 { self.rom_bank as usize } else { 1 },
+			0xa000 ..= 0xbfff => if self.bank_mode == true { self.ram_bank as usize} else { 0 },
+			_ => unreachable!(),
+		};
+		let base = bank_nbr * start_off;
+		let offset = address - end_off;
+		let index = (base + offset) & (self.data.len() - 1);
+		self.data[index]
+	}
+
 	fn update_bank_mode(&mut self, data: u8) {
 		self.bank_mode = match data & 0x01 {
 			0 => false,
@@ -72,21 +75,19 @@ impl Mbc1 {
 	fn update_bank_nbr(&mut self, address: usize, data: u8) {
 		match address {
 			0x2000 ..= 0x3FFF => {
-				let bk_nbr = data & 0x1F ;
-				self.rom_bank |= match bk_nbr {
+				self.rom_bank = match (self.rom_bank & !0x1f) | (data & 0x1f) {
 					0 => 1,
 					20 => 21,
 					40 => 41,
 					60 => 61,
-					_ => bk_nbr,
+					_s => _s,
 				}
 			},
 			0x4000 ..= 0x5FFF => {
-				let bk_nbr = data & 0x03;
 				if !self.bank_mode { // upper bit of rom bank nbr
-					self.rom_bank |= bk_nbr << 5
+					self.rom_bank = (self.rom_bank & !0x60) | ((data & 0x03) << 5);
 				} else { // RAM bank nbr 00-11
-					self.ram_bank = bk_nbr
+					self.ram_bank = data & 0x03
 				}
 			},
 			_ => unreachable!(),
@@ -95,23 +96,24 @@ impl Mbc1 {
 	}
 
 	fn update_ram_lock(&mut self, data: u8) {
-		if data == 0x0A {
-			self.ram_lock = true
-		} else {
-			self.ram_lock = false
-		}
+		self.ram_lock = if data == 0x0A { true } else { false }
+	}
+}
+
+impl Default for Mbc1 {
+	fn default() -> Self {
+		Mbc1::new(vec![0; MBC1_MAX_SIZE])
 	}
 }
 
 #[cfg(test)]
 mod mbc1_test {
-
 	use super::Mbc1;
 	use std::fs;
 	use shared::traits::Bus;
 
 	#[test]
-	fn test_mbc1_get()  {
+	fn test_mbc1_get() {
 		let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap();
 		let mbc = Mbc1::new(rom_file);
 		let data = mbc.get(0x00000000);
@@ -146,8 +148,9 @@ mod mbc1_test {
 		assert_eq!(mbc.bank_mode, true);
 	}
 
+
 	#[test]
-	fn test_mbc1_reg2_0() {
+	fn test_mbc1_reg1_0() {
 		let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
 		let mut mbc = Mbc1::new(rom_file);
 
@@ -156,7 +159,7 @@ mod mbc1_test {
 	}
 
 	#[test]
-	fn test_mbc1_reg2_1a() {
+	fn test_mbc1_reg1_1a() {
 		let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
 		let mut mbc = Mbc1::new(rom_file);
 
@@ -165,7 +168,7 @@ mod mbc1_test {
 	}
 
 	#[test]
-	fn test_mbc1_reg2_14() {
+	fn test_mbc1_reg1_14() {
 		let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
 		let mut mbc = Mbc1::new(rom_file);
 
@@ -174,23 +177,77 @@ mod mbc1_test {
 	}
 
 	#[test]
-	fn test_mbc1_reg3_3_14() { // rom_bank previously set to 0x15 so
+	fn test_mbc1_reg2_1_28() {
+		let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
+		let mut mbc = Mbc1::new(rom_file);
+
+		mbc.set(0x4f4f, 0x01).unwrap();
+		assert_eq!(mbc.rom_bank, 0x20);
+		mbc.set(0x2fff, 0x08).unwrap();
+		assert_eq!(mbc.rom_bank, 0x29);
+	}
+
+	#[test]
+	fn test_mbc1_reg2_1_3c() {
+		let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
+		let mut mbc = Mbc1::new(rom_file);
+
+		mbc.set(0x4f4f, 0x01).unwrap();
+		assert_eq!(mbc.rom_bank, 0x20);
+		mbc.set(0x2fff, 0x1c).unwrap();
+		assert_eq!(mbc.rom_bank, 0x3d);
+	}
+
+	#[test]
+	fn test_mbc1_reg2_1_14() {
 		let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
 		let mut mbc = Mbc1::new(rom_file);
 
 		mbc.set(0x4f4f, 0x03).unwrap();
 		assert_eq!(mbc.rom_bank, 0x60);
 		mbc.set(0x2fff, 0x14).unwrap();
-		assert_eq!(mbc.rom_bank, 0x75);
-		// mbc.set(0x2fff, 0x14);
-		// assert_eq!(mbc.rom_bank, 0x75);
-
-		// mbc.set(0x2fff, 0x42);
-		// assert_eq!(mbc.rom_bank, 0x43);
+		assert_eq!(mbc.rom_bank, 0x74);
 	}
 
 	#[test]
-	fn test_mbc1_ram_bank() {
+	fn test_mbc1_get_last_rom_bank() {
+		let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
+		let mut mbc = Mbc1::new(rom_file);
+
+		mbc.set(0x4f4f, 0x03).unwrap();
+		assert_eq!(mbc.rom_bank, 0x60);
+		mbc.set(0x2fff, 0x1f).unwrap();
+		assert_eq!(mbc.rom_bank, 0x7f);
+		// let data = mbc.get(0x7b80);
+		// assert_eq!(data, 0xc0);
+	}
+
+	#[test]
+	fn test_mbc1_write_in_ram() {
+
+		let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
+		let mut mbc = Mbc1::new(rom_file);
+
+		mbc.set(0x01f5, 0x0a).unwrap();
+		assert_eq!(mbc.ram_lock, true);
+
+		mbc.set(0x7abc, 3).unwrap();// enable bank_mode
+		assert_eq!(mbc.bank_mode, true);
+
+		mbc.set(0x4f4f, 0x00).unwrap();
+		assert_eq!(mbc.ram_bank, 0);
+
+		mbc.set(0x0000a630, 0xca).unwrap();
+
+		let data = mbc.get(0x0000a630);
+		assert_eq!(data, 0xca);
+
+		mbc.set(0x01ff, 0x00).unwrap();
+		assert_eq!(mbc.ram_lock, false);
+	}
+
+	#[test]
+	fn test_mbc1_change_ram_bank() {
 
 		// LA RAM EST INIT A 0 FAIRE UN TRUC QUI LOAD LA RAM DLA CART A PARTIR DE LA BONNE @
 		let rom_file = fs::read("/Users/guvillat/GBMU/roms/Metroid.gb").unwrap(); // MBC1 + RAM + BATTERY
@@ -202,13 +259,10 @@ mod mbc1_test {
 		mbc.set(0x7abc, 3).unwrap();// enable bank_mode
 		assert_eq!(mbc.bank_mode, true);
 
-		mbc.set(0x4f4f, 0x03).unwrap();
-		assert_eq!(mbc.ram_bank, 3);
+		mbc.set(0x4f4f, 0x01).unwrap();
+		assert_eq!(mbc.ram_bank, 1);
 
-		mbc.set(0xafcf, 0x99).unwrap();
-		// assert_eq!(mbc.ram_bank, 1);
-
-		let data = mbc.get(0x0000afcf);
-		assert_eq!(data, 0x99)
+		mbc.set(0x01ff, 0x00).unwrap();
+		assert_eq!(mbc.ram_lock, false);
 	}
 }
