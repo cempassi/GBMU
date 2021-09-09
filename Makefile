@@ -6,7 +6,7 @@ BIOS_DIR += $(RESSOURCES_DIR)/bios
 
 BIOS += "dmg_boot.bin"
 
-ROMS_URL := "https://projects.intra.42.fr/uploads/document/document/2833/roms.zip"
+ROMS_URL := "https://projects.intra.42.fr/uploads/document/document/4986/roms.zip"
 
 ROMS_DIR := roms
 
@@ -23,7 +23,7 @@ $(BIOS_DIR):
 	mkdir -p $@
 
 roms: roms.zip
-	unzip -f $< 'roms/*' -x '*/.DS_Store'
+	unzip -o $< 'roms/*' -x '*/.DS_Store'
 
 roms.zip:
 	curl -L $(ROMS_URL) > $@
