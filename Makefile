@@ -1,37 +1,43 @@
-ROMS_LINK := "https://projects.intra.42.fr/uploads/document/document/2833/roms.zip"
-ROMS := \
-	roms/Super\ Mario\ Land.gb \
-	roms/Legend\ of\ Zelda,\ The\ -\ Link's\ Awakening\ DX.gbc \
-	roms/Legend\ of\ Zelda,\ The\ -\ Oracle\ of\ Seasons.gbc \
-	roms/Pokemon_Rouge.gb \
-	roms/Pokemon\ -\ Version\ Cristal.gbc \
-	roms/Tetris.gb \
-	roms/Bubble_Ghost.gb \
-	roms/Pokemon\ -\ Version\ Argent.gbc \
-	roms/Super\ Mario\ Land\ 2.gb \
-	roms/Metroid\ II\ -\ Return\ of\ Samus.gb \
-	roms/Pokemon\ -\ Version\ Or.gbc \
-	roms/Legend_of_Zelda_link_Awaking.gb \
-	roms/Metal\ Gear\ Solid.gbc \
-	roms/Kirby\ 2.gb \
-	roms/Mystic_Quest.gb \
-	roms/Pokemon_Bleue.gb \
-	roms/Legend\ of\ Zelda,\ The\ -\ Oracle\ of\ Ages.gbc \
-	roms/Pokemon\ -\ Jaune.gbc \
+RESSOURCES_DIR := ressources
+
+BIOS_URL := "https://gbdev.gg8.se/files/roms/bootroms/"
+
+BIOS_DIR += $(RESSOURCES_DIR)/bios
+
+BIOS += "dmg_boot.bin"
+
+ROMS_URL := "https://projects.intra.42.fr/uploads/document/document/2833/roms.zip"
 
 ROMS_DIR := roms
 
-requirement: roms
+ROMS := $(ROMS_DIR)/$(_ROMS)
 
-roms: $(ROMS)
+all: requirements
 
+requirements: roms $(BIOS)
+
+$(BIOS): $(BIOS_DIR)
+	curl $(BIOS_URL)/$@ > $</$@
+
+$(BIOS_DIR):
+	mkdir -p $@
+
+roms: roms.zip
+	unzip -f $< 'roms/*' -x '*/.DS_Store'
 
 roms.zip:
-	wget $(ROMS_LINK) -O $@
+	curl -L $(ROMS_URL) > $@
 
-$(ROMS_DIR)/%: roms.zip
-	echo "target: $@"
-	unzip $< 'roms/*' -x '*/.DS_Store'
-	touch roms/*
+lint:
+	cargo clippy --workspace --verbose -- -D warnings
+
+format.check:
+	cargo fmt --verbose -- --check
+
+format:
+	cargo fmt --all
+
+clean:
+	rm -rf roms roms.zip ressources
 
 .PHONY: requirement roms

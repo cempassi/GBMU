@@ -5,7 +5,6 @@ use std::convert::TryFrom;
 use std::u8;
 
 #[derive(Debug, PartialEq, Eq, TryFromPrimitive)]
-#[deny(clippy::upper_case_acronyms)]
 #[repr(u8)]
 pub enum NewLicense {
     None = 0x00,
@@ -43,7 +42,7 @@ pub enum NewLicense {
     Activision = 0x52,
     AmericanSammy = 0x53,
     HiTechEntertainment = 0x55,
-    LJN = 0x56,
+    Ljn = 0x56,
     Matchbox = 0x57,
     Mattel = 0x58,
     MiltonBradley = 0x59,
@@ -56,7 +55,7 @@ pub enum NewLicense {
     Broderbund = 0x72,
     Sculptured = 0x73,
     Sci = 0x75,
-    THQ = 0x78,
+    Thq = 0x78,
     Accolade = 0x79,
     Misawa = 0x80,
     Lozc = 0x83,

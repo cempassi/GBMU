@@ -113,7 +113,7 @@ pub enum OldLicense {
     SpectrumHoloby = 0x47,
     Squaresoft = 0xC3,
     Sunsoft = 0xBB,
-    THQ = 0x78,
+    Thq = 0x78,
     #[num_enum(alternatives = [ 0xD0 ])]
     Taito = 0xC0,
     Takara = 0xA7,
