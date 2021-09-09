@@ -16,6 +16,7 @@ pub struct SOC {
     memory: Memory,
 }
 
+
 impl TryFrom<&str> for SOC {
     type Error = std::io::Error;
 
