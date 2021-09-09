@@ -1,4 +1,5 @@
 pub mod cartridge;
+pub mod consts;
 pub mod mbc1;
 pub mod nombc;
 
