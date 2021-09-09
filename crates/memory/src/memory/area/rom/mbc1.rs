@@ -34,26 +34,17 @@ impl Bus<usize> for Mbc1 {
     fn get(&self, address: usize) -> Self::Item {
         match address {
             MBC_BANK0_START..=MBC_BANK0_END => self.data[address],
-            MBC_BANK1_START..=MBC_BANK1_END => {
-                Mbc1::swap_bank_nbr(self, MBC_BANK1_START, MBC_BANK1_START, address)
-            }
-            MBC_RAM_START..=MBC_RAM_END => {
-                if self.ram_lock {
-                    Mbc1::swap_bank_nbr(self, MBC1_RAM_BASE, MBC_RAM_START, address)
-                } else {
-                    0
-                }
-            }
+            MBC_BANK1_START..=MBC_RAM_END => self.swap_bank_nbr(address),
             _ => panic!("Invalid Address {:04X}", address),
         }
     }
 
     fn set(&mut self, address: usize, data: Self::Data) -> Self::Result {
         match address {
-            MBC1_REG0_START..=MBC1_REG0_END => Mbc1::update_ram_lock(self, data), // enable RAM REG0
-            MBC1_REG1_START..=MBC1_REG2_END => Mbc1::update_bank_nbr(self, address, data), // change bank nbr REG1 REG2
-            MBC1_REG3_START..=MBC1_REG3_END => Mbc1::update_bank_mode(self, data), // change RAM bank nbr if  REG3
-            MBC_RAM_START..=MBC_RAM_END => Mbc1::write_ram_bank(self, address, data),
+            MBC1_REG0_START..=MBC1_REG0_END => self.update_ram_lock(data), // enable RAM REG0
+            MBC1_REG1_START..=MBC1_REG2_END => self.update_bank_nbr(address, data), // change bank nbr REG1 REG2
+            MBC1_REG3_START..=MBC1_REG3_END => self.update_bank_mode(data), // change RAM bank nbr if  REG3
+            MBC_RAM_START..=MBC_RAM_END => self.write_ram_bank(address, data),
             _ => Err(shared::Error::IllegalSet(address, data)),
         }
     }
@@ -84,27 +75,27 @@ impl Mbc1 {
         Ok(())
     }
 
-    fn swap_bank_nbr(&self, start_off: usize, end_off: usize, address: usize) -> u8 {
-        let bank_nbr = match address {
+    fn swap_bank_nbr(&self, address: usize) -> u8 {
+        let (bank_nbr, start_off, end_off) = match address {
             MBC_BANK1_START..=MBC_BANK1_END => {
-                if self.rom_bank != 0 {
+                let bank_nbr = if self.rom_bank != 0 {
                     self.rom_bank as usize
                 } else {
                     1
-                }
+                };
+                (bank_nbr, MBC_BANK1_START, MBC_BANK1_START)
             }
             MBC_RAM_START..=MBC_RAM_END => {
-                if self.bank_mode {
+                let bank_nbr = if self.ram_lock && self.bank_mode {
                     self.ram_bank as usize
                 } else {
                     0
-                }
+                };
+                (bank_nbr, MBC1_RAM_BASE, MBC_RAM_START)
             }
             _ => unreachable!(),
         };
-        let base = bank_nbr * start_off;
-        let offset = address - end_off;
-        let index = (base + offset) & (self.data.len() - 1);
+        let index = ((bank_nbr * start_off) + (address - end_off)) & (self.data.len() - 1);
         self.data[index]
     }
 
