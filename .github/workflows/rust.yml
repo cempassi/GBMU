@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  check:
 
     runs-on: ubuntu-latest
 
@@ -47,7 +47,7 @@ jobs:
     - name: Check code format
       run: cargo fmt --verbose -- --check
 
-    - name: Lint code base
+    - name: Lint code
       run: cargo clippy --workspace --verbose -- -D warnings
 
     - name: Build
