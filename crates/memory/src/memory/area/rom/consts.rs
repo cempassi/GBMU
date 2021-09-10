@@ -29,7 +29,6 @@ pub const MBC2_MAGIC_BYTE: usize = 0x100;
 pub const MBC2_REG_START: usize = 0x0;
 pub const MBC2_REG_END: usize = 0x3fff;
 
-
 ///(max 2MByte ROM and/or 32KByte RAM and Timer)
 pub const MBC3_MAX_SIZE: usize = 16_777_216;
 pub const MBC3_RAM_BASE: usize = 0x2000;

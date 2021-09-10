@@ -40,7 +40,7 @@ roms: roms.zip
   
 roms.zip:
 	curl -L $(ROMS_URL1) > $@
-	curl -L $(ROMS_URL2) > $(ROM2_ZIP)
+	curl $(ROMS_URL2) > $(ROM2_ZIP)
 	curl -L $(ROMS_URL3) > $(ROM3_ZIP)
 
 lint:
