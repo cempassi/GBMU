@@ -35,8 +35,8 @@ roms: roms.zip
 	unzip -o $< 'roms/*' -x '*/.DS_Store'
 	unzip -o $(ROM2_ZIP)
 	unzip -o $(ROM3_ZIP)
-  mv $(ROM2_NAME) roms/$(ROM2_NAME)
-  mv $(ROM3_NAME) roms/$(ROM3_NAME)
+	mv $(ROM2_NAME) roms/$(ROM2_NAME)
+	mv $(ROM3_NAME) roms/$(ROM3_NAME)
   
 roms.zip:
 	curl -L $(ROMS_URL1) > $@
