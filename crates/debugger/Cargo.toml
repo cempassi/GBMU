@@ -13,3 +13,4 @@ iced = "0.3"
 glium = "*"
 iced_native = "0.4"
 iced_graphics = "0.2"
+cpu = { path = "../cpu" }
