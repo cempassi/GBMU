@@ -6,9 +6,9 @@ use glium::glutin::{
     window::WindowId,
 };
 
-use glium::Display;
 use crate::debugger::generate_debugger;
 use crate::emulator::generate_emulator;
+use glium::Display;
 
 type DisplayMap = HashMap<WindowId, Display>;
 
@@ -22,7 +22,7 @@ impl Windows {
                 display.gl_window().resize(physical_size);
             }
             WindowEvent::CloseRequested => {
-                if let Some(_) = map.remove(&id) {
+                if map.remove(&id).is_some() {
                     println!("Window with ID {:?} has been closed", id);
                 }
             }
