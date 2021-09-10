@@ -151,9 +151,7 @@ mod mbc1_test {
         let rom_file = FILE.to_vec(); // MBC1 + RAM + BATTERY
         let mut mbc = Mbc1::new(rom_file);
 
-        // assert_eq!(mbc.data[0x149], 0x02);
-
-        // assert_eq!(mbc.ram, vec!(0, 0));
+        assert_eq!(mbc.data[0x147], 0x03);
 
         mbc.set(0x01f5, 0x0a).unwrap();
         assert_eq!(mbc.ram_lock, true);
