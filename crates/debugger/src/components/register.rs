@@ -1,17 +1,26 @@
-use iced::Checkbox;
+use iced::{Checkbox, Element};
 
-pub struct Register {}
+#[derive(Default)]
+pub struct Registers {
+    is_checked: bool,
+}
 
+#[derive(Debug, Clone)]
 pub enum Message {
     CheckboxToogled(bool),
 }
 
-impl Register {
-    pub fn new() -> Self {
-        Self {}
+impl Registers {
+    pub fn update(&mut self, message: Message) {
+        match message {
+            Message::CheckboxToogled(is_checked) => self.is_checked = is_checked,
+        }
     }
 
-    pub fn view(&mut self) -> Checkbox<Message> {
-        Checkbox::new(false, "Merge", Message::CheckboxToogled).into()
+    pub fn view(&mut self) -> Element<Message> {
+        Checkbox::new(self.is_checked, "Merge", |is_checked| {
+            Message::CheckboxToogled(is_checked)
+        })
+        .into()
     }
 }
