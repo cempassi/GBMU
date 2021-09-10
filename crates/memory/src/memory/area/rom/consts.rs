@@ -26,4 +26,3 @@ pub const MBC2_MAGIC_LOCK: usize = 0x0a;
 pub const MBC2_MAGIC_BYTE: usize = 0x100;
 pub const MBC2_REG_START: usize = 0x0;
 pub const MBC2_REG_END: usize = 0x3fff;
-
