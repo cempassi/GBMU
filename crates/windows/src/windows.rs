@@ -9,6 +9,7 @@ use glium::glutin::{
 use crate::debugger::generate_debugger;
 use crate::emulator::generate_emulator;
 use glium::Display;
+use glium::glutin::platform::run_return::EventLoopExtRunReturn;
 
 type DisplayMap = HashMap<WindowId, Display>;
 
@@ -31,14 +32,14 @@ impl Windows {
     }
 
     pub fn run() {
-        let event_loop = EventLoop::new();
+        let mut event_loop = EventLoop::new();
         let mut displays: DisplayMap = HashMap::new();
         let (window_id, display) = generate_debugger(&event_loop);
         displays.insert(window_id, display);
         let (window_id, display) = generate_emulator(&event_loop);
         displays.insert(window_id, display);
 
-        event_loop.run(move |event, _, control_flow| {
+        event_loop.run_return(move |event, _, control_flow| {
             match event {
                 Event::LoopDestroyed => return,
                 Event::WindowEvent { event, window_id } => {
