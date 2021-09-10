@@ -1,3 +1,3 @@
-pub mod register;
+pub mod hexdump;
 
-pub use register::Register;
+pub use hexdump::Hexdump;
