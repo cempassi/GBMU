@@ -1,8 +1,9 @@
 [workspace]
 members = [
-"crates/cpu",
-"crates/gbmu",
-"crates/memory",
-"crates/shared",
-"crates/soc",
+  "crates/cpu",
+  "crates/windows",
+  "crates/gbmu",
+  "crates/memory",
+  "crates/shared",
+  "crates/soc",
 ]
