@@ -107,8 +107,7 @@ mod mbc2_test {
         mbc.set(0x00ff, 0x0a).unwrap();
         assert_eq!(mbc.ram_lock, true);
 
-        mbc.set(0x0000a0e0, 0xeb);
-        assert_eq!(FILE[0x0000a0e0], 0xea);
+        assert_eq!(mbc.set(0x0000a0e0, 0xeb).unwrap(), ());
 
         let data = mbc.get(0x0000a0e0);
         assert_eq!(data, 0x0b);
