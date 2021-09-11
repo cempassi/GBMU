@@ -31,7 +31,7 @@ roms: roms.zip
 
 roms.zip:
 	curl -L $(ROMS_URL1) > $@
-	curl -L $(ROMS_URL2) > $(ROMS_URL2_NAME)
+	curl $(ROMS_URL2) > $(ROMS_URL2_NAME)
 
 lint:
 	cargo clippy --workspace --verbose -- -D warnings
