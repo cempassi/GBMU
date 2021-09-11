@@ -18,7 +18,10 @@ pub fn range_intersect<T: Copy + PartialOrd + Ord>(a: Range<T>, b: Range<T>) -> 
 }
 
 /// Restrict a value to a certain interval.
-pub fn clamp<T>(value: T, min: T, max: T) -> T where T: Copy + PartialOrd {
+pub fn clamp<T>(value: T, min: T, max: T) -> T
+where
+    T: Copy + PartialOrd,
+{
     if value < min {
         min
     } else if value > max {

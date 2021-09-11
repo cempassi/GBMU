@@ -1,26 +1,52 @@
-use std::ops::Range;
 use iced_graphics::triangle::Vertex2D;
 use iced_graphics::Vector;
+use std::ops::Range;
 
-pub const CURSOR_MESH: (&[Vertex2D], &[u32]) = (&[
-    Vertex2D { position: [0.0, 0.0], color: [1.0, 1.0, 1.0, 1.0] },
-    Vertex2D { position: [2.0, 0.0], color: [1.0, 1.0, 1.0, 1.0] },
-    Vertex2D { position: [0.0, 6.0], color: [1.0, 1.0, 1.0, 1.0] },
-    Vertex2D { position: [2.0, 6.0], color: [1.0, 1.0, 1.0, 1.0] },
-    Vertex2D { position: [2.0, 4.0], color: [1.0, 1.0, 1.0, 1.0] },
-    Vertex2D { position: [24.0, 4.0], color: [1.0, 1.0, 1.0, 1.0] },
-    Vertex2D { position: [24.0, 6.0], color: [1.0, 1.0, 1.0, 1.0] },
-    Vertex2D { position: [24.0, 0.0], color: [1.0, 1.0, 1.0, 1.0] },
-    Vertex2D { position: [26.0, 0.0], color: [1.0, 1.0, 1.0, 1.0] },
-    Vertex2D { position: [26.0, 6.0], color: [1.0, 1.0, 1.0, 1.0] },
-], &[
-    0, 1, 3,
-    0, 2, 3,
-    4, 5, 6,
-    4, 3, 6,
-    7, 8, 9,
-    7, 6, 9,
-]);
+pub const CURSOR_MESH: (&[Vertex2D], &[u32]) = (
+    &[
+        Vertex2D {
+            position: [0.0, 0.0],
+            color: [1.0, 1.0, 1.0, 1.0],
+        },
+        Vertex2D {
+            position: [2.0, 0.0],
+            color: [1.0, 1.0, 1.0, 1.0],
+        },
+        Vertex2D {
+            position: [0.0, 6.0],
+            color: [1.0, 1.0, 1.0, 1.0],
+        },
+        Vertex2D {
+            position: [2.0, 6.0],
+            color: [1.0, 1.0, 1.0, 1.0],
+        },
+        Vertex2D {
+            position: [2.0, 4.0],
+            color: [1.0, 1.0, 1.0, 1.0],
+        },
+        Vertex2D {
+            position: [24.0, 4.0],
+            color: [1.0, 1.0, 1.0, 1.0],
+        },
+        Vertex2D {
+            position: [24.0, 6.0],
+            color: [1.0, 1.0, 1.0, 1.0],
+        },
+        Vertex2D {
+            position: [24.0, 0.0],
+            color: [1.0, 1.0, 1.0, 1.0],
+        },
+        Vertex2D {
+            position: [26.0, 0.0],
+            color: [1.0, 1.0, 1.0, 1.0],
+        },
+        Vertex2D {
+            position: [26.0, 6.0],
+            color: [1.0, 1.0, 1.0, 1.0],
+        },
+    ],
+    &[0, 1, 3, 0, 2, 3, 4, 5, 6, 4, 3, 6, 7, 8, 9, 7, 6, 9],
+);
 
 pub const CURSOR_RIGHT_VERTEX: ([usize; 3], [usize; 2]) = ([5, 6, 7], [8, 9]);
 

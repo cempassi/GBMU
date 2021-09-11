@@ -9,6 +9,7 @@ use glium::glutin::{
 use crate::debugger::generate_debugger;
 use crate::emulator::generate_emulator;
 use glium::glutin::platform::run_return::EventLoopExtRunReturn;
+
 use glium::Display;
 
 type DisplayMap = HashMap<WindowId, Display>;

@@ -5,8 +5,8 @@ mod style;
 mod utils;
 
 use iced_native::{
-    event::Status, layout, Element, Event, Font, Hasher, Layout, Length, Point,
-    Rectangle, Size, Widget,
+    event::Status, layout, Element, Event, Font, Hasher, Layout, Length, Point, Rectangle, Size,
+    Widget,
 };
 use std::{hash::Hash, marker::PhantomData};
 use utils::clamp;
