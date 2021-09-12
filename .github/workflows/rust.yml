@@ -45,7 +45,7 @@ jobs:
       run: make
 
     - name: Check format
-      run: make format.check
+      run: make format
 
     - name: Check lint
       run: make lint
