@@ -2,7 +2,7 @@
 members = [
   "crates/cpu",
   "crates/windows",
-  "crates/debugger",
+  "crates/gui",
   "crates/windows",
   "crates/gbmu",
   "crates/memory",

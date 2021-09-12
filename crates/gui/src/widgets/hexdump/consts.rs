@@ -66,7 +66,7 @@ pub const LINE_SPACING: f32 = 8.0;
 pub const MARGINS: Vector = Vector::new(10.0, 10.0);
 pub const HEX_CHARS: &[u8] = b"0123456789ABCDEF\
                            0123456789ABCDEF";
-pub const OFFSET_REFERENCE: &'static str = "00000000";
-pub const BYTES_HEADER: &'static str = "00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F \
+pub const OFFSET_REFERENCE: &str = "00000000";
+pub const BYTES_HEADER: &str = "00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F \
                                     10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F";
 pub const ASCII_RANGE: Range<u8> = 32..128;

@@ -19,7 +19,6 @@ pub use state::State;
 /// [`State::set_bytes`] with huge data.
 ///
 /// [`State::set_bytes`]: struct.State.html#method.set_bytes
-#[allow(missing_debug_implementations)]
 pub struct Hexdump<'a, Message, Renderer: renderer::Renderer> {
     state: &'a mut State,
     style: Renderer::Style,
@@ -187,14 +186,14 @@ where
                         &self.state.bytes,
                     );
 
-                    if let Some(new_cursor) = cursor_from_pos {
-                        if new_cursor < cursor {
+                    match cursor_from_pos {
+                        Some(new_cursor) if new_cursor < cursor => {
                             self.state.selection = Some((new_cursor, cursor))
-                        } else if new_cursor > cursor {
-                            self.state.selection = Some((cursor, new_cursor))
-                        } else {
-                            self.state.selection = None;
                         }
+                        Some(new_cursor) if new_cursor > cursor => {
+                            self.state.selection = Some((cursor, new_cursor))
+                        }
+                        _ => self.state.selection = None,
                     }
 
                     println!("Selection: {:?}", self.state.selection);
@@ -257,6 +256,7 @@ where
         Status::Captured
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn draw(
         &self,
         renderer: &mut Renderer,

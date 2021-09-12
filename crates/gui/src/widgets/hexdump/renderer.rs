@@ -9,6 +9,7 @@ use iced_native::{mouse, Background, Color, Font, Point, Rectangle, Size};
 /// The renderer of an `Hexview`.
 ///
 /// [`Hexview`]: struct.Hexview.html
+#[allow(clippy::too_many_arguments)]
 pub trait Renderer: iced_native::Renderer {
     /// The style supported by this renderer.
     type Style: Default;

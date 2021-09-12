@@ -3,7 +3,7 @@ use iced_native::{mouse, Point};
 /// state of hexdump
 /// The local state of an [`Hexdump`].
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct State {
     pub bytes: Vec<u8>,
     pub cursor: usize,
@@ -19,23 +19,6 @@ pub struct State {
 }
 
 impl State {
-    /// Creates a new [`Hexdump`] state with default values.
-    pub fn new() -> Self {
-        Self {
-            bytes: Vec::new(),
-            cursor: 0,
-            bytes_hash: 0,
-            keyboard_focus: false,
-            test_offset: 0.0,
-            debug_enabled: false,
-            last_click: None,
-            last_click_pos: None,
-            is_dragging: false,
-            selection: None,
-            mouse_pos: Point::new(0.0, 0.0),
-        }
-    }
-
     /// Sets the data [`Hexdump`] will be working with.
     ///
     /// Currently, we just clone the data into a Vec, which should work fine for

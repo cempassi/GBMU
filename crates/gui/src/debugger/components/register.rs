@@ -1,5 +1,6 @@
-use iced::{Checkbox, Element};
-
+// use iced_glow::Renderer;
+// use iced_native::{Checkbox, Element};
+//
 #[derive(Default)]
 pub struct Registers {
     is_checked: bool,
@@ -17,10 +18,10 @@ impl Registers {
         }
     }
 
-    pub fn view(&mut self) -> Element<Message> {
-        Checkbox::new(self.is_checked, "Merge", |is_checked| {
-            Message::CheckboxToogled(is_checked)
-        })
-        .into()
-    }
+    // pub fn view(&mut self) -> Element<Message, Renderer> {
+    //     Checkbox::new(self.is_checked, "Merge", |is_checked| {
+    //         Message::CheckboxToogled(is_checked)
+    //     })
+    //     .into()
+    //}
 }
