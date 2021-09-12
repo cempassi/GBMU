@@ -23,7 +23,6 @@ impl Windows {
             Event::MainEventsCleared => {
                 // If there are events pending
                 if !debugger.state.state.is_queue_empty() {
-
                     // We update iced
                     debugger.update();
 
