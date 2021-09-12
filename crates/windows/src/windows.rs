@@ -1,58 +1,46 @@
-use std::collections::HashMap;
+use iced_glutin::glutin::{event::Event, event_loop::EventLoop};
 
-use glium::glutin::{
-    event::{Event, WindowEvent},
-    event_loop::{ControlFlow, EventLoop},
-    window::WindowId,
-};
-
-use crate::debugger::generate_debugger;
-use crate::emulator::generate_emulator;
-use glium::glutin::platform::run_return::EventLoopExtRunReturn;
-
-use glium::Display;
-
-type DisplayMap = HashMap<WindowId, Display>;
+use crate::debugger;
+use crate::emulator;
 
 pub struct Windows {}
 
+
 impl Windows {
-    fn window_event(map: &mut DisplayMap, event: WindowEvent, id: WindowId) {
-        match event {
-            WindowEvent::Resized(physical_size) => {
-                let display = map.get(&id).unwrap();
-                display.gl_window().resize(physical_size);
+    pub fn run() {
+        let event_loop = EventLoop::new();
+        let (debugger_id, mut debugger_context, mut debugger, gl) =
+            debugger::generate_debugger(&event_loop);
+
+        let (emulator_id, mut emulator) = emulator::generate_emulator(&event_loop);
+
+        event_loop.run(move |event, _, control_flow| match event {
+            Event::LoopDestroyed => (),
+            Event::WindowEvent { event, window_id } if window_id == debugger_id => {
+                *control_flow = debugger::process_event(&mut debugger_context, event)
             }
-            WindowEvent::CloseRequested => {
-                if map.remove(&id).is_some() {
-                    println!("Window with ID {:?} has been closed", id);
+            Event::WindowEvent { event, window_id } if window_id == emulator_id => {
+                *control_flow = emulator::process_event(&mut emulator, event)
+            }
+            Event::MainEventsCleared => {
+                // If there are events pending
+                if !debugger.state.is_queue_empty() {
+
+                    // We update iced
+                    debugger.update(debugger_context.window().scale_factor());
+
+                    // and request a redraw
+                    debugger_context.window().request_redraw();
                 }
+            }
+            Event::RedrawRequested(window_id) if window_id == debugger_id => {
+                debugger::redraw(&mut debugger, &gl, debugger_context.window());
+                debugger_context.swap_buffers().unwrap();
+            }
+            Event::RedrawRequested(window_id) if window_id == emulator_id => {
+                // Do emulator redraw
             }
             _ => (),
-        }
-    }
-
-    pub fn run() {
-        let mut event_loop = EventLoop::new();
-        let mut displays: DisplayMap = HashMap::new();
-        let (window_id, display) = generate_debugger(&event_loop);
-        displays.insert(window_id, display);
-        let (window_id, display) = generate_emulator(&event_loop);
-        displays.insert(window_id, display);
-
-        event_loop.run_return(move |event, _, control_flow| {
-            match event {
-                Event::LoopDestroyed => return,
-                Event::WindowEvent { event, window_id } => {
-                    Windows::window_event(&mut displays, event, window_id)
-                }
-                _ => (),
-            }
-            if displays.is_empty() {
-                *control_flow = ControlFlow::Exit
-            } else {
-                *control_flow = ControlFlow::Wait
-            }
         })
     }
 }
