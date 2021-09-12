@@ -1,17 +1,8 @@
 [package]
 name = "gbmu"
 version = "0.1.0"
-authors = [
-  "Cedric M'Passi <cedricmpassi@gmail.com>"
-]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-sdl2 = { version = "0.34", features = ["bundled", "static-link"] }
-egui = { version = "0.13" }
-rfd = { version = "0.4" }
-gb-lcd = { path= "../gb-lcd" }
-gb-ppu = { path = "../gb-ppu" }
-

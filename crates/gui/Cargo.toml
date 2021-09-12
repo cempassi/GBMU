@@ -1,0 +1,18 @@
+[package]
+name = "gui"
+version = "0.1.0"
+edition = "2018"
+authors = [
+  "Cedric M'Passi <cedricmpassi@gmail.com>"
+]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+glow = "0.6"
+iced_native = "0.4"
+iced_graphics = "0.2"
+iced_glow = "0.2"
+iced_glutin = "0.2"
+winit = "0.25.0"
+cpu = { path = "../cpu" }

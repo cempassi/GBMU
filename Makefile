@@ -37,7 +37,7 @@ roms: roms.zip
 	unzip -o $(ROM3_ZIP)
 	mv $(ROM2_NAME) roms/Ayakashi.gb
 	mv $(ROM3_NAME) roms/$(ROM3_NAME)
-  
+
 roms.zip:
 	curl -L $(ROMS_URL1) > $@
 	curl $(ROMS_URL2) > $(ROM2_ZIP)
@@ -46,11 +46,11 @@ roms.zip:
 lint:
 	cargo clippy --workspace --verbose -- -D warnings
 
-format.check:
-	cargo fmt --verbose -- --check
+format.all:
+	cargo fmt --all
 
 format:
-	cargo fmt --all
+	cargo fmt --verbose -- --check
 
 clean:
 	rm -rf roms roms.zip ressources $(ROM2_ZIP) $(ROM3_ZIP)
