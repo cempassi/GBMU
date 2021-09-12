@@ -23,4 +23,3 @@ impl From<Theme> for Box<dyn container::StyleSheet> {
         }
     }
 }
-
