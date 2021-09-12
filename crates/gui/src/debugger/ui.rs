@@ -9,10 +9,10 @@ pub enum Message {
     ForRegister(register::Message),
 }
 
+#[derive(Default)]
 pub struct UserInterface {
     registers: register::Registers,
 }
-
 
 impl Program for UserInterface {
     type Clipboard = Clipboard;
@@ -41,12 +41,6 @@ impl Program for UserInterface {
 }
 
 impl UserInterface {
-    pub fn new() -> Self {
-        Self {
-            registers: register::Registers::default(),
-        }
-    }
-
     // fn title(&self) -> String {
     //     String::from("Hello World")
     // }

@@ -3,8 +3,8 @@ mod ui;
 use iced_glow::{Backend, Renderer, Settings, Viewport};
 use iced_glutin::{glutin::window::Window, mouse::Interaction, Clipboard, Debug, Point, Size};
 use iced_native::program;
-use winit::dpi::PhysicalPosition;
 use ui::UserInterface;
+use winit::dpi::PhysicalPosition;
 
 pub struct Debugger {
     pub state: program::State<UserInterface>,
@@ -17,7 +17,7 @@ pub struct Debugger {
 
 impl Debugger {
     pub fn new(window: &Window, context: &glow::Context) -> Self {
-        let user_interface = UserInterface::new();
+        let user_interface = UserInterface::default();
         let mut debug = Debug::new();
         let clipboard = Clipboard::connect(window);
 
