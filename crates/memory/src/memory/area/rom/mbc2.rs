@@ -4,7 +4,8 @@ use shared::{traits::Bus, Error};
 pub struct Mbc2 {
     ram_lock: bool,
     data: Vec<u8>,
-    rom_bank: u8, // Max 16 [0..=f]
+    /// Max 16 0x00 ..= 0x0f
+    rom_bank: u8,
 }
 
 impl Bus<usize> for Mbc2 {
@@ -21,9 +22,9 @@ impl Bus<usize> for Mbc2 {
             }
             consts::MBC_RAM_START..=consts::MBC2_ERAM_END => {
                 if self.ram_lock {
-                    let offset = self.get_ram_offset(address);
-                    self.data[address - offset] & 0xf
+                    self.data[address - self.get_ram_offset(address)] & 0xf
                 } else {
+                    // Should be Undefined behavior or raise an Error
                     0
                 }
             }
@@ -39,7 +40,7 @@ impl Bus<usize> for Mbc2 {
                     let offset = self.get_ram_offset(address);
                     self.data[address - offset] = data & 0xf
                 }
-            }
+            } // Else should be undefined behavior Or Err
             _ => return Err(shared::Error::IllegalSet(address, data)),
         };
         Ok(())
@@ -55,14 +56,17 @@ impl Mbc2 {
         }
     }
 
+    /// If address & 0x100 == 1 : change the rom bank
+    /// else if data == MBC_MAGIC_LOCK (0x0a) enable RAM operation by setting the ram lock as true
     fn mbc2_register(&mut self, address: usize, data: u8) {
         if address & consts::MBC2_MAGIC_BYTE != 0 {
             self.rom_bank = if data == 0 { 1 } else { data & 0xf };
         } else {
-            self.ram_lock = (data & 0x0f) == consts::MBC2_MAGIC_LOCK as u8;
+            self.ram_lock = (data & 0x0f) == consts::MBC_MAGIC_LOCK as u8;
         }
     }
 
+    /// Get the RAM or the Echoes RAM Offset
     fn get_ram_offset(&self, address: usize) -> usize {
         match address {
             consts::MBC_RAM_START..=consts::MBC2_RAM_END => consts::MBC_RAM_START,
