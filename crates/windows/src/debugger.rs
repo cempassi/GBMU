@@ -1,12 +1,12 @@
+use gui::debugger;
+use iced_glutin::glutin::window::CursorIcon;
 use iced_glutin::glutin::{
     event::WindowEvent,
     event_loop::{ControlFlow, EventLoop},
     window::{Window, WindowBuilder, WindowId},
     ContextBuilder, ContextCurrentState, ContextWrapper, PossiblyCurrent,
 };
-use iced_glutin::glutin::window::CursorIcon;
 use iced_glutin::mouse;
-use gui::debugger;
 
 pub fn mouse_interaction(interaction: mouse::Interaction) -> CursorIcon {
     use mouse::Interaction;
@@ -61,9 +61,7 @@ pub fn process_event<T: ContextCurrentState>(
 ) -> ControlFlow {
     match event {
         WindowEvent::Resized(_physical_size) => ControlFlow::Wait,
-        WindowEvent::CloseRequested => {
-            ControlFlow::Wait
-        }
+        WindowEvent::CloseRequested => ControlFlow::Wait,
         _ => ControlFlow::Wait,
     }
 }

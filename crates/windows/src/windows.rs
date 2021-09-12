@@ -5,7 +5,6 @@ use crate::emulator;
 
 pub struct Windows {}
 
-
 impl Windows {
     pub fn run() {
         let event_loop = EventLoop::new();
@@ -25,7 +24,6 @@ impl Windows {
             Event::MainEventsCleared => {
                 // If there are events pending
                 if !debugger.state.is_queue_empty() {
-
                     // We update iced
                     debugger.update(debugger_context.window().scale_factor());
 
