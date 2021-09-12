@@ -1,17 +1,13 @@
-mod components;
+mod ui;
 
-use components::register;
 use iced_glow::{Backend, Renderer, Settings, Viewport};
 use iced_glutin::{glutin::window::Window, mouse::Interaction, Clipboard, Debug, Point, Size};
-use iced_native::{program, Column, Command, Element, Program, Text};
+use iced_native::program;
 use winit::dpi::PhysicalPosition;
+use ui::UserInterface;
 
 pub struct Debugger {
-    registers: register::Registers,
-}
-
-pub struct State {
-    pub state: program::State<Debugger>,
+    pub state: program::State<UserInterface>,
     pub clipboard: Clipboard,
     pub debug: Debug,
     pub viewport: Viewport,
@@ -19,9 +15,9 @@ pub struct State {
     pub cursor: PhysicalPosition<f64>,
 }
 
-impl State {
+impl Debugger {
     pub fn new(window: &Window, context: &glow::Context) -> Self {
-        let debugger = Debugger::new();
+        let user_interface = UserInterface::new();
         let mut debug = Debug::new();
         let clipboard = Clipboard::connect(window);
 
@@ -36,7 +32,7 @@ impl State {
         let mut renderer = Renderer::new(Backend::new(context, Settings::default()));
 
         let state = program::State::new(
-            debugger,
+            user_interface,
             viewport.logical_size(),
             point,
             &mut renderer,
@@ -74,47 +70,4 @@ impl State {
             &self.debug.overlay(),
         )
     }
-}
-
-#[derive(Debug, Clone)]
-pub enum Message {
-    ForRegister(register::Message),
-}
-
-impl Program for Debugger {
-    type Clipboard = Clipboard;
-    type Message = Message;
-    type Renderer = Renderer;
-
-    fn update(
-        &mut self,
-        message: Message,
-        _clipboard: &mut Self::Clipboard,
-    ) -> Command<Self::Message> {
-        match message {
-            Message::ForRegister(message) => {
-                self.registers.update(message);
-                Command::none()
-            }
-        }
-    }
-
-    fn view(&mut self) -> Element<Message, Self::Renderer> {
-        let column = Column::new()
-            .push(Text::new("Hello, world! Are we doing this or what?").color([0.0, 0.0, 1.0]));
-
-        Element::new(column)
-    }
-}
-
-impl Debugger {
-    fn new() -> Self {
-        Self {
-            registers: register::Registers::default(),
-        }
-    }
-
-    // fn title(&self) -> String {
-    //     String::from("Hello World")
-    // }
 }
