@@ -53,7 +53,7 @@ impl Mbc1 {
         } else {
             0
         };
-        let index = (bank_nbr * consts::MBC1_RAM_BASE) | (address & consts::MBC1_RAM_OFFSET);
+        let index = (bank_nbr * consts::MBC_RAM_BASE) | (address & consts::MBC_RAM_OFFSET);
         self.data[index] = data;
         Ok(())
     }
@@ -74,7 +74,7 @@ impl Mbc1 {
                 } else {
                     0
                 };
-                (bank_nbr, consts::MBC1_RAM_BASE, consts::MBC_RAM_START)
+                (bank_nbr, consts::MBC_RAM_BASE, consts::MBC_RAM_START)
             }
             _ => unreachable!(),
         };
@@ -119,7 +119,7 @@ impl Mbc1 {
     }
 
     fn update_ram_lock(&mut self, data: u8) -> Result<(), Error> {
-        self.ram_lock = data == consts::MBC1_MAGIC_LOCK;
+        self.ram_lock = data == consts::MBC_MAGIC_LOCK;
         Ok(())
     }
 }
