@@ -1,4 +1,3 @@
-use gui::debugger;
 use iced_glutin::glutin::window::CursorIcon;
 use iced_glutin::glutin::{
     event::WindowEvent,
@@ -12,7 +11,7 @@ use iced_glutin::mouse;
 pub struct Debugger {
     pub id: WindowId,
     pub context: ContextWrapper<PossiblyCurrent, Window>,
-    pub state: debugger::State,
+    pub state: gui::Debugger,
     pub gl: glow::Context,
 }
 
@@ -35,7 +34,7 @@ impl Debugger {
                 (windowed_context, gl)
             }
         };
-        let state = debugger::State::new(windowed_context.window(), &gl);
+        let state = gui::Debugger::new(windowed_context.window(), &gl);
 
         let id = windowed_context.window().id();
         Self {

@@ -1,4 +1,4 @@
-pub mod debugger;
+mod debugger;
 mod widgets;
 
-pub use debugger::State;
+pub use debugger::Debugger;
