@@ -1,6 +1,6 @@
 #[derive(Debug)]
 pub enum Mbc {
-    NoMbc,
+    Mbc0,
     Mbc1,
     Mbc2,
     Mbc3,
