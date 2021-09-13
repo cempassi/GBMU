@@ -44,13 +44,12 @@ pub const MBC3_REG3_END: usize = 0x7fff;
 pub const MBC3_REG4_START: usize = 0xa000;
 pub const MBC3_REG4_END: usize = 0xbfff;
 
-// It can map up to 64 Mbits (8 MiB) of ROM.
-// pub const MBC5_MAX_SIZE: usize = 8_388_608;
-// pub const MBC5_REG0_START: usize = 0x0;
-// pub const MBC5_REG0_END: usize = 0x1fff;
-// pub const MBC5_REG1_START: usize = 0x2000;
-// pub const MBC5_REG1_END: usize = 0x2fff;
-// pub const MBC5_REG2_START: usize = 0x3000;
-// pub const MBC5_REG2_END: usize = 0x3fff;
-// pub const MBC5_REG3_START: usize = 0x4000;
-// pub const MBC5_REG3_END: usize = 0x5fff;
+pub const MBC5_MAX_SIZE: usize = 8_388_608; // It can map up to 64 Mbits (8 MiB) of ROM.
+pub const MBC5_REG0_START: usize = 0x0;
+pub const MBC5_REG0_END: usize = 0x1fff;
+pub const MBC5_REG1_START: usize = 0x2000;
+pub const MBC5_REG1_END: usize = 0x2fff;
+pub const MBC5_REG2_START: usize = 0x3000;
+pub const MBC5_REG2_END: usize = 0x3fff;
+pub const MBC5_REG3_START: usize = 0x4000;
+pub const MBC5_REG3_END: usize = 0x5fff;
