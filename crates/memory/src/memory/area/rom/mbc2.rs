@@ -59,7 +59,7 @@ impl Mbc2 {
         if address & consts::MBC2_MAGIC_BYTE != 0 {
             self.rom_bank = if data == 0 { 1 } else { data & 0xf };
         } else {
-            self.ram_lock = (data & 0x0f) == consts::MBC2_MAGIC_LOCK as u8;
+            self.ram_lock = (data & 0x0f) == consts::MBC_MAGIC_LOCK as u8;
         }
     }
 
