@@ -21,7 +21,7 @@ pub const MBC1_REG2_END: usize = 0x5fff;
 pub const MBC1_REG3_START: usize = 0x6000;
 pub const MBC1_REG3_END: usize = 0x7fff;
 
-// Controller for up to 2 Mbits (256 Kbytes) of ROM with built-in backup RAM (512 x 4 bits)
+/// Controller for up to 2 Mbits (256 Kbytes) of ROM with built-in backup RAM (512 x 4 bits)
 pub const MBC2_MAX_SIZE: usize = 262_144;
 pub const MBC2_RAM_END: usize = 0xa1ff;
 pub const MBC2_ERAM_START: usize = 0xa200;

@@ -1,12 +1,11 @@
+use super::consts;
 use shared::{traits::Bus, Error};
 
-pub const NOMBC_MAX_SIZE: usize = 32_768;
-
-pub struct NoMbc {
+pub struct Mbc0 {
     data: Vec<u8>,
 }
 
-impl Bus<usize> for NoMbc {
+impl Bus<usize> for Mbc0 {
     type Item = u8;
     type Result = Result<(), Error>;
     type Data = u8;
@@ -20,35 +19,35 @@ impl Bus<usize> for NoMbc {
     }
 }
 
-impl NoMbc {
+impl Mbc0 {
     pub fn new(data: Vec<u8>) -> Self {
-        NoMbc { data }
+        Mbc0 { data }
     }
 }
 
-impl Default for NoMbc {
+impl Default for Mbc0 {
     fn default() -> Self {
-        NoMbc::new(vec![0; NOMBC_MAX_SIZE])
+        Mbc0::new(vec![0; consts::MBC0_MAX_SIZE])
     }
 }
 
 #[cfg(test)]
 mod test_nombc {
-    use super::NoMbc;
+    use super::Mbc0;
     use shared::traits::Bus;
 
     #[test]
     fn test_read_nombc() {
-        let nombc = NoMbc::default();
+        let mbc0 = Mbc0::default();
 
-        assert_eq!(nombc.get(0x10), 0);
+        assert_eq!(mbc0.get(0x10), 0);
     }
 
     #[test]
     fn test_write_read_nombc() {
-        let mut nombc = NoMbc::default();
+        let mut mbc0 = Mbc0::default();
 
-        match nombc.set(0x42, 42) {
+        match mbc0.set(0x42, 42) {
             Ok(_) => panic!(),
             Err(_) => (),
         }
