@@ -4,7 +4,7 @@ mod consts;
 mod state;
 
 use area::rom::Cartridge;
-use area::rom::NoMbc;
+use area::rom::Mbc0;
 use area::{Area, Wram};
 use bios::Bios;
 use shared::{traits::Bus, Error};
@@ -57,7 +57,7 @@ impl Bus<u16> for Memory {
 impl Memory {
     pub fn new(mbc: Cartridge, data: Vec<u8>) -> Self {
         let rom: Rom = match mbc {
-            Cartridge::NoMbc => Box::new(NoMbc::new(data)),
+            Cartridge::Mbc0 => Box::new(Mbc0::new(data)),
             _ => unimplemented!(),
         };
 
@@ -76,7 +76,7 @@ impl Default for Memory {
             state: State::Bios,
             bios: bios::DMG,
             wram: Wram::default(),
-            rom: Box::new(NoMbc::default()),
+            rom: Box::new(Mbc0::default()),
         }
     }
 }

@@ -3,7 +3,7 @@ use num_enum::TryFromPrimitive;
 #[derive(Debug, PartialEq, Eq, TryFromPrimitive)]
 #[repr(u8)]
 pub enum Cartridge {
-    NoMbc = 0x00,
+    Mbc0 = 0x00,
     Mbc1 = 0x01,
     Mbc1Ram = 0x02,
     Mbc1RamBattery = 0x03,
