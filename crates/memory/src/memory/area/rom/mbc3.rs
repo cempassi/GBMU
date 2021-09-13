@@ -89,8 +89,8 @@ impl Mbc3 {
         }
         match self.ram_bank {
             0x00..=0x03 => {
-                self.data[(self.ram_bank as usize * consts::MBC3_RAM_BASE)
-                    | (address - consts::MBC3_RAM_OFFSET)]
+                self.data[(self.ram_bank as usize * consts::MBC_RAM_BASE)
+                    | (address - consts::MBC_RAM_OFFSET)]
             }
             0x08 => self.rtc.seconds,
             0x09 => self.rtc.minutes,
@@ -147,8 +147,8 @@ impl Mbc3 {
             return Err(shared::Error::IllegalSet(address, data));
         }
         if self.ram_bank <= 0x03 {
-            self.data[(self.ram_bank as usize * consts::MBC3_RAM_BASE)
-                | (address - consts::MBC3_RAM_OFFSET)] = data;
+            self.data[(self.ram_bank as usize * consts::MBC_RAM_BASE)
+                | (address - consts::MBC_RAM_OFFSET)] = data;
             return Ok(());
         }
         match self.ram_bank {
@@ -187,8 +187,8 @@ impl Mbc3 {
     }
 
     fn update_ram_rtc_lock(&mut self, data: u8) -> Result<(), Error> {
-        self.ram_lock = data == consts::MBC3_MAGIC_LOCK;
-        self.rtc_lock = data == consts::MBC3_MAGIC_LOCK;
+        self.ram_lock = data == consts::MBC_MAGIC_LOCK;
+        self.rtc_lock = data == consts::MBC_MAGIC_LOCK;
         Ok(())
     }
 
