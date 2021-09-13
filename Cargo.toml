@@ -8,4 +8,5 @@ members = [
   "crates/memory",
   "crates/shared",
   "crates/soc",
+  "crates/sound",
 ]
