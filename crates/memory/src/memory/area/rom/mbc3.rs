@@ -1,9 +1,16 @@
 use super::consts;
 use shared::{traits::Bus, Error};
 
+/// Return the epoch in microseconds.
+fn get_epoch() -> u64 {
+    let epoch = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .expect("Couldn't get epoch");
+    (epoch.as_micros() as u64) / 1_000_000
+}
+
 pub struct Mbc3 {
     ram_lock: bool,
-    rtc_lock: bool,
     latch: bool,
     data: Vec<u8>,
     rom_bank: u8,
@@ -26,14 +33,6 @@ struct Mbc3Rtc {
     epoch: u64,
 }
 
-fn get_epoch() -> u64 {
-    // Return the epoch in microseconds.
-    let epoch = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .expect("Couldn't get epoch");
-    (epoch.as_micros() as u64) / 1_000_000
-}
-
 impl Bus<usize> for Mbc3 {
     type Item = u8;
     type Result = Result<(), Error>;
@@ -53,11 +52,11 @@ impl Bus<usize> for Mbc3 {
 
     fn set(&mut self, address: usize, data: Self::Data) -> Self::Result {
         match address {
-            consts::MBC3_REG0_START..=consts::MBC3_REG0_END => self.update_ram_rtc_lock(data), // enable RAM / RTC REG0
-            consts::MBC3_REG1_START..=consts::MBC3_REG1_END => self.update_rom_bank_nbr(data), // change ROM bank nbr REG1
-            consts::MBC3_REG2_START..=consts::MBC3_REG2_END => self.update_ram_bank_rtc_reg(data), // change RAN bank OR RTC register nbr
-            consts::MBC3_REG3_START..=consts::MBC3_REG3_END => self.latch_rtc_register(data), // latch la struct rtc dans la ram pour la lire
-            consts::MBC3_REG4_START..=consts::MBC3_REG4_END => self.write_ram_bank(address, data),
+            consts::MBC3_REG0_START..=consts::MBC3_REG0_END => self.update_ram_lock(data),
+            consts::MBC3_REG1_START..=consts::MBC3_REG1_END => self.update_rom_bank(data),
+            consts::MBC3_REG2_START..=consts::MBC3_REG2_END => self.update_ram_bank(data),
+            consts::MBC3_REG3_START..=consts::MBC3_REG3_END => self.latch_rtc_register(data),
+            consts::MBC3_REG4_START..=consts::MBC3_REG4_END => self.set_ram(address, data),
             _ => Err(shared::Error::IllegalSet(address, data)),
         }
     }
@@ -67,7 +66,6 @@ impl Mbc3 {
     pub fn new(data: Vec<u8>) -> Self {
         Mbc3 {
             ram_lock: false,
-            rtc_lock: false,
             latch: false,
             data,
             rom_bank: 0,
@@ -83,8 +81,10 @@ impl Mbc3 {
         }
     }
 
+    /// Retrieve a RAM bank or a RTC value depending on the Ram lock and the RAM bank number
     fn get_ram(&self, address: usize) -> u8 {
         if !self.ram_lock {
+            // Should be undefined behavior or raise an Error
             return 0;
         }
         match self.ram_bank {
@@ -101,6 +101,7 @@ impl Mbc3 {
         }
     }
 
+    /// Latch / Save the current time since the Epoch in Mbc3.rtc.epoch
     fn latch(&mut self) {
         let new_epoch = if self.rtc.dc_upper & 0x40 == 0 {
             get_epoch()
@@ -130,10 +131,12 @@ impl Mbc3 {
         self.rtc.epoch = new_epoch;
     }
 
+    /// Register to latch the RTC values into the RAM, should write 0x0001 in this register address area
     fn latch_rtc_register(&mut self, data: u8) -> Result<(), Error> {
         if self.latch {
             if data == 0x1 {
                 self.latch();
+                std::time::Duration::from_millis(4);
             }
             self.latch = false;
         } else if data == 0 {
@@ -142,9 +145,11 @@ impl Mbc3 {
         Ok(())
     }
 
-    fn write_ram_bank(&mut self, address: usize, data: u8) -> Result<(), Error> {
+    /// Write into the RAM if the Ram bank number if <= 0x03
+    /// Or update RTC register if 0x08 <= ram_bank 0x0c
+    fn set_ram(&mut self, address: usize, data: u8) -> Result<(), Error> {
         if !self.ram_lock {
-            return Err(shared::Error::IllegalSet(address, data));
+            return Err(shared::Error::RamLock(address));
         }
         if self.ram_bank <= 0x03 {
             self.data[(self.ram_bank as usize * consts::MBC_RAM_BASE)
@@ -167,18 +172,20 @@ impl Mbc3 {
             0x0c => {
                 self.rtc.dc_upper = data;
             }
-            _ => return Err(shared::Error::IllegalSet(address, data)), //Ok(self.data[self.ram_bank - consts::MBC3_RTC_OFFSET] = data),
+            _ => return Err(shared::Error::IllegalSet(address, data)), // Should be undefined behavior or Ok(self.data[self.ram_bank - consts::MBC3_RTC_OFFSET] = data),
         }
         self.rtc.epoch = get_epoch();
         Ok(())
     }
 
-    fn update_ram_bank_rtc_reg(&mut self, data: u8) -> Result<(), Error> {
+    /// Update RAM bank number
+    fn update_ram_bank(&mut self, data: u8) -> Result<(), Error> {
         self.ram_bank = data & 0x0f;
         Ok(())
     }
 
-    fn update_rom_bank_nbr(&mut self, data: u8) -> Result<(), Error> {
+    /// Update ROM bank number $00 bank is not valid
+    fn update_rom_bank(&mut self, data: u8) -> Result<(), Error> {
         self.rom_bank = match data & 0x7f {
             0 => 1,
             _nbr => _nbr,
@@ -186,16 +193,18 @@ impl Mbc3 {
         Ok(())
     }
 
-    fn update_ram_rtc_lock(&mut self, data: u8) -> Result<(), Error> {
+    /// Enable RAM Read/Write Operation by sending 0x0a into reg0
+    fn update_ram_lock(&mut self, data: u8) -> Result<(), Error> {
         self.ram_lock = data == consts::MBC_MAGIC_LOCK;
-        self.rtc_lock = data == consts::MBC_MAGIC_LOCK;
         Ok(())
     }
 
+    /// Add rtc.dc_lower & rtc.dc_upper to retrieve the day
     fn get_days(&mut self) -> u64 {
         ((self.rtc.dc_upper as u64 & 1) << 8) & self.rtc.dc_lower as u64
     }
 
+    /// Convert RTC register into the number of seconds since the Epoch
     fn rtc_to_epoch(&mut self) -> u64 {
         let sec = self.rtc.seconds as u64;
         let min = self.rtc.minutes as u64;
@@ -204,6 +213,7 @@ impl Mbc3 {
         (days * 24 + hours) * 3600 + min * 60 + sec
     }
 
+    /// Convert a number of seconds since the Epoch into RTC
     fn epoch_to_rtc(&mut self, epoch: u64) {
         self.rtc.seconds = (epoch % 60) as u8;
         self.rtc.minutes = ((epoch / 60) % 60) as u8;
@@ -225,9 +235,8 @@ mod mbc3_test {
     use super::Mbc3;
     use shared::traits::Bus;
 
-    const FILE: &[u8; 1048576] = include_bytes!(
-        "../../../../../../roms/Mary-Kate and Ashley - Pocket Planner (USA, Europe).gbc"
-    );
+    const FILE: &[u8; 2097152] =
+        include_bytes!("../../../../../../roms/Pokemon - Version Argent.gbc");
 
     #[test]
     fn test_mbc3_get_0x0() {
@@ -345,7 +354,7 @@ mod mbc3_test {
         mbc.set(0x0aff, 0x28).unwrap();
 
         let data = mbc.get(0x0aff);
-        assert_eq!(data, 0xea);
+        assert_eq!(data, 0xc9);
 
         mbc.set(0x01ff, 0x00).unwrap();
         assert_eq!(mbc.ram_lock, false);
@@ -365,7 +374,7 @@ mod mbc3_test {
         mbc.set(0x0aff, 0x29).unwrap();
 
         let data = mbc.get(0x0aff);
-        assert_eq!(data, 0xea);
+        assert_eq!(data, 0xc9);
 
         mbc.set(0x01ff, 0x00).unwrap();
         assert_eq!(mbc.ram_lock, false);
@@ -385,7 +394,7 @@ mod mbc3_test {
         mbc.set(0x0aff, 0x30).unwrap();
 
         let data = mbc.get(0x0aff);
-        assert_eq!(data, 0xea);
+        assert_eq!(data, 0xc9);
 
         mbc.set(0x01ff, 0x00).unwrap();
         assert_eq!(mbc.ram_lock, false);
@@ -461,7 +470,7 @@ mod mbc3_test {
         assert_eq!(mbc.ram_bank, 8);
 
         let data = mbc.get(0x0aff);
-        assert_eq!(data, 0xea);
+        assert_eq!(data, 0xc9);
 
         mbc.set(0x01ff, 0x00).unwrap();
         assert_eq!(mbc.ram_lock, false);
