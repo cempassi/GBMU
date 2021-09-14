@@ -1,21 +1,26 @@
-use blip_buf::BlipBuf;
 use crate::channel::volume::VolumeEnvelope;
+use blip_buf::BlipBuf;
 
-const WAVE_PATTERN : [[i32; 8]; 4] = [[-1,-1,-1,-1,1,-1,-1,-1],[-1,-1,-1,-1,1,1,-1,-1],[-1,-1,1,1,1,1,-1,-1],[1,1,1,1,-1,-1,1,1]];
+const WAVE_PATTERN: [[i32; 8]; 4] = [
+    [-1, -1, -1, -1, 1, -1, -1, -1],
+    [-1, -1, -1, -1, 1, 1, -1, -1],
+    [-1, -1, 1, 1, 1, 1, -1, -1],
+    [1, 1, 1, 1, -1, -1, 1, 1],
+];
 
 #[allow(dead_code)]
 pub struct SquareChannel {
-    enabled : bool,
-    duty : u8,
-    phase : u8,
+    enabled: bool,
+    duty: u8,
+    phase: u8,
     length: u8,
     new_length: u8,
-    length_enabled : bool,
+    length_enabled: bool,
     frequency: u16,
     period: u32,
     last_amp: i32,
     delay: u32,
-    has_sweep : bool,
+    has_sweep: bool,
     sweep_frequency: u16,
     sweep_delay: u8,
     sweep_period: u8,
@@ -62,16 +67,16 @@ impl SquareChannel {
                 self.sweep_shift = data & 0x7;
                 self.sweep_frequency_increase = data & 0x8 == 0x8;
                 self.sweep_period = (data >> 4) & 0x7;
-            },
+            }
             0xff11 | 0xff16 => {
                 self.duty = data >> 6;
                 self.new_length = 64 - (data & 0x3F);
-            },
+            }
             0xff13 | 0xff18 => {
                 self.frequency = (self.frequency & 0x0700) | (data as u16);
                 self.length = self.new_length;
                 self.calculate_period();
-            },
+            }
             0xff14 | 0xff19 => {
                 self.frequency = (self.frequency & 0x00ff) | (((data & 0b0000_0111) as u16) << 8);
                 self.calculate_period();
@@ -87,7 +92,7 @@ impl SquareChannel {
                         self.step_sweep();
                     }
                 }
-            },
+            }
             _ => (),
         }
         self.volume_envelope.set(address, data);
@@ -95,8 +100,11 @@ impl SquareChannel {
 
     #[allow(dead_code)]
     fn calculate_period(&mut self) {
-        if self.frequency > 2048 { self.period = 0; }
-        else { self.period = (2048 - self.frequency as u32) * 4; }
+        if self.frequency > 2048 {
+            self.period = 0;
+        } else {
+            self.period = (2048 - self.frequency as u32) * 4;
+        }
     }
 
     #[allow(dead_code)]
@@ -104,12 +112,11 @@ impl SquareChannel {
     pub fn run(&mut self, start_time: u32, end_time: u32) {
         if !self.enabled || self.period == 0 || self.volume_envelope.volume == 0 {
             if self.last_amp != 0 {
-                self.blip.add_delta(start_time, - self.last_amp);
+                self.blip.add_delta(start_time, -self.last_amp);
                 self.last_amp = 0;
                 self.delay = 0;
             }
-        }
-        else {
+        } else {
             dbg!("toto");
             let mut time = start_time + self.delay;
             let pattern = WAVE_PATTERN[self.duty as usize];
@@ -142,12 +149,13 @@ impl SquareChannel {
 
     #[allow(dead_code)]
     pub fn step_sweep(&mut self) {
-        if !self.has_sweep || self.sweep_period == 0 { return; }
+        if !self.has_sweep || self.sweep_period == 0 {
+            return;
+        }
 
         if self.sweep_delay > 1 {
             self.sweep_delay -= 1;
-        }
-        else {
+        } else {
             self.sweep_delay = self.sweep_period;
             self.frequency = self.sweep_frequency;
             if self.frequency == 2048 {
@@ -162,18 +170,13 @@ impl SquareChannel {
                 // Increase in frequency means subtracting the offset
                 if self.sweep_frequency <= offset {
                     self.sweep_frequency = 0;
-                }
-                else {
+                } else {
                     self.sweep_frequency -= offset;
                 }
-            }
-            else {
-                if self.sweep_frequency >= 2048 - offset {
-                    self.sweep_frequency = 2048;
-                }
-                else {
-                    self.sweep_frequency += offset;
-                }
+            } else if self.sweep_frequency >= 2048 - offset {
+                self.sweep_frequency = 2048;
+            } else {
+                self.sweep_frequency += offset;
             }
         }
     }
@@ -184,7 +187,7 @@ mod test_square_channel {
     use super::SquareChannel;
     use blip_buf::BlipBuf;
 
-    const CLOCKS_PER_SECOND : u32 = 1 << 22;
+    const CLOCKS_PER_SECOND: u32 = 1 << 22;
     const SAMPLES_RATE: u32 = 48000;
 
     fn create_blipbuf(samples_rate: u32) -> BlipBuf {
@@ -268,7 +271,6 @@ mod test_square_channel {
         square_channel.set(0xff19, 0xcf);
         assert_eq!(square_channel.sweep_frequency, 0x70e);
         assert_eq!(square_channel.sweep_delay, 5);
-
     }
 
     #[test]
