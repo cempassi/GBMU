@@ -28,7 +28,7 @@ impl VolumeEnvelope {
                 self.initial_volume = data >> 4;
                 self.volume = self.initial_volume;
             }
-            0xFF14 | 0xFF19 | 0xFF23 if data & 0x80 == 0x80 => {
+            0xff14 | 0xff19 | 0xff23 if data & 0x80 == 0x80 => {
                 self.delay = self.period;
                 self.volume = self.initial_volume;
             }
