@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 pub struct VolumeEnvelope {
     period: u8,
     goes_up: bool,
@@ -7,7 +8,8 @@ pub struct VolumeEnvelope {
 }
 
 impl VolumeEnvelope {
-    pub(crate) fn new() -> VolumeEnvelope {
+    #[allow(dead_code)]
+    pub fn new() -> VolumeEnvelope {
         VolumeEnvelope {
             period: 0,
             goes_up: false,
@@ -17,7 +19,8 @@ impl VolumeEnvelope {
         }
     }
 
-    pub(crate) fn set(&mut self, address: usize, data: u8) {
+    #[allow(dead_code)]
+    pub fn set(&mut self, address: usize, data: u8) {
         match address {
             0xff12 | 0xff17 | 0xff21 => {
                 self.period = data & 0x7;
@@ -33,16 +36,20 @@ impl VolumeEnvelope {
         }
     }
 
-    pub(crate) fn step(&mut self) {
-        if self.delay > 1 {
-            self.delay -= 1;
-        } else if self.delay == 1 {
-            self.delay = self.period;
-            if self.goes_up && self.volume < 15 {
-                self.volume += 1;
-            } else if !self.goes_up && self.volume > 0 {
-                self.volume -= 1;
+    #[allow(dead_code)]
+    pub fn step(&mut self) {
+        match self.delay {
+            0 => (),
+            1 => {
+                self.delay = self.period;
+                if self.goes_up && self.volume < 15 {
+                    self.volume += 1;
+                } else if !self.goes_up && self.volume > 0 {
+                    self.volume -= 1;
+                }
             }
+            2..=7 => self.delay -= 1, // period is on 3 bit
+            _ => unreachable!(),
         }
     }
 }

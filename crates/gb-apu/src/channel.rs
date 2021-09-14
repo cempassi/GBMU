@@ -6,4 +6,4 @@ pub mod volume;
 // pub use noise::NoiseChannel;
 // pub use wave::WaveChannel;
 // pub use square::SquareChannel;
-// pub use volume::VolumeEnvelope;
+pub use volume::VolumeEnvelope;
