@@ -32,7 +32,7 @@ impl VolumeEnvelope {
                 self.delay = self.period;
                 self.volume = self.initial_volume;
             }
-            _ => unreachable!(),
+            _ => (),
         }
     }
 
@@ -49,7 +49,7 @@ impl VolumeEnvelope {
                 }
             }
             2..=7 => self.delay -= 1, // period is on 3 bit
-            _ => unreachable!(),
+            _ => (),
         }
     }
 }
