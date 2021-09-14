@@ -1,6 +1,6 @@
-pub mod noise;
-pub mod wave;
-pub mod square;
+// pub mod noise;
+// pub mod wave;
+// pub mod square;
 pub mod volume;
 
 // pub use noise::NoiseChannel;

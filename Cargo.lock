@@ -606,6 +606,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "gb-apu"
+version = "0.1.0"
+dependencies = [
+ "blip_buf",
+ "num_enum 0.5.4",
+ "shared",
+]
+
+[[package]]
 name = "gbmu"
 version = "0.1.0"
 dependencies = [
@@ -1698,15 +1707,6 @@ dependencies = [
  "memory",
  "num_enum 0.5.4",
  "pretty-hex",
-]
-
-[[package]]
-name = "sound"
-version = "0.1.0"
-dependencies = [
- "blip_buf",
- "num_enum 0.5.4",
- "shared",
 ]
 
 [[package]]
