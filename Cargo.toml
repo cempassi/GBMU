@@ -8,5 +8,5 @@ members = [
   "crates/memory",
   "crates/shared",
   "crates/soc",
-  "crates/gb-apu",
+  "crates/apu",
 ]
