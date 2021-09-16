@@ -117,7 +117,6 @@ impl SquareChannel {
                 self.delay = 0;
             }
         } else {
-            dbg!("toto");
             let mut time = start_time + self.delay;
             let pattern = WAVE_PATTERN[self.duty as usize];
             let vol = self.volume_envelope.volume as i32;
