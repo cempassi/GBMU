@@ -1,6 +1,6 @@
 #[allow(dead_code)]
 pub struct VolumeEnvelope {
-    period: u8,
+    pub(crate) period: u8,
     goes_up: bool,
     delay: u8,
     initial_volume: u8,
