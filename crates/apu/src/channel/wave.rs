@@ -11,14 +11,13 @@ pub struct WaveChannel {
     last_amp: i32,
     delay: u32,
     volume_shift: u8,
-    ram: [u8; 32],
+    pub(crate) ram: [u8; 32],
     current_wave: u8,
-    blip: BlipBuf,
+    pub(crate) blip: BlipBuf,
 }
 
 impl WaveChannel {
-    #[allow(dead_code)]
-    fn new(blip: BlipBuf) -> WaveChannel {
+    pub(crate) fn new(blip: BlipBuf) -> WaveChannel {
         WaveChannel {
             enabled: false,
             enabled_flag: false,
@@ -36,8 +35,7 @@ impl WaveChannel {
         }
     }
 
-    #[allow(dead_code)]
-    fn set(&mut self, address: usize, data: u8) {
+    pub(crate) fn set(&mut self, address: usize, data: u8) {
         match address {
             0xff1a => {
                 self.enabled_flag = (data & 0x80) == 0x80;
@@ -68,7 +66,6 @@ impl WaveChannel {
         }
     }
 
-    #[allow(dead_code)]
     fn calculate_period(&mut self) {
         if self.frequency > 2048 {
             self.period = 0;
@@ -77,13 +74,11 @@ impl WaveChannel {
         }
     }
 
-    #[allow(dead_code)]
-    fn on(&self) -> bool {
+    pub(crate) fn on(&self) -> bool {
         self.enabled
     }
 
-    #[allow(dead_code)]
-    fn run(&mut self, start_time: u32, end_time: u32) {
+    pub(crate) fn run(&mut self, start_time: u32, end_time: u32) {
         if !self.enabled || self.period == 0 {
             if self.last_amp != 0 {
                 self.blip.add_delta(start_time, -self.last_amp);
@@ -125,8 +120,7 @@ impl WaveChannel {
         }
     }
 
-    #[allow(dead_code)]
-    fn step_length(&mut self) {
+    pub(crate) fn step_length(&mut self) {
         if self.length_enabled && self.length != 0 {
             self.length -= 1;
             if self.length == 0 {
@@ -139,16 +133,9 @@ impl WaveChannel {
 #[cfg(test)]
 mod test_wave_channel {
     use super::WaveChannel;
-    use blip_buf::BlipBuf;
+    use crate::sound::create_blipbuf;
 
-    const CLOCKS_PER_SECOND: u32 = 1 << 22;
     const SAMPLES_RATE: u32 = 48000;
-
-    fn create_blipbuf(samples_rate: u32) -> BlipBuf {
-        let mut blipbuf = BlipBuf::new(samples_rate);
-        blipbuf.set_rates(CLOCKS_PER_SECOND as f64, samples_rate as f64);
-        blipbuf
-    }
 
     #[test]
     fn test_wave_channel_on() {

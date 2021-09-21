@@ -8,7 +8,6 @@ const WAVE_PATTERN: [[i32; 8]; 4] = [
     [1, 1, 1, 1, -1, -1, 1, 1],
 ];
 
-#[allow(dead_code)]
 pub struct SquareChannel {
     enabled: bool,
     duty: u8,
@@ -31,7 +30,6 @@ pub struct SquareChannel {
 }
 
 impl SquareChannel {
-    #[allow(dead_code)]
     pub fn new(blip: BlipBuf, with_sweep: bool) -> SquareChannel {
         SquareChannel {
             enabled: false,
@@ -55,12 +53,10 @@ impl SquareChannel {
         }
     }
 
-    #[allow(dead_code)]
     pub fn on(&self) -> bool {
         self.enabled
     }
 
-    #[allow(dead_code)]
     pub fn set(&mut self, address: usize, data: u8) {
         match address {
             0xff10 => {
@@ -98,7 +94,6 @@ impl SquareChannel {
         self.volume_envelope.set(address, data);
     }
 
-    #[allow(dead_code)]
     fn calculate_period(&mut self) {
         if self.frequency > 2048 {
             self.period = 0;
@@ -107,7 +102,6 @@ impl SquareChannel {
         }
     }
 
-    #[allow(dead_code)]
     // This assumes no volume or sweep adjustments need to be done in the meantime
     pub fn run(&mut self, start_time: u32, end_time: u32) {
         if !self.enabled || self.period == 0 || self.volume_envelope.volume == 0 {
@@ -136,7 +130,6 @@ impl SquareChannel {
         }
     }
 
-    #[allow(dead_code)]
     pub fn step_length(&mut self) {
         if self.length_enabled && self.length != 0 {
             self.length -= 1;
@@ -146,7 +139,6 @@ impl SquareChannel {
         }
     }
 
-    #[allow(dead_code)]
     pub fn step_sweep(&mut self) {
         if !self.has_sweep || self.sweep_period == 0 {
             return;
@@ -184,16 +176,9 @@ impl SquareChannel {
 #[cfg(test)]
 mod test_square_channel {
     use super::SquareChannel;
-    use blip_buf::BlipBuf;
+    use crate::sound::create_blipbuf;
 
-    const CLOCKS_PER_SECOND: u32 = 1 << 22;
     const SAMPLES_RATE: u32 = 48000;
-
-    fn create_blipbuf(samples_rate: u32) -> BlipBuf {
-        let mut blipbuf = BlipBuf::new(samples_rate);
-        blipbuf.set_rates(CLOCKS_PER_SECOND as f64, samples_rate as f64);
-        blipbuf
-    }
 
     #[test]
     fn test_square_channel_on() {

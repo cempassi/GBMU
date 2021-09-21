@@ -1,3 +1,3 @@
-// pub mod sound;
-// pub mod player;
 mod channel;
+pub mod player;
+pub mod sound;

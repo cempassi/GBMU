@@ -6,18 +6,17 @@ pub struct NoiseChannel {
     length: u8,
     new_length: u8,
     length_enabled: bool,
-    volume_envelope: VolumeEnvelope,
+    pub(crate) volume_envelope: VolumeEnvelope,
     period: u32,
     shift_width: u8,
     state: u16,
     delay: u32,
     last_amp: i32,
-    blip: BlipBuf,
+    pub(crate) blip: BlipBuf,
 }
 
 impl NoiseChannel {
-    #[allow(dead_code)]
-    fn new(blip: BlipBuf) -> NoiseChannel {
+    pub(crate) fn new(blip: BlipBuf) -> NoiseChannel {
         NoiseChannel {
             enabled: false,
             length: 0,
@@ -33,8 +32,7 @@ impl NoiseChannel {
         }
     }
 
-    #[allow(dead_code)]
-    fn set(&mut self, address: usize, data: u8) {
+    pub(crate) fn set(&mut self, address: usize, data: u8) {
         match address {
             0xff20 => self.new_length = 64 - (data & 0x3f),
             // 0xff21 => (),
@@ -60,13 +58,11 @@ impl NoiseChannel {
         self.volume_envelope.set(address, data);
     }
 
-    #[allow(dead_code)]
-    fn on(&self) -> bool {
+    pub(crate) fn on(&self) -> bool {
         self.enabled
     }
 
-    #[allow(dead_code)]
-    fn run(&mut self, start_time: u32, end_time: u32) {
+    pub(crate) fn run(&mut self, start_time: u32, end_time: u32) {
         if !self.enabled || self.volume_envelope.volume == 0 {
             if self.last_amp != 0 {
                 self.blip.add_delta(start_time, -self.last_amp);
@@ -97,8 +93,7 @@ impl NoiseChannel {
         }
     }
 
-    #[allow(dead_code)]
-    fn step_length(&mut self) {
+    pub(crate) fn step_length(&mut self) {
         if self.length_enabled && self.length != 0 {
             self.length -= 1;
             if self.length == 0 {
@@ -111,16 +106,9 @@ impl NoiseChannel {
 #[cfg(test)]
 mod test_noise_channel {
     use super::NoiseChannel;
-    use blip_buf::BlipBuf;
+    use crate::sound::create_blipbuf;
 
-    const CLOCKS_PER_SECOND: u32 = 1 << 22;
     const SAMPLES_RATE: u32 = 48000;
-
-    fn create_blipbuf(samples_rate: u32) -> BlipBuf {
-        let mut blipbuf = BlipBuf::new(samples_rate);
-        blipbuf.set_rates(CLOCKS_PER_SECOND as f64, samples_rate as f64);
-        blipbuf
-    }
 
     #[test]
     fn test_noise_channel_on() {
