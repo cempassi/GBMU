@@ -6,11 +6,11 @@ const SURFACE: Color = Color::from_rgb(
     0x4B as f32 / 255.0,
 );
 
-const ACCENT: Color = Color::from_rgb(
-    0x6F as f32 / 255.0,
-    0xFF as f32 / 255.0,
-    0xE9 as f32 / 255.0,
-);
+// const ACCENT: Color = Color::from_rgb(
+//     0x6F as f32 / 255.0,
+//     0xFF as f32 / 255.0,
+//     0xE9 as f32 / 255.0,
+// );
 
 const ACTIVE: Color = Color::from_rgb(
     0x72 as f32 / 255.0,
@@ -18,11 +18,11 @@ const ACTIVE: Color = Color::from_rgb(
     0xDA as f32 / 255.0,
 );
 
-const HOVERED: Color = Color::from_rgb(
-    0x67 as f32 / 255.0,
-    0x7B as f32 / 255.0,
-    0xC4 as f32 / 255.0,
-);
+// const HOVERED: Color = Color::from_rgb(
+//     0x67 as f32 / 255.0,
+//     0x7B as f32 / 255.0,
+//     0xC4 as f32 / 255.0,
+// );
 
 pub struct Container;
 
