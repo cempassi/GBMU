@@ -23,3 +23,12 @@ impl From<Theme> for Box<dyn container::StyleSheet> {
         }
     }
 }
+
+impl From<Theme> for Box<dyn checkbox::StyleSheet> {
+    fn from(theme: Theme) -> Self {
+        match theme {
+            Theme::Light => light::Checkbox.into(),
+            Theme::Dark => dark::Checkbox.into(),
+        }
+    }
+}
