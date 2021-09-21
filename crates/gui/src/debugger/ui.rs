@@ -30,21 +30,12 @@ pub enum Message {
     ForRegister(register::Message),
 }
 
-#[derive(Default)]
-pub struct UserInterface {
-    registers: register::Registers,
-}
-
 impl Program for UserInterface {
-    type Clipboard = Clipboard;
     type Message = Message;
     type Renderer = Renderer;
 
-    fn update(
-        &mut self,
-        message: Message,
-        _clipboard: &mut Self::Clipboard,
-    ) -> Command<Self::Message> {
+    fn update(&mut self, message: Message) -> Command<Self::Message> {
+        println!("Update of UserInterface reached");
         match message {
             Message::ForRegister(message) => {
                 self.registers.update(message);
@@ -54,15 +45,8 @@ impl Program for UserInterface {
     }
 
     fn view(&mut self) -> Element<Message, Self::Renderer> {
-        let column = Column::new()
-            .push(Text::new("Hello, world! Are we doing this or what?").color([0.0, 0.0, 1.0]));
-
-        Element::new(column)
+        self.registers
+            .view()
+            .map(|message| Message::ForRegister(message))
     }
-}
-
-impl UserInterface {
-    // fn title(&self) -> String {
-    //     String::from("Hello World")
-    // }
 }
