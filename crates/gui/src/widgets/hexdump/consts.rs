@@ -1,5 +1,5 @@
-use iced_graphics::triangle::Vertex2D;
-use iced_graphics::Vector;
+use iced_wgpu::triangle::Vertex2D;
+use iced_winit::Vector;
 use std::ops::Range;
 
 pub const CURSOR_MESH: (&[Vertex2D], &[u32]) = (

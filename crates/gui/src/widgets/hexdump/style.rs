@@ -1,7 +1,8 @@
 //! Style for an [`Hexview`] widget.
 //!
 //! [`Hexview`]: ../native/hexview/struct.Hexview.html
-use iced_native::Color;
+
+use iced_wgpu::Color;
 
 /// The apperance of an [`Hexview`].
 ///

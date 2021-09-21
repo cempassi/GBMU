@@ -1,4 +1,4 @@
-use iced_native::{mouse, Point};
+use iced_winit::Point;
 
 
 /// state of hexdump
@@ -13,7 +13,7 @@ pub struct State {
     pub test_offset: f32,
     pub debug_enabled: bool,
     pub selection: Option<(usize, usize)>,
-    pub last_click: Option<mouse::click::Click>,
+    pub last_click: Option<iced_winit::mouse::click::Click>,
     pub last_click_pos: Option<Point>,
     pub is_dragging: bool,
     pub mouse_pos: Point,
@@ -27,7 +27,7 @@ impl State {
     pub fn load(&mut self, bytes: &[u8]) {
         use std::hash::Hasher;
 
-        let mut hasher = iced_native::Hasher::default();
+        let mut hasher = iced_winit::Hasher::default();
         hasher.write(bytes);
         self.bytes_hash = hasher.finish();
         self.bytes = bytes.to_vec();

@@ -1,16 +1,19 @@
-use super::{consts, style, utils::range_intersect};
-use iced_graphics::{
-    backend,
+use iced_graphics::backend::Text;
+use iced_wgpu::{
     triangle::{Mesh2D, Vertex2D},
-    Backend, HorizontalAlignment, Primitive, Vector, VerticalAlignment,
+    Color, Primitive,
 };
-use iced_native::{mouse, Background, Color, Font, Point, Rectangle, Size};
+use iced_winit::{
+    Background, Font, HorizontalAlignment, Point, Rectangle, Size, Vector, VerticalAlignment,
+};
+
+use super::{consts, style, utils::range_intersect};
 
 /// The renderer of an `Hexview`.
 ///
 /// [`Hexview`]: struct.Hexview.html
 #[allow(clippy::too_many_arguments)]
-pub trait Renderer: iced_native::Renderer {
+pub trait Renderer: iced_winit::Renderer {
     /// The style supported by this renderer.
     type Style: Default;
 
@@ -64,7 +67,7 @@ struct LineSpan {
     end: usize,
 }
 
-impl<B: Backend + backend::Text> self::Renderer for iced_graphics::Renderer<B> {
+impl self::Renderer for iced_wgpu::Renderer {
     type Style = Box<dyn style::StyleSheet>;
 
     fn cursor_offset(
@@ -739,7 +742,7 @@ impl<B: Backend + backend::Text> self::Renderer for iced_graphics::Renderer<B> {
                 cursor_prim,
                 debug_info,
             ]),
-            mouse::Interaction::default(),
+            iced_winit::mouse::Interaction::default(),
         )
     }
 }
