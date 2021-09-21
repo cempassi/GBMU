@@ -14,7 +14,6 @@ pub fn create_blipbuf(samples_rate: u32) -> BlipBuf {
     blipbuf
 }
 
-#[derive(Debug)]
 pub struct Sound {
     on: bool,
     registerdata: [u8; 23],
