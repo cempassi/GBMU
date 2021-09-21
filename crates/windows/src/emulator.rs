@@ -1,7 +1,7 @@
 use iced_wgpu::wgpu::{
     util::StagingBelt, CommandEncoderDescriptor, Device, DeviceDescriptor, Features, Instance,
     Limits, PowerPreference, PresentMode, Queue, RequestAdapterOptions, Surface,
-    SurfaceConfiguration, SurfaceError, TextureFormat, TextureUsages, TextureViewDescriptor,
+    SurfaceConfiguration, SurfaceError, TextureFormat, TextureUsages,
 };
 
 use iced_winit::{

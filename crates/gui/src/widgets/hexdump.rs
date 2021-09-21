@@ -6,7 +6,6 @@ pub mod state;
 
 use iced_winit::{
     event::Status, layout, Element, Event, Font, Hasher, Layout, Length, Point, Rectangle, Size,
-    Widget,
 };
 use std::{hash::Hash, marker::PhantomData};
 use utils::clamp;
