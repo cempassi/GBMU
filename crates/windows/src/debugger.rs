@@ -1,6 +1,6 @@
 use iced_wgpu::wgpu::{
-    util::StagingBelt, CommandEncoderDescriptor, Device, DeviceDescriptor, Features, Instance,
-    Limits, PowerPreference, PresentMode, Queue, RequestAdapterOptions, Surface,
+    self, util::StagingBelt, CommandEncoderDescriptor, Device, DeviceDescriptor, Features,
+    Instance, Limits, PowerPreference, PresentMode, Queue, RequestAdapterOptions, Surface,
     SurfaceConfiguration, SurfaceError, TextureFormat, TextureUsages, TextureViewDescriptor,
 };
 
@@ -163,14 +163,38 @@ impl Debugger {
 
         match self.surface.get_current_frame() {
             Ok(frame) => {
+                // Generate the encoder to create the actual commands to send to the gpu.
                 let mut encoder = self
                     .device
-                    .create_command_encoder(&CommandEncoderDescriptor { label: None });
+                    .create_command_encoder(&CommandEncoderDescriptor {
+                        label: Some("Render Encoder"),
+                    });
 
+                // Generate the frame that we will render to.
                 let view = frame
                     .output
                     .texture
                     .create_view(&TextureViewDescriptor::default());
+
+                // Clear the screen to white before drawing
+                let _render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                    label: Some("Render Pass"),
+                    color_attachments: &[wgpu::RenderPassColorAttachment {
+                        view: &view,
+                        resolve_target: None,
+                        ops: wgpu::Operations {
+                            load: wgpu::LoadOp::Clear(wgpu::Color {
+                                r: 1.0,
+                                g: 1.0,
+                                b: 1.0,
+                                a: 1.0,
+                            }),
+                            store: true,
+                        },
+                    }],
+                    depth_stencil_attachment: None,
+                });
+                drop(_render_pass);
 
                 // And then iced on top
                 let mouse_action = self.state.renderer.backend_mut().draw(
