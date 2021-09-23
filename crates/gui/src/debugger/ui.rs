@@ -25,10 +25,6 @@ impl<'a> From<&SOC<'a>> for UserInterface {
     }
 }
 
-#[derive(Debug, Clone)]
-pub enum Message {
-    Registers(register::Message),
-}
 
 impl Program for UserInterface {
     type Message = Message;
@@ -38,15 +34,16 @@ impl Program for UserInterface {
         println!("Update of UserInterface reached");
         match message {
             Message::Registers(message) => {
-                self.registers.update(message);
+                self.cpu_registers.update(message);
                 Command::none()
             }
         }
     }
 
     fn view(&mut self) -> Element<Message, Self::Renderer> {
-        self.registers
+        self.cpu_registers
             .view()
             .map(|message| Message::Registers(message))
     }
 }
+
