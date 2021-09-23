@@ -1,5 +1,21 @@
-mod loadreg1reg2;
-mod loadregnum8bit;
+mod alu_8bits;
+mod loads_16bits;
+mod loads_8bits;
+mod miscellaneous;
+mod rotates_shifts;
+mod bit_operations;
+mod jumps;
+mod calls;
+mod returns;
+mod restart;
 
-pub use loadregnum8bit::LoadRegNum8bit;
-pub use loadreg1reg2::LoadReg1Reg2;
+pub use alu_8bits::*;
+pub use loads_16bits::*;
+pub use loads_8bits::*;
+pub use miscellaneous::*;
+pub use rotates_shifts::*;
+pub use bit_operations::*;
+pub use jumps::*;
+pub use calls::*;
+pub use returns::*;
+pub use restart::*;
