@@ -1,6 +1,6 @@
 use crate::fonts;
 use crate::theme::Theme;
-use iced_wgpu::{Column, Container, Renderer, Row, Text};
+use iced_wgpu::{Checkbox, Column, Container, Renderer, Row, Text};
 use iced_winit::{Align, Element};
 
 #[derive(Default)]
@@ -9,24 +9,43 @@ pub struct CpuRegisters {
     registers: Vec<RegisterPair>,
 }
 
+#[derive(Debug, Clone)]
+pub enum Message {
+    MergeToogle,
+}
+
 enum RegisterPair {
     Splited(Register, Register),
-    Merged(Register)
+    Merged(Register),
 }
 
 impl RegisterPair {
     pub fn view(&self, theme: Theme) -> Element<Message, Renderer> {
-        match self {
-            RegisterPair::Splited(left, right) => {
-                Row::new().push(left.view(theme)).push(right.view(theme)).into()
-            },
+        let checkbox = Checkbox::new(self.is_merged(), "", |_| Message::MergeToogle);
+
+        let register_pair = match self {
+            RegisterPair::Splited(left, right) => Row::new()
+                .push(left.view(theme))
+                .push(right.view(theme))
+                .into(),
             RegisterPair::Merged(register) => register.view(theme),
+        };
+
+        Row::new()
+            .push(checkbox)
+            .push(register_pair)
+            .spacing(10)
+            .align_items(Align::Center)
+            .into()
+    }
+
+    pub fn is_merged(&self) -> bool {
+        match self {
+            RegisterPair::Splited(_, _) => false,
+            RegisterPair::Merged(_) => true,
         }
     }
 }
-
-#[derive(Debug, Clone)]
-pub enum Message {}
 
 pub struct Register {
     name: String,
@@ -43,7 +62,9 @@ impl Register {
 
     pub fn view(&self, theme: Theme) -> Element<Message, Renderer> {
         let data = Text::new(self.get_data()).font(fonts::HASKLIG_LIGHT);
-        let name = Text::new(self.name.clone()).font(fonts::HASKLIG_BOLD).size(30);
+        let name = Text::new(self.name.clone())
+            .font(fonts::HASKLIG_BOLD)
+            .size(30);
         let number = Container::new(data).style(theme).padding(5);
         Row::new()
             .push(name)
