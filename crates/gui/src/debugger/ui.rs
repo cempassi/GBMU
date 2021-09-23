@@ -27,7 +27,7 @@ impl<'a> From<&SOC<'a>> for UserInterface {
 
 #[derive(Debug, Clone)]
 pub enum Message {
-    ForRegister(register::Message),
+    Registers(register::Message),
 }
 
 impl Program for UserInterface {
@@ -37,7 +37,7 @@ impl Program for UserInterface {
     fn update(&mut self, message: Message) -> Command<Self::Message> {
         println!("Update of UserInterface reached");
         match message {
-            Message::ForRegister(message) => {
+            Message::Registers(message) => {
                 self.registers.update(message);
                 Command::none()
             }
@@ -47,6 +47,6 @@ impl Program for UserInterface {
     fn view(&mut self) -> Element<Message, Self::Renderer> {
         self.registers
             .view()
-            .map(|message| Message::ForRegister(message))
+            .map(|message| Message::Registers(message))
     }
 }
