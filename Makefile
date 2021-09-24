@@ -1,8 +1,8 @@
-RESSOURCES_DIR := ressources
+RESSOURCES_PATH := ressources
 
 BIOS_URL := "https://gbdev.gg8.se/files/roms/bootroms/"
 
-BIOS_DIR += $(RESSOURCES_DIR)/bios
+BIOS_PATH += $(RESSOURCES_PATH)/bios
 
 BIOS += "dmg_boot.bin"
 
@@ -11,20 +11,54 @@ ROMS_URL2 := "https://s3roms.download/romfiles/gameboy/a/ayakashi-no-shiro-japan
 
 ROM2_ZIP := "Ayakashi.zip"
 ROM2_NAME := "Ayakashi no Shiro (J) [!].gb"
+ROM3_ZIP := "Mary-Kate and Ashley - Pocket Planner (USA, Europe).zip"
+ROM3_NAME := "Mary-Kate and Ashley - Pocket Planner (USA, Europe).gbc"
 
-ROMS_DIR := roms
+# Fonts
+FONT_PATH := $(RESSOURCES_PATH)/fonts
 
-ROMS := $(ROMS_DIR)/$(_ROMS)
+## Hasklig
+HASKLIG_URL := "https://github.com/i-tu/Hasklig/releases/download/v1.2/Hasklig-1.2.zip"
+HASKLIG_PATH := $(FONT_PATH)/hasklig
+HASKLIG_ZIP := "Hasklig-1.2.zip"
 
-all: requirements
+ROMS_PATH := roms
 
-requirements: roms $(BIOS)
+ROMS := $(ROMS_PATH)/$(_ROMS)
 
-$(BIOS): $(BIOS_DIR)
+### Base ###
+
+all: requirements clean
+
+requirements: roms fonts $(BIOS)
+
+### Fonts ###
+
+fonts: hasklig
+
+### Hasklig ###
+
+hasklig: $(HASKLIG_ZIP)
+	unzip -o $<
+	rm -rf ./__MACOSX OTF
+	mv TTF/* $(HASKLIG_PATH)
+	rm -rf TTF
+
+$(HASKLIG_ZIP): $(HASKLIG_PATH)
+	curl -L $(HASKLIG_URL) > $@
+
+$(HASKLIG_PATH):
+	mkdir -p $@
+
+### Bios ###
+
+$(BIOS): $(BIOS_PATH)
 	curl $(BIOS_URL)/$@ > $</$@
 
-$(BIOS_DIR):
+$(BIOS_PATH):
 	mkdir -p $@
+
+### Roms ###
 
 roms: roms.zip
 	unzip -o $< 'roms/*' -x '*/.DS_Store'
@@ -34,6 +68,8 @@ roms: roms.zip
 roms.zip:
 	curl -L $(ROMS_URL1) > $@
 	curl $(ROMS_URL2) > $(ROM2_ZIP)
+
+### utils ###
 
 lint:
 	cargo clippy --workspace --verbose -- -D warnings
@@ -45,6 +81,9 @@ format:
 	cargo fmt --verbose -- --check
 
 clean:
-	rm -rf roms roms.zip ressources $(ROM2_ZIP)
+	rm -rf roms.zip  $(ROM2_ZIP) $(ROM3_ZIP) $(HASKLIG_ZIP)
 
-.PHONY: requirement roms
+fclean: clean
+	rm -rf roms ressources
+
+.PHONY: requirement roms hasklig lint format.all format clean
