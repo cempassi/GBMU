@@ -1,3 +1,5 @@
+use soc::SOC;
+
 use iced_wgpu::wgpu::{
     self, util::StagingBelt, CommandEncoderDescriptor, Device, DeviceDescriptor, Features,
     Instance, Limits, PowerPreference, PresentMode, Queue, RequestAdapterOptions, Surface,
@@ -75,7 +77,7 @@ fn init_device(
 }
 
 impl Debugger {
-    pub fn new(event_loop: &EventLoop<()>, instance: &Instance) -> Self {
+    pub fn new(event_loop: &EventLoop<()>, instance: &Instance, soc: &SOC) -> Self {
         let title = "Debugger";
         let window = Window::new(event_loop).unwrap();
         let modifiers = ModifiersState::default();
@@ -92,7 +94,7 @@ impl Debugger {
         let staging_belt = StagingBelt::new(5 * 1024);
         let format_pool = LocalPool::new();
 
-        let state = gui::Debugger::new(&window, &device, format);
+        let state = gui::Debugger::new(&window, &device, format, soc);
 
         Self {
             id,

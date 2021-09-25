@@ -9,9 +9,6 @@ use registers::{CpuMsg, CpuRegisters};
 use soc::SOC;
 use std::convert::From;
 
-use registers::{CpuMsg, CpuRegisters};
-
-#[derive(Default)]
 pub struct UserInterface {
     theme: Theme,
     cpu_registers: CpuRegisters,

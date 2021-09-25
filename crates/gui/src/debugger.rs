@@ -1,4 +1,5 @@
 mod ui;
+use soc::SOC;
 
 use iced_wgpu::wgpu::util::StagingBelt;
 use iced_wgpu::wgpu::{
@@ -21,8 +22,8 @@ pub struct Debugger {
 }
 
 impl Debugger {
-    pub fn new(window: &Window, device: &Device, format: TextureFormat) -> Self {
-        let user_interface = UserInterface::new();
+    pub fn new(window: &Window, device: &Device, format: TextureFormat, soc: &SOC) -> Self {
+        let user_interface = UserInterface::from(soc);
         let mut debug = Debug::new();
         let clipboard = Clipboard::connect(window);
 
