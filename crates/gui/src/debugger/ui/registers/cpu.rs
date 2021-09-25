@@ -68,11 +68,7 @@ impl RegisterPair {
         }
     }
 
-    fn view_register(
-        &self,
-        registers: Registers,
-        theme: Theme,
-    ) -> Element<RegisterMsg, Renderer> {
+    fn view_register(&self, registers: Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
         match self {
             RegisterPair::Splited(left, right) => Row::new()
                 .push(left.view(registers.clone(), theme))

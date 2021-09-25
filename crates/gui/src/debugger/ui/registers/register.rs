@@ -4,7 +4,6 @@ use cpu::Registers;
 use iced_wgpu::{Container, Renderer, Row, Text};
 use iced_winit::{Align, Element, Length, Space};
 use shared::traits::Bus;
-use cpu::Registers;
 
 use cpu::area::{Bits16, Bits8};
 
