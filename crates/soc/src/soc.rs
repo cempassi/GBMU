@@ -11,9 +11,9 @@ const HEADER_START: usize = 0x100;
 const HEADER_LEN: usize = 0x50;
 const HEAD_LEN: usize = 0x100;
 
-pub struct SOC /*<'a>*/ {
-    //clock: u32,
-    cpu: Cpu, /*<'a>*/
+pub struct SOC {
+    clock: u32,
+    cpu: Cpu,
 }
 
 impl TryFrom<&str> for SOC /*<'a>*/ {
@@ -32,15 +32,15 @@ impl TryFrom<&str> for SOC /*<'a>*/ {
 
         let header = Header::try_from(raw_header).expect("Invalid data in raw_header");
 
-        let _clock: u32 = 0;
-        let _memory = <Memory as NewMemory>::new(header.cartridge, rom);
-        let cpu: Cpu = Cpu::new(/*memory*/);
+        let clock: u32 = 0;
+        let memory = Memory::new(header.cartridge, rom);
+        let cpu: Cpu = Cpu::new(memory);
 
-        Ok(SOC { /*clock,*/ cpu, })
+        Ok(SOC { clock, cpu })
     }
 }
 
-impl SOC /*<'a>*/ {
+impl SOC {
     pub fn get_cpu_registers(&self) -> Registers {
         self.cpu.get_registers()
     }
