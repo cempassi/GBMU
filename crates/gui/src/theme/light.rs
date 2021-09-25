@@ -1,6 +1,5 @@
 use iced_wgpu::{checkbox, container, Color};
 
-
 const BACKGROUND: Color = Color::from_rgb(
     0xFF as f32 / 255.0,
     0xFF as f32 / 255.0,
@@ -56,7 +55,7 @@ pub struct Checkbox;
 impl checkbox::StyleSheet for Checkbox {
     fn active(&self, _is_checked: bool) -> checkbox::Style {
         checkbox::Style {
-            background:  BACKGROUND.into(),
+            background: BACKGROUND.into(),
             checkmark_color: CHECKED,
             border_radius: 10.0,
             border_width: 5.0,

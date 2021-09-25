@@ -59,7 +59,7 @@ impl CpuRegisters {
 enum RegisterPair {
     Splited(Bits8, Bits8),
     Merged(Bits16),
-    NoSplit(Bits16)
+    NoSplit(Bits16),
 }
 
 impl RegisterPair {
@@ -84,7 +84,9 @@ impl RegisterPair {
                 .push(left.view(registers, theme))
                 .push(right.view(registers, theme))
                 .into(),
-            RegisterPair::Merged(register) | RegisterPair::NoSplit(register)  => register.view(registers, theme),
+            RegisterPair::Merged(register) | RegisterPair::NoSplit(register) => {
+                register.view(registers, theme)
+            }
         }
     }
 
@@ -93,9 +95,7 @@ impl RegisterPair {
         let register = self.view_register(registers, theme);
         let row = Row::new().padding(10).spacing(2).align_items(Align::Center);
         let row = match self {
-            RegisterPair::Splited(_, _) | RegisterPair::Merged(_) => {
-                row.push(checkbox)
-            }
+            RegisterPair::Splited(_, _) | RegisterPair::Merged(_) => row.push(checkbox),
             RegisterPair::NoSplit(_) => row,
         };
         row.push(register).into()
