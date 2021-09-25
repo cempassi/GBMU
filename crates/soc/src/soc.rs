@@ -33,7 +33,7 @@ impl TryFrom<&str> for SOC /*<'a>*/ {
         let header = Header::try_from(raw_header).expect("Invalid data in raw_header");
 
         let clock: u32 = 0;
-        let memory = Memory::new(header.cartridge, rom);
+        let memory = <Memory as New>::new(header.cartridge, rom);
         let cpu: Cpu = Cpu::new(memory);
 
         Ok(SOC { clock, cpu })
