@@ -45,7 +45,7 @@ impl container::StyleSheet for Container {
             background: CONTAINER_BACKGROUND.into(),
             border_radius: 10.0,
             border_width: 2.0,
-            border_color: CONTAINER_BORDER.into(),
+            border_color: CONTAINER_BORDER,
         }
     }
 }

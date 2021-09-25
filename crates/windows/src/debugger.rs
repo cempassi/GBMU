@@ -37,7 +37,7 @@ fn init_device(
         let adapter = instance
             .request_adapter(&RequestAdapterOptions {
                 power_preference: PowerPreference::HighPerformance,
-                compatible_surface: Some(&surface),
+                compatible_surface: Some(surface),
             })
             .await
             .expect("Request adapter");
@@ -77,7 +77,7 @@ fn init_device(
 impl Debugger {
     pub fn new(event_loop: &EventLoop<()>, instance: &Instance) -> Self {
         let title = "Debugger";
-        let window = Window::new(&event_loop).unwrap();
+        let window = Window::new(event_loop).unwrap();
         let modifiers = ModifiersState::default();
         window.set_title(title);
 
@@ -86,7 +86,7 @@ impl Debugger {
 
         // Initialize wgpu
         let surface = unsafe { instance.create_surface(&window) };
-        let (format, device, queue) = init_device(&window, &instance, &surface);
+        let (format, device, queue) = init_device(&window, instance, &surface);
 
         // Initialize staging belt and local pool
         let staging_belt = StagingBelt::new(5 * 1024);
@@ -198,7 +198,7 @@ impl Debugger {
 
                 // And then iced on top
                 let mouse_action = self.state.renderer.backend_mut().draw(
-                    &mut self.device,
+                    &self.device,
                     &mut self.staging_belt,
                     &mut encoder,
                     &view,

@@ -37,7 +37,7 @@ fn init_device(
         let adapter = instance
             .request_adapter(&RequestAdapterOptions {
                 power_preference: PowerPreference::HighPerformance,
-                compatible_surface: Some(&surface),
+                compatible_surface: Some(surface),
             })
             .await
             .expect("Request adapter");
@@ -77,7 +77,7 @@ fn init_device(
 impl Emulator {
     pub fn new(event_loop: &EventLoop<()>, instance: &Instance) -> Self {
         let title = "Debugger";
-        let window = Window::new(&event_loop).unwrap();
+        let window = Window::new(event_loop).unwrap();
         window.set_title(title);
         let modifiers = ModifiersState::default();
 
@@ -86,7 +86,7 @@ impl Emulator {
 
         // Initialize wgpu
         let surface = unsafe { instance.create_surface(&window) };
-        let (format, device, queue) = init_device(&window, &instance, &surface);
+        let (format, device, queue) = init_device(&window, instance, &surface);
 
         // Initialize staging belt and local pool
         let staging_belt = StagingBelt::new(5 * 1024);
