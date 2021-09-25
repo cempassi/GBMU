@@ -677,6 +677,7 @@ dependencies = [
 name = "gbmu"
 version = "0.1.0"
 dependencies = [
+ "soc",
  "windows",
 ]
 
@@ -2200,6 +2201,7 @@ dependencies = [
  "gui",
  "iced_wgpu",
  "iced_winit",
+ "soc",
 ]
 
 [[package]]

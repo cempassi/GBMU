@@ -20,3 +20,4 @@ soc = { path = "../soc" }
 cpu = { path = "../cpu" }
 memory = { path = "../memory" }
 shared = { path = "../shared" }
+soc = { path = "../soc" }

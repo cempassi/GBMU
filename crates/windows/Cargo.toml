@@ -8,4 +8,5 @@ edition = "2018"
 [dependencies]
 iced_wgpu = {git = "https://github.com/hecrj/iced"}
 iced_winit = {git = "https://github.com/hecrj/iced"}
-gui = { path = "../gui"}
+gui = { path = "../gui" }
+soc = { path = "../soc" }
