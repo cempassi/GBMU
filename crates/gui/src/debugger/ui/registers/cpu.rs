@@ -8,7 +8,6 @@ use itertools::Itertools;
 
 #[derive(Default)]
 pub struct CpuRegisters {
-    theme: Theme,
     reg: cpu::Registers,
     registers: Vec<RegisterPair>,
 }
@@ -19,7 +18,7 @@ pub enum CpuMsg {
 }
 
 impl CpuRegisters {
-    pub fn new(theme: Theme) -> Self {
+    pub fn new() -> Self {
         let mut registers = Vec::new();
         for (left, right) in Bits8::into_enum_iter().tuples() {
             registers.push(RegisterPair::Splited(left, right));
@@ -28,7 +27,6 @@ impl CpuRegisters {
         registers.push(RegisterPair::NoSplit(Bits16::PC));
         let reg = cpu::Registers::default();
         Self {
-            theme,
             reg,
             registers,
         }
@@ -43,13 +41,13 @@ impl CpuRegisters {
         }
     }
 
-    pub fn view(&mut self) -> Element<CpuMsg, Renderer> {
+    pub fn view(&mut self, theme: Theme) -> Element<CpuMsg, Renderer> {
         let column =
             self.registers
                 .iter()
                 .enumerate()
                 .fold(Column::new(), |column, (index, register)| {
-                    let element = register.view(&self.reg, self.theme);
+                    let element = register.view(&self.reg, theme);
                     column.push(element.map(move |_message| CpuMsg::Merge(index)))
                 });
         column.into()

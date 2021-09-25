@@ -12,7 +12,6 @@ use std::convert::From;
 use registers::{CpuMsg, CpuRegisters};
 
 #[derive(Default)]
-#[allow(dead_code)]
 pub struct UserInterface {
     theme: Theme,
     cpu_registers: CpuRegisters,
@@ -51,7 +50,7 @@ impl Program for UserInterface {
     #[allow(clippy::redundant_closure)]
     fn view(&mut self) -> Element<Message, Self::Renderer> {
         self.cpu_registers
-            .view()
+            .view(self.theme)
             .map(|message| Message::Registers(message))
     }
 }
