@@ -1,4 +1,4 @@
-mod register;
+mod registers;
 
 use crate::style::Theme;
 
@@ -25,6 +25,10 @@ impl<'a> From<&SOC<'a>> for UserInterface {
     }
 }
 
+#[derive(Debug, Clone)]
+pub enum Message {
+    Registers(CpuMsg),
+}
 
 impl Program for UserInterface {
     type Message = Message;
