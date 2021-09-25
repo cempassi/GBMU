@@ -4,6 +4,7 @@ use cpu::Registers;
 use iced_wgpu::{Container, Renderer, Row, Text};
 use iced_winit::{Align, Element, Length, Space};
 use shared::traits::Bus;
+use cpu::Registers;
 
 use cpu::area::{Bits16, Bits8};
 
@@ -53,22 +54,22 @@ impl Split for Bits16 {
 }
 
 pub trait View {
-    fn get_data(&self, registers: &cpu::Registers) -> String;
+    fn get_data(&self, registers: Registers) -> String;
     fn get_name(&self) -> String;
 
-    fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<RegisterMsg, Renderer>;
+    fn view(&self, registers: Registers, theme: Theme) -> Element<RegisterMsg, Renderer>;
 }
 
 impl View for Bits8 {
-    fn get_data(&self, registers: &cpu::Registers) -> String {
-        format!("{:#x}", registers.get(self))
+    fn get_data(&self, registers: Registers) -> String {
+        format!("{:#x}", registers.borrow().get(self))
     }
 
     fn get_name(&self) -> String {
         format!("{:?}", self)
     }
 
-    fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
+    fn view(&self, registers: Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
         let data = Text::new(self.get_data(registers)).font(fonts::HASKLIG_LIGHT);
         let space = Space::new(Length::Units(20), Length::Units(5));
         let name = Text::new(self.get_name())
@@ -90,19 +91,16 @@ impl View for Bits8 {
 }
 
 impl View for Bits16 {
-    fn get_data(&self, registers: &cpu::Registers) -> String {
-        format!("{:#x}", registers.get(self))
+    fn get_data(&self, registers: Registers) -> String {
+        format!("{:#x}", registers.borrow().get(self))
     }
 
     fn get_name(&self) -> String {
         format!("{:?}", self)
     }
 
-    fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
-        let data = Text::new(self.get_data(registers))
-            .font(fonts::HASKLIG_LIGHT)
-            .width(Length::Units(10));
-        let space = Space::new(Length::Units(10), Length::Units(5));
+    fn view(&self, registers: Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
+        let data = Text::new(self.get_data(registers)).font(fonts::HASKLIG_LIGHT);
         let name = Text::new(self.get_name())
             .font(fonts::HASKLIG_BOLD)
             .size(20);
