@@ -1,5 +1,5 @@
 use super::register::{Merge, RegisterMsg, Split, View};
-use crate::theme::Theme;
+use crate::style::Theme;
 use cpu::area::{Bits16, Bits8};
 use cpu::Registers;
 use enum_iterator::IntoEnumIterator;

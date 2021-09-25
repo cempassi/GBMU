@@ -1,6 +1,6 @@
 mod debugger;
 mod fonts;
-mod theme;
+mod style;
 mod widgets;
 
 pub use debugger::Debugger;

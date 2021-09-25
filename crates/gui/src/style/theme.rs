@@ -1,7 +1,8 @@
 mod dark;
 mod light;
 
-use iced_wgpu::{checkbox, container};
+use iced_wgpu::{checkbox, container, Color};
+use iced_winit::Background;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Theme {
@@ -14,6 +15,7 @@ impl Default for Theme {
         Theme::Light
     }
 }
+
 
 impl From<Theme> for Box<dyn container::StyleSheet> {
     fn from(theme: Theme) -> Self {
