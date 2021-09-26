@@ -1,8 +1,4 @@
-pub mod rom;
-pub mod wram;
-
 use super::consts;
-pub use wram::Wram;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Area {

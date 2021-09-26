@@ -9,6 +9,7 @@ fn get_epoch() -> u64 {
     (epoch.as_micros() as u64) / 1_000_000
 }
 
+#[derive(Debug)]
 pub struct Mbc3 {
     ram_lock: bool,
     latch: bool,
@@ -24,6 +25,7 @@ pub struct Mbc3 {
 /// Hours      0-23    0x0A
 /// DC Lower   0-255   0x0B    The lower 8 bits of the Day Counter
 /// DC Upper           0x0C    bit 0 => 9th bit of the Day Counter, bit 6 => Halt, bit 7 => Day Counter Carry Bit
+#[derive(Debug)]
 struct Mbc3Rtc {
     seconds: u8,
     minutes: u8,
@@ -236,7 +238,7 @@ mod mbc3_test {
     use shared::traits::Bus;
 
     const FILE: &[u8; 2097152] =
-        include_bytes!("../../../../../../roms/Pokemon - Version Argent.gbc");
+        include_bytes!("../../../../roms/Pokemon - Version Argent.gbc");
 
     #[test]
     fn test_mbc3_get_0x0() {

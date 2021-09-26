@@ -1,6 +1,7 @@
 use super::consts;
 use shared::{traits::Bus, Error};
 
+#[derive(Debug)]
 pub struct Mbc2 {
     ram_lock: bool,
     data: Vec<u8>,
@@ -86,7 +87,7 @@ impl Default for Mbc2 {
 mod mbc2_test {
     use super::Mbc2;
     use shared::traits::Bus;
-    const FILE: &[u8; 65536] = include_bytes!("../../../../../../roms/Ayakashi.gb");
+    const FILE: &[u8; 65536] = include_bytes!("../../../../roms/Ayakashi.gb");
 
     #[test]
     fn test_is_mbc2_rom() {

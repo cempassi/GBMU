@@ -1,6 +1,7 @@
 use super::consts;
 use shared::{traits::Bus, Error};
 
+#[derive(Debug)]
 pub struct Mbc0 {
     data: Vec<u8>,
 }
