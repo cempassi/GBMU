@@ -46,7 +46,7 @@ impl CpuRegisters {
                     let element = register_ui.view(self.registers.clone(), theme);
                     column.push(element.map(move |_message| CpuMsg::Merge(index)))
                 });
-        column.into()
+        column.padding(15).spacing(5).into()
     }
 }
 
@@ -69,9 +69,11 @@ impl RegisterPair {
     }
 
     fn view_register(&self, registers: Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
+        let space = Space::new(Length::Units(10), Length::Units(5));
         match self {
             RegisterPair::Splited(left, right) => Row::new()
                 .push(left.view(registers.clone(), theme))
+                .push(space)
                 .push(right.view(registers.clone(), theme))
                 .into(),
             RegisterPair::Merged(register) | RegisterPair::NoSplit(register) => {
@@ -83,10 +85,10 @@ impl RegisterPair {
     pub fn view(&self, registers: Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
         let checkbox = Checkbox::new(self.is_merged(), "", |_| RegisterMsg::MergeToogle);
         let register = self.view_register(registers.clone(), theme);
-        let space = Space::new(Length::Units(45), Length::Units(0));
+        let space = Space::new(Length::Units(35), Length::Units(0));
         let row = Row::new().align_items(Align::Center);
         let row = match self {
-            RegisterPair::Splited(_, _) | RegisterPair::Merged(_) => row.push(checkbox).padding(10),
+            RegisterPair::Splited(_, _) | RegisterPair::Merged(_) => row.push(checkbox),
             RegisterPair::NoSplit(_) => row.push(space),
         };
         row.push(register).into()

@@ -99,7 +99,9 @@ impl View for Bits16 {
     }
 
     fn view(&self, registers: Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
-        let data = Text::new(self.get_data(registers)).font(fonts::HASKLIG_LIGHT);
+        let data = Text::new(self.get_data(registers))
+            .font(fonts::HASKLIG_LIGHT)
+            .width(Length::Units(10));
         let space = Space::new(Length::Units(10), Length::Units(5));
         let name = Text::new(self.get_name())
             .font(fonts::HASKLIG_BOLD)
