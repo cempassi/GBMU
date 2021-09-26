@@ -71,6 +71,8 @@ roms.zip:
 
 ### utils ###
 
+check: lint format
+
 lint:
 	cargo clippy --workspace --verbose -- -D warnings
 
@@ -81,9 +83,11 @@ format:
 	cargo fmt --verbose -- --check
 
 clean:
+	cargo clean
+	cargo cache -a
 	rm -rf roms.zip  $(ROM2_ZIP) $(ROM3_ZIP) $(HASKLIG_ZIP)
 
 fclean: clean
 	rm -rf roms ressources
 
-.PHONY: requirement roms hasklig lint format.all format clean
+.PHONY: requirement roms hasklig check lint format.all format clean fclean
