@@ -16,27 +16,40 @@ pub enum LoadRegNum8bit {
     L = 0x2E,
 }
 
+#[allow(dead_code)]
 impl<'a> LoadRegNum8bit {
     pub fn proceed(
         self,
         registers: &'a mut Registers,
         memory: &'a mut Memory,
     ) -> Result<u32, Error> {
-        if let Ok(byte) = registers.pc.next(memory) {
+        if let Ok(byte) = registers.borrow_mut().pc.next(memory) {
             let result = match self {
-                LoadRegNum8bit::B => memory.set(byte.into(), registers.get(Bits8::B)),
-                LoadRegNum8bit::C => memory.set(byte.into(), registers.get(Bits8::C)),
-                LoadRegNum8bit::D => memory.set(byte.into(), registers.get(Bits8::D)),
-                LoadRegNum8bit::E => memory.set(byte.into(), registers.get(Bits8::E)),
-                LoadRegNum8bit::H => memory.set(byte.into(), registers.get(Bits8::H)),
-                LoadRegNum8bit::L => memory.set(byte.into(), registers.get(Bits8::L)),
+                LoadRegNum8bit::B => memory
+                    .borrow_mut()
+                    .set(byte.into(), registers.borrow().get(Bits8::B)),
+                LoadRegNum8bit::C => memory
+                    .borrow_mut()
+                    .set(byte.into(), registers.borrow().get(Bits8::C)),
+                LoadRegNum8bit::D => memory
+                    .borrow_mut()
+                    .set(byte.into(), registers.borrow().get(Bits8::D)),
+                LoadRegNum8bit::E => memory
+                    .borrow_mut()
+                    .set(byte.into(), registers.borrow().get(Bits8::E)),
+                LoadRegNum8bit::H => memory
+                    .borrow_mut()
+                    .set(byte.into(), registers.borrow().get(Bits8::H)),
+                LoadRegNum8bit::L => memory
+                    .borrow_mut()
+                    .set(byte.into(), registers.borrow().get(Bits8::L)),
             };
             match result {
                 Ok(_) => Ok(8),
                 Err(e) => Err(e),
             }
         } else {
-            Err(Error::InvalidPC(registers.pc))
+            Err(Error::InvalidPC(registers.borrow().pc))
         }
     }
 }

@@ -1,6 +1,7 @@
 use super::consts;
 use shared::{traits::Bus, Error};
 
+#[derive(Debug)]
 pub struct Mbc5 {
     ram_lock: bool,
     data: Vec<u8>,
@@ -116,7 +117,7 @@ mod mbc5_test {
     use super::Mbc5;
     use shared::traits::Bus;
 
-    const FILE: &[u8; 1048576] = include_bytes!("../../../../../../roms/Pokemon_Rouge.gb");
+    const FILE: &[u8; 1048576] = include_bytes!("../../../../roms/Pokemon_Rouge.gb");
 
     #[test]
     fn test_mbc5_get() {

@@ -1,29 +1,28 @@
-mod area;
+pub mod area;
 mod flags;
 mod opcodes;
 mod pc;
 mod registers;
+use registers::New;
 
-use memory::Memory;
-use opcodes::LoadRegNum8bit;
-use pc::NextPc;
-pub use registers::Registers;
-use shared::Error;
-use std::convert::TryFrom;
+//use memory::Memory;
+pub use registers::RcRegisters as Registers;
 
-#[derive(Debug, Default)]
-pub struct Cpu {
-    pub registers: Registers,
+#[derive(Default)]
+pub struct Cpu /*<'a>*/ {
+    //memory: Memory<'a>,
+    registers: Registers,
 }
 
-impl Cpu {
-    pub fn step(&mut self, memory: &mut Memory) -> Result<u32, Error> {
-        let opcode = self.registers.pc.next(memory)?;
-
-        if let Ok(load) = LoadRegNum8bit::try_from(opcode) {
-            load.proceed(&mut self.registers, memory)
-        } else {
-            Err(Error::Unimplemented)
+impl Cpu /*<'a>*/ {
+    pub fn new(/*memory: Memory<'a>*/) -> Self {
+        Self {
+            //memory,
+            registers: <Registers as New>::new(),
         }
+    }
+
+    pub fn get_registers(&self) -> Registers {
+        self.registers.clone()
     }
 }

@@ -1,6 +1,7 @@
 use super::consts;
 use shared::{traits::Bus, Error};
 
+#[derive(Debug)]
 pub struct Mbc1 {
     ram_lock: bool,
     /// [false] = rom mode | [true] = ram mode
@@ -143,8 +144,7 @@ mod mbc1_test {
     use super::Mbc1;
     use shared::traits::Bus;
 
-    const FILE: &[u8; 262144] =
-        include_bytes!("../../../../../../roms/Metroid II - Return of Samus.gb");
+    const FILE: &[u8; 262144] = include_bytes!("../../../../roms/Metroid II - Return of Samus.gb");
 
     #[test]
     fn test_mbc1_get() {
