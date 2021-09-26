@@ -2,7 +2,7 @@ use super::{Theme, Style};
 use iced_wgpu::{container, Color};
 use iced_winit::Background;
 
-pub struct RegisterData {
+pub struct Register {
     text_color: Option<Color>,
     background: Option<Background>,
     border_radius: f32,
@@ -47,7 +47,7 @@ const BORDER_DARK: Color = Color::from_rgb(
 );
 
 
-impl RegisterData {
+impl Register {
     fn light() -> Self {
         Self {
             text_color: TEXT_LIGHT.into(),
@@ -69,7 +69,7 @@ impl RegisterData {
     }
 }
 
-impl container::StyleSheet for RegisterData {
+impl container::StyleSheet for Register {
     fn style(&self) -> container::Style {
         container::Style{
             text_color: self.text_color,
@@ -81,11 +81,11 @@ impl container::StyleSheet for RegisterData {
     }
 }
 
-impl Style for RegisterData {
+impl Style for Register {
     fn style(theme: Theme) -> Self {
         match theme {
-            Theme::Light => RegisterData::light(),
-            Theme::Dark => RegisterData::dark(),
+            Theme::Light => Register::light(),
+            Theme::Dark => Register::dark(),
         }
     }
 }
