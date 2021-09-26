@@ -10,7 +10,7 @@ use iced_winit::winit::dpi::PhysicalSize;
 use iced_winit::winit::{dpi::PhysicalPosition, window::Window};
 use iced_winit::Clipboard;
 use iced_winit::{mouse::Interaction, program, Debug, Point, Size};
-use ui::UserInterface;
+use self::ui::UserInterface;
 
 pub struct Debugger {
     pub state: program::State<UserInterface>,
