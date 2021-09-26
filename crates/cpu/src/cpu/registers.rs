@@ -1,6 +1,20 @@
 use super::area::{Bits16, Bits8, Flag};
 use super::flags::Flags;
-use shared::traits::Bus;
+use shared::traits::{Bus, Memory};
+use std::cell::RefCell;
+use std::rc::Rc;
+
+pub type RcRegisters = Rc<RefCell<Registers>>;
+
+pub trait New {
+    fn new() -> Self;
+}
+
+impl New for RcRegisters {
+    fn new() -> Self {
+        Rc::new(RefCell::new(Registers::default()))
+    }
+}
 
 #[derive(Debug, Default)]
 pub struct Registers {
@@ -16,6 +30,8 @@ pub struct Registers {
     pub pc: u16,
 }
 
+impl Memory for Registers {}
+
 impl Bus<Bits8> for Registers {
     type Result = ();
     type Data = u8;
@@ -24,6 +40,7 @@ impl Bus<Bits8> for Registers {
     fn get(&self, area: Bits8) -> Self::Item {
         match area {
             Bits8::A => self.a,
+            Bits8::F => self.f.into_bytes()[0],
             Bits8::B => self.b,
             Bits8::C => self.c,
             Bits8::D => self.d,
@@ -36,6 +53,7 @@ impl Bus<Bits8> for Registers {
     fn set(&mut self, area: Bits8, data: Self::Data) -> Self::Result {
         match area {
             Bits8::A => self.a = data,
+            Bits8::F => self.f = Flags::from_bytes([data]),
             Bits8::B => self.b = data,
             Bits8::C => self.c = data,
             Bits8::D => self.d = data,

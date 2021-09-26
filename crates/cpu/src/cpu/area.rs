@@ -1,6 +1,9 @@
-#[derive(Debug)]
+use enum_iterator::IntoEnumIterator;
+
+#[derive(Debug, IntoEnumIterator, PartialEq, Clone, Copy)]
 pub enum Bits8 {
     A,
+    F,
     B,
     C,
     D,
@@ -9,7 +12,7 @@ pub enum Bits8 {
     L,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Bits16 {
     AF,
     SP,
@@ -19,7 +22,7 @@ pub enum Bits16 {
     HL,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Flag {
     /// Zero flag
     /// This flag is set when :
