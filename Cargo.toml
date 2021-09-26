@@ -9,3 +9,4 @@ members = [
   "crates/shared",
   "crates/soc",
 ]
+resolver = "2"

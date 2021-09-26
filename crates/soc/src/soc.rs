@@ -11,12 +11,13 @@ const HEADER_START: usize = 0x100;
 const HEADER_LEN: usize = 0x50;
 const HEAD_LEN: usize = 0x100;
 
-pub struct SOC /*<'a>*/ {
-    //clock: u32,
-    cpu: Cpu, /*<'a>*/
+#[allow(dead_code)]
+pub struct SOC<'a> {
+    clock: u32,
+    cpu: Cpu<'a>,
 }
 
-impl TryFrom<&str> for SOC /*<'a>*/ {
+impl<'a> TryFrom<&str> for SOC<'a> {
     type Error = std::io::Error;
 
     fn try_from(path: &str) -> Result<Self, Self::Error> {
@@ -32,15 +33,15 @@ impl TryFrom<&str> for SOC /*<'a>*/ {
 
         let header = Header::try_from(raw_header).expect("Invalid data in raw_header");
 
-        let _clock: u32 = 0;
-        let _memory = <Memory as NewMemory>::new(header.cartridge, rom);
-        let cpu: Cpu = Cpu::new(/*memory*/);
+        let clock: u32 = 0;
+        let memory = <Memory as NewMemory>::new(header.cartridge, rom);
+        let cpu: Cpu = Cpu::new(memory);
 
-        Ok(SOC { /*clock,*/ cpu, })
+        Ok(SOC { clock, cpu })
     }
 }
 
-impl SOC /*<'a>*/ {
+impl<'a> SOC<'a> {
     pub fn get_cpu_registers(&self) -> Registers {
         self.cpu.get_registers()
     }

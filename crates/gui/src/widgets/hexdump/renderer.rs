@@ -1,16 +1,19 @@
-use super::{consts, style, utils::range_intersect};
-use iced_graphics::{
-    backend,
+use iced_graphics::backend::Text;
+use iced_wgpu::{
     triangle::{Mesh2D, Vertex2D},
-    Backend, HorizontalAlignment, Primitive, Vector, VerticalAlignment,
+    Color, Primitive,
 };
-use iced_native::{mouse, Background, Color, Font, Point, Rectangle, Size};
+use iced_winit::{
+    alignment::Horizontal, alignment::Vertical, Background, Font, Point, Rectangle, Size, Vector,
+};
+
+use super::{consts, style, utils::range_intersect};
 
 /// The renderer of an `Hexview`.
 ///
 /// [`Hexview`]: struct.Hexview.html
 #[allow(clippy::too_many_arguments)]
-pub trait Renderer: iced_native::Renderer {
+pub trait Renderer: iced_winit::Renderer {
     /// The style supported by this renderer.
     type Style: Default;
 
@@ -64,7 +67,7 @@ struct LineSpan {
     end: usize,
 }
 
-impl<B: Backend + backend::Text> self::Renderer for iced_graphics::Renderer<B> {
+impl self::Renderer for iced_wgpu::Renderer {
     type Style = Box<dyn style::StyleSheet>;
 
     fn cursor_offset(
@@ -231,8 +234,8 @@ impl<B: Backend + backend::Text> self::Renderer for iced_graphics::Renderer<B> {
             color: style.offset_color,
             size: text_size,
             font: header_font,
-            horizontal_alignment: HorizontalAlignment::Left,
-            vertical_alignment: VerticalAlignment::Top,
+            horizontal_alignment: Horizontal::Left,
+            vertical_alignment: Vertical::Top,
         };
 
         let ascii_hex_chars = std::str::from_utf8(&consts::HEX_CHARS[0..column_count]).unwrap();
@@ -430,8 +433,8 @@ impl<B: Backend + backend::Text> self::Renderer for iced_graphics::Renderer<B> {
                         },
                         size: text_size,
                         font: data_font,
-                        horizontal_alignment: HorizontalAlignment::Left,
-                        vertical_alignment: VerticalAlignment::Top,
+                        horizontal_alignment: Horizontal::Left,
+                        vertical_alignment: Vertical::Top,
                     });
 
                     data_x += content_width + test_offset;
@@ -461,8 +464,8 @@ impl<B: Backend + backend::Text> self::Renderer for iced_graphics::Renderer<B> {
                         },
                         size: text_size,
                         font: data_font,
-                        horizontal_alignment: HorizontalAlignment::Left,
-                        vertical_alignment: VerticalAlignment::Top,
+                        horizontal_alignment: Horizontal::Left,
+                        vertical_alignment: Vertical::Top,
                     });
 
                     // FIXME: Why is the width over by one pixel?
@@ -556,8 +559,8 @@ impl<B: Backend + backend::Text> self::Renderer for iced_graphics::Renderer<B> {
                         color: style.offset_color,
                         size: text_size,
                         font: header_font,
-                        horizontal_alignment: HorizontalAlignment::Left,
-                        vertical_alignment: VerticalAlignment::Top,
+                        horizontal_alignment: Horizontal::Left,
+                        vertical_alignment: Vertical::Top,
                     },
                     // Bytes
                     group(byte_prims),
@@ -596,8 +599,8 @@ impl<B: Backend + backend::Text> self::Renderer for iced_graphics::Renderer<B> {
             color: style.offset_color,
             size: text_size,
             font: header_font,
-            horizontal_alignment: HorizontalAlignment::Left,
-            vertical_alignment: VerticalAlignment::Top,
+            horizontal_alignment: Horizontal::Left,
+            vertical_alignment: Vertical::Top,
         };
 
         let line = cursor / column_count;
@@ -721,8 +724,8 @@ impl<B: Backend + backend::Text> self::Renderer for iced_graphics::Renderer<B> {
                 color: Color::from_rgb(1.0, 0.0, 0.0),
                 size: text_size,
                 font: data_font,
-                horizontal_alignment: HorizontalAlignment::Left,
-                vertical_alignment: VerticalAlignment::Top,
+                horizontal_alignment: Horizontal::Left,
+                vertical_alignment: Vertical::Top,
             }])
         } else {
             Primitive::None
@@ -739,7 +742,7 @@ impl<B: Backend + backend::Text> self::Renderer for iced_graphics::Renderer<B> {
                 cursor_prim,
                 debug_info,
             ]),
-            mouse::Interaction::default(),
+            iced_winit::mouse::Interaction::default(),
         )
     }
 }

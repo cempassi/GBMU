@@ -1,10 +1,16 @@
 mod ui;
+use soc::SOC;
 
-use iced_glow::{Backend, Renderer, Settings, Viewport};
-use iced_glutin::{glutin::window::Window, mouse::Interaction, Clipboard, Debug, Point, Size};
-use iced_native::program;
+use iced_wgpu::wgpu::util::StagingBelt;
+use iced_wgpu::wgpu::{
+    CommandEncoderDescriptor, Device, SurfaceFrame, TextureFormat, TextureViewDescriptor,
+};
+use iced_wgpu::{Backend, Renderer, Settings, Viewport};
+use iced_winit::winit::dpi::PhysicalSize;
+use iced_winit::winit::{dpi::PhysicalPosition, window::Window};
+use iced_winit::Clipboard;
+use iced_winit::{mouse::Interaction, program, Debug, Point, Size};
 use ui::UserInterface;
-use winit::dpi::PhysicalPosition;
 
 pub struct Debugger {
     pub state: program::State<UserInterface>,
@@ -16,8 +22,8 @@ pub struct Debugger {
 }
 
 impl Debugger {
-    pub fn new(window: &Window, context: &glow::Context) -> Self {
-        let user_interface = UserInterface::default();
+    pub fn new(window: &Window, device: &Device, format: TextureFormat, soc: &SOC) -> Self {
+        let user_interface = UserInterface::from(soc);
         let mut debug = Debug::new();
         let clipboard = Clipboard::connect(window);
 
@@ -29,7 +35,7 @@ impl Debugger {
         let logical_cursor = cursor.to_logical(window.scale_factor());
         let point = Point::new(logical_cursor.x, logical_cursor.y);
 
-        let mut renderer = Renderer::new(Backend::new(context, Settings::default()));
+        let mut renderer = Renderer::new(Backend::new(device, Settings::default(), format));
 
         let state = program::State::new(
             user_interface,
@@ -50,6 +56,7 @@ impl Debugger {
     }
 
     pub fn update(&mut self, scale_factor: f64) {
+        println!("In debugger update");
         let logical_cursor = self.cursor.to_logical(scale_factor);
         let point = Point::new(logical_cursor.x, logical_cursor.y);
 
@@ -62,9 +69,27 @@ impl Debugger {
         );
     }
 
-    pub fn draw(&mut self, context: &glow::Context) -> Interaction {
+    pub fn resize(&mut self, physical_size: PhysicalSize<u32>, scale_factor: f64) {
+        let size = Size::new(physical_size.width, physical_size.height);
+        self.viewport = Viewport::with_physical_size(size, scale_factor);
+    }
+
+    pub fn draw(
+        &mut self,
+        frame: &SurfaceFrame,
+        device: &mut Device,
+        staging_belt: &mut StagingBelt,
+    ) -> Interaction {
+        let mut encoder = device.create_command_encoder(&CommandEncoderDescriptor { label: None });
+        let view = frame
+            .output
+            .texture
+            .create_view(&TextureViewDescriptor::default());
         self.renderer.backend_mut().draw(
-            context,
+            device,
+            staging_belt,
+            &mut encoder,
+            &view,
             &self.viewport,
             self.state.primitive(),
             &self.debug.overlay(),

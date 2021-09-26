@@ -1,17 +1,17 @@
 mod consts;
 mod renderer;
-mod state;
-mod style;
+pub mod state;
+pub mod style;
 mod utils;
 
-use iced_native::{
+use iced_winit::{
     event::Status, layout, Element, Event, Font, Hasher, Layout, Length, Point, Rectangle, Size,
-    Widget,
 };
 use std::{hash::Hash, marker::PhantomData};
 use utils::clamp;
 
 pub use state::State;
+pub use style::{Dark, Light, Style};
 
 /// A view into a region of bytes.
 ///
@@ -86,7 +86,7 @@ impl<'a, Message, Renderer: renderer::Renderer> Hexdump<'a, Message, Renderer> {
     }
 }
 
-impl<'a, Message, Renderer> Widget<Message, Renderer> for Hexdump<'a, Message, Renderer>
+impl<'a, Message, Renderer> iced_winit::Widget<Message, Renderer> for Hexdump<'a, Message, Renderer>
 where
     Renderer: renderer::Renderer,
 {
@@ -117,11 +117,11 @@ where
         layout: Layout<'_>,
         cursor_position: Point,
         renderer: &Renderer,
-        _clipboard: &mut dyn iced_native::Clipboard,
+        _clipboard: &mut dyn iced_native::clipboard::Clipboard,
         _messages: &mut Vec<Message>,
     ) -> Status {
-        use iced_native::keyboard::{Event as KeyboardEvent, KeyCode};
-        use iced_native::mouse::{Button as MouseButton, Event as MouseEvent};
+        use iced_winit::keyboard::{Event as KeyboardEvent, KeyCode};
+        use iced_winit::mouse::{Button as MouseButton, Event as MouseEvent};
 
         let bytes_len = self.state.bytes.len();
         let column_count = self.column_count as usize;
@@ -157,7 +157,7 @@ where
                 self.state.selection = None;
                 self.state.last_click_pos = Some(cursor_position);
 
-                let click = iced_native::mouse::Click::new(cursor_position, self.state.last_click);
+                let click = iced_winit::mouse::Click::new(cursor_position, self.state.last_click);
 
                 self.state.last_click = Some(click);
             }
