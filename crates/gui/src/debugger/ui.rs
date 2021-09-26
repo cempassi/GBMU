@@ -1,3 +1,4 @@
+mod memory;
 mod registers;
 
 use crate::style::Theme;
@@ -28,6 +29,7 @@ impl<'a> From<&SOC<'a>> for UserInterface {
 #[derive(Debug, Clone)]
 pub enum Message {
     Registers(CpuMsg),
+    Memory(MemoryMsg),
 }
 
 impl Program for UserInterface {
@@ -41,13 +43,20 @@ impl Program for UserInterface {
                 self.cpu_registers.update(message);
                 Command::none()
             }
+            Message::Memory(message) => {
+                self.memory.update(message);
+                Command::none()
+            }
         }
     }
 
     #[allow(clippy::redundant_closure)]
     fn view(&mut self) -> Element<Message, Self::Renderer> {
-        self.cpu_registers
+        let cpu_registers = self
+            .cpu_registers
             .view(self.theme)
-            .map(|message| Message::Registers(message))
+            .map(|message| Message::Registers(message));
+        let memory = self.memory.view(self.theme).map(|message| Message::Memory(message));
+        Column::new().push(cpu_registers).push(memory).into()
     }
 }
