@@ -4,7 +4,7 @@ use iced_wgpu::{
     Color, Primitive,
 };
 use iced_winit::{
-    Background, Font, HorizontalAlignment, Point, Rectangle, Size, Vector, VerticalAlignment,
+    Background, Font, alignment::Horizontal, Point, Rectangle, Size, Vector, alignment::Vertical,
 };
 
 use super::{consts, style, utils::range_intersect};
@@ -234,8 +234,8 @@ impl self::Renderer for iced_wgpu::Renderer {
             color: style.offset_color,
             size: text_size,
             font: header_font,
-            horizontal_alignment: HorizontalAlignment::Left,
-            vertical_alignment: VerticalAlignment::Top,
+            horizontal_alignment: Horizontal::Left,
+            vertical_alignment: Vertical::Top,
         };
 
         let ascii_hex_chars = std::str::from_utf8(&consts::HEX_CHARS[0..column_count]).unwrap();
@@ -433,8 +433,8 @@ impl self::Renderer for iced_wgpu::Renderer {
                         },
                         size: text_size,
                         font: data_font,
-                        horizontal_alignment: HorizontalAlignment::Left,
-                        vertical_alignment: VerticalAlignment::Top,
+                        horizontal_alignment: Horizontal::Left,
+                        vertical_alignment: Vertical::Top,
                     });
 
                     data_x += content_width + test_offset;
@@ -464,8 +464,8 @@ impl self::Renderer for iced_wgpu::Renderer {
                         },
                         size: text_size,
                         font: data_font,
-                        horizontal_alignment: HorizontalAlignment::Left,
-                        vertical_alignment: VerticalAlignment::Top,
+                        horizontal_alignment: Horizontal::Left,
+                        vertical_alignment: Vertical::Top,
                     });
 
                     // FIXME: Why is the width over by one pixel?
@@ -559,8 +559,8 @@ impl self::Renderer for iced_wgpu::Renderer {
                         color: style.offset_color,
                         size: text_size,
                         font: header_font,
-                        horizontal_alignment: HorizontalAlignment::Left,
-                        vertical_alignment: VerticalAlignment::Top,
+                        horizontal_alignment: Horizontal::Left,
+                        vertical_alignment: Vertical::Top,
                     },
                     // Bytes
                     group(byte_prims),
@@ -599,8 +599,8 @@ impl self::Renderer for iced_wgpu::Renderer {
             color: style.offset_color,
             size: text_size,
             font: header_font,
-            horizontal_alignment: HorizontalAlignment::Left,
-            vertical_alignment: VerticalAlignment::Top,
+            horizontal_alignment: Horizontal::Left,
+            vertical_alignment: Vertical::Top,
         };
 
         let line = cursor / column_count;
@@ -724,8 +724,8 @@ impl self::Renderer for iced_wgpu::Renderer {
                 color: Color::from_rgb(1.0, 0.0, 0.0),
                 size: text_size,
                 font: data_font,
-                horizontal_alignment: HorizontalAlignment::Left,
-                vertical_alignment: VerticalAlignment::Top,
+                horizontal_alignment: Horizontal::Left,
+                vertical_alignment: Vertical::Top,
             }])
         } else {
             Primitive::None
