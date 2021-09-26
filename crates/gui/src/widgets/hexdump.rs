@@ -1,8 +1,8 @@
 mod consts;
 mod renderer;
-mod state;
-mod style;
 mod utils;
+pub mod style;
+pub mod state;
 
 use iced_native::{
     event::Status, layout, Element, Event, Font, Hasher, Layout, Length, Point, Rectangle, Size,
@@ -12,6 +12,7 @@ use std::{hash::Hash, marker::PhantomData};
 use utils::clamp;
 
 pub use state::State;
+pub use style::{Style, Dark, Light};
 
 /// A view into a region of bytes.
 ///
