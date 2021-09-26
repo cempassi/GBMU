@@ -2,7 +2,7 @@ use crate::fonts;
 use crate::style::{Register, Style, Theme};
 use cpu::Registers;
 use iced_wgpu::{Container, Renderer, Row, Text};
-use iced_winit::{Align, Element, Length, Space};
+use iced_winit::{alignment::Horizontal, alignment::Vertical, alignment::Alignment, Element, Length, Space};
 use shared::traits::Bus;
 
 use cpu::area::{Bits16, Bits8};
@@ -84,7 +84,7 @@ impl View for Bits8 {
             .push(name)
             .push(space)
             .push(number)
-            .align_items(Align::Center)
+            .align_items(Alignment::Center)
             .into()
     }
 }
@@ -118,7 +118,7 @@ impl View for Bits16 {
             .push(name)
             .push(space)
             .push(number)
-            .align_items(Align::Center)
+            .align_items(Alignment::Center)
             .into()
     }
 }

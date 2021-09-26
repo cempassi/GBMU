@@ -4,7 +4,7 @@ use cpu::area::{Bits16, Bits8};
 use cpu::Registers;
 use enum_iterator::IntoEnumIterator;
 use iced_wgpu::{Checkbox, Column, Renderer, Row};
-use iced_winit::{Align, Element, Space, Length};
+use iced_winit::{alignment::Alignment, Element, Space, Length};
 use itertools::Itertools;
 
 pub struct CpuRegisters {
@@ -86,7 +86,7 @@ impl RegisterPair {
         let checkbox = Checkbox::new(self.is_merged(), "", |_| RegisterMsg::MergeToogle);
         let register = self.view_register(registers.clone(), theme);
         let space = Space::new(Length::Units(35), Length::Units(0));
-        let row = Row::new().align_items(Align::Center);
+        let row = Row::new().align_items(Alignment::Center);
         let row = match self {
             RegisterPair::Splited(_, _) | RegisterPair::Merged(_) => row.push(checkbox),
             RegisterPair::NoSplit(_) => row.push(space),

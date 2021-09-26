@@ -5,19 +5,19 @@ mod pc;
 mod registers;
 use registers::New;
 
-//use memory::Memory;
+use memory::Memory;
 pub use registers::RcRegisters as Registers;
 
 #[derive(Default)]
-pub struct Cpu /*<'a>*/ {
-    //memory: Memory<'a>,
+pub struct Cpu <'a> {
+    memory: Memory<'a>,
     registers: Registers,
 }
 
-impl Cpu /*<'a>*/ {
-    pub fn new(/*memory: Memory<'a>*/) -> Self {
+impl<'a> Cpu<'a> {
+    pub fn new(memory: Memory<'a>) -> Self {
         Self {
-            //memory,
+            memory,
             registers: <Registers as New>::new(),
         }
     }

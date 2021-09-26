@@ -1,8 +1,7 @@
 mod dark;
 mod light;
 
-use iced_wgpu::{checkbox, container, Color};
-use iced_winit::Background;
+use iced_wgpu::{checkbox, container};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Theme {
