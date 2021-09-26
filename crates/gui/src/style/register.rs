@@ -1,4 +1,4 @@
-use super::{Theme, Style};
+use super::{Style, Theme};
 use iced_wgpu::{container, Color};
 use iced_winit::Background;
 
@@ -22,11 +22,8 @@ const BACKGROUND_LIGHT: Color = Color::from_rgb(
     0xFF as f32 / 255.0,
 );
 
-const BORDER_LIGHT: Color = Color::from_rgb(
-    0x00 as f32 / 255.0,
-    0x18 as f32 / 255.0,
-    0x4 as f32 / 255.0,
-);
+const BORDER_LIGHT: Color =
+    Color::from_rgb(0x00 as f32 / 255.0, 0x18 as f32 / 255.0, 0x4 as f32 / 255.0);
 
 const TEXT_DARK: Color = Color::from_rgb(
     0x22 as f32 / 255.0,
@@ -45,7 +42,6 @@ const BORDER_DARK: Color = Color::from_rgb(
     0x74 as f32 / 255.0,
     0xA5 as f32 / 255.0,
 );
-
 
 impl Register {
     fn light() -> Self {
@@ -71,7 +67,7 @@ impl Register {
 
 impl container::StyleSheet for Register {
     fn style(&self) -> container::Style {
-        container::Style{
+        container::Style {
             text_color: self.text_color,
             background: self.background,
             border_radius: self.border_radius,

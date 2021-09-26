@@ -15,7 +15,6 @@ impl Default for Theme {
     }
 }
 
-
 impl From<Theme> for Box<dyn container::StyleSheet> {
     fn from(theme: Theme) -> Self {
         match theme {

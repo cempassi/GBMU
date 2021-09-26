@@ -1,8 +1,8 @@
 mod consts;
 mod renderer;
-mod utils;
-pub mod style;
 pub mod state;
+pub mod style;
+mod utils;
 
 use iced_winit::{
     event::Status, layout, Element, Event, Font, Hasher, Layout, Length, Point, Rectangle, Size,
@@ -11,7 +11,7 @@ use std::{hash::Hash, marker::PhantomData};
 use utils::clamp;
 
 pub use state::State;
-pub use style::{Style, Dark, Light};
+pub use style::{Dark, Light, Style};
 
 /// A view into a region of bytes.
 ///

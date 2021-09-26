@@ -36,7 +36,6 @@ const CONTAINER_BORDER: Color = Color::from_rgb(
     0xA5 as f32 / 255.0,
 );
 
-
 pub struct Container;
 
 impl container::StyleSheet for Container {

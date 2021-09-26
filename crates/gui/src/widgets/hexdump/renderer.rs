@@ -4,7 +4,7 @@ use iced_wgpu::{
     Color, Primitive,
 };
 use iced_winit::{
-    Background, Font, alignment::Horizontal, Point, Rectangle, Size, Vector, alignment::Vertical,
+    alignment::Horizontal, alignment::Vertical, Background, Font, Point, Rectangle, Size, Vector,
 };
 
 use super::{consts, style, utils::range_intersect};

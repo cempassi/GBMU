@@ -1,6 +1,6 @@
 use crate::style::Theme;
 use crate::widgets::hexdump;
-use iced_wgpu::{Renderer, Scrollable, scrollable};
+use iced_wgpu::{scrollable, Renderer, Scrollable};
 use iced_winit::Element;
 
 const LOREM_IPSUM: &[u8] = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed \
@@ -8,7 +8,7 @@ const LOREM_IPSUM: &[u8] = b"Lorem ipsum dolor sit amet, consectetur adipiscing 
 
 pub struct Memory {
     hexdump: hexdump::State,
-    scrollable: scrollable::State
+    scrollable: scrollable::State,
 }
 
 #[derive(Debug, Clone)]
@@ -20,7 +20,10 @@ impl Memory {
         hexdump.load(LOREM_IPSUM);
         let scrollable = scrollable::State::new();
 
-        Self { hexdump , scrollable}
+        Self {
+            hexdump,
+            scrollable,
+        }
     }
 
     pub fn update(&self, _message: MemoryMsg) {}

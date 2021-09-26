@@ -6,7 +6,16 @@ use iced_wgpu::wgpu::{
     SurfaceConfiguration, SurfaceError, TextureFormat, TextureUsages, TextureViewDescriptor,
 };
 
-use iced_winit::{conversion::mouse_interaction, futures::{executor::LocalPool, task::SpawnExt}, winit::{dpi::{PhysicalSize, Size}, event::{ModifiersState, WindowEvent}, event_loop::{ControlFlow, EventLoop}, window::{Window, WindowId}}};
+use iced_winit::{
+    conversion::mouse_interaction,
+    futures::{executor::LocalPool, task::SpawnExt},
+    winit::{
+        dpi::{PhysicalSize, Size},
+        event::{ModifiersState, WindowEvent},
+        event_loop::{ControlFlow, EventLoop},
+        window::{Window, WindowId},
+    },
+};
 
 pub struct Debugger {
     pub id: WindowId,

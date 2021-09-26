@@ -16,7 +16,7 @@ pub struct SOC<'a> {
     cpu: Cpu<'a>,
 }
 
-impl<'a> TryFrom<&str> for SOC <'a> {
+impl<'a> TryFrom<&str> for SOC<'a> {
     type Error = std::io::Error;
 
     fn try_from(path: &str) -> Result<Self, Self::Error> {

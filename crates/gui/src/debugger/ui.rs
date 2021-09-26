@@ -3,9 +3,9 @@ mod registers;
 
 use crate::style::Theme;
 
+use self::memory::{Memory, MemoryMsg};
 use iced_wgpu::{Column, Renderer};
 use iced_winit::{Command, Element, Program};
-use self::memory::{Memory, MemoryMsg};
 use registers::{CpuMsg, CpuRegisters};
 use soc::SOC;
 use std::convert::From;
@@ -56,7 +56,10 @@ impl Program for UserInterface {
             .cpu_registers
             .view(self.theme)
             .map(|message| Message::Registers(message));
-        let memory = self.memory.view(self.theme).map(|message| Message::Memory(message));
+        let memory = self
+            .memory
+            .view(self.theme)
+            .map(|message| Message::Memory(message));
         Column::new().push(cpu_registers).push(memory).into()
     }
 }

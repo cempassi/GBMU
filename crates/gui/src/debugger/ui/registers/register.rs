@@ -2,7 +2,9 @@ use crate::fonts;
 use crate::style::{Register, Style, Theme};
 use cpu::Registers;
 use iced_wgpu::{Container, Renderer, Row, Text};
-use iced_winit::{alignment::Horizontal, alignment::Vertical, alignment::Alignment, Element, Length, Space};
+use iced_winit::{
+    alignment::Alignment, alignment::Horizontal, alignment::Vertical, Element, Length, Space,
+};
 use shared::traits::Bus;
 
 use cpu::area::{Bits16, Bits8};

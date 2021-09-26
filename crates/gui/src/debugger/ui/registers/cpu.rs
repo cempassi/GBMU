@@ -4,7 +4,7 @@ use cpu::area::{Bits16, Bits8};
 use cpu::Registers;
 use enum_iterator::IntoEnumIterator;
 use iced_wgpu::{Checkbox, Column, Renderer, Row};
-use iced_winit::{alignment::Alignment, Element, Space, Length};
+use iced_winit::{alignment::Alignment, Element, Length, Space};
 use itertools::Itertools;
 
 pub struct CpuRegisters {
