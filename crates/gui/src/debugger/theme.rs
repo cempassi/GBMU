@@ -1,7 +1,7 @@
 mod dark;
 mod light;
 
-use iced_glow::container;
+use iced_wgpu::{checkbox, container};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Theme {

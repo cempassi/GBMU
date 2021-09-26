@@ -1,9 +1,9 @@
 pub mod theme;
-mod register_data;
+mod register;
 mod memory;
 
 pub use theme::Theme;
-pub use register_data::Register;
+pub use register::Register;
 
 pub trait Style {
     fn style(theme: Theme) -> Self;
