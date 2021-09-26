@@ -11,6 +11,7 @@ const HEADER_START: usize = 0x100;
 const HEADER_LEN: usize = 0x50;
 const HEAD_LEN: usize = 0x100;
 
+#[allow(dead_code)]
 pub struct SOC<'a> {
     clock: u32,
     cpu: Cpu<'a>,

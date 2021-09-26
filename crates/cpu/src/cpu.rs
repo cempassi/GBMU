@@ -9,6 +9,7 @@ use memory::Memory;
 pub use registers::RcRegisters as Registers;
 
 #[derive(Default)]
+#[allow(dead_code)]
 pub struct Cpu<'a> {
     memory: Memory<'a>,
     registers: Registers,

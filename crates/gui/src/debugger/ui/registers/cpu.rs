@@ -74,7 +74,7 @@ impl RegisterPair {
             RegisterPair::Splited(left, right) => Row::new()
                 .push(left.view(registers.clone(), theme))
                 .push(space)
-                .push(right.view(registers.clone(), theme))
+                .push(right.view(registers, theme))
                 .into(),
             RegisterPair::Merged(register) | RegisterPair::NoSplit(register) => {
                 register.view(registers, theme)
@@ -84,7 +84,7 @@ impl RegisterPair {
 
     pub fn view(&self, registers: Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
         let checkbox = Checkbox::new(self.is_merged(), "", |_| RegisterMsg::MergeToogle);
-        let register = self.view_register(registers.clone(), theme);
+        let register = self.view_register(registers, theme);
         let space = Space::new(Length::Units(35), Length::Units(0));
         let row = Row::new().align_items(Alignment::Center);
         let row = match self {
