@@ -6,15 +6,7 @@ use iced_wgpu::wgpu::{
     SurfaceConfiguration, SurfaceError, TextureFormat, TextureUsages, TextureViewDescriptor,
 };
 
-use iced_winit::{
-    conversion::mouse_interaction,
-    futures::{executor::LocalPool, task::SpawnExt},
-    winit::{
-        event::{ModifiersState, WindowEvent},
-        event_loop::{ControlFlow, EventLoop},
-        window::{Window, WindowId},
-    },
-};
+use iced_winit::{conversion::mouse_interaction, futures::{executor::LocalPool, task::SpawnExt}, winit::{dpi::{PhysicalSize, Size}, event::{ModifiersState, WindowEvent}, event_loop::{ControlFlow, EventLoop}, window::{Window, WindowId}}};
 
 pub struct Debugger {
     pub id: WindowId,
@@ -81,7 +73,10 @@ impl Debugger {
         let title = "Debugger";
         let window = Window::new(event_loop).unwrap();
         let modifiers = ModifiersState::default();
+        let size = Size::Physical(PhysicalSize::new(1024, 768));
         window.set_title(title);
+        window.set_resizable(false);
+        window.set_inner_size(size);
 
         let id = window.id();
         let resized = false;
