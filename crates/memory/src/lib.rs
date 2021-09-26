@@ -8,5 +8,5 @@ pub(crate) mod state;
 pub(crate) mod wram;
 
 pub use area::Area;
-pub use interface::{Memory, NewMemory, Rom, Wram};
+pub use interface::{Memory, NewMemory, Rom, Wram, Bios};
 pub use rom::Cartridge;
