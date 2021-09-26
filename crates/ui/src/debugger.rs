@@ -1,6 +1,7 @@
 mod ui;
 use soc::SOC;
 
+use self::ui::UserInterface;
 use iced_wgpu::wgpu::util::StagingBelt;
 use iced_wgpu::wgpu::{
     CommandEncoderDescriptor, Device, SurfaceFrame, TextureFormat, TextureViewDescriptor,
@@ -10,7 +11,6 @@ use iced_winit::winit::dpi::PhysicalSize;
 use iced_winit::winit::{dpi::PhysicalPosition, window::Window};
 use iced_winit::Clipboard;
 use iced_winit::{mouse::Interaction, program, Debug, Point, Size};
-use ui::UserInterface;
 
 pub struct Debugger {
     pub state: program::State<UserInterface>,

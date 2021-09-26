@@ -23,7 +23,7 @@ pub struct Debugger {
     pub surface: Surface,
     pub device: Device,
     pub queue: Queue,
-    pub state: gui::Debugger,
+    pub state: ui::Debugger,
     pub modifiers: ModifiersState,
     pub resized: bool,
     pub staging_belt: StagingBelt,
@@ -98,7 +98,7 @@ impl Debugger {
         let staging_belt = StagingBelt::new(5 * 1024);
         let format_pool = LocalPool::new();
 
-        let state = gui::Debugger::new(&window, &device, format, soc);
+        let state = ui::Debugger::new(&window, &device, format, soc);
 
         Self {
             id,
