@@ -10,30 +10,61 @@ pub struct RegisterData {
     border_color: Color,
 }
 
-const REGISTER: Color = Color::from_rgb(
+const TEXT_LIGHT: Color = Color::from_rgb(
+    0x00 as f32 / 255.0,
+    0x00 as f32 / 255.0,
+    0x00 as f32 / 255.0,
+);
+
+const BACKGROUND_LIGHT: Color = Color::from_rgb(
+    0xFF as f32 / 255.0,
+    0xFF as f32 / 255.0,
+    0xFF as f32 / 255.0,
+);
+
+const BORDER_LIGHT: Color = Color::from_rgb(
+    0x00 as f32 / 255.0,
+    0x18 as f32 / 255.0,
+    0x4 as f32 / 255.0,
+);
+
+const TEXT_DARK: Color = Color::from_rgb(
     0x22 as f32 / 255.0,
     0x74 as f32 / 255.0,
     0xA5 as f32 / 255.0,
 );
 
+const BACKGROUND_DARK: Color = Color::from_rgb(
+    0x22 as f32 / 255.0,
+    0x74 as f32 / 255.0,
+    0xA5 as f32 / 255.0,
+);
+
+const BORDER_DARK: Color = Color::from_rgb(
+    0x22 as f32 / 255.0,
+    0x74 as f32 / 255.0,
+    0xA5 as f32 / 255.0,
+);
+
+
 impl RegisterData {
     fn light() -> Self {
         Self {
-            text_color: REGISTER.into(),
-            background: REGISTER.into(),
+            text_color: TEXT_LIGHT.into(),
+            background: BACKGROUND_LIGHT.into(),
             border_radius: 10.0,
             border_width: 2.0,
-            border_color: REGISTER,
+            border_color: BORDER_LIGHT,
         }
     }
 
     fn dark() -> Self {
         Self {
-            text_color: REGISTER.into(),
-            background: REGISTER.into(),
+            text_color: TEXT_DARK.into(),
+            background: BACKGROUND_DARK.into(),
             border_radius: 10.0,
             border_width: 2.0,
-            border_color: REGISTER,
+            border_color: BORDER_DARK,
         }
     }
 }
@@ -51,7 +82,7 @@ impl container::StyleSheet for RegisterData {
 }
 
 impl Style for RegisterData {
-    fn theme(theme: Theme) -> Self {
+    fn style(theme: Theme) -> Self {
         match theme {
             Theme::Light => RegisterData::light(),
             Theme::Dark => RegisterData::dark(),
