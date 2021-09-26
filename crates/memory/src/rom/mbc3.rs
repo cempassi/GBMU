@@ -237,8 +237,7 @@ mod mbc3_test {
     use super::Mbc3;
     use shared::traits::Bus;
 
-    const FILE: &[u8; 2097152] =
-        include_bytes!("../../../../roms/Pokemon - Version Argent.gbc");
+    const FILE: &[u8; 2097152] = include_bytes!("../../../../roms/Pokemon - Version Argent.gbc");
 
     #[test]
     fn test_mbc3_get_0x0() {

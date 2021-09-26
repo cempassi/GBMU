@@ -11,12 +11,12 @@ const HEADER_START: usize = 0x100;
 const HEADER_LEN: usize = 0x50;
 const HEAD_LEN: usize = 0x100;
 
-pub struct SOC/*<'a>*/ {
+pub struct SOC /*<'a>*/ {
     //clock: u32,
-    cpu: Cpu/*<'a>*/,
+    cpu: Cpu, /*<'a>*/
 }
 
-impl/*<'a>*/ TryFrom<&str> for SOC/*<'a>*/ {
+impl TryFrom<&str> for SOC /*<'a>*/ {
     type Error = std::io::Error;
 
     fn try_from(path: &str) -> Result<Self, Self::Error> {
@@ -36,11 +36,11 @@ impl/*<'a>*/ TryFrom<&str> for SOC/*<'a>*/ {
         let _memory = <Memory as NewMemory>::new(header.cartridge, rom);
         let cpu: Cpu = Cpu::new(/*memory*/);
 
-        Ok(SOC { /*clock,*/ cpu })
+        Ok(SOC { /*clock,*/ cpu, })
     }
 }
 
-impl/*<'a>*/ SOC/*<'a>*/ {
+impl SOC /*<'a>*/ {
     pub fn get_cpu_registers(&self) -> Registers {
         self.cpu.get_registers()
     }

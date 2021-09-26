@@ -1,8 +1,8 @@
 use crate::area::Area;
 use crate::consts;
-use shared::{traits::Bus, Error};
+use crate::interface::{Bios, BiosDefault, Rom, RomDefault, Wram};
 use crate::state::State;
-use crate::interface::{Wram, Rom, Bios, RomDefault, BiosDefault};
+use shared::{traits::Bus, Error};
 
 #[derive(Debug)]
 pub struct Memory<'a> {
@@ -22,8 +22,12 @@ impl Memory<'_> {
                     Err(Error::SegmentationFault(address))
                 }
             }
-            consts::ROM_MIN..=consts::ROM_MAX => Ok(self.rom.borrow().get(Area::Rom.relative(address))),
-            consts::WRAM_MIN..=consts::WRAM_MAX => Ok(self.wram.borrow().get(Area::Wram.relative(address))),
+            consts::ROM_MIN..=consts::ROM_MAX => {
+                Ok(self.rom.borrow().get(Area::Rom.relative(address)))
+            }
+            consts::WRAM_MIN..=consts::WRAM_MAX => {
+                Ok(self.wram.borrow().get(Area::Wram.relative(address)))
+            }
             _ => Err(Error::SegmentationFault(address)),
         }
     }
@@ -31,11 +35,15 @@ impl Memory<'_> {
     pub fn set(&mut self, address: u16, data: u8) -> Result<(), Error> {
         match address {
             consts::WRAM_MIN..=consts::WRAM_MAX => {
-                self.wram.borrow_mut().set(Area::Wram.relative(address), data);
+                self.wram
+                    .borrow_mut()
+                    .set(Area::Wram.relative(address), data);
                 Ok(())
             }
             consts::ROM_MIN..=consts::ROM_MAX => {
-                self.wram.borrow_mut().set(Area::Rom.relative(address), data);
+                self.wram
+                    .borrow_mut()
+                    .set(Area::Rom.relative(address), data);
                 Ok(())
             }
             _ => Err(Error::SegmentationFault(address)),

@@ -9,12 +9,12 @@ use registers::New;
 pub use registers::RcRegisters as Registers;
 
 #[derive(Default)]
-pub struct Cpu/*<'a>*/ {
+pub struct Cpu /*<'a>*/ {
     //memory: Memory<'a>,
     registers: Registers,
 }
 
-impl/*<'a>*/ Cpu/*<'a>*/ {
+impl Cpu /*<'a>*/ {
     pub fn new(/*memory: Memory<'a>*/) -> Self {
         Self {
             //memory,

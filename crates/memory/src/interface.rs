@@ -1,12 +1,12 @@
+use super::rom::{Cartridge, Mbc0};
+use super::wram;
+use crate::bios;
 use crate::memory;
 use crate::state::State;
-use crate::bios;
-use super::wram;
-use super::rom::{Cartridge, Mbc0};
-use std::cell::RefCell;
-use std::rc::Rc;
-use std::convert::From;
 use shared::{traits::Bus, Error};
+use std::cell::RefCell;
+use std::convert::From;
+use std::rc::Rc;
 
 pub type Memory<'a> = Rc<RefCell<memory::Memory<'a>>>;
 
@@ -14,7 +14,7 @@ pub trait NewMemory {
     fn new(mbc: Cartridge, data: Vec<u8>) -> Self;
 }
 
-struct Data<'a> (State, Bios<'a>, Rom, Wram);
+struct Data<'a>(State, Bios<'a>, Rom, Wram);
 
 impl<'a> From<Data<'a>> for memory::Memory<'a> {
     fn from(data: Data<'a>) -> Self {

@@ -14,7 +14,7 @@
 
 use std::fmt::Debug;
 
-pub trait Bus<T> : Debug {
+pub trait Bus<T>: Debug {
     type Item;
     type Result;
     type Data;
