@@ -1,6 +1,6 @@
 use super::area::Flag;
-use modular_bitfield::{bitfield, specifiers::B4};
 use crate::RegisterBus;
+use modular_bitfield::{bitfield, specifiers::B4};
 
 #[bitfield]
 #[derive(Debug, Copy, Clone)]

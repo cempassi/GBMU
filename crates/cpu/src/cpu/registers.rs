@@ -31,7 +31,7 @@ pub struct Registers {
 }
 
 impl RegisterBus<Bits8, u8> for Registers {
-    fn get(&self, area: Bits8) -> u8{
+    fn get(&self, area: Bits8) -> u8 {
         match area {
             Bits8::A => self.a,
             Bits8::F => self.f.into_bytes()[0],
@@ -59,7 +59,7 @@ impl RegisterBus<Bits8, u8> for Registers {
 }
 
 impl RegisterBus<Bits16, u16> for Registers {
-    fn get(&self, area: Bits16) -> u16{
+    fn get(&self, area: Bits16) -> u16 {
         match area {
             Bits16::SP => self.sp,
             Bits16::PC => self.pc,
