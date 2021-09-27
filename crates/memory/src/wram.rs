@@ -1,4 +1,3 @@
-use shared::traits::Bus;
 const WRAM_SIZE: usize = 8192;
 
 #[derive(Debug)]
@@ -12,32 +11,25 @@ impl Default for Wram {
     }
 }
 
-impl Bus<usize> for Wram {
-    type Item = u8;
-    type Result = ();
-    type Data = u8;
-
-    fn set(&mut self, address: usize, data: Self::Data) -> Self::Result {
-        self.data[address] = data;
-    }
-
-    fn get(&self, address: usize) -> Self::Item {
-        self.data[address]
-    }
-}
-
 impl Wram {
     pub fn new() -> Self {
         Wram {
             data: [0; WRAM_SIZE],
         }
     }
+
+    pub fn set(&mut self, address: usize, data: u8) {
+        self.data[address] = data;
+    }
+
+    pub fn get(&self, address: usize) -> u8 {
+        self.data[address]
+    }
 }
 
 #[cfg(test)]
 mod test_wram {
     use super::Wram;
-    use shared::traits::Bus;
 
     #[test]
     fn test_read_wram() {

@@ -2,7 +2,7 @@ use crate::area::Area;
 use crate::consts;
 use crate::interface::{Bios, BiosDefault, Rom, RomDefault, Wram};
 use crate::state::State;
-use shared::{traits::Bus, Error};
+use shared::Error;
 
 #[derive(Debug)]
 pub struct Memory<'a> {
