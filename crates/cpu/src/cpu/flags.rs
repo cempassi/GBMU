@@ -1,6 +1,6 @@
 use super::area::Flag;
 use modular_bitfield::{bitfield, specifiers::B4};
-use shared::traits::Bus;
+use crate::RegisterBus;
 
 #[bitfield]
 #[derive(Debug, Copy, Clone)]
@@ -19,12 +19,8 @@ impl Default for Flags {
     }
 }
 
-impl Bus<Flag> for Flags {
-    type Result = ();
-    type Data = bool;
-    type Item = bool;
-
-    fn get(&self, flag: Flag) -> Self::Item {
+impl RegisterBus<Flag, bool> for Flags {
+    fn get(&self, flag: Flag) -> bool {
         match flag {
             Flag::Z => self.z(),
             Flag::N => self.n(),
@@ -33,7 +29,7 @@ impl Bus<Flag> for Flags {
         }
     }
 
-    fn set(&mut self, flag: Flag, data: Self::Data) -> Self::Result {
+    fn set(&mut self, flag: Flag, data: bool) {
         match flag {
             Flag::Z => self.set_z(data),
             Flag::N => self.set_n(data),
@@ -47,7 +43,7 @@ impl Bus<Flag> for Flags {
 mod test_flags {
     use super::Flag;
     use super::Flags;
-    use shared::traits::Bus;
+    use crate::RegisterBus;
 
     #[test]
     fn test_valid_flag_set_get() {

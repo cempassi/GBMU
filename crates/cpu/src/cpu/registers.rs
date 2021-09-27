@@ -1,6 +1,6 @@
 use super::area::{Bits16, Bits8, Flag};
 use super::flags::Flags;
-use shared::traits::{Bus, Memory};
+use crate::RegisterBus;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -30,14 +30,8 @@ pub struct Registers {
     pub pc: u16,
 }
 
-impl Memory for Registers {}
-
-impl Bus<Bits8> for Registers {
-    type Result = ();
-    type Data = u8;
-    type Item = u8;
-
-    fn get(&self, area: Bits8) -> Self::Item {
+impl RegisterBus<Bits8, u8> for Registers {
+    fn get(&self, area: Bits8) -> u8{
         match area {
             Bits8::A => self.a,
             Bits8::F => self.f.into_bytes()[0],
@@ -50,7 +44,7 @@ impl Bus<Bits8> for Registers {
         }
     }
 
-    fn set(&mut self, area: Bits8, data: Self::Data) -> Self::Result {
+    fn set(&mut self, area: Bits8, data: u8) {
         match area {
             Bits8::A => self.a = data,
             Bits8::F => self.f = Flags::from_bytes([data]),
@@ -64,12 +58,19 @@ impl Bus<Bits8> for Registers {
     }
 }
 
-impl Bus<Bits16> for Registers {
-    type Item = u16;
-    type Result = ();
-    type Data = u16;
+impl RegisterBus<Bits16, u16> for Registers {
+    fn get(&self, area: Bits16) -> u16{
+        match area {
+            Bits16::SP => self.sp,
+            Bits16::PC => self.pc,
+            Bits16::AF => (self.a as u16) << 8 | self.f.into_bytes()[0] as u16,
+            Bits16::BC => (self.b as u16) << 8 | self.c as u16,
+            Bits16::DE => (self.d as u16) << 8 | self.e as u16,
+            Bits16::HL => (self.h as u16) << 8 | self.l as u16,
+        }
+    }
 
-    fn set(&mut self, area: Bits16, data: Self::Data) -> Self::Result {
+    fn set(&mut self, area: Bits16, data: u16) {
         match area {
             Bits16::AF => {
                 self.a = (data >> 8) as u8;
@@ -95,29 +96,14 @@ impl Bus<Bits16> for Registers {
             }
         }
     }
-
-    fn get(&self, area: Bits16) -> Self::Item {
-        match area {
-            Bits16::SP => self.sp,
-            Bits16::PC => self.pc,
-            Bits16::AF => (self.a as u16) << 8 | self.f.into_bytes()[0] as u16,
-            Bits16::BC => (self.b as u16) << 8 | self.c as u16,
-            Bits16::DE => (self.d as u16) << 8 | self.e as u16,
-            Bits16::HL => (self.h as u16) << 8 | self.l as u16,
-        }
-    }
 }
 
-impl Bus<Flag> for Registers {
-    type Result = ();
-    type Data = bool;
-    type Item = bool;
-
-    fn get(&self, flag: Flag) -> Self::Item {
+impl RegisterBus<Flag, bool> for Registers {
+    fn get(&self, flag: Flag) -> bool {
         self.f.get(flag)
     }
 
-    fn set(&mut self, flag: Flag, data: Self::Data) -> Self::Result {
+    fn set(&mut self, flag: Flag, data: bool) {
         self.f.set(flag, data)
     }
 }
@@ -132,7 +118,7 @@ impl Registers {
 mod test_registers {
     use super::Registers;
     use super::{Bits16, Bits8};
-    use shared::traits::Bus;
+    use crate::RegisterBus;
 
     #[test]
     fn test_valid_write_read_8bits() {
