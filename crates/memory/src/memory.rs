@@ -1,26 +1,22 @@
 use crate::area::Area;
 use crate::consts;
-use crate::interface::{Bios, BiosDefault, Rom, RomDefault, Wram};
+use crate::interface::{Bios, Rom, RomDefault, Wram};
 use crate::state::State;
 use shared::Error;
 
 #[derive(Debug)]
-pub struct Memory<'a> {
+pub struct Memory {
     pub(crate) state: State,
-    pub(crate) bios: Bios<'a>,
+    pub(crate) bios: Bios,
     pub(crate) rom: Rom,
     pub(crate) wram: Wram,
 }
 
-impl Memory<'_> {
+impl Memory {
     pub fn get(&self, address: u16) -> Result<u8, Error> {
         match address {
             consts::BIOS_MIN..=consts::BIOS_MAX if self.state == State::Bios => {
-                if let Some(data) = self.bios.borrow().get(Area::Rom.relative(address)) {
-                    Ok(*data)
-                } else {
-                    Err(Error::SegmentationFault(address))
-                }
+                Ok(self.bios.borrow().get(Area::Rom.relative(address)))
             }
             consts::ROM_MIN..=consts::ROM_MAX => {
                 Ok(self.rom.borrow().get(Area::Rom.relative(address)))
@@ -51,7 +47,7 @@ impl Memory<'_> {
     }
 }
 
-impl Default for Memory<'_> {
+impl Default for Memory {
     fn default() -> Self {
         Memory {
             state: State::Bios,

@@ -8,16 +8,16 @@ use std::cell::RefCell;
 use std::convert::From;
 use std::rc::Rc;
 
-pub type Memory<'a> = Rc<RefCell<memory::Memory<'a>>>;
+pub type Memory = Rc<RefCell<memory::Memory>>;
 
 pub trait NewMemory {
     fn new(mbc: Cartridge, data: Vec<u8>) -> Self;
 }
 
-struct Data<'a>(State, Bios<'a>, Rom, Wram);
+struct Data(State, Bios, Rom, Wram);
 
-impl<'a> From<Data<'a>> for memory::Memory<'a> {
-    fn from(data: Data<'a>) -> Self {
+impl From<Data> for memory::Memory {
+    fn from(data: Data) -> Self {
         Self {
             state: data.0,
             bios: data.1,
@@ -27,7 +27,7 @@ impl<'a> From<Data<'a>> for memory::Memory<'a> {
     }
 }
 
-impl NewMemory for Memory<'_> {
+impl NewMemory for Memory {
     fn new(mbc: Cartridge, data: Vec<u8>) -> Self {
         let rom: Rom = Rc::new(RefCell::new(match mbc {
             Cartridge::Mbc0 => crate::rom::Mbc0::new(data),
@@ -56,14 +56,4 @@ impl RomDefault for Rom {
     }
 }
 
-pub type Bios<'a> = Rc<RefCell<bios::Bios<'a>>>;
-
-pub trait BiosDefault {
-    fn default() -> Self;
-}
-
-impl<'a> BiosDefault for Bios<'a> {
-    fn default() -> Self {
-        Rc::new(RefCell::new(bios::DMG))
-    }
-}
+pub type Bios = Rc<RefCell<bios::Bios>>;

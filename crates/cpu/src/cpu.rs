@@ -3,13 +3,13 @@ use memory::Memory;
 
 #[derive(Default)]
 #[allow(dead_code)]
-pub struct Cpu<'a> {
-    memory: Memory<'a>,
+pub struct Cpu {
+    memory: Memory,
     registers: Registers,
 }
 
-impl<'a> Cpu<'a> {
-    pub fn new(memory: Memory<'a>) -> Self {
+impl Cpu {
+    pub fn new(memory: Memory) -> Self {
         Self {
             memory,
             registers: <Registers as NewRegisters>::new(),

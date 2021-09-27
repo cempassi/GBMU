@@ -12,7 +12,7 @@ pub struct UserInterface {
     memory: Memory,
 }
 
-impl<'a> From<&SOC<'a>> for UserInterface {
+impl From<&SOC> for UserInterface {
     fn from(soc: &SOC) -> UserInterface {
         Self {
             theme: Theme::default(),
