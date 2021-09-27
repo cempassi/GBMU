@@ -45,4 +45,8 @@ impl SOC {
     pub fn get_cpu_registers(&self) -> Registers {
         self.cpu.get_registers()
     }
+
+    pub fn run_once(&mut self) {
+        if self.clock == 0{ self.cpu.run(); } else { self.clock = 1 }
+    }
 }

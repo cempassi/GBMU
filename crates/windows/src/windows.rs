@@ -18,6 +18,7 @@ impl Windows {
         //let (emulator_id, mut emulator) = emulator::generate_emulator(&event_loop);
 
         event_loop.run(move |event, _, control_flow| {
+            // soc.run_once();
             match event {
                 Event::LoopDestroyed => (),
                 Event::WindowEvent { event, window_id } if window_id == debugger.id => {

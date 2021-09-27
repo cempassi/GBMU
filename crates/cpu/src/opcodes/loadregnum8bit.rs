@@ -19,28 +19,21 @@ pub enum LoadRegNum8bit {
 
 #[allow(dead_code)]
 impl<'a> LoadRegNum8bit {
-    pub fn proceed(self, registers: Registers, memory: Memory) -> Result<u32, Error> {
+    pub fn exec(
+        self,
+        registers: Registers,
+        memory: Memory,
+    ) -> Result<u32, Error> {
         if let Ok(byte) = registers.borrow_mut().pc.next(memory.clone()) {
-            let result = match self {
-                LoadRegNum8bit::B => memory
-                    .borrow_mut()
-                    .set(byte.into(), registers.borrow().get(Bits8::B)),
-                LoadRegNum8bit::C => memory
-                    .borrow_mut()
-                    .set(byte.into(), registers.borrow().get(Bits8::C)),
-                LoadRegNum8bit::D => memory
-                    .borrow_mut()
-                    .set(byte.into(), registers.borrow().get(Bits8::D)),
-                LoadRegNum8bit::E => memory
-                    .borrow_mut()
-                    .set(byte.into(), registers.borrow().get(Bits8::E)),
-                LoadRegNum8bit::H => memory
-                    .borrow_mut()
-                    .set(byte.into(), registers.borrow().get(Bits8::H)),
-                LoadRegNum8bit::L => memory
-                    .borrow_mut()
-                    .set(byte.into(), registers.borrow().get(Bits8::L)),
+            let bits = match self {
+                LoadRegNum8bit::B => Bits8::B,
+                LoadRegNum8bit::C => Bits8::C,
+                LoadRegNum8bit::D => Bits8::D,
+                LoadRegNum8bit::E => Bits8::E,
+                LoadRegNum8bit::H => Bits8::H,
+                LoadRegNum8bit::L => Bits8::L,
             };
+            let result = memory.borrow_mut().set(byte.into(), registers.borrow().get(bits));
             match result {
                 Ok(_) => Ok(8),
                 Err(e) => Err(e),
