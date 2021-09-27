@@ -1,11 +1,11 @@
 use crate::fonts;
 use crate::style::{Register, Style, Theme};
+use cpu::RegisterBus;
 use cpu::Registers;
 use iced_wgpu::{Container, Renderer, Row, Text};
 use iced_winit::{
     alignment::Alignment, alignment::Horizontal, alignment::Vertical, Element, Length, Space,
 };
-use cpu::RegisterBus;
 
 use cpu::area::{Bits16, Bits8};
 

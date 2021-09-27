@@ -83,11 +83,11 @@ format:
 	cargo fmt --verbose -- --check
 
 clean:
-	cargo clean
-	cargo cache -a
 	rm -rf roms.zip  $(ROM2_ZIP) $(ROM3_ZIP) $(HASKLIG_ZIP)
 
 fclean: clean
+	cargo clean
+	cargo cache -a
 	rm -rf roms ressources
 
 .PHONY: requirement roms hasklig check lint format.all format clean fclean
