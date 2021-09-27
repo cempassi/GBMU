@@ -1,12 +1,8 @@
-mod memory;
-mod registers;
-
+use super::memory_map::{Memory, MemoryMsg};
+use super::registers::{CpuMsg, CpuRegisters};
 use crate::style::Theme;
-
-use self::memory::{Memory, MemoryMsg};
 use iced_wgpu::{Column, Renderer};
 use iced_winit::{Command, Element, Program};
-use registers::{CpuMsg, CpuRegisters};
 use soc::SOC;
 use std::convert::From;
 

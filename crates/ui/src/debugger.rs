@@ -1,4 +1,8 @@
+mod memory_map;
+mod registers;
 mod ui;
+mod widgets;
+
 use soc::SOC;
 
 use self::ui::UserInterface;

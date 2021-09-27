@@ -1,4 +1,4 @@
-use crate::fonts;
+use crate::style::fonts;
 use crate::style::{Register, Style, Theme};
 use cpu::RegisterBus;
 use cpu::Registers;
