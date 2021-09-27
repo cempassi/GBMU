@@ -94,12 +94,6 @@ impl RegisterBus<Flag, bool> for Registers {
     }
 }
 
-impl Registers {
-    pub fn next_pc(&mut self) {
-        self.pc = self.pc.wrapping_add(1);
-    }
-}
-
 #[cfg(test)]
 mod test_registers {
     use super::Registers;

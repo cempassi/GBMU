@@ -6,7 +6,7 @@ use shared::Error;
 pub type Pc = u16;
 
 impl NextPc for Pc {
-    fn next(&mut self, memory: &Memory) -> Result<u8, Error> {
+    fn next(&mut self, memory: Memory) -> Result<u8, Error> {
         match memory.borrow().get(*self) {
             Ok(byte) => {
                 *self = self.wrapping_add(1);
@@ -17,6 +17,6 @@ impl NextPc for Pc {
     }
 }
 
-pub trait NextPc {
-    fn next(&mut self, memory: &Memory) -> Result<u8, Error>;
+pub(crate) trait NextPc {
+    fn next(&mut self, memory: Memory) -> Result<u8, Error>;
 }
