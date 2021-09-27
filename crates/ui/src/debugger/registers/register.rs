@@ -1,4 +1,4 @@
-use crate::fonts;
+use crate::style::fonts;
 use crate::style::{Register, Style, Theme};
 use cpu::RegisterBus;
 use cpu::Registers;
@@ -90,6 +90,7 @@ impl View for Bits8 {
             .into()
     }
 }
+
 
 impl View for Bits16 {
     fn get_data(&self, registers: Registers) -> String {

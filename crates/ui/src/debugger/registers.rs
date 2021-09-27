@@ -1,4 +1,4 @@
-pub mod cpu;
+pub(crate) mod cpu;
 mod register;
 
 pub use self::cpu::CpuMsg;
