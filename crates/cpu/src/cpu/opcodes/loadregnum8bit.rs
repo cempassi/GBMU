@@ -1,9 +1,10 @@
 use super::super::area::Bits8;
 use super::super::pc::NextPc;
 use crate::cpu::Registers;
+use crate::RegisterBus;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
-use shared::{traits::Bus, Error};
+use shared::Error;
 
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u8)]

@@ -1,11 +1,11 @@
 use crate::fonts;
 use crate::style::{Register, Style, Theme};
+use cpu::RegisterBus;
 use cpu::Registers;
 use iced_wgpu::{Container, Renderer, Row, Text};
 use iced_winit::{
     alignment::Alignment, alignment::Horizontal, alignment::Vertical, Element, Length, Space,
 };
-use shared::traits::Bus;
 
 use cpu::area::{Bits16, Bits8};
 
@@ -63,7 +63,7 @@ pub trait View {
 
 impl View for Bits8 {
     fn get_data(&self, registers: Registers) -> String {
-        format!("{:#x}", registers.borrow().get(self))
+        format!("{:#x}", registers.borrow().get(*self))
     }
 
     fn get_name(&self) -> String {
@@ -93,7 +93,7 @@ impl View for Bits8 {
 
 impl View for Bits16 {
     fn get_data(&self, registers: Registers) -> String {
-        format!("{:#x}", registers.borrow().get(self))
+        format!("{:#x}", registers.borrow().get(*self))
     }
 
     fn get_name(&self) -> String {
