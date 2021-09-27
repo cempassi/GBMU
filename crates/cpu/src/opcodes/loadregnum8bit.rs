@@ -19,12 +19,8 @@ pub enum LoadRegNum8bit {
 
 #[allow(dead_code)]
 impl<'a> LoadRegNum8bit {
-    pub fn proceed(
-        self,
-        registers: &'a mut Registers,
-        memory: &'a mut Memory,
-    ) -> Result<u32, Error> {
-        if let Ok(byte) = registers.borrow_mut().pc.next(memory) {
+    pub fn proceed(self, registers: Registers, memory: Memory) -> Result<u32, Error> {
+        if let Ok(byte) = registers.borrow_mut().pc.next(memory.clone()) {
             let result = match self {
                 LoadRegNum8bit::B => memory
                     .borrow_mut()
