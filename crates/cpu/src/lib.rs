@@ -1,14 +1,13 @@
-pub(crate) mod bus;
-pub mod cpu;
 pub mod area;
+pub mod bus;
+pub mod cpu;
 mod flags;
+pub mod interface;
 mod opcodes;
 mod pc;
-mod registers;
-use registers::New;
-
+pub mod registers;
 
 pub use crate::bus::RegisterBus;
-pub use crate::cpu::area;
 pub use crate::cpu::Cpu;
-pub use crate::cpu::Registers;
+pub use crate::interface::{NewRegisters, Registers};
+pub(crate) use flags::Flags;
