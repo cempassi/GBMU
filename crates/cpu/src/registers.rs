@@ -1,20 +1,6 @@
 use super::area::{Bits16, Bits8, Flag};
-use super::flags::Flags;
+use crate::Flags;
 use crate::RegisterBus;
-use std::cell::RefCell;
-use std::rc::Rc;
-
-pub type RcRegisters = Rc<RefCell<Registers>>;
-
-pub trait New {
-    fn new() -> Self;
-}
-
-impl New for RcRegisters {
-    fn new() -> Self {
-        Rc::new(RefCell::new(Registers::default()))
-    }
-}
 
 #[derive(Debug, Default)]
 pub struct Registers {

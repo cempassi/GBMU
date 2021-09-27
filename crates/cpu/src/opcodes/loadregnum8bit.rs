@@ -1,7 +1,7 @@
-use super::super::area::Bits8;
-use super::super::pc::NextPc;
-use crate::cpu::Registers;
+use crate::area::Bits8;
+use crate::pc::NextPc;
 use crate::RegisterBus;
+use crate::Registers;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 use shared::Error;

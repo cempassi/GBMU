@@ -1,12 +1,5 @@
-pub mod area;
-mod flags;
-mod opcodes;
-mod pc;
-mod registers;
-use registers::New;
-
+use crate::{NewRegisters, Registers};
 use memory::Memory;
-pub use registers::RcRegisters as Registers;
 
 #[derive(Default)]
 #[allow(dead_code)]
@@ -19,7 +12,7 @@ impl<'a> Cpu<'a> {
     pub fn new(memory: Memory<'a>) -> Self {
         Self {
             memory,
-            registers: <Registers as New>::new(),
+            registers: <Registers as NewRegisters>::new(),
         }
     }
 
