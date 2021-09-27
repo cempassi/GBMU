@@ -1,6 +1,6 @@
+pub(crate) mod fonts;
 pub(crate) mod memory;
 pub(crate) mod register;
-pub(crate) mod fonts;
 pub(crate) mod theme;
 
 pub use register::Register;

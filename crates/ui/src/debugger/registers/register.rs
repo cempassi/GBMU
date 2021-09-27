@@ -91,7 +91,6 @@ impl View for Bits8 {
     }
 }
 
-
 impl View for Bits16 {
     fn get_data(&self, registers: Registers) -> String {
         format!("{:#x}", registers.borrow().get(*self))
