@@ -9,7 +9,7 @@ use crate::debugger;
 pub struct Windows {}
 
 impl Windows {
-    pub fn run(soc: SOC) {
+    pub fn run(mut soc: SOC) {
         let event_loop = EventLoop::new();
         let instance = Instance::new(iced_wgpu::wgpu::Backends::PRIMARY);
         let mut debugger = debugger::Debugger::new(&event_loop, &instance, &soc);
@@ -18,6 +18,7 @@ impl Windows {
         //let (emulator_id, mut emulator) = emulator::generate_emulator(&event_loop);
 
         event_loop.run(move |event, _, control_flow| {
+            soc.run_once();
             match event {
                 Event::LoopDestroyed => (),
                 Event::WindowEvent { event, window_id } if window_id == debugger.id => {
