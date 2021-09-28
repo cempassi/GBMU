@@ -1,9 +1,8 @@
-use super::rom::{Cartridge, Mbc0};
+use super::mbc::{Cartridge, Mbc0};
 use super::wram;
 use crate::bios;
 use crate::memory;
 use crate::state::State;
-use shared::{traits::Bus, Error};
 use std::cell::RefCell;
 use std::convert::From;
 use std::rc::Rc;
