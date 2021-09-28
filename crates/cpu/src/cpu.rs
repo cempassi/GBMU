@@ -1,9 +1,13 @@
 pub use crate::interface::{NewRegisters, Registers};
 use crate::opcodes::LoadR1R2;
-use crate::opcodes::LoadRegNum8bit;
+use crate::opcodes::LoadR8b;
+use crate::opcodes::LoadRR16b;
+
 use crate::pc::NextPc;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
+use crate::area::Bits16;
+use crate::RegisterBus;
 
 #[derive(Default)]
 #[allow(dead_code)]
@@ -38,7 +42,9 @@ impl Cpu {
 
         if let Ok(ope) = LoadR1R2::try_from_primitive(opcode) {
             ope.exec(self.registers.clone());
-        } else if let Ok(ope) = LoadRegNum8bit::try_from_primitive(opcode) {
+        } else if let Ok(ope) = LoadR8b::try_from_primitive(opcode) {
+            ope.exec(self.registers.clone(), self.memory.clone());
+        } else if let Ok(ope) = LoadRR16b::try_from_primitive(opcode.into()) {
             ope.exec(self.registers.clone(), self.memory.clone());
         };
     }
