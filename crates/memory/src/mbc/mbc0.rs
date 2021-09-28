@@ -19,7 +19,7 @@ impl MemoryBus for Mbc0 {
         self.data[address]
     }
 
-    fn set(&mut self, address: usize, data: u8) {}
+    fn set(&mut self, _address: usize, _data: u8) {}
 }
 
 impl Mbc0 {
