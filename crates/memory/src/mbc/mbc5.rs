@@ -138,10 +138,10 @@ mod mbc5_test {
 
         assert_eq!(mbc.data[0x147], 0x1b);
 
-        mbc.set(0x01f5, 0x0a).unwrap();
+        mbc.set(0x01f5, 0x0a);
         assert_eq!(mbc.ram_lock, true);
 
-        mbc.set(0x034b, 0x03).unwrap();
+        mbc.set(0x034b, 0x03);
         assert_eq!(mbc.ram_lock, false)
     }
 
@@ -150,7 +150,7 @@ mod mbc5_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc5::new(rom_file);
 
-        mbc.set(0x2156, 0x00).unwrap();
+        mbc.set(0x2156, 0x00);
         assert_eq!(mbc.rom_bank, 0x00);
     }
 
@@ -159,7 +159,7 @@ mod mbc5_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc5::new(rom_file);
 
-        mbc.set(0x2156, 0xff).unwrap();
+        mbc.set(0x2156, 0xff);
         assert_eq!(mbc.rom_bank, 0xff);
     }
 
@@ -168,10 +168,10 @@ mod mbc5_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc5::new(rom_file);
 
-        mbc.set(0x2fff, 0xff).unwrap();
+        mbc.set(0x2fff, 0xff);
         assert_eq!(mbc.rom_bank, 0xff);
 
-        mbc.set(0x3000, 0x01).unwrap();
+        mbc.set(0x3000, 0x01);
         assert_eq!(mbc.rom_bank, 0x1ff);
     }
 
@@ -180,21 +180,21 @@ mod mbc5_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc5::new(rom_file);
 
-        mbc.set(0x01f5, 0x0a).unwrap();
+        mbc.set(0x01f5, 0x0a);
         assert_eq!(mbc.ram_lock, true);
 
-        mbc.set(0x2fff, 0xff).unwrap();
+        mbc.set(0x2fff, 0xff);
         assert_eq!(mbc.rom_bank, 0xff);
 
-        mbc.set(0x3000, 0x01).unwrap();
+        mbc.set(0x3000, 0x01);
         assert_eq!(mbc.rom_bank, 0x1ff);
 
-        mbc.set(0xa042, 0x42).unwrap();
+        mbc.set(0xa042, 0x42);
 
         let data = mbc.get(0xa042);
         assert_eq!(data, 0x42);
 
-        mbc.set(0x01f5, 0x00).unwrap();
+        mbc.set(0x01f5, 0x00);
         assert_eq!(mbc.ram_lock, false);
     }
 
@@ -203,7 +203,7 @@ mod mbc5_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc5::new(rom_file);
 
-        mbc.set(0x4f4f, 0xff).unwrap();
+        mbc.set(0x4f4f, 0xff);
         assert_eq!(mbc.ram_bank, 0x0f);
     }
 
@@ -212,18 +212,18 @@ mod mbc5_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc5::new(rom_file);
 
-        mbc.set(0x01f5, 0x0a).unwrap();
+        mbc.set(0x01f5, 0x0a);
         assert_eq!(mbc.ram_lock, true);
 
-        mbc.set(0x4f4f, 0x00).unwrap();
+        mbc.set(0x4f4f, 0x00);
         assert_eq!(mbc.ram_bank, 0);
 
-        mbc.set(0x0000a630, 0xca).unwrap();
+        mbc.set(0x0000a630, 0xca);
 
         let data = mbc.get(0x0000a630);
         assert_eq!(data, 0xca);
 
-        mbc.set(0x01ff, 0x00).unwrap();
+        mbc.set(0x01ff, 0x00);
         assert_eq!(mbc.ram_lock, false);
     }
 
@@ -232,13 +232,13 @@ mod mbc5_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc5::new(rom_file);
 
-        mbc.set(0x01f5, 0x0a).unwrap();
+        mbc.set(0x01f5, 0x0a);
         assert_eq!(mbc.ram_lock, true);
 
-        mbc.set(0x4f4f, 0x01).unwrap();
+        mbc.set(0x4f4f, 0x01);
         assert_eq!(mbc.ram_bank, 1);
 
-        mbc.set(0x01ff, 0x00).unwrap();
+        mbc.set(0x01ff, 0x00);
         assert_eq!(mbc.ram_lock, false);
     }
 }
