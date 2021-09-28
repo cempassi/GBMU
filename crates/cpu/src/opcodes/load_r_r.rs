@@ -7,7 +7,7 @@ use num_enum::TryFromPrimitive;
 /// Description:
 ///  Put value r2 into r1.
 /// Use with:
-///  r1,r2 = A,B,C,D,E,H,L,(HL)
+///  r1,r2 = A,B,C,D,E,H,L
 /// Opcodes:
 /// Instruction Parameters Opcode Cycles
 /// [LD A,A    7F 4]   [LD B,B    40 4]     [LD C,B    48 4]  [LD D,B    50 4]   [LD E,B    58 4] [LD H,B    60 4]  [LD L,B    68 4]
@@ -67,7 +67,7 @@ pub enum LoadR1R2 {
 
 impl LoadR1R2 {
     pub fn exec(self, registers: Registers) {
-        let (r1, r2) = match self {
+        let (dst, src) = match self {
             LoadR1R2::AA => (Bits8::A, Bits8::A),
             LoadR1R2::AB => (Bits8::A, Bits8::B),
             LoadR1R2::AC => (Bits8::A, Bits8::C),
@@ -112,9 +112,7 @@ impl LoadR1R2 {
             LoadR1R2::LH => (Bits8::L, Bits8::H),
             LoadR1R2::LL => (Bits8::L, Bits8::L),
         };
-        let reg = registers.borrow();
-        let reg_data = reg.get(r2);
-        drop(reg);
-        registers.borrow_mut().set(r1, reg_data)
+        let data = { registers.borrow().get(src) };
+        registers.borrow_mut().set(dst, data)
     }
 }
