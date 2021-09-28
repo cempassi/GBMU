@@ -1,5 +1,5 @@
 // mod load_a_addr;
-// mod load_r_b8;
+mod load_r_b8;
 mod load_r_r;
 
 pub use load_a_addr::LoadRegANum8bit;
