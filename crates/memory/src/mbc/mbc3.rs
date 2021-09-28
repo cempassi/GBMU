@@ -1,5 +1,5 @@
-use super::consts;
 use super::bus::MbcBus;
+use super::consts;
 use crate::MemoryBus;
 use shared::Error;
 

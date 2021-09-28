@@ -1,7 +1,7 @@
+use crate::MemoryBus;
 use std::fs;
 use std::path::PathBuf;
 use std::str;
-use crate::MemoryBus;
 
 #[derive(Debug)]
 pub struct Bios {
@@ -31,7 +31,6 @@ impl Bios {
 }
 
 impl MemoryBus for Bios {
-
     fn set(&mut self, address: usize, data: u8) {
         if let Some(index) = self.data.get_mut(address) {
             *index = data;

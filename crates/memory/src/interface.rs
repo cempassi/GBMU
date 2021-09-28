@@ -1,4 +1,4 @@
-use super::mbc::{Cartridge, Mbc0};
+use super::mbc::{Cartridge, Mbc0, MbcBus};
 use super::wram;
 use crate::bios;
 use crate::memory;
@@ -29,7 +29,7 @@ impl From<Data> for memory::Memory {
 impl NewMemory for Memory {
     fn new(mbc: Cartridge, data: Vec<u8>) -> Self {
         let rom: Rom = Rc::new(RefCell::new(match mbc {
-            Cartridge::Mbc0 => crate::rom::Mbc0::new(data),
+            Cartridge::Mbc0 => Mbc0::new(data),
             _ => unimplemented!(),
         }));
         let state = State::Bios;
@@ -43,7 +43,7 @@ impl NewMemory for Memory {
 
 pub type Wram = Rc<RefCell<wram::Wram>>;
 
-pub type Rom = Rc<RefCell<dyn Bus<usize, Item = u8, Result = Result<(), Error>, Data = u8>>>;
+pub type Rom = Rc<RefCell<dyn MbcBus>>;
 
 pub trait RomDefault {
     fn default() -> Self;

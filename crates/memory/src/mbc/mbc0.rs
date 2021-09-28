@@ -1,7 +1,7 @@
-use super::consts;
-use shared::Error;
 use super::bus::MbcBus;
+use super::consts;
 use crate::MemoryBus;
+use shared::Error;
 
 #[derive(Debug)]
 pub struct Mbc0 {
@@ -9,7 +9,7 @@ pub struct Mbc0 {
 }
 
 impl MbcBus for Mbc0 {
-    fn set(&mut self, address: usize, data: u8) ->  Result<(), Error>{
+    fn set(&mut self, address: usize, data: u8) -> Result<(), Error> {
         Err(Error::IllegalSet(address, data))
     }
 }
@@ -19,8 +19,7 @@ impl MemoryBus for Mbc0 {
         self.data[address]
     }
 
-    fn set(&mut self, address: usize, data: Self::Data){
-    }
+    fn set(&mut self, address: usize, data: Self::Data) {}
 }
 
 impl Mbc0 {

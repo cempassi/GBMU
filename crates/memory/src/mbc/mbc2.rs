@@ -1,5 +1,5 @@
-use super::consts;
 use super::bus::MbcBus;
+use super::consts;
 use crate::MemoryBus;
 use shared::Error;
 
@@ -12,7 +12,7 @@ pub struct Mbc2 {
 }
 
 impl MbcBus for Mbc2 {
-    fn set(&mut self, address: usize, data: Self::Data) ->  Result<(), Error> {
+    fn set(&mut self, address: usize, data: Self::Data) -> Result<(), Error> {
         match address {
             consts::MBC2_REG_START..=consts::MBC2_REG_END => self.mbc2_register(address, data),
             consts::MBC_RAM_START..=consts::MBC2_ERAM_END => {
