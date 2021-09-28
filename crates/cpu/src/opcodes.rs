@@ -1,10 +1,10 @@
 // mod load_a_addr;
-mod load_r_b8;
+// mod load_r_b8;
 mod load_r_r;
 
+pub use load_a_addr::LoadRegANum8bit;
 pub use load_r_b8::LoadRegNum8bit;
 pub use load_r_r::LoadReg1Reg2;
-// pub use load_a_addr::LoadRegANum8bit;
 //
 
 // ADD (address)      DEC r               LD A,(address)      LD rr,d16         RET

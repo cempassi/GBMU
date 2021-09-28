@@ -1,7 +1,7 @@
 use super::super::area::Bits8;
+use crate::bus::RegisterBus;
 use crate::cpu::Registers;
 use num_enum::TryFromPrimitive;
-use crate::bus::RegisterBus;
 
 /// 2. LD r1,r2
 /// Description:
