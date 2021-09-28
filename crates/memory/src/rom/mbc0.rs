@@ -1,22 +1,25 @@
 use super::consts;
-use shared::{traits::Bus, Error};
+use shared::Error;
+use super::bus::MbcBus;
+use crate::MemoryBus;
 
 #[derive(Debug)]
 pub struct Mbc0 {
     data: Vec<u8>,
 }
 
-impl Bus<usize> for Mbc0 {
-    type Item = u8;
-    type Result = Result<(), Error>;
-    type Data = u8;
+impl MbcBus for Mbc0 {
+    fn set(&mut self, address: usize, data: u8) ->  Result<(), Error>{
+        Err(Error::IllegalSet(address, data))
+    }
+}
 
-    fn get(&self, address: usize) -> Self::Item {
+impl MemoryBus for Mbc0 {
+    fn get(&self, address: usize) -> u8 {
         self.data[address]
     }
 
-    fn set(&mut self, address: usize, data: Self::Data) -> Self::Result {
-        Err(Error::IllegalSet(address, data))
+    fn set(&mut self, address: usize, data: Self::Data){
     }
 }
 
@@ -35,7 +38,7 @@ impl Default for Mbc0 {
 #[cfg(test)]
 mod test_nombc {
     use super::Mbc0;
-    use shared::traits::Bus;
+    use super::MbcBus;
 
     #[test]
     fn test_read_nombc() {
