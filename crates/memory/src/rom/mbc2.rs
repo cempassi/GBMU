@@ -1,5 +1,7 @@
 use super::consts;
-use shared::{traits::Bus, Error};
+use super::bus::MbcBus;
+use crate::MemoryBus;
+use shared::Error;
 
 #[derive(Debug)]
 pub struct Mbc2 {
@@ -9,12 +11,24 @@ pub struct Mbc2 {
     rom_bank: u8,
 }
 
-impl Bus<usize> for Mbc2 {
-    type Item = u8;
-    type Result = Result<(), Error>;
-    type Data = u8;
+impl MbcBus for Mbc2 {
+    fn set(&mut self, address: usize, data: Self::Data) ->  Result<(), Error> {
+        match address {
+            consts::MBC2_REG_START..=consts::MBC2_REG_END => self.mbc2_register(address, data),
+            consts::MBC_RAM_START..=consts::MBC2_ERAM_END => {
+                if self.ram_lock {
+                    let offset = self.get_ram_offset(address);
+                    self.data[address - offset] = data & 0xf
+                }
+            } // Else should be undefined behavior Or Err
+            _ => return Err(shared::Error::IllegalSet(address, data)),
+        };
+        Ok(())
+    }
+}
 
-    fn get(&self, address: usize) -> Self::Item {
+impl MemoryBus for Mbc2 {
+    fn get(&self, address: usize) -> u8 {
         match address {
             consts::MBC_BANK0_START..=consts::MBC_BANK0_END => self.data[address],
             consts::MBC_BANK1_START..=consts::MBC_BANK1_END => {
@@ -33,18 +47,8 @@ impl Bus<usize> for Mbc2 {
         }
     }
 
-    fn set(&mut self, address: usize, data: Self::Data) -> Self::Result {
-        match address {
-            consts::MBC2_REG_START..=consts::MBC2_REG_END => self.mbc2_register(address, data),
-            consts::MBC_RAM_START..=consts::MBC2_ERAM_END => {
-                if self.ram_lock {
-                    let offset = self.get_ram_offset(address);
-                    self.data[address - offset] = data & 0xf
-                }
-            } // Else should be undefined behavior Or Err
-            _ => return Err(shared::Error::IllegalSet(address, data)),
-        };
-        Ok(())
+    fn set(&mut self, address: usize, data: u8) {
+        <Self as MbcBus>::set(address, data);
     }
 }
 
@@ -86,7 +90,7 @@ impl Default for Mbc2 {
 #[cfg(test)]
 mod mbc2_test {
     use super::Mbc2;
-    use shared::traits::Bus;
+    use super::MemoryBus;
     const FILE: &[u8; 65536] = include_bytes!("../../../../roms/Ayakashi.gb");
 
     #[test]
