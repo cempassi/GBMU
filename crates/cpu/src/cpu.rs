@@ -6,8 +6,6 @@ use crate::opcodes::LoadRR16b;
 use crate::pc::NextPc;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
-use crate::area::Bits16;
-use crate::RegisterBus;
 
 #[derive(Default)]
 #[allow(dead_code)]

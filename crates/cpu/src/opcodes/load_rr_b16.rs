@@ -1,7 +1,7 @@
-use memory::Memory;
 use crate::area::Bits16;
-use crate::{RegisterBus, Registers};
 use crate::pc::NextPc;
+use crate::{RegisterBus, Registers};
+use memory::Memory;
 use num_enum::TryFromPrimitive;
 
 ///1. LD n,nn
@@ -29,7 +29,7 @@ pub enum LoadRR16b {
 impl LoadRR16b {
     pub fn exec(self, registers: Registers, memory: Memory) {
         let first_byte = registers.borrow_mut().pc.next(memory.clone()).unwrap();
-        let second_byte = registers.borrow_mut().pc.next(memory.clone()).unwrap();
+        let second_byte = registers.borrow_mut().pc.next(memory).unwrap();
         let word = (second_byte as u16) << 8 | (first_byte as u16) as u16;
         let bits16 = match self {
             LoadRR16b::BC => Bits16::BC,
