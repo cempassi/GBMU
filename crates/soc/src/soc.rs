@@ -12,12 +12,12 @@ const HEADER_LEN: usize = 0x50;
 const HEAD_LEN: usize = 0x100;
 
 #[allow(dead_code)]
-pub struct SOC<'a> {
+pub struct SOC {
     clock: u32,
-    cpu: Cpu<'a>,
+    cpu: Cpu,
 }
 
-impl<'a> TryFrom<&str> for SOC<'a> {
+impl TryFrom<&str> for SOC {
     type Error = std::io::Error;
 
     fn try_from(path: &str) -> Result<Self, Self::Error> {
@@ -41,7 +41,7 @@ impl<'a> TryFrom<&str> for SOC<'a> {
     }
 }
 
-impl<'a> SOC<'a> {
+impl SOC {
     pub fn get_cpu_registers(&self) -> Registers {
         self.cpu.get_registers()
     }
