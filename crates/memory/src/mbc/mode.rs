@@ -1,5 +1,5 @@
 #[derive(Debug)]
-pub enum Mbc {
+pub enum MbcMode {
     Mbc0,
     Mbc1,
     Mbc2,
