@@ -136,7 +136,6 @@ impl Debugger {
         if let Some(event) =
             iced_winit::conversion::window_event(&event, self.window.scale_factor(), self.modifiers)
         {
-            println!("Queuing event: {:?}", event);
             self.state.state.queue_event(event);
         }
     }

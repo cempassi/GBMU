@@ -60,7 +60,6 @@ impl Debugger {
     }
 
     pub fn update(&mut self, scale_factor: f64) {
-        println!("In debugger update");
         let logical_cursor = self.cursor.to_logical(scale_factor);
         let point = Point::new(logical_cursor.x, logical_cursor.y);
 
