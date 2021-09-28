@@ -45,5 +45,6 @@ impl Cpu {
         } else if let Ok(operation) = LoadRR16b::try_from_primitive(opcode.into()) {
             operation.exec(self.registers.clone(), self.memory.clone());
         };
+        println!("{:#?}", self.registers.borrow());
     }
 }

@@ -71,11 +71,15 @@ impl View for Bits8 {
     }
 
     fn view(&self, registers: Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
-        let data = Text::new(self.get_data(registers)).font(fonts::HASKLIG_LIGHT);
-        let space = Space::new(Length::Units(20), Length::Units(5));
         let name = Text::new(self.get_name())
             .font(fonts::HASKLIG_BOLD)
             .size(20);
+        let space = Space::new(Length::Units(20), Length::Units(5));
+        let data = Text::new(self.get_data(registers))
+            .font(fonts::HASKLIG_LIGHT)
+            .width(Length::Fill)
+            .horizontal_alignment(Horizontal::Center)
+            .vertical_alignment(Vertical::Center);
         let number = Container::new(data)
             .style(Register::style(theme))
             .align_x(Horizontal::Center)
@@ -107,7 +111,9 @@ impl View for Bits16 {
         let space = Space::new(Length::Units(10), Length::Units(5));
         let data = Text::new(self.get_data(registers))
             .font(fonts::HASKLIG_LIGHT)
-            .width(Length::Units(10));
+            .width(Length::Fill)
+            .horizontal_alignment(Horizontal::Center)
+            .vertical_alignment(Vertical::Center);
         let number = Container::new(data)
             .style(Register::style(theme))
             .align_x(Horizontal::Center)
