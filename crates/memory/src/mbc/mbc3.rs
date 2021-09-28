@@ -38,7 +38,7 @@ struct Mbc3Rtc {
 }
 
 impl MbcBus for Mbc3 {
-    fn set(&mut self, address: usize, data: Self::Data) -> Self::Result {
+    fn set(&mut self, address: usize, data: u8) -> Result<(), Error> {
         match address {
             consts::MBC3_REG0_START..=consts::MBC3_REG0_END => self.update_ram_lock(data),
             consts::MBC3_REG1_START..=consts::MBC3_REG1_END => self.update_rom_bank(data),
@@ -64,7 +64,7 @@ impl MemoryBus for Mbc3 {
     }
 
     fn set(&mut self, address: usize, data: u8) {
-        <Self as MbcBus>::set(address, data);
+        <Self as MbcBus>::set(self, address, data);
     }
 }
 
