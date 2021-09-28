@@ -82,6 +82,9 @@ format.all:
 format:
 	cargo fmt --verbose -- --check
 
+test:
+	cargo test
+
 clean:
 	rm -rf roms.zip  $(ROM2_ZIP) $(ROM3_ZIP) $(HASKLIG_ZIP)
 
