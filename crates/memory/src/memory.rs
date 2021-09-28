@@ -2,6 +2,7 @@ use crate::area::Area;
 use crate::consts;
 use crate::interface::{Bios, Rom, RomDefault, Wram};
 use crate::state::State;
+use crate::MemoryBus;
 use shared::Error;
 
 #[derive(Debug)]
