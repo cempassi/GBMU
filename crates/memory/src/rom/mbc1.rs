@@ -1,5 +1,7 @@
 use super::consts;
-use shared::{traits::Bus, Error};
+use super::bus::MbcBus;
+use crate::MemoryBus;
+use shared::Error;
 
 #[derive(Debug)]
 pub struct Mbc1 {
@@ -11,12 +13,20 @@ pub struct Mbc1 {
     ram_bank: u8,
 }
 
-impl Bus<usize> for Mbc1 {
-    type Item = u8;
-    type Result = Result<(), Error>;
-    type Data = u8;
+impl MbcBus for Mbc1 {
+    fn set(&mut self, address: usize, data: u8) -> Result<(), Error> {
+        match address {
+            consts::MBC1_REG0_START..=consts::MBC1_REG0_END => self.update_ram_lock(data),
+            consts::MBC1_REG1_START..=consts::MBC1_REG2_END => self.update_bank_nbr(address, data),
+            consts::MBC1_REG3_START..=consts::MBC1_REG3_END => self.update_bank_mode(data),
+            consts::MBC_RAM_START..=consts::MBC_RAM_END => self.set_ram(address, data),
+            _ => Err(shared::Error::IllegalSet(address, data)),
+        }
+    }
+}
 
-    fn get(&self, address: usize) -> Self::Item {
+impl MemoryBus for Mbc1 {
+    fn get(&self, address: usize) -> u8 {
         match address {
             consts::MBC_BANK0_START..=consts::MBC_BANK0_END => self.data[address],
             consts::MBC_BANK1_START..=consts::MBC_BANK1_END => self.swap_bank_nbr(address),
@@ -25,14 +35,8 @@ impl Bus<usize> for Mbc1 {
         }
     }
 
-    fn set(&mut self, address: usize, data: Self::Data) -> Self::Result {
-        match address {
-            consts::MBC1_REG0_START..=consts::MBC1_REG0_END => self.update_ram_lock(data),
-            consts::MBC1_REG1_START..=consts::MBC1_REG2_END => self.update_bank_nbr(address, data),
-            consts::MBC1_REG3_START..=consts::MBC1_REG3_END => self.update_bank_mode(data),
-            consts::MBC_RAM_START..=consts::MBC_RAM_END => self.set_ram(address, data),
-            _ => Err(shared::Error::IllegalSet(address, data)),
-        }
+    fn set(&mut self, address: usize, data: u8) {
+        <Self as MbcBus>::set(address, data);
     }
 }
 
@@ -142,7 +146,7 @@ impl Default for Mbc1 {
 #[cfg(test)]
 mod mbc1_test {
     use super::Mbc1;
-    use shared::traits::Bus;
+    use crate::MemoryBus;
 
     const FILE: &[u8; 262144] = include_bytes!("../../../../roms/Metroid II - Return of Samus.gb");
 
