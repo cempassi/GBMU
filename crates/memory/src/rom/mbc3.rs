@@ -1,5 +1,7 @@
 use super::consts;
-use shared::{traits::Bus, Error};
+use super::bus::MbcBus;
+use crate::MemoryBus;
+use shared::Error;
 
 /// Return the epoch in microseconds.
 fn get_epoch() -> u64 {
@@ -35,12 +37,21 @@ struct Mbc3Rtc {
     epoch: u64,
 }
 
-impl Bus<usize> for Mbc3 {
-    type Item = u8;
-    type Result = Result<(), Error>;
-    type Data = u8;
+impl MbcBus for Mbc3 {
+    fn set(&mut self, address: usize, data: Self::Data) -> Self::Result {
+        match address {
+            consts::MBC3_REG0_START..=consts::MBC3_REG0_END => self.update_ram_lock(data),
+            consts::MBC3_REG1_START..=consts::MBC3_REG1_END => self.update_rom_bank(data),
+            consts::MBC3_REG2_START..=consts::MBC3_REG2_END => self.update_ram_bank(data),
+            consts::MBC3_REG3_START..=consts::MBC3_REG3_END => self.latch_rtc_register(data),
+            consts::MBC3_REG4_START..=consts::MBC3_REG4_END => self.set_ram(address, data),
+            _ => Err(shared::Error::IllegalSet(address, data)),
+        }
+    }
+}
 
-    fn get(&self, address: usize) -> Self::Item {
+impl MemoryBus for Mbc3 {
+    fn get(&self, address: usize) -> u8 {
         match address {
             consts::MBC_BANK0_START..=consts::MBC_BANK0_END => self.data[address],
             consts::MBC_BANK1_START..=consts::MBC_BANK1_END => {
@@ -52,15 +63,8 @@ impl Bus<usize> for Mbc3 {
         }
     }
 
-    fn set(&mut self, address: usize, data: Self::Data) -> Self::Result {
-        match address {
-            consts::MBC3_REG0_START..=consts::MBC3_REG0_END => self.update_ram_lock(data),
-            consts::MBC3_REG1_START..=consts::MBC3_REG1_END => self.update_rom_bank(data),
-            consts::MBC3_REG2_START..=consts::MBC3_REG2_END => self.update_ram_bank(data),
-            consts::MBC3_REG3_START..=consts::MBC3_REG3_END => self.latch_rtc_register(data),
-            consts::MBC3_REG4_START..=consts::MBC3_REG4_END => self.set_ram(address, data),
-            _ => Err(shared::Error::IllegalSet(address, data)),
-        }
+    fn set(&mut self, address: usize, data: u8) {
+        <Self as MbcBus>::set(address, data);
     }
 }
 
@@ -235,7 +239,7 @@ impl Default for Mbc3 {
 #[cfg(test)]
 mod mbc3_test {
     use super::Mbc3;
-    use shared::traits::Bus;
+    use super::MbcBus;
 
     const FILE: &[u8; 2097152] = include_bytes!("../../../../roms/Pokemon - Version Argent.gbc");
 
