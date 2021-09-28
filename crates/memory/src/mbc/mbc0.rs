@@ -19,7 +19,7 @@ impl MemoryBus for Mbc0 {
         self.data[address]
     }
 
-    fn set(&mut self, address: usize, data: Self::Data) {}
+    fn set(&mut self, address: usize, data: u8) {}
 }
 
 impl Mbc0 {
@@ -38,6 +38,7 @@ impl Default for Mbc0 {
 mod test_nombc {
     use super::Mbc0;
     use super::MbcBus;
+    use super::MemoryBus;
 
     #[test]
     fn test_read_nombc() {
@@ -50,7 +51,7 @@ mod test_nombc {
     fn test_write_read_nombc() {
         let mut mbc0 = Mbc0::default();
 
-        match mbc0.set(0x42, 42) {
+        match <Mbc0 as MbcBus>::set(&mut mbc0, 0x42, 42) {
             Ok(_) => panic!(),
             Err(_) => (),
         }
