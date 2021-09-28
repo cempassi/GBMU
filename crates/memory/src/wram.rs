@@ -1,3 +1,5 @@
+use crate::MemoryBus;
+
 const WRAM_SIZE: usize = 8192;
 
 #[derive(Debug)]
@@ -17,19 +19,22 @@ impl Wram {
             data: [0; WRAM_SIZE],
         }
     }
+}
 
-    pub fn set(&mut self, address: usize, data: u8) {
-        self.data[address] = data;
+impl MemoryBus for Wram {
+    fn get(&self, address: usize) -> u8 {
+        self.data[address]
     }
 
-    pub fn get(&self, address: usize) -> u8 {
-        self.data[address]
+    fn set(&mut self, address: usize, data: u8) {
+        self.data[address] = data;
     }
 }
 
 #[cfg(test)]
 mod test_wram {
     use super::Wram;
+    use crate::MemoryBus;
 
     #[test]
     fn test_read_wram() {
