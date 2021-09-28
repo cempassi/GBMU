@@ -36,7 +36,7 @@ impl MemoryBus for Mbc1 {
     }
 
     fn set(&mut self, address: usize, data: u8) {
-        <Self as MbcBus>::set(address, data);
+        <Self as MbcBus>::set(&mut self, address, data);
     }
 }
 
