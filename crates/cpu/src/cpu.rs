@@ -38,12 +38,12 @@ impl Cpu {
             .next(self.memory.clone())
             .unwrap();
 
-        if let Ok(ope) = LoadR1R2::try_from_primitive(opcode) {
-            ope.exec(self.registers.clone());
-        } else if let Ok(ope) = LoadR8b::try_from_primitive(opcode) {
-            ope.exec(self.registers.clone(), self.memory.clone());
-        } else if let Ok(ope) = LoadRR16b::try_from_primitive(opcode.into()) {
-            ope.exec(self.registers.clone(), self.memory.clone());
+        if let Ok(operation) = LoadR1R2::try_from_primitive(opcode) {
+            operation.exec(self.registers.clone());
+        } else if let Ok(operation) = LoadR8b::try_from_primitive(opcode) {
+            operation.exec(self.registers.clone(), self.memory.clone());
+        } else if let Ok(operation) = LoadRR16b::try_from_primitive(opcode.into()) {
+            operation.exec(self.registers.clone(), self.memory.clone());
         };
     }
 }
