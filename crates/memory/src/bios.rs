@@ -1,5 +1,6 @@
 use std::fs;
-use std::path::Path;
+use std::path::PathBuf;
+use std::str;
 #[derive(Debug)]
 pub struct Bios {
     data: Vec<u8>,
@@ -13,17 +14,31 @@ impl Default for Bios {
 
 impl Bios {
     pub fn new() -> Self {
-        let path = Path::new("ressources/bios/dmg_boot.bin");
+        let output = std::process::Command::new("git")
+            .args(&["rev-parse", "--show-toplevel"])
+            .output()
+            .unwrap();
+        let git_root = str::from_utf8(&output.stdout).unwrap().trim();
+        let mut path = PathBuf::new();
+        path.push(git_root);
+        path.push("ressources/bios/dmg_boot.bin");
+        println!("path: {:?}", path);
         let data = fs::read(path).unwrap();
         Bios { data }
     }
 
     pub fn set(&mut self, address: usize, data: u8) {
-        self.data[address] = data;
+        if let Some(index) = self.data.get_mut(address) {
+            *index = data;
+        }
     }
 
     pub fn get(&self, address: usize) -> u8 {
-        self.data[address]
+        if let Some(index) = self.data.get(address) {
+            *index
+        } else {
+            0
+        }
     }
 }
 
