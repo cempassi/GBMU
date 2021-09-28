@@ -12,7 +12,7 @@ pub struct Mbc2 {
 }
 
 impl MbcBus for Mbc2 {
-    fn set(&mut self, address: usize, data: Self::Data) -> Result<(), Error> {
+    fn set(&mut self, address: usize, data: u8) -> Result<(), Error> {
         match address {
             consts::MBC2_REG_START..=consts::MBC2_REG_END => self.mbc2_register(address, data),
             consts::MBC_RAM_START..=consts::MBC2_ERAM_END => {
@@ -48,7 +48,7 @@ impl MemoryBus for Mbc2 {
     }
 
     fn set(&mut self, address: usize, data: u8) {
-        <Self as MbcBus>::set(address, data);
+        <Self as MbcBus>::set(self, address, data);
     }
 }
 
