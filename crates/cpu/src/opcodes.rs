@@ -1,8 +1,17 @@
-mod loadreg1reg2;
-mod loadregnum8bit;
+// mod load_a_addr;
+mod load_r_b8;
+mod load_r_r;
 
-pub use loadregnum8bit::LoadRegNum8bit;
-pub use loadreg1reg2::LoadReg1Reg2;
+pub use load_r_b8::LoadRegNum8bit;
+pub use load_r_r::LoadReg1Reg2;
+// pub use load_a_addr::LoadRegANum8bit;
+//
+
+// ADD (address)      DEC r               LD A,(address)      LD rr,d16         RET
+// BIT n,r            INC r               LD r,r              LD (HL+),A        RLA
+// CALL address       INC rr              LD r,d8             LD (HL-),A        RL r
+// CP d8              JR cond,address     LD r,(address)      POP rr            SUB r
+// CP (HL)            LD (address),A      LD (address),r      PUSH rr           XOR r
 
 //
 // type Address = u16;
