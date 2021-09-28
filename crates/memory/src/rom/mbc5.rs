@@ -1,5 +1,7 @@
 use super::consts;
-use shared::{traits::Bus, Error};
+use super::bus::MbcBus;
+use crate::MemoryBus;
+use shared::Error;
 
 #[derive(Debug)]
 pub struct Mbc5 {
@@ -9,12 +11,19 @@ pub struct Mbc5 {
     ram_bank: u8,
 }
 
-impl Bus<usize> for Mbc5 {
-    type Item = u8;
-    type Result = Result<(), Error>;
-    type Data = u8;
+impl MbcBus for Mbc5 {
+    fn set(&mut self, address: usize, data: u8) -> Result<(), Error> {
+        match address {
+            consts::MBC5_REG0_START..=consts::MBC5_REG0_END => self.update_ram_lock(data),
+            consts::MBC5_REG1_START..=consts::MBC5_REG3_END => self.set_bank_number(address, data),
+            consts::MBC_RAM_START..=consts::MBC_RAM_END => self.set_ram(address, data),
+            _ => Err(shared::Error::IllegalSet(address, data)),
+        }
+    }
+}
 
-    fn get(&self, address: usize) -> Self::Item {
+impl MemoryBus for Mbc5 {
+    fn get(&self, address: usize) -> u8 {
         match address {
             consts::MBC_BANK0_START..=consts::MBC_BANK0_END => self.data[address],
             consts::MBC_BANK1_START..=consts::MBC_BANK1_END => self.swap_bank_nbr(address),
@@ -23,13 +32,8 @@ impl Bus<usize> for Mbc5 {
         }
     }
 
-    fn set(&mut self, address: usize, data: Self::Data) -> Self::Result {
-        match address {
-            consts::MBC5_REG0_START..=consts::MBC5_REG0_END => self.update_ram_lock(data),
-            consts::MBC5_REG1_START..=consts::MBC5_REG3_END => self.set_bank_number(address, data),
-            consts::MBC_RAM_START..=consts::MBC_RAM_END => self.set_ram(address, data),
-            _ => Err(shared::Error::IllegalSet(address, data)),
-        }
+    fn set(&mut self, address: usize, data: u8) {
+        <Self as MbcBus>::set(address, data);
     }
 }
 
@@ -115,7 +119,7 @@ impl Default for Mbc5 {
 #[cfg(test)]
 mod mbc5_test {
     use super::Mbc5;
-    use shared::traits::Bus;
+    use crate::MemoryBus;
 
     const FILE: &[u8; 1048576] = include_bytes!("../../../../roms/Pokemon_Rouge.gb");
 
