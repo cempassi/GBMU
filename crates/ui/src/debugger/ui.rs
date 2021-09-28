@@ -33,7 +33,6 @@ impl Program for UserInterface {
     type Renderer = Renderer;
 
     fn update(&mut self, message: Message) -> Command<Self::Message> {
-        println!("Update of UserInterface reached");
         match message {
             Message::Registers(message) => {
                 self.cpu_registers.update(message);
