@@ -1,3 +1,4 @@
+pub(crate) mod bus;
 pub(super) mod cartridge;
 pub(super) mod consts;
 pub(super) mod mbc0;
