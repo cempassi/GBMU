@@ -32,7 +32,7 @@ pub enum LoadRegNum8bit {
 
 impl LoadRegNum8bit {
     pub fn exec(self, registers: Registers, memory: Memory) {
-        let byte = registers.borrow_mut().pc.next(memory.clone()).unwrap();
+        let byte = registers.borrow_mut().pc.next(memory).unwrap();
         let bits = match self {
             LoadRegNum8bit::B => Bits8::B,
             LoadRegNum8bit::C => Bits8::C,

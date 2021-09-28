@@ -12,9 +12,9 @@ const HEADER_LEN: usize = 0x50;
 const HEAD_LEN: usize = 0x100;
 
 #[allow(dead_code)]
-pub struct SOC<'a> {
+pub struct SOC {
     clock: u32,
-    cpu: Cpu<'a>,
+    cpu: Cpu,
 }
 
 impl TryFrom<&str> for SOC {
@@ -41,12 +41,15 @@ impl TryFrom<&str> for SOC {
     }
 }
 
-impl SOC<'_> {
+impl SOC {
     pub fn get_cpu_registers(&self) -> Registers {
         self.cpu.get_registers()
     }
 
     pub fn run_once(&mut self) {
-        if self.clock == 0{ self.cpu.run(); } else { self.clock = 1 }
+        if self.clock < 2 {
+            self.cpu.run();
+        }
+        self.clock += 1;
     }
 }

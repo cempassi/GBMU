@@ -1,6 +1,5 @@
 pub use crate::interface::{NewRegisters, Registers};
-use crate::opcodes::LoadReg1Reg2;
-// use crate::opcodes::LoadRegANum8bit;
+use crate::opcodes::LoadR1R2;
 use crate::opcodes::LoadRegNum8bit;
 use crate::pc::NextPc;
 use memory::Memory;
@@ -30,7 +29,6 @@ impl Cpu {
     /// 3 - Tryfrom to Instruction
     /// 4 - Exec Instructions -> Do the Maths put in Dest and set Flags
     pub fn run(&self) {
-        // 1 Get ospcodes from PC
         let opcode = self
             .registers
             .borrow_mut()
@@ -38,16 +36,10 @@ impl Cpu {
             .next(self.memory.clone())
             .unwrap();
 
-        // 2 Convert opcodes With Tryfrom
-        if let Ok(ope) = LoadReg1Reg2::try_from_primitive(opcode) {
+        if let Ok(ope) = LoadR1R2::try_from_primitive(opcode) {
             ope.exec(self.registers.clone());
         } else if let Ok(ope) = LoadRegNum8bit::try_from_primitive(opcode) {
             ope.exec(self.registers.clone(), self.memory.clone());
-            // } else if let Ok(ope) = LoadRegANum8bit::try_from_primitive(opcode) {
-            //     ope.exec(self.registers.clone(), self.memory.clone());
         };
     }
 }
-
-// #[cfg(test)]
-// mod
