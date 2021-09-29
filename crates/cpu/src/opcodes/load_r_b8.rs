@@ -9,7 +9,7 @@ use num_enum::TryFromPrimitive;
 /// Description:
 ///  Put value nn into n.
 /// Use with:
-///  nn = A,B,C,D,E,H,L
+///  nn = A,B,C,D,E,H,L,(HL)
 ///  n = 8 bit immediate value
 /// Opcodes:
 /// Instruction Parameters Opcode Cycles
@@ -46,17 +46,20 @@ impl LoadR8b {
             LoadR8b::E => registers.borrow_mut().set(Bits8::E, byte),
             LoadR8b::H => registers.borrow_mut().set(Bits8::H, byte),
             LoadR8b::L => registers.borrow_mut().set(Bits8::L, byte),
-            LoadR8b::HL => memory.borrow_mut().set(registers.borrow().get(Bits16::HL), byte).unwrap(),
+            LoadR8b::HL => memory
+                .borrow_mut()
+                .set(registers.borrow().get(Bits16::HL), byte)
+                .unwrap(),
         };
     }
 }
 
 #[cfg(test)]
 mod test_instruction_load_8bit_into_reg {
-    use memory::Memory;
-    use crate::{RegisterBus, Registers};
-    use crate::area::Bits8;
     use super::LoadR8b;
+    use crate::area::Bits8;
+    use crate::{RegisterBus, Registers};
+    use memory::Memory;
 
     #[test]
     fn test_reg_b() {
@@ -122,7 +125,7 @@ mod test_instruction_load_8bit_into_reg {
         assert_eq!(byte, 0x31);
         ldr8b.exec(register.clone(), memory.clone());
         assert_eq!(byte, register.borrow().get(Bits8::L));
-        }
+    }
 
     #[test]
     fn test_reg_a() {
