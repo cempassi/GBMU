@@ -1,8 +1,8 @@
 pub use crate::interface::{NewRegisters, Registers};
+use crate::opcodes::DecR;
 use crate::opcodes::LoadR1R2;
 use crate::opcodes::LoadR8b;
 use crate::opcodes::LoadRR16b;
-
 use crate::pc::NextPc;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
@@ -44,6 +44,8 @@ impl Cpu {
             operation.exec(self.registers.clone(), self.memory.clone());
         } else if let Ok(operation) = LoadRR16b::try_from_primitive(opcode.into()) {
             operation.exec(self.registers.clone(), self.memory.clone());
+        } else if let Ok(operation) = DecR::try_from_primitive(opcode) {
+            operation.exec(self.registers.clone());
         };
         println!("{:#?}", self.registers.borrow());
     }
