@@ -16,7 +16,6 @@ use num_enum::TryFromPrimitive;
 ///  LD DE,nn 11 12
 ///  LD HL,nn 21 12
 ///  LD SP,nn 31 12
-
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u16)]
 pub enum LoadRR16b {
