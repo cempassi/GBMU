@@ -3,6 +3,7 @@ use super::consts;
 use super::Mbc;
 use crate::MemoryBus;
 use shared::Error;
+use std::convert::AsRef;
 
 #[derive(Debug)]
 pub struct Mbc5 {
@@ -10,6 +11,23 @@ pub struct Mbc5 {
     data: Vec<u8>,
     rom_bank: u16,
     ram_bank: u8,
+}
+
+impl Default for Mbc5 {
+    fn default() -> Self {
+        Mbc5 {
+            ram_lock: false,
+            data: vec![0; consts::MBC5_MAX_SIZE],
+            rom_bank: 0,
+            ram_bank: 0,
+        }
+    }
+}
+
+impl AsRef<Vec<u8>> for Mbc5 {
+    fn as_ref(&self) -> &Vec<u8> {
+        self.data.as_ref()
+    }
 }
 
 impl MbcBus for Mbc5 {
@@ -110,17 +128,6 @@ impl Mbc5 {
     fn update_ram_lock(&mut self, data: u8) -> Result<(), Error> {
         self.ram_lock = data == consts::MBC_MAGIC_LOCK;
         Ok(())
-    }
-}
-
-impl Default for Mbc5 {
-    fn default() -> Self {
-        Mbc5 {
-            ram_lock: false,
-            data: vec![0; consts::MBC5_MAX_SIZE],
-            rom_bank: 0,
-            ram_bank: 0,
-        }
     }
 }
 
