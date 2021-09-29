@@ -1,5 +1,6 @@
 use super::bus::MbcBus;
 use super::consts;
+use super::Mbc;
 use crate::MemoryBus;
 use shared::Error;
 
@@ -37,14 +38,16 @@ impl MemoryBus for Mbc5 {
     }
 }
 
+impl Mbc for Mbc5 {}
+
 impl Mbc5 {
-    pub fn new(data: Vec<u8>) -> Self {
-        Mbc5 {
+    pub fn new(data: Vec<u8>) -> Box<Self> {
+        Box::new(Mbc5 {
             ram_lock: false,
             data,
             rom_bank: 0,
             ram_bank: 0,
-        }
+        })
     }
 
     /// Write the Data into the Ram at the address
@@ -112,7 +115,12 @@ impl Mbc5 {
 
 impl Default for Mbc5 {
     fn default() -> Self {
-        Mbc5::new(vec![0; consts::MBC5_MAX_SIZE])
+        Mbc5 {
+            ram_lock: false,
+            data: vec![0; consts::MBC5_MAX_SIZE],
+            rom_bank: 0,
+            ram_bank: 0,
+        }
     }
 }
 

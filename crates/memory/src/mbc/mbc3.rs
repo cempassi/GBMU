@@ -1,5 +1,6 @@
 use super::bus::MbcBus;
 use super::consts;
+use super::Mbc;
 use crate::MemoryBus;
 use shared::Error;
 
@@ -68,9 +69,11 @@ impl MemoryBus for Mbc3 {
     }
 }
 
+impl Mbc for Mbc3 {}
+
 impl Mbc3 {
-    pub fn new(data: Vec<u8>) -> Self {
-        Mbc3 {
+    pub fn new(data: Vec<u8>) -> Box<Self> {
+        Box::new(Mbc3 {
             ram_lock: false,
             latch: false,
             data,
@@ -84,7 +87,7 @@ impl Mbc3 {
                 dc_upper: 0,
                 epoch: 0,
             },
-        }
+        })
     }
 
     /// Retrieve a RAM bank or a RTC value depending on the Ram lock and the RAM bank number
@@ -232,7 +235,21 @@ impl Mbc3 {
 
 impl Default for Mbc3 {
     fn default() -> Self {
-        Mbc3::new(vec![0; consts::MBC3_MAX_SIZE])
+        Mbc3 {
+            ram_lock: false,
+            latch: false,
+            data: vec![0; consts::MBC3_MAX_SIZE],
+            rom_bank: 0,
+            ram_bank: 0,
+            rtc: Mbc3Rtc {
+                seconds: 3,
+                minutes: 2,
+                hours: 1,
+                dc_lower: 0,
+                dc_upper: 0,
+                epoch: 0,
+            },
+        }
     }
 }
 

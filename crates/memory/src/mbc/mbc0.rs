@@ -1,5 +1,6 @@
 use super::bus::MbcBus;
 use super::consts;
+use super::Mbc;
 use crate::MemoryBus;
 use shared::Error;
 
@@ -22,15 +23,19 @@ impl MemoryBus for Mbc0 {
     fn set(&mut self, _address: usize, _data: u8) {}
 }
 
+impl Mbc for Mbc0 {}
+
 impl Mbc0 {
-    pub fn new(data: Vec<u8>) -> Self {
-        Mbc0 { data }
+    pub fn new(data: Vec<u8>) -> Box<Self> {
+        Box::new(Self { data })
     }
 }
 
 impl Default for Mbc0 {
     fn default() -> Self {
-        Mbc0::new(vec![0; consts::MBC0_MAX_SIZE])
+        Mbc0 {
+            data: vec![0; consts::MBC0_MAX_SIZE],
+        }
     }
 }
 
@@ -42,7 +47,7 @@ mod test_nombc {
 
     #[test]
     fn test_read_nombc() {
-        let mbc0 = Mbc0::default();
+        let mbc0 = Box::<Mbc0>::default();
 
         assert_eq!(mbc0.get(0x10), 0);
     }

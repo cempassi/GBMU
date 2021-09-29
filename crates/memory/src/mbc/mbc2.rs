@@ -1,5 +1,6 @@
 use super::bus::MbcBus;
 use super::consts;
+use super::Mbc;
 use crate::MemoryBus;
 use shared::Error;
 
@@ -52,13 +53,15 @@ impl MemoryBus for Mbc2 {
     }
 }
 
+impl Mbc for Mbc2 {}
+
 impl Mbc2 {
-    pub fn new(data: Vec<u8>) -> Self {
-        Mbc2 {
+    pub fn new(data: Vec<u8>) -> Box<Self> {
+        Box::new(Mbc2 {
             ram_lock: false,
             data,
             rom_bank: 1,
-        }
+        })
     }
 
     /// If address & 0x100 == 1 : change the rom bank
@@ -83,7 +86,11 @@ impl Mbc2 {
 
 impl Default for Mbc2 {
     fn default() -> Self {
-        Mbc2::new(vec![0; consts::MBC2_MAX_SIZE])
+        Mbc2 {
+            ram_lock: false,
+            data: vec![0; consts::MBC2_MAX_SIZE],
+            rom_bank: 1,
+        }
     }
 }
 
