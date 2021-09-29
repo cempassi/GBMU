@@ -3,6 +3,7 @@ use super::consts;
 use super::Mbc;
 use crate::MemoryBus;
 use shared::Error;
+use std::convert::AsRef;
 
 /// Return the epoch in microseconds.
 fn get_epoch() -> u64 {
@@ -20,6 +21,32 @@ pub struct Mbc3 {
     rom_bank: u8,
     ram_bank: u8,
     rtc: Mbc3Rtc,
+}
+
+impl Default for Mbc3 {
+    fn default() -> Self {
+        Mbc3 {
+            ram_lock: false,
+            latch: false,
+            data: vec![0; consts::MBC3_MAX_SIZE],
+            rom_bank: 0,
+            ram_bank: 0,
+            rtc: Mbc3Rtc {
+                seconds: 3,
+                minutes: 2,
+                hours: 1,
+                dc_lower: 0,
+                dc_upper: 0,
+                epoch: 0,
+            },
+        }
+    }
+}
+
+impl AsRef<Vec<u8>> for Mbc3 {
+    fn as_ref(&self) -> &Vec<u8> {
+        self.data.as_ref()
+    }
 }
 
 /// [Name]    [Range]  [Id]    [Description]
@@ -230,26 +257,6 @@ impl Mbc3 {
         let day = epoch / (3600 * 24);
         self.rtc.dc_lower = day as u8;
         self.rtc.dc_upper = (self.rtc.dc_upper & !1) | ((day >> 8) & 1) as u8;
-    }
-}
-
-impl Default for Mbc3 {
-    fn default() -> Self {
-        Mbc3 {
-            ram_lock: false,
-            latch: false,
-            data: vec![0; consts::MBC3_MAX_SIZE],
-            rom_bank: 0,
-            ram_bank: 0,
-            rtc: Mbc3Rtc {
-                seconds: 3,
-                minutes: 2,
-                hours: 1,
-                dc_lower: 0,
-                dc_upper: 0,
-                epoch: 0,
-            },
-        }
     }
 }
 
