@@ -1,14 +1,16 @@
+pub mod area;
 pub(crate) mod bios;
+mod bus;
 pub(crate) mod consts;
+pub mod interface;
 pub(crate) mod mbc;
+pub mod memory;
+pub mod new;
 pub(crate) mod state;
 pub(crate) mod wram;
-pub mod area;
-pub mod interface;
-pub mod memory;
-mod bus;
 
 pub use area::Area;
 pub use bus::MemoryBus;
-pub use interface::{Bios, Memory, NewMemory, Rom, Wram};
-pub use mbc::Cartridge;
+pub use interface::{Bios, Memory, Rom, Wram};
+pub use mbc::{Cartridge, Mbc};
+pub use new::NewMemory;
