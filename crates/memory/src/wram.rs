@@ -30,6 +30,14 @@ impl MemoryBus for Wram {
     }
 }
 
+impl Wram {
+    pub fn new() -> Self {
+        Wram {
+            data: vec![0; WRAM_SIZE],
+        }
+    }
+}
+
 #[cfg(test)]
 mod test_wram {
     use super::Wram;
