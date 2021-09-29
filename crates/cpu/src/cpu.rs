@@ -1,4 +1,5 @@
 pub use crate::interface::{NewRegisters, Registers};
+use crate::opcodes::LoadHL8b;
 use crate::opcodes::LoadR1R2;
 use crate::opcodes::LoadR8b;
 use crate::opcodes::LoadRR16b;
@@ -47,6 +48,8 @@ impl Cpu {
         } else if let Ok(operation) = LoadR8b::try_from_primitive(opcode) {
             operation.exec(self.registers.clone(), self.memory.clone());
         } else if let Ok(operation) = LoadRR16b::try_from_primitive(opcode.into()) {
+            operation.exec(self.registers.clone(), self.memory.clone());
+        } else if let Ok(operation) = LoadHL8b::try_from_primitive(opcode) {
             operation.exec(self.registers.clone(), self.memory.clone());
         };
         println!("{:#?}", self.registers.borrow());
