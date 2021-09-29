@@ -42,11 +42,9 @@ impl LoadRegHL {
             LoadRegHL::LHL => Bits8::L,
             LoadRegHL::AHL => Bits8::A,
         };
-        let data = memory
-            .borrow()
-            .get(registers.borrow().get(Bits16::HL))
-            .unwrap();
-        registers.borrow_mut().set(reg, data)
+        let hl = registers.borrow().get(Bits16::HL);
+        let data = memory.borrow().get(hl).unwrap();
+        registers.borrow_mut().set(reg, data);
     }
 }
 
@@ -125,10 +123,7 @@ mod test_instruction_load_reg_hl {
         instruction.exec(register.clone(), memory.clone());
         assert_eq!(
             register.borrow().get(Bits8::H),
-            memory
-                .borrow()
-                .get(register.borrow().get(Bits16::HL))
-                .unwrap()
+            memory.borrow().get(0).unwrap()
         );
     }
 
@@ -140,10 +135,7 @@ mod test_instruction_load_reg_hl {
         instruction.exec(register.clone(), memory.clone());
         assert_eq!(
             register.borrow().get(Bits8::L),
-            memory
-                .borrow()
-                .get(register.borrow().get(Bits16::HL))
-                .unwrap()
+            memory.borrow().get(0).unwrap()
         );
     }
 
