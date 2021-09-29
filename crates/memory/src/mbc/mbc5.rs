@@ -1,5 +1,8 @@
+use super::bus::MbcBus;
 use super::consts;
-use shared::{traits::Bus, Error};
+use super::Mbc;
+use crate::MemoryBus;
+use shared::Error;
 
 #[derive(Debug)]
 pub struct Mbc5 {
@@ -9,21 +12,8 @@ pub struct Mbc5 {
     ram_bank: u8,
 }
 
-impl Bus<usize> for Mbc5 {
-    type Item = u8;
-    type Result = Result<(), Error>;
-    type Data = u8;
-
-    fn get(&self, address: usize) -> Self::Item {
-        match address {
-            consts::MBC_BANK0_START..=consts::MBC_BANK0_END => self.data[address],
-            consts::MBC_BANK1_START..=consts::MBC_BANK1_END => self.swap_bank_nbr(address),
-            consts::MBC_RAM_START..=consts::MBC_RAM_END => self.swap_bank_nbr(address),
-            _ => unreachable!(),
-        }
-    }
-
-    fn set(&mut self, address: usize, data: Self::Data) -> Self::Result {
+impl MbcBus for Mbc5 {
+    fn set(&mut self, address: usize, data: u8) -> Result<(), Error> {
         match address {
             consts::MBC5_REG0_START..=consts::MBC5_REG0_END => self.update_ram_lock(data),
             consts::MBC5_REG1_START..=consts::MBC5_REG3_END => self.set_bank_number(address, data),
@@ -33,14 +23,31 @@ impl Bus<usize> for Mbc5 {
     }
 }
 
+impl MemoryBus for Mbc5 {
+    fn get(&self, address: usize) -> u8 {
+        match address {
+            consts::MBC_BANK0_START..=consts::MBC_BANK0_END => self.data[address],
+            consts::MBC_BANK1_START..=consts::MBC_BANK1_END => self.swap_bank_nbr(address),
+            consts::MBC_RAM_START..=consts::MBC_RAM_END => self.swap_bank_nbr(address),
+            _ => unreachable!(),
+        }
+    }
+
+    fn set(&mut self, address: usize, data: u8) {
+        let _ = <Self as MbcBus>::set(self, address, data);
+    }
+}
+
+impl Mbc for Mbc5 {}
+
 impl Mbc5 {
-    pub fn new(data: Vec<u8>) -> Self {
-        Mbc5 {
+    pub fn new(data: Vec<u8>) -> Box<Self> {
+        Box::new(Mbc5 {
             ram_lock: false,
             data,
             rom_bank: 0,
             ram_bank: 0,
-        }
+        })
     }
 
     /// Write the Data into the Ram at the address
@@ -108,14 +115,19 @@ impl Mbc5 {
 
 impl Default for Mbc5 {
     fn default() -> Self {
-        Mbc5::new(vec![0; consts::MBC5_MAX_SIZE])
+        Mbc5 {
+            ram_lock: false,
+            data: vec![0; consts::MBC5_MAX_SIZE],
+            rom_bank: 0,
+            ram_bank: 0,
+        }
     }
 }
 
 #[cfg(test)]
 mod mbc5_test {
     use super::Mbc5;
-    use shared::traits::Bus;
+    use crate::MemoryBus;
 
     const FILE: &[u8; 1048576] = include_bytes!("../../../../roms/Pokemon_Rouge.gb");
 
@@ -134,10 +146,10 @@ mod mbc5_test {
 
         assert_eq!(mbc.data[0x147], 0x1b);
 
-        mbc.set(0x01f5, 0x0a).unwrap();
+        mbc.set(0x01f5, 0x0a);
         assert_eq!(mbc.ram_lock, true);
 
-        mbc.set(0x034b, 0x03).unwrap();
+        mbc.set(0x034b, 0x03);
         assert_eq!(mbc.ram_lock, false)
     }
 
@@ -146,7 +158,7 @@ mod mbc5_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc5::new(rom_file);
 
-        mbc.set(0x2156, 0x00).unwrap();
+        mbc.set(0x2156, 0x00);
         assert_eq!(mbc.rom_bank, 0x00);
     }
 
@@ -155,7 +167,7 @@ mod mbc5_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc5::new(rom_file);
 
-        mbc.set(0x2156, 0xff).unwrap();
+        mbc.set(0x2156, 0xff);
         assert_eq!(mbc.rom_bank, 0xff);
     }
 
@@ -164,10 +176,10 @@ mod mbc5_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc5::new(rom_file);
 
-        mbc.set(0x2fff, 0xff).unwrap();
+        mbc.set(0x2fff, 0xff);
         assert_eq!(mbc.rom_bank, 0xff);
 
-        mbc.set(0x3000, 0x01).unwrap();
+        mbc.set(0x3000, 0x01);
         assert_eq!(mbc.rom_bank, 0x1ff);
     }
 
@@ -176,21 +188,21 @@ mod mbc5_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc5::new(rom_file);
 
-        mbc.set(0x01f5, 0x0a).unwrap();
+        mbc.set(0x01f5, 0x0a);
         assert_eq!(mbc.ram_lock, true);
 
-        mbc.set(0x2fff, 0xff).unwrap();
+        mbc.set(0x2fff, 0xff);
         assert_eq!(mbc.rom_bank, 0xff);
 
-        mbc.set(0x3000, 0x01).unwrap();
+        mbc.set(0x3000, 0x01);
         assert_eq!(mbc.rom_bank, 0x1ff);
 
-        mbc.set(0xa042, 0x42).unwrap();
+        mbc.set(0xa042, 0x42);
 
         let data = mbc.get(0xa042);
         assert_eq!(data, 0x42);
 
-        mbc.set(0x01f5, 0x00).unwrap();
+        mbc.set(0x01f5, 0x00);
         assert_eq!(mbc.ram_lock, false);
     }
 
@@ -199,7 +211,7 @@ mod mbc5_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc5::new(rom_file);
 
-        mbc.set(0x4f4f, 0xff).unwrap();
+        mbc.set(0x4f4f, 0xff);
         assert_eq!(mbc.ram_bank, 0x0f);
     }
 
@@ -208,18 +220,18 @@ mod mbc5_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc5::new(rom_file);
 
-        mbc.set(0x01f5, 0x0a).unwrap();
+        mbc.set(0x01f5, 0x0a);
         assert_eq!(mbc.ram_lock, true);
 
-        mbc.set(0x4f4f, 0x00).unwrap();
+        mbc.set(0x4f4f, 0x00);
         assert_eq!(mbc.ram_bank, 0);
 
-        mbc.set(0x0000a630, 0xca).unwrap();
+        mbc.set(0x0000a630, 0xca);
 
         let data = mbc.get(0x0000a630);
         assert_eq!(data, 0xca);
 
-        mbc.set(0x01ff, 0x00).unwrap();
+        mbc.set(0x01ff, 0x00);
         assert_eq!(mbc.ram_lock, false);
     }
 
@@ -228,13 +240,13 @@ mod mbc5_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc5::new(rom_file);
 
-        mbc.set(0x01f5, 0x0a).unwrap();
+        mbc.set(0x01f5, 0x0a);
         assert_eq!(mbc.ram_lock, true);
 
-        mbc.set(0x4f4f, 0x01).unwrap();
+        mbc.set(0x4f4f, 0x01);
         assert_eq!(mbc.ram_bank, 1);
 
-        mbc.set(0x01ff, 0x00).unwrap();
+        mbc.set(0x01ff, 0x00);
         assert_eq!(mbc.ram_lock, false);
     }
 }

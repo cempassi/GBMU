@@ -1,6 +1,8 @@
+use crate::MemoryBus;
 use std::fs;
 use std::path::PathBuf;
 use std::str;
+
 #[derive(Debug)]
 pub struct Bios {
     data: Vec<u8>,
@@ -26,14 +28,16 @@ impl Bios {
         let data = fs::read(path).unwrap();
         Bios { data }
     }
+}
 
-    pub fn set(&mut self, address: usize, data: u8) {
+impl MemoryBus for Bios {
+    fn set(&mut self, address: usize, data: u8) {
         if let Some(index) = self.data.get_mut(address) {
             *index = data;
         }
     }
 
-    pub fn get(&self, address: usize) -> u8 {
+    fn get(&self, address: usize) -> u8 {
         if let Some(index) = self.data.get(address) {
             *index
         } else {
