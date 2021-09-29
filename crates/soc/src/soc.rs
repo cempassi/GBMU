@@ -1,7 +1,7 @@
 use crate::header::Header;
 use cpu::cpu::Cpu;
 use cpu::Registers;
-use memory::{Memory, NewMemory};
+use memory;
 use pretty_hex::*;
 use std::convert::TryFrom;
 use std::fs;
@@ -34,7 +34,7 @@ impl TryFrom<&str> for SOC {
         let header = Header::try_from(raw_header).expect("Invalid data in raw_header");
 
         let clock: u32 = 0;
-        let memory = <Memory as NewMemory>::new(header.cartridge, rom);
+        let memory: memory::Memory = memory::memory::Memory::new(header.cartridge, rom);
         let cpu: Cpu = Cpu::new(memory);
 
         Ok(SOC { clock, cpu })
