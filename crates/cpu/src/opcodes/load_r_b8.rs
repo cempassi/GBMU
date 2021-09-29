@@ -20,7 +20,6 @@ use num_enum::TryFromPrimitive;
 /// LD          H,n        0x26   8
 /// LD          L,n        0x2e   8
 /// LD          L,n        0x2e   8
-/// LD          (HL),n     0x36   12
 /// LD          A,n        0x3e   8
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive, Clone)]
 #[repr(u8)]
@@ -31,26 +30,23 @@ pub enum LoadR8b {
     E = 0x1e,
     H = 0x26,
     L = 0x2e,
-    HL = 0x36,
     A = 0x3e,
 }
 
 impl LoadR8b {
     pub fn exec(self, registers: Registers, memory: Memory) {
-        let byte = registers.borrow_mut().pc.next(memory.clone()).unwrap();
-        match self {
-            LoadR8b::A => registers.borrow_mut().set(Bits8::A, byte),
-            LoadR8b::B => registers.borrow_mut().set(Bits8::B, byte),
-            LoadR8b::C => registers.borrow_mut().set(Bits8::C, byte),
-            LoadR8b::D => registers.borrow_mut().set(Bits8::D, byte),
-            LoadR8b::E => registers.borrow_mut().set(Bits8::E, byte),
-            LoadR8b::H => registers.borrow_mut().set(Bits8::H, byte),
-            LoadR8b::L => registers.borrow_mut().set(Bits8::L, byte),
-            LoadR8b::HL => memory
-                .borrow_mut()
-                .set(registers.borrow().get(Bits16::HL), byte)
-                .unwrap(),
-        };
+        let data = registers.borrow_mut().pc.next(memory.clone()).unwrap();
+        let dst = match self {
+            LoadR8b::A => Bits8::A,
+            LoadR8b::B => Bits8::B,
+            LoadR8b::C => Bits8::C,
+            LoadR8b::D => Bits8::D,
+            LoadR8b::E => Bits8::E,
+            LoadR8b::H => Bits8::H,
+            LoadR8b::L => Bits8::L,
+            };
+            registers.borrow_mut().set(dst, data);
+        }
     }
 }
 
