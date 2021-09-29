@@ -1,24 +1,29 @@
+use super::mbc::{Cartridge, Mbc0, Mbc1, Mbc2, Mbc3, Mbc5};
 use crate::area::Area;
+use crate::bios::Bios;
+use crate::bus::MemoryBus;
 use crate::consts;
-use crate::interface::{Bios, Rom, Wram};
+use crate::interface::{Bus, Rom};
 use crate::mbc::default::RomDefault;
 use crate::state::State;
-use crate::MemoryBus;
+use crate::wram::Wram;
 use shared::Error;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 #[derive(Debug)]
 pub struct Memory {
     pub(crate) state: State,
-    pub(crate) bios: Bios,
+    pub(crate) bios: Bus,
     pub(crate) rom: Rom,
-    pub(crate) wram: Wram,
+    pub(crate) wram: Bus,
 }
 
 impl Memory {
     pub fn get(&self, address: u16) -> Result<u8, Error> {
         match address {
             consts::BIOS_MIN..=consts::BIOS_MAX if self.state == State::Bios => {
-                Ok(self.bios.borrow().get(Area::Rom.relative(address)))
+                Ok(self.bios.borrow().get(Area::Bios.relative(address)))
             }
             consts::ROM_MIN..=consts::ROM_MAX => {
                 Ok(self.rom.borrow().get(Area::Rom.relative(address)))
@@ -47,16 +52,54 @@ impl Memory {
             _ => Err(Error::SegmentationFault(address)),
         }
     }
+
+    pub fn get_area(&self, area: Area) -> Bus {
+        match area {
+            Area::Bios => self.bios.clone(),
+            Area::Rom => todo!(),
+            Area::_Vram => todo!(),
+            Area::_ExtRam => todo!(),
+            Area::Wram => self.wram.clone(),
+            Area::_EchoRam => todo!(),
+            Area::_Oam => todo!(),
+            Area::_IOReg => todo!(),
+            Area::_HighRam => todo!(),
+        }
+    }
 }
 
 impl Default for Memory {
     fn default() -> Self {
         Memory {
             state: State::Bios,
-            bios: Bios::default(),
-            wram: Wram::default(),
+            bios: Rc::new(RefCell::new(Box::new(Bios::new()))),
+            wram: Rc::new(RefCell::new(Box::new(Wram::default()))),
             rom: Rom::default(),
         }
+    }
+}
+
+impl Memory {
+    pub fn new(mbc: Cartridge, data: Vec<u8>) -> Rc<RefCell<Self>> {
+        let rom: Rom = Rc::new(RefCell::new(match mbc {
+            Cartridge::Mbc0 => Mbc0::new(data),
+            Cartridge::Mbc1 => Mbc1::new(data),
+            Cartridge::Mbc2 => Mbc2::new(data),
+            Cartridge::Mbc3 => Mbc3::new(data),
+            Cartridge::Mbc5 => Mbc5::new(data),
+            _ => unimplemented!(),
+        }));
+        let state = State::Bios;
+        let bios: Box<dyn MemoryBus> = Box::new(Bios::new());
+        let bios = Rc::new(RefCell::new(bios));
+        let wram: Box<dyn MemoryBus> = Box::new(Wram::default());
+        let wram = Rc::new(RefCell::new(wram));
+        Rc::new(RefCell::new(Self {
+            state,
+            bios,
+            rom,
+            wram,
+        }))
     }
 }
 
