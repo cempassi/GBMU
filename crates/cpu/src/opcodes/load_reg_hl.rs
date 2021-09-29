@@ -73,21 +73,6 @@ mod test_instruction_load_reg_hl {
     }
 
     #[test]
-    fn test_load_reg_h_hl() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let instruction = LoadRegHL::HHL;
-        instruction.exec(register.clone(), memory.clone());
-        assert_eq!(
-            register.borrow().get(Bits8::H),
-            memory
-                .borrow()
-                .get(register.borrow().get(Bits16::HL))
-                .unwrap()
-        );
-    }
-
-    #[test]
     fn test_load_reg_c_hl() {
         let register = Registers::default();
         let memory = Memory::default();
