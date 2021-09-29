@@ -116,3 +116,477 @@ impl LoadR1R2 {
         registers.borrow_mut().set(dst, data)
     }
 }
+
+#[cfg(test)]
+mod test_instruction_load_reg_reg {
+    use super::LoadR1R2;
+    use crate::area::Bits8;
+    use crate::{RegisterBus, Registers};
+
+    #[test]
+    fn test_instruction_aa() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::AA;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::A),
+            register.borrow().get(Bits8::A)
+        );
+    }
+
+    #[test]
+    fn test_instruction_ab() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::AB;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::A),
+            register.borrow().get(Bits8::B)
+        );
+    }
+
+    #[test]
+    fn test_instruction_ac() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::AC;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::A),
+            register.borrow().get(Bits8::C)
+        );
+    }
+
+    #[test]
+    fn test_instruction_ad() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::AD;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::A),
+            register.borrow().get(Bits8::D)
+        );
+    }
+
+    #[test]
+    fn test_instruction_ae() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::AE;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::A),
+            register.borrow().get(Bits8::E)
+        );
+    }
+
+    #[test]
+    fn test_instruction_ah() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::AH;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::A),
+            register.borrow().get(Bits8::H)
+        );
+    }
+
+    #[test]
+    fn test_instruction_al() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::AL;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::A),
+            register.borrow().get(Bits8::L)
+        );
+    }
+
+    #[test]
+    fn test_instruction_bb() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::BB;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::B),
+            register.borrow().get(Bits8::B)
+        );
+    }
+    #[test]
+    fn test_instruction_bc() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::BC;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::B),
+            register.borrow().get(Bits8::C)
+        );
+    }
+
+    #[test]
+    fn test_instruction_bd() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::BD;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::B),
+            register.borrow().get(Bits8::D)
+        );
+    }
+
+    #[test]
+    fn test_instruction_be() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::BE;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::B),
+            register.borrow().get(Bits8::E)
+        );
+    }
+
+    #[test]
+    fn test_instruction_bh() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::BH;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::B),
+            register.borrow().get(Bits8::H)
+        );
+    }
+
+    #[test]
+    fn test_instruction_bl() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::BL;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::B),
+            register.borrow().get(Bits8::L)
+        );
+    }
+
+    #[test]
+    fn test_instruction_cb() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::CB;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::C),
+            register.borrow().get(Bits8::B)
+        );
+    }
+    #[test]
+    fn test_instruction_cc() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::CC;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::C),
+            register.borrow().get(Bits8::C)
+        );
+    }
+
+    #[test]
+    fn test_instruction_cd() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::CD;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::C),
+            register.borrow().get(Bits8::D)
+        );
+    }
+
+    #[test]
+    fn test_instruction_ce() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::CE;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::C),
+            register.borrow().get(Bits8::E)
+        );
+    }
+
+    #[test]
+    fn test_instruction_ch() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::CH;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::C),
+            register.borrow().get(Bits8::H)
+        );
+    }
+
+    #[test]
+    fn test_instruction_cl() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::CL;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::C),
+            register.borrow().get(Bits8::L)
+        );
+    }
+
+    #[test]
+    fn test_instruction_db() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::DB;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::D),
+            register.borrow().get(Bits8::B)
+        );
+    }
+    #[test]
+    fn test_instruction_dc() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::DC;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::D),
+            register.borrow().get(Bits8::C)
+        );
+    }
+
+    #[test]
+    fn test_instruction_dd() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::DD;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::D),
+            register.borrow().get(Bits8::D)
+        );
+    }
+
+    #[test]
+    fn test_instruction_de() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::DE;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::D),
+            register.borrow().get(Bits8::E)
+        );
+    }
+
+    #[test]
+    fn test_instruction_dh() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::DH;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::D),
+            register.borrow().get(Bits8::H)
+        );
+    }
+
+    #[test]
+    fn test_instruction_dl() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::DL;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::D),
+            register.borrow().get(Bits8::L)
+        );
+    }
+
+    #[test]
+    fn test_instruction_eb() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::EB;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::E),
+            register.borrow().get(Bits8::B)
+        );
+    }
+    #[test]
+    fn test_instruction_ec() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::EC;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::E),
+            register.borrow().get(Bits8::C)
+        );
+    }
+
+    #[test]
+    fn test_instruction_ed() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::ED;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::E),
+            register.borrow().get(Bits8::D)
+        );
+    }
+
+    #[test]
+    fn test_instruction_ee() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::EE;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::E),
+            register.borrow().get(Bits8::E)
+        );
+    }
+
+    #[test]
+    fn test_instruction_eh() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::EH;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::E),
+            register.borrow().get(Bits8::H)
+        );
+    }
+
+    #[test]
+    fn test_instruction_el() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::EL;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::E),
+            register.borrow().get(Bits8::L)
+        );
+    }
+
+    #[test]
+    fn test_instruction_hb() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::HB;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::H),
+            register.borrow().get(Bits8::B)
+        );
+    }
+    #[test]
+    fn test_instruction_hc() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::HC;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::H),
+            register.borrow().get(Bits8::C)
+        );
+    }
+
+    #[test]
+    fn test_instruction_hd() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::HD;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::H),
+            register.borrow().get(Bits8::D)
+        );
+    }
+
+    #[test]
+    fn test_instruction_he() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::HE;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::H),
+            register.borrow().get(Bits8::E)
+        );
+    }
+
+    #[test]
+    fn test_instruction_hh() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::HH;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::H),
+            register.borrow().get(Bits8::H)
+        );
+    }
+
+    #[test]
+    fn test_instruction_hl() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::HL;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::H),
+            register.borrow().get(Bits8::L)
+        );
+    }
+
+    #[test]
+    fn test_instruction_lb() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::LB;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::L),
+            register.borrow().get(Bits8::B)
+        );
+    }
+    #[test]
+    fn test_instruction_lc() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::LC;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::L),
+            register.borrow().get(Bits8::C)
+        );
+    }
+
+    #[test]
+    fn test_instruction_ld() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::LD;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::L),
+            register.borrow().get(Bits8::D)
+        );
+    }
+
+    #[test]
+    fn test_instruction_le() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::LE;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::L),
+            register.borrow().get(Bits8::E)
+        );
+    }
+
+    #[test]
+    fn test_instruction_lh() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::LH;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::L),
+            register.borrow().get(Bits8::H)
+        );
+    }
+
+    #[test]
+    fn test_instruction_ll() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::LL;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::L),
+            register.borrow().get(Bits8::L)
+        );
+    }
+}
