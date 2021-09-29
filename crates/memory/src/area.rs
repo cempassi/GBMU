@@ -2,6 +2,7 @@ use super::consts;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Area {
+    Bios,
     Rom,
     _Vram,
     _ExtRam,
@@ -15,6 +16,7 @@ pub enum Area {
 impl Area {
     pub fn relative(self, address: u16) -> usize {
         let result = match self {
+            Area::Bios => address,
             Area::Rom => address,
             Area::_Vram => address - consts::ROM_MIN,
             Area::_ExtRam => address - consts::EXT_RAM_MIN,
