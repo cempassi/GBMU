@@ -19,7 +19,6 @@ use num_enum::TryFromPrimitive;
 /// LD          E,n        0x1e   8
 /// LD          H,n        0x26   8
 /// LD          L,n        0x2e   8
-/// LD          L,n        0x2e   8
 /// LD          A,n        0x3e   8
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive, Clone)]
 #[repr(u8)]
