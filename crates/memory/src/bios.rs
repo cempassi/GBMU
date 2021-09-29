@@ -37,6 +37,23 @@ impl MemoryBus for Bios {
     }
 }
 
+impl Bios {
+    pub fn new() -> Self {
+        let output = std::process::Command::new("git")
+            .args(&["rev-parse", "--show-toplevel"])
+            .output()
+            .unwrap();
+        let git_root = str::from_utf8(&output.stdout).unwrap().trim();
+        let mut path = PathBuf::new();
+        path.push(git_root);
+        path.push("ressources/bios/dmg_boot.bin");
+        println!("path: {:?}", path);
+        let data = fs::read(path).unwrap();
+        Bios { data }
+    }
+
+}
+
 #[cfg(test)]
 mod test_bios {
     //use super::Bios;
