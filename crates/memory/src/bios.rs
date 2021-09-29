@@ -1,8 +1,8 @@
 use crate::MemoryBus;
+use std::convert::AsRef;
 use std::fs;
 use std::path::PathBuf;
 use std::str;
-use std::convert::AsRef;
 
 #[derive(Debug)]
 pub struct Bios {
@@ -51,7 +51,6 @@ impl Bios {
         let data = fs::read(path).unwrap();
         Bios { data }
     }
-
 }
 
 #[cfg(test)]

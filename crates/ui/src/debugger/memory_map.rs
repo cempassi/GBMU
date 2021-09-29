@@ -1,4 +1,3 @@
-//mod memory;
 use super::widgets::hexdump;
 use crate::style::Theme;
 use iced_wgpu::{scrollable, Renderer, Scrollable};
