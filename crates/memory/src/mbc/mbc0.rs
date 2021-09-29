@@ -3,10 +3,25 @@ use super::consts;
 use super::Mbc;
 use crate::MemoryBus;
 use shared::Error;
+use std::convert::AsRef;
 
 #[derive(Debug)]
 pub struct Mbc0 {
     data: Vec<u8>,
+}
+
+impl Default for Mbc0 {
+    fn default() -> Self {
+        Mbc0 {
+            data: vec![0; consts::MBC0_MAX_SIZE],
+        }
+    }
+}
+
+impl AsRef<Vec<u8>> for Mbc0 {
+    fn as_ref(&self) -> &Vec<u8> {
+        self.data.as_ref()
+    }
 }
 
 impl MbcBus for Mbc0 {
@@ -28,14 +43,6 @@ impl Mbc for Mbc0 {}
 impl Mbc0 {
     pub fn new(data: Vec<u8>) -> Box<Self> {
         Box::new(Self { data })
-    }
-}
-
-impl Default for Mbc0 {
-    fn default() -> Self {
-        Mbc0 {
-            data: vec![0; consts::MBC0_MAX_SIZE],
-        }
     }
 }
 

@@ -1,10 +1,11 @@
 use crate::MemoryBus;
+use std::convert::AsRef;
 
 const WRAM_SIZE: usize = 8192;
 
 #[derive(Debug)]
 pub struct Wram {
-    data: [u8; WRAM_SIZE],
+    data: Vec<u8>,
 }
 
 impl Default for Wram {
@@ -13,11 +14,9 @@ impl Default for Wram {
     }
 }
 
-impl Wram {
-    pub fn new() -> Self {
-        Wram {
-            data: [0; WRAM_SIZE],
-        }
+impl AsRef<Vec<u8>> for Wram {
+    fn as_ref(&self) -> &Vec<u8> {
+        self.data.as_ref()
     }
 }
 
@@ -28,6 +27,14 @@ impl MemoryBus for Wram {
 
     fn set(&mut self, address: usize, data: u8) {
         self.data[address] = data;
+    }
+}
+
+impl Wram {
+    pub fn new() -> Self {
+        Wram {
+            data: vec![0; WRAM_SIZE],
+        }
     }
 }
 

@@ -1,4 +1,5 @@
 use crate::MemoryBus;
+use std::convert::AsRef;
 use std::fs;
 use std::path::PathBuf;
 use std::str;
@@ -14,19 +15,9 @@ impl Default for Bios {
     }
 }
 
-impl Bios {
-    pub fn new() -> Self {
-        let output = std::process::Command::new("git")
-            .args(&["rev-parse", "--show-toplevel"])
-            .output()
-            .unwrap();
-        let git_root = str::from_utf8(&output.stdout).unwrap().trim();
-        let mut path = PathBuf::new();
-        path.push(git_root);
-        path.push("ressources/bios/dmg_boot.bin");
-        println!("path: {:?}", path);
-        let data = fs::read(path).unwrap();
-        Bios { data }
+impl AsRef<Vec<u8>> for Bios {
+    fn as_ref(&self) -> &Vec<u8> {
+        self.data.as_ref()
     }
 }
 
@@ -43,6 +34,22 @@ impl MemoryBus for Bios {
         } else {
             0
         }
+    }
+}
+
+impl Bios {
+    pub fn new() -> Self {
+        let output = std::process::Command::new("git")
+            .args(&["rev-parse", "--show-toplevel"])
+            .output()
+            .unwrap();
+        let git_root = str::from_utf8(&output.stdout).unwrap().trim();
+        let mut path = PathBuf::new();
+        path.push(git_root);
+        path.push("ressources/bios/dmg_boot.bin");
+        println!("path: {:?}", path);
+        let data = fs::read(path).unwrap();
+        Bios { data }
     }
 }
 
