@@ -3,7 +3,7 @@ use crate::bus::RegisterBus;
 use crate::cpu::Registers;
 use num_enum::TryFromPrimitive;
 
-/// 2. LD r1,r2
+/// LD r1,r2
 /// Description:
 ///  Put value r2 into r1.
 /// Use with:

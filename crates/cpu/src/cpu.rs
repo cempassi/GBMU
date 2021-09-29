@@ -1,5 +1,6 @@
 pub use crate::interface::{NewRegisters, Registers};
 use crate::opcodes::LoadR1R2;
+use crate::opcodes::LoadRegHL;
 use crate::opcodes::LoadRegNum8bit;
 use crate::pc::NextPc;
 use memory::Memory;
@@ -39,6 +40,8 @@ impl Cpu {
         if let Ok(ope) = LoadR1R2::try_from_primitive(opcode) {
             ope.exec(self.registers.clone());
         } else if let Ok(ope) = LoadRegNum8bit::try_from_primitive(opcode) {
+            ope.exec(self.registers.clone(), self.memory.clone());
+        } else if let Ok(ope) = LoadRegHL::try_from_primitive(opcode) {
             ope.exec(self.registers.clone(), self.memory.clone());
         };
     }

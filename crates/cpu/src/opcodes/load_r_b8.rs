@@ -5,7 +5,7 @@ use crate::Registers;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
-/// 1. LD nn,n
+/// LD nn,n
 /// Description:
 ///  Put value nn into n.
 /// Use with:
