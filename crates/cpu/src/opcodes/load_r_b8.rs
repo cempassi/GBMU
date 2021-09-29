@@ -1,4 +1,4 @@
-use crate::area::{Bits16, Bits8};
+use crate::area::Bits8;
 use crate::pc::NextPc;
 use crate::RegisterBus;
 use crate::Registers;
@@ -7,9 +7,9 @@ use num_enum::TryFromPrimitive;
 
 /// 1. LD nn,n
 /// Description:
-///  Put value nn into n.
+///  Put value n into nn.
 /// Use with:
-///  nn = A,B,C,D,E,H,L,(HL)
+///  nn = B,C,D,E,H,L,A
 ///  n = 8 bit immediate value
 /// Opcodes:
 /// Instruction Parameters Opcode Cycles
@@ -35,7 +35,7 @@ pub enum LoadR8b {
 
 impl LoadR8b {
     pub fn exec(self, registers: Registers, memory: Memory) {
-        let data = registers.borrow_mut().pc.next(memory.clone()).unwrap();
+        let data = registers.borrow_mut().pc.next(memory).unwrap();
         let dst = match self {
             LoadR8b::A => Bits8::A,
             LoadR8b::B => Bits8::B,
@@ -44,9 +44,8 @@ impl LoadR8b {
             LoadR8b::E => Bits8::E,
             LoadR8b::H => Bits8::H,
             LoadR8b::L => Bits8::L,
-            };
-            registers.borrow_mut().set(dst, data);
-        }
+        };
+        registers.borrow_mut().set(dst, data);
     }
 }
 
