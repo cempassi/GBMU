@@ -1,19 +1,21 @@
 use iced_winit::Point;
+use memory::Bus;
+use std::hash::Hasher;
 
 /// state of hexdump
 /// The local state of an [`Hexdump`].
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct State {
-    pub bytes: Vec<u8>,
+    pub data: Bus,
     pub cursor: usize,
     pub bytes_hash: u64,
     pub keyboard_focus: bool,
     pub test_offset: f32,
     pub debug_enabled: bool,
-    pub selection: Option<(usize, usize)>,
     pub last_click: Option<iced_winit::mouse::click::Click>,
     pub last_click_pos: Option<Point>,
+    pub selection: Option<(usize, usize)>,
     pub is_dragging: bool,
     pub mouse_pos: Point,
 }
@@ -23,15 +25,35 @@ impl State {
     ///
     /// Currently, we just clone the data into a Vec, which should work fine for
     /// small amounts of data.
-    pub fn load(&mut self, bytes: &[u8]) {
-        use std::hash::Hasher;
+    pub fn new(bus: Bus) -> Self {
 
         let mut hasher = iced_winit::Hasher::default();
-        hasher.write(bytes);
-        self.bytes_hash = hasher.finish();
-        self.bytes = bytes.to_vec();
-        self.cursor = 0;
-        self.selection = None;
+        hasher.write(bus.borrow().as_ref().as_ref());
+        let data = bus;
+        let cursor = 0;
+        let bytes_hash = hasher.finish();
+        let selection = None;
+        let keyboard_focus = false;
+        let test_offset = 0.0;
+        let debug_enabled = false;
+        let last_click = None;
+        let last_click_pos = None;
+        let is_dragging = false;
+        let mouse_pos = Point::default();
+
+        Self {
+            data,
+            cursor,
+            bytes_hash,
+            keyboard_focus,
+            test_offset,
+            debug_enabled,
+            last_click,
+            last_click_pos,
+            selection,
+            is_dragging,
+            mouse_pos,
+        }
     }
 
     /// Sets the keyboard focus of an [`Hexdump`].
