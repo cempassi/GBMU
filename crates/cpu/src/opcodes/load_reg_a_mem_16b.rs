@@ -7,17 +7,17 @@ use num_enum::TryFromPrimitive;
 
 /// LDH A, (nn)
 /// Description:
-///  Put A into (nn).
+///  Put (nn) into A.
 /// Use with:
 ///  nn = two bytes immediate value.
 /// Opcodes:
 /// Instruction Parameters  Opcode Cycles
-/// LD          (nn),A      0xfa   16
+/// LD          A,(nn)      0xfa   16
 
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u8)]
 pub enum LoadMem16bRegA {
-    LD16bA = 0xfa,
+    LDRegA16b = 0xfa,
 }
 
 impl LoadMem16bRegA {
@@ -41,7 +41,7 @@ mod test_instruction_memory_8bit_reg_a {
     fn test_memory_16b_reg_a() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = LoadMem16bRegA::LD16bA;
+        let instruction = LoadMem16bRegA::LDRegA16b;
         instruction.exec(register.clone(), memory.clone());
         assert_eq!(
             register.borrow().get(Bits8::A),
