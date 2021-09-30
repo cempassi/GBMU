@@ -6,6 +6,7 @@ use crate::opcodes::LoadR8b;
 use crate::opcodes::LoadRR16b;
 use crate::opcodes::LoadRegHL;
 use crate::opcodes::SubRegA;
+use crate::opcodes::LoadRegARegHLP;
 
 use crate::nextpc::NextPc;
 use memory::Memory;
@@ -52,6 +53,8 @@ impl Cpu {
         } else if let Ok(operation) = LoadRR16b::try_from_primitive(opcode.into()) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadHL8b::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = LoadRegARegHLP::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadRegHL::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
