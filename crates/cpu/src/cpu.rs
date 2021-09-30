@@ -1,12 +1,12 @@
 pub use crate::interface::{NewRegisters, Registers};
 use crate::opcodes::AddRegA;
 use crate::opcodes::LoadHL8b;
+use crate::opcodes::LoadMem16bRegA;
 use crate::opcodes::LoadR1R2;
 use crate::opcodes::LoadR8b;
 use crate::opcodes::LoadRR16b;
 use crate::opcodes::LoadRegHL;
 use crate::opcodes::SubRegA;
-use crate::opcodes::LoadMem16bRegA;
 
 use crate::nextpc::NextPc;
 use memory::Memory;
