@@ -33,7 +33,7 @@ pub enum LoadRegHL {
 
 impl LoadRegHL {
     pub fn exec(self, registers: Registers, memory: Memory) {
-        let reg = match self {
+        let dst = match self {
             LoadRegHL::BHL => Bits8::B,
             LoadRegHL::CHL => Bits8::C,
             LoadRegHL::DHL => Bits8::D,
@@ -42,9 +42,9 @@ impl LoadRegHL {
             LoadRegHL::LHL => Bits8::L,
             LoadRegHL::AHL => Bits8::A,
         };
-        let hl = registers.borrow().get(Bits16::HL);
-        let data = memory.borrow().get(hl).unwrap();
-        registers.borrow_mut().set(reg, data);
+        let src = registers.borrow().get(Bits16::HL);
+        let data = memory.borrow().get(src).unwrap();
+        registers.borrow_mut().set(dst, data);
     }
 }
 
@@ -63,90 +63,6 @@ mod test_instruction_load_reg_hl {
         instruction.exec(register.clone(), memory.clone());
         assert_eq!(
             register.borrow().get(Bits8::B),
-            memory
-                .borrow()
-                .get(register.borrow().get(Bits16::HL))
-                .unwrap()
-        );
-    }
-
-    #[test]
-    fn test_load_reg_c_hl() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let instruction = LoadRegHL::CHL;
-        instruction.exec(register.clone(), memory.clone());
-        assert_eq!(
-            register.borrow().get(Bits8::C),
-            memory
-                .borrow()
-                .get(register.borrow().get(Bits16::HL))
-                .unwrap()
-        );
-    }
-
-    #[test]
-    fn test_load_reg_d_hl() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let instruction = LoadRegHL::DHL;
-        instruction.exec(register.clone(), memory.clone());
-        assert_eq!(
-            register.borrow().get(Bits8::D),
-            memory
-                .borrow()
-                .get(register.borrow().get(Bits16::HL))
-                .unwrap()
-        );
-    }
-
-    #[test]
-    fn test_load_reg_e_hl() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let instruction = LoadRegHL::EHL;
-        instruction.exec(register.clone(), memory.clone());
-        assert_eq!(
-            register.borrow().get(Bits8::E),
-            memory
-                .borrow()
-                .get(register.borrow().get(Bits16::HL))
-                .unwrap()
-        );
-    }
-
-    #[test]
-    fn test_load_reg_h_hl() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let instruction = LoadRegHL::HHL;
-        instruction.exec(register.clone(), memory.clone());
-        assert_eq!(
-            register.borrow().get(Bits8::H),
-            memory.borrow().get(0).unwrap()
-        );
-    }
-
-    #[test]
-    fn test_load_reg_l_hl() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let instruction = LoadRegHL::LHL;
-        instruction.exec(register.clone(), memory.clone());
-        assert_eq!(
-            register.borrow().get(Bits8::L),
-            memory.borrow().get(0).unwrap()
-        );
-    }
-
-    #[test]
-    fn test_load_reg_a_hl() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let instruction = LoadRegHL::AHL;
-        instruction.exec(register.clone(), memory.clone());
-        assert_eq!(
-            register.borrow().get(Bits8::A),
             memory
                 .borrow()
                 .get(register.borrow().get(Bits16::HL))
