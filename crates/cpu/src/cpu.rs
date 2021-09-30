@@ -4,9 +4,9 @@ use crate::opcodes::LoadHL8b;
 use crate::opcodes::LoadR1R2;
 use crate::opcodes::LoadR8b;
 use crate::opcodes::LoadRR16b;
-use crate::opcodes::LoadRegHL;
 use crate::opcodes::SubRegA;
 use crate::opcodes::LoadRegARegHLP;
+use crate::opcodes::LoadRegHL;
 
 use crate::nextpc::NextPc;
 use memory::Memory;
