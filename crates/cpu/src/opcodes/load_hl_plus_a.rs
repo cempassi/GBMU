@@ -29,7 +29,7 @@ impl LoadHLPRegA {
         let data = registers.borrow().get(Bits8::A);
         let src = registers.borrow().get(Bits16::HL);
         memory.borrow_mut().set(src, data).unwrap();
-        registers.borrow_mut().set(Bits16::HL, src.wrapping_sub(1));
+        registers.borrow_mut().set(Bits16::HL, src.wrapping_add(1));
     }
 }
 
