@@ -46,6 +46,10 @@ impl SOC {
         self.cpu.get_registers()
     }
 
+    pub fn get_memory(&self) -> memory::Memory {
+        self.cpu.get_memory()
+    }
+
     pub fn run_once(&mut self) {
         if self.clock < 2 {
             self.cpu.run();
