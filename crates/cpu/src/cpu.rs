@@ -22,6 +22,10 @@ impl Cpu {
         }
     }
 
+    pub fn get_memory(&self) -> Memory {
+        self.memory.clone()
+    }
+
     pub fn get_registers(&self) -> Registers {
         self.registers.clone()
     }
