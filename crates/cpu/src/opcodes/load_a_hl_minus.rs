@@ -19,39 +19,48 @@ use num_enum::TryFromPrimitive;
 /// LDD         (HL),A     0x32   8
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u8)]
+<<<<<<< HEAD
 pub enum LoadRegARegHLM {
     AHLM = 0x32,
+=======
+pub enum LoadDecRegHLRegA {
+    AHLm = 0x32,
+>>>>>>> Add Opcode Load Reg A HL Minus
 }
 
-impl LoadRegARegHLM {
+impl LoadDecRegHLRegA {
     pub fn exec(self, registers: Registers, memory: Memory) {
+        let data = registers.borrow().get(Bits8::A);
         let hl = registers.borrow().get(Bits16::HL);
-        let data = memory.borrow().get(hl).unwrap();
-        registers.borrow_mut().set(Bits8::A, data);
+        memory.borrow_mut().set(hl, data).unwrap();
         registers.borrow_mut().set(Bits16::HL, hl - 1);
     }
 }
 
 #[cfg(test)]
 mod test_instruction_load_reg_a_hl_minus {
-    use super::LoadRegARegHLM;
+    use super::LoadDecRegHLRegA;
     use crate::area::{Bits16, Bits8};
     use crate::{RegisterBus, Registers};
+    use memory::Area;
     use memory::Memory;
 
     #[test]
     fn test_reg_a_hlm() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = LoadRegARegHLM::AHLm;
-        register.borrow_mut().set(Bits16::HL, 1);
-        let hl = register.borrow().get(Bits16::HL);
-        assert_eq!(hl, 1);
+        let instruction = LoadDecRegHLRegA::AHLm;
+        let wram_address = Area::Wram.relative(0xc042) as u16;
+        register.borrow_mut().set(Bits8::A, 1);
+        register.borrow_mut().set(Bits16::HL, wram_address);
+        assert_eq!(register.borrow_mut().get(Bits8::A), 1);
+        assert_eq!(register.borrow_mut().get(Bits16::HL), wram_address);
+
         instruction.exec(register.clone(), memory.clone());
         assert_eq!(
-            register.borrow().get(Bits8::A),
-            memory.borrow().get(hl).unwrap()
+            memory.borrow().get(0xc042).unwrap(),
+            register.borrow().get(Bits8::A)
         );
-        assert_eq!(register.borrow().get(Bits16::HL), 0);
+        assert_eq!(register.borrow().get(Bits16::HL), wram_address - 1);
     }
 }
