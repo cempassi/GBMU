@@ -19,37 +19,33 @@ use num_enum::TryFromPrimitive;
 /// LDD         (HL),A     0x32   8
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u8)]
-<<<<<<< HEAD
-pub enum LoadRegARegHLM {
+#[allow(clippy::upper_case_acronyms)]
+pub enum LoadRegAHLM {
     AHLM = 0x32,
-=======
-pub enum LoadDecRegHLRegA {
-    AHLm = 0x32,
->>>>>>> Add Opcode Load Reg A HL Minus
 }
 
-impl LoadDecRegHLRegA {
+impl LoadRegAHLM {
     pub fn exec(self, registers: Registers, memory: Memory) {
         let data = registers.borrow().get(Bits8::A);
-        let hl = registers.borrow().get(Bits16::HL);
-        memory.borrow_mut().set(hl, data).unwrap();
-        registers.borrow_mut().set(Bits16::HL, hl - 1);
+        let src = registers.borrow().get(Bits16::HL);
+        memory.borrow_mut().set(src, data).unwrap();
+        registers.borrow_mut().set(Bits16::HL, src.wrapping_sub(1));
     }
 }
 
 #[cfg(test)]
-mod test_instruction_load_reg_a_hl_minus {
-    use super::LoadDecRegHLRegA;
+mod test_instruction_load_reg_hl_minus_reg_a {
+    use super::LoadRegAHLM;
     use crate::area::{Bits16, Bits8};
     use crate::{RegisterBus, Registers};
     use memory::Area;
     use memory::Memory;
 
     #[test]
-    fn test_reg_a_hlm() {
+    fn test_reg_hlm_reg_a() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = LoadDecRegHLRegA::AHLm;
+        let instruction = LoadRegAHLM::AHLM;
         let wram_address = Area::Wram.relative(0xc042) as u16;
         register.borrow_mut().set(Bits8::A, 1);
         register.borrow_mut().set(Bits16::HL, wram_address);
@@ -61,6 +57,9 @@ mod test_instruction_load_reg_a_hl_minus {
             memory.borrow().get(0xc042).unwrap(),
             register.borrow().get(Bits8::A)
         );
-        assert_eq!(register.borrow().get(Bits16::HL), wram_address - 1);
+        assert_eq!(
+            register.borrow().get(Bits16::HL),
+            wram_address.wrapping_sub(1)
+        );
     }
 }
