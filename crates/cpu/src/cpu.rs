@@ -1,7 +1,6 @@
 pub use crate::interface::{NewRegisters, Registers};
 use crate::opcodes::AddRegA;
 use crate::opcodes::LoadHL8b;
-use crate::opcodes::LoadHLPRegA;
 use crate::opcodes::LoadR1R2;
 use crate::opcodes::LoadR8b;
 use crate::opcodes::LoadRR16b;
