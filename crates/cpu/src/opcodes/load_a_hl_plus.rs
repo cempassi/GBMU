@@ -28,7 +28,7 @@ impl LoadRegARegHLP {
         let hl = registers.borrow().get(Bits16::HL);
         let data = memory.borrow().get(hl).unwrap();
         registers.borrow_mut().set(Bits8::A, data);
-        registers.borrow_mut().set(Bits16::HL, hl + 1);
+        registers.borrow_mut().set(Bits16::HL, hl.wrapping_add(1));
     }
 }
 
@@ -50,6 +50,6 @@ mod test_instruction_load_reg_a_hl_plus {
             register.borrow().get(Bits8::A),
             memory.borrow().get(hl).unwrap()
         );
-        assert_eq!(register.borrow().get(Bits16::HL), hl + 1);
+        assert_eq!(register.borrow().get(Bits16::HL), hl.wrapping_add(1));
     }
 }
