@@ -116,3 +116,21 @@ impl LoadR1R2 {
         registers.borrow_mut().set(dst, data)
     }
 }
+
+#[cfg(test)]
+mod test_instruction_load_reg_reg {
+    use super::LoadR1R2;
+    use crate::area::Bits8;
+    use crate::{RegisterBus, Registers};
+
+    #[test]
+    fn test_instruction_hl() {
+        let register = Registers::default();
+        let instruction = LoadR1R2::HL;
+        instruction.exec(register.clone());
+        assert_eq!(
+            register.borrow().get(Bits8::H),
+            register.borrow().get(Bits8::L)
+        );
+    }
+}
