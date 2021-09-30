@@ -26,7 +26,6 @@ impl State {
     /// Currently, we just clone the data into a Vec, which should work fine for
     /// small amounts of data.
     pub fn new(bus: Bus) -> Self {
-
         let mut hasher = iced_winit::Hasher::default();
         hasher.write(bus.borrow().as_ref().as_ref());
         let data = bus;

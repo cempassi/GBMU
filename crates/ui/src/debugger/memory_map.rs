@@ -2,10 +2,10 @@ use iced_wgpu::{scrollable, Renderer, Scrollable};
 use iced_winit::Element;
 use std::convert::From;
 
-use memory::Memory as MemoryData;
-use memory::Area;
 use super::widgets::hexdump;
 use crate::style::Theme;
+use memory::Area;
+use memory::Memory as MemoryData;
 
 pub struct Memory {
     state: hexdump::State,
@@ -20,13 +20,9 @@ impl From<MemoryData> for Memory {
         let data = memory.borrow().get_area(Area::Bios);
         let state = hexdump::State::new(data);
         let scrollable = scrollable::State::new();
-        Self {
-            state,
-            scrollable,
-        }
+        Self { state, scrollable }
     }
 }
-
 
 impl Memory {
     pub fn update(&self, _message: MemoryMsg) {}

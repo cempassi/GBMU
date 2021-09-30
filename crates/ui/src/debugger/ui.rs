@@ -17,7 +17,7 @@ impl From<&SOC> for UserInterface {
         Self {
             theme: Theme::default(),
             cpu_registers: CpuRegisters::new(soc.get_cpu_registers()),
-            memory:  <Memory as From<memory::Memory>>::from(soc.get_memory())
+            memory: <Memory as From<memory::Memory>>::from(soc.get_memory()),
         }
     }
 }

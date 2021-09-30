@@ -3,10 +3,10 @@ use iced_wgpu::{
     triangle::{Mesh2D, Vertex2D},
     Color, Primitive,
 };
-use memory::Bus;
 use iced_winit::{
     alignment::Horizontal, alignment::Vertical, Background, Font, Point, Rectangle, Size, Vector,
 };
+use memory::Bus;
 
 use super::{consts, style, utils::range_intersect};
 

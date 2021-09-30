@@ -102,8 +102,7 @@ where
         let limits = limits.width(Length::Fill);
         let max_width = limits.max().width;
         let len = self.state.data.borrow().as_ref().as_ref().len();
-        let rows =
-            (len as f32 / self.column_count as usize as usize as f32).ceil();
+        let rows = (len as f32 / self.column_count as usize as usize as f32).ceil();
         let rows_size = (self.font_size + consts::LINE_SPACING) * rows;
 
         // Vertical margins + top headers + rows
