@@ -34,14 +34,14 @@ impl LoadHLMRegA {
 }
 
 #[cfg(test)]
-mod test_instruction_load_reg_a_hl_minus {
+mod test_instruction_load_hl_minus_reg_a {
     use super::LoadHLMRegA;
     use crate::area::{Bits16, Bits8};
     use crate::{RegisterBus, Registers};
     use memory::Memory;
 
     #[test]
-    fn test_reg_a_hlm() {
+    fn test_load_hl_minus_reg_a() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = LoadHLMRegA::HLMA;

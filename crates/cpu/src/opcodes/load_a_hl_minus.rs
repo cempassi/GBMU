@@ -34,7 +34,7 @@ impl LoadRegAHLM {
 }
 
 #[cfg(test)]
-mod test_instruction_load_reg_hl_minus_reg_a {
+mod test_instruction_load_reg_a_hl_minus {
     use super::LoadRegAHLM;
     use crate::area::{Bits16, Bits8};
     use crate::{RegisterBus, Registers};
@@ -42,7 +42,7 @@ mod test_instruction_load_reg_hl_minus_reg_a {
     use memory::Memory;
 
     #[test]
-    fn test_reg_hlm_reg_a() {
+    fn test_load_reg_a_hl_minus() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = LoadRegAHLM::AHLM;
