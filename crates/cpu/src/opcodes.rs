@@ -5,10 +5,12 @@ mod load_r_b8;
 mod load_r_r;
 mod load_reg_hl;
 mod load_rr_b16;
+mod load_hl_minus_a;
 mod sub_reg_a;
 
 pub use add_reg_a::AddRegA;
 pub use data::Data;
+pub use load_hl_minus_a::LoadHLMRegA;
 pub use load_hl_8b::LoadHL8b;
 pub use load_r_b8::LoadR8b;
 pub use load_r_r::LoadR1R2;
