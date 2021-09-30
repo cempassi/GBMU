@@ -28,9 +28,7 @@ pub enum LoadRR16b {
 
 impl LoadRR16b {
     pub fn exec(self, registers: Registers, memory: Memory) {
-        let first_byte = registers.borrow_mut().pc.next(memory.clone()).unwrap();
-        let second_byte = registers.borrow_mut().pc.next(memory).unwrap();
-        let data = (second_byte as u16) << 8 | (first_byte as u16) as u16;
+        let data: u16 = registers.borrow_mut().pc.next(memory).unwrap();
         let dst = match self {
             LoadRR16b::BC => Bits16::BC,
             LoadRR16b::DE => Bits16::DE,
