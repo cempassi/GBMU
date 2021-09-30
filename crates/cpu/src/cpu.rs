@@ -3,6 +3,7 @@ use crate::opcodes::LoadHL8b;
 use crate::opcodes::LoadR1R2;
 use crate::opcodes::LoadR8b;
 use crate::opcodes::LoadRR16b;
+use crate::opcodes::LoadRegAMemC;
 use crate::opcodes::LoadRegHL;
 
 use crate::pc::NextPc;
@@ -53,6 +54,8 @@ impl Cpu {
         } else if let Ok(operation) = LoadHL8b::try_from_primitive(opcode) {
             operation.exec(self.registers.clone(), self.memory.clone());
         } else if let Ok(operation) = LoadRegHL::try_from_primitive(opcode) {
+            operation.exec(self.registers.clone(), self.memory.clone());
+        } else if let Ok(operation) = LoadRegAMemC::try_from_primitive(opcode) {
             operation.exec(self.registers.clone(), self.memory.clone());
         };
         println!("{:#?}", self.registers.borrow());
