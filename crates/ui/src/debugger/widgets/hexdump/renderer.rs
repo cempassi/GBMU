@@ -6,6 +6,7 @@ use iced_wgpu::{
 use iced_winit::{
     alignment::Horizontal, alignment::Vertical, Background, Font, Point, Rectangle, Size, Vector,
 };
+use memory::Bus;
 
 use super::{consts, style, utils::range_intersect};
 
@@ -26,7 +27,7 @@ pub trait Renderer: iced_winit::Renderer {
         size: f32,
         column_count: usize,
         extend_line: bool,
-        bytes: &[u8],
+        bytes: Bus,
     ) -> Option<usize>;
 
     /// Measures the text contents with the given size and font, returning the
@@ -50,7 +51,7 @@ pub trait Renderer: iced_winit::Renderer {
         header_font: Font,
         data_font: Font,
         selection: &Option<(usize, usize)>,
-        data: &[u8],
+        data: Bus,
     ) -> Self::Output;
 }
 
@@ -78,9 +79,10 @@ impl self::Renderer for iced_wgpu::Renderer {
         text_size: f32,
         column_count: usize,
         extend_line: bool,
-        bytes: &[u8],
+        data: Bus,
     ) -> Option<usize> {
-        let row_count = (bytes.len() as f32 / column_count as f32).ceil() as usize;
+        let len = data.borrow().as_ref().as_ref().len();
+        let row_count = (len as f32 / column_count as f32).ceil() as usize;
 
         let offset_width = self
             .measure(consts::OFFSET_REFERENCE, text_size, font, bounds.size())
@@ -172,8 +174,9 @@ impl self::Renderer for iced_wgpu::Renderer {
         header_font: Font,
         data_font: Font,
         selection: &Option<(usize, usize)>,
-        data: &[u8],
+        data: Bus,
     ) -> Self::Output {
+        let len = data.borrow().as_ref().as_ref().len();
         let style = style_sheet.active();
         let bounds_pos = (bounds.x.floor(), bounds.y.floor());
         let bounds_size = (bounds.width.floor(), bounds.height.floor());
@@ -190,7 +193,7 @@ impl self::Renderer for iced_wgpu::Renderer {
             border_color: Color::BLACK,
         };
 
-        let line_count = (data.len() as f32 / column_count as f32).ceil() as usize;
+        let line_count = (len as f32 / column_count as f32).ceil() as usize;
         let data_y = consts::MARGINS.y + text_size + consts::LINE_SPACING;
 
         let offset_width = self
@@ -250,8 +253,10 @@ impl self::Renderer for iced_wgpu::Renderer {
         let lines: Vec<Primitive> = (0..line_count)
             .map(|i| {
                 let lower_bound = column_count * i;
-                let upper_bound = (lower_bound + column_count).min(data.len());
-                let data_slice = &data[lower_bound..upper_bound];
+                let upper_bound = (lower_bound + column_count).min(len);
+                let rc = data.borrow();
+                let vector = rc.as_ref().as_ref();
+                let data_slice = &vector[lower_bound..upper_bound];
                 let line_x = bounds_pos.0 + consts::MARGINS.x;
                 let line_y = bounds_pos.1 + data_y + i as f32 * (text_size + consts::LINE_SPACING);
                 let np_have_color = style.non_printable_color.is_some();
@@ -694,7 +699,7 @@ impl self::Renderer for iced_wgpu::Renderer {
                 cursor_mesh_pos[1],
                 cursor_size.width,
                 cursor_size.height,
-                data.len(),
+                len,
                 byte_offset,
                 test_offset,
                 bounds_pos.0,
