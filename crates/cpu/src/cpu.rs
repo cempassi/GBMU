@@ -1,11 +1,12 @@
 pub use crate::interface::{NewRegisters, Registers};
 use crate::opcodes::AddRegA;
 use crate::opcodes::LoadHL8b;
+use crate::opcodes::LoadHLPRegA;
 use crate::opcodes::LoadR1R2;
 use crate::opcodes::LoadR8b;
 use crate::opcodes::LoadRR16b;
 use crate::opcodes::SubRegA;
-use crate::opcodes::LoadRegARegHLP;
+use crate::opcodes::LoadRegAHLP;
 use crate::opcodes::LoadRegHL;
 
 use crate::nextpc::NextPc;
@@ -54,7 +55,9 @@ impl Cpu {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadHL8b::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
-        } else if let Ok(operation) = LoadRegARegHLP::try_from_primitive(opcode) {
+        } else if let Ok(operation) = LoadRegAHLP::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = LoadHLPRegA::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadRegHL::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;

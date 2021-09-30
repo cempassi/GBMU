@@ -14,16 +14,17 @@ use num_enum::TryFromPrimitive;
 ///  Same as: LD A,(HL) - INC HL
 /// Opcodes:
 /// Instruction Parameters Opcode Cycles
-///  LD A,(HLI) 2A 8
-///  LD A,(HL+) 2A 8
-///  LDI A,(HL) 2A 8
+/// LD          A,(HLI)    0x2a   8
+/// LD          A,(HL+)    0x2a   8
+/// LDI         A,(HL)     0x2a   8
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u8)]
-pub enum LoadRegARegHLP {
-    AHLp = 0x2a,
+#[allow(clippy::upper_case_acronyms)]
+pub enum LoadRegAHLP {
+    AHLP = 0x2a,
 }
 
-impl LoadRegARegHLP {
+impl LoadRegAHLP {
     pub fn exec(self, registers: Registers, memory: Memory) {
         let hl = registers.borrow().get(Bits16::HL);
         let data = memory.borrow().get(hl).unwrap();
@@ -34,7 +35,7 @@ impl LoadRegARegHLP {
 
 #[cfg(test)]
 mod test_instruction_load_reg_a_hl_plus {
-    use super::LoadRegARegHLP;
+    use super::LoadRegAHLP;
     use crate::area::{Bits16, Bits8};
     use crate::{RegisterBus, Registers};
     use memory::Memory;
@@ -43,7 +44,7 @@ mod test_instruction_load_reg_a_hl_plus {
     fn test_reg_a_hlp() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = LoadRegARegHLP::AHLp;
+        let instruction = LoadRegAHLP::AHLP;
         let hl = register.borrow().get(Bits16::HL);
         instruction.exec(register.clone(), memory.clone());
         assert_eq!(
