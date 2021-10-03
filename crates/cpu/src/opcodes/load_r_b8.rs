@@ -1,5 +1,5 @@
 use crate::area::Bits8;
-use crate::pc::NextPc;
+use crate::nextpc::NextPc;
 use crate::RegisterBus;
 use crate::Registers;
 use memory::Memory;
@@ -33,8 +33,8 @@ pub enum LoadR8b {
 }
 
 impl LoadR8b {
-    pub fn exec(self, registers: Registers, memory: Memory) {
-        let data = registers.borrow_mut().pc.next(memory).unwrap();
+    pub async fn exec(self, registers: Registers, memory: Memory) {
+        let data = registers.clone().next_pc(memory).await.unwrap();
         let dst = match self {
             LoadR8b::A => Bits8::A,
             LoadR8b::B => Bits8::B,
@@ -54,6 +54,7 @@ mod test_instruction_load_8bit_into_reg {
     use crate::area::Bits8;
     use crate::{RegisterBus, Registers};
     use memory::Memory;
+    use async_std::task;
 
     #[test]
     fn test_reg_b() {
@@ -62,7 +63,7 @@ mod test_instruction_load_8bit_into_reg {
         let ldr8b = LoadR8b::B;
         let byte = memory.borrow().get(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
-        ldr8b.exec(register.clone(), memory.clone());
+        task::block_on(ldr8b.exec(register.clone(), memory.clone()));
         assert_eq!(byte, register.borrow().get(Bits8::B));
     }
 
@@ -73,7 +74,7 @@ mod test_instruction_load_8bit_into_reg {
         let ldr8b = LoadR8b::C;
         let byte = memory.borrow().get(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
-        ldr8b.exec(register.clone(), memory.clone());
+        task::block_on(ldr8b.exec(register.clone(), memory.clone()));
         assert_eq!(byte, register.borrow().get(Bits8::C));
     }
 
@@ -84,7 +85,7 @@ mod test_instruction_load_8bit_into_reg {
         let ldr8b = LoadR8b::D;
         let byte = memory.borrow().get(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
-        ldr8b.exec(register.clone(), memory.clone());
+        task::block_on(ldr8b.exec(register.clone(), memory.clone()));
         assert_eq!(byte, register.borrow().get(Bits8::D));
     }
 
@@ -95,7 +96,7 @@ mod test_instruction_load_8bit_into_reg {
         let ldr8b = LoadR8b::E;
         let byte = memory.borrow().get(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
-        ldr8b.exec(register.clone(), memory.clone());
+        task::block_on(ldr8b.exec(register.clone(), memory.clone()));
         assert_eq!(byte, register.borrow().get(Bits8::E));
     }
 
@@ -106,7 +107,7 @@ mod test_instruction_load_8bit_into_reg {
         let ldr8b = LoadR8b::H;
         let byte = memory.borrow().get(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
-        ldr8b.exec(register.clone(), memory.clone());
+        task::block_on(ldr8b.exec(register.clone(), memory.clone()));
         assert_eq!(byte, register.borrow().get(Bits8::H));
     }
 
@@ -117,7 +118,7 @@ mod test_instruction_load_8bit_into_reg {
         let ldr8b = LoadR8b::L;
         let byte = memory.borrow().get(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
-        ldr8b.exec(register.clone(), memory.clone());
+        task::block_on(ldr8b.exec(register.clone(), memory.clone()));
         assert_eq!(byte, register.borrow().get(Bits8::L));
     }
 
@@ -128,7 +129,7 @@ mod test_instruction_load_8bit_into_reg {
         let ldr8b = LoadR8b::A;
         let byte = memory.borrow().get(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
-        ldr8b.exec(register.clone(), memory.clone());
+        task::block_on(ldr8b.exec(register.clone(), memory.clone()));
         assert_eq!(byte, register.borrow().get(Bits8::A));
     }
 }

@@ -4,7 +4,7 @@ pub mod cpu;
 mod flags;
 pub mod interface;
 mod opcodes;
-mod pc;
+pub mod nextpc;
 pub mod registers;
 
 pub use crate::bus::RegisterBus;

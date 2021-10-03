@@ -1,5 +1,5 @@
 use crate::area::Bits16;
-use crate::pc::NextPc;
+use crate::nextpc::NextPc;
 use crate::{RegisterBus, Registers};
 use memory::Memory;
 use num_enum::TryFromPrimitive;
@@ -27,8 +27,8 @@ pub enum LoadRR16b {
 }
 
 impl LoadRR16b {
-    pub fn exec(self, registers: Registers, memory: Memory) {
-        let data: u16 = registers.borrow_mut().pc.next(memory).unwrap();
+    pub async fn exec(self, registers: Registers, memory: Memory) {
+        let data: u16 = registers.clone().next_pc(memory.clone()).await.unwrap();
         let dst = match self {
             LoadRR16b::BC => Bits16::BC,
             LoadRR16b::DE => Bits16::DE,

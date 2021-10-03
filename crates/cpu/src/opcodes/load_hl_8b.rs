@@ -1,5 +1,5 @@
 use crate::area::Bits16;
-use crate::pc::NextPc;
+use crate::nextpc::NextPc;
 use crate::RegisterBus;
 use crate::Registers;
 use memory::Memory;
@@ -20,8 +20,8 @@ pub enum LoadHL8b {
 }
 
 impl LoadHL8b {
-    pub fn exec(self, registers: Registers, memory: Memory) {
-        let data = registers.borrow_mut().pc.next(memory.clone()).unwrap();
+    pub async fn exec(self, registers: Registers, memory: Memory) {
+        let data = registers.clone().next_pc(memory.clone()).await.unwrap();
         memory
             .borrow_mut()
             .set(registers.borrow().get(Bits16::HL), data)
@@ -35,6 +35,7 @@ mod test_instruction_load_hl_8b {
     use crate::area::Bits16;
     use crate::{RegisterBus, Registers};
     use memory::Memory;
+    use async_std::task;
 
     #[test]
     fn test_load_hl_8b() {
@@ -43,7 +44,7 @@ mod test_instruction_load_hl_8b {
         let ldhl8b = LoadHL8b::HL8b;
         let byte = memory.borrow().get(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
-        ldhl8b.exec(register.clone(), memory.clone());
+        task::block_on(ldhl8b.exec(register.clone(), memory.clone()));
         assert_eq!(
             byte,
             memory

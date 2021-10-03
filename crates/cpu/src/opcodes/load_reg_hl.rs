@@ -1,6 +1,7 @@
 use crate::area::{Bits16, Bits8};
 use crate::RegisterBus;
 use crate::Registers;
+use memory::Async;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
@@ -32,7 +33,7 @@ pub enum LoadRegHL {
 }
 
 impl LoadRegHL {
-    pub fn exec(self, registers: Registers, memory: Memory) {
+    pub async fn exec(self, registers: Registers, memory: Memory) {
         let dst = match self {
             LoadRegHL::BHL => Bits8::B,
             LoadRegHL::CHL => Bits8::C,
@@ -43,7 +44,7 @@ impl LoadRegHL {
             LoadRegHL::AHL => Bits8::A,
         };
         let src = registers.borrow().get(Bits16::HL);
-        let data = memory.borrow().get(src).unwrap();
+        let data = <Memory as Async>::get(memory, src).await.unwrap();
         registers.borrow_mut().set(dst, data);
     }
 }
@@ -53,6 +54,7 @@ mod test_instruction_load_reg_hl {
     use super::LoadRegHL;
     use crate::area::{Bits16, Bits8};
     use crate::{RegisterBus, Registers};
+    use async_std::task;
     use memory::Memory;
 
     #[test]
@@ -60,7 +62,7 @@ mod test_instruction_load_reg_hl {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = LoadRegHL::BHL;
-        instruction.exec(register.clone(), memory.clone());
+        task::block_on(instruction.exec(register.clone(), memory.clone()));
         assert_eq!(
             register.borrow().get(Bits8::B),
             memory
