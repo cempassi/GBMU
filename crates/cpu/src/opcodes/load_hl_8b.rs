@@ -2,8 +2,8 @@ use crate::area::Bits16;
 use crate::nextpc::NextPc;
 use crate::RegisterBus;
 use crate::Registers;
-use memory::Memory;
 use memory::Async;
+use memory::Memory;
 use num_enum::TryFromPrimitive;
 
 /// 1. LD HL,n
@@ -24,7 +24,7 @@ impl LoadHL8b {
     pub async fn exec(self, registers: Registers, memory: Memory) {
         let dst = registers.borrow().get(Bits16::HL);
         let data = registers.clone().next_pc(memory.clone()).await.unwrap();
-        <Memory as Async>::set(memory,dst, data ).await.unwrap();
+        <Memory as Async>::set(memory, dst, data).await.unwrap();
     }
 }
 
@@ -32,9 +32,9 @@ impl LoadHL8b {
 mod test_instruction_load_hl_8b {
     use super::LoadHL8b;
     use crate::area::Bits16;
+    use crate::executor;
     use crate::{RegisterBus, Registers};
     use memory::Memory;
-    use crate::executor;
 
     #[test]
     fn test_load_hl_8b() {

@@ -1,10 +1,10 @@
+use crate::Registers;
 use memory::Async;
 use memory::Memory;
 use shared::Error;
 use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
-use crate::Registers;
 
 pub(crate) trait NextPc<T> {
     fn next_pc(self, memory: Memory) -> Pin<Box<dyn Future<Output = Result<T, Error>>>>;

@@ -36,18 +36,31 @@ impl Cpu {
     /// 3 - Tryfrom to Instruction
     /// 4 - Exec Instructions -> Do the Maths put in Dest and set Flags
     pub async fn run(self) -> u8 {
-        let opcode: u8 = self.registers.clone().next_pc(self.memory.clone()).await.unwrap();
+        let opcode: u8 = self
+            .registers
+            .clone()
+            .next_pc(self.memory.clone())
+            .await
+            .unwrap();
 
         if let Ok(operation) = LoadR1R2::try_from_primitive(opcode) {
             operation.exec(self.registers.clone());
         } else if let Ok(operation) = LoadR8b::try_from_primitive(opcode) {
-            operation.exec(self.registers.clone(), self.memory.clone()).await;
+            operation
+                .exec(self.registers.clone(), self.memory.clone())
+                .await;
         } else if let Ok(operation) = LoadRR16b::try_from_primitive(opcode.into()) {
-            operation.exec(self.registers.clone(), self.memory.clone()).await;
+            operation
+                .exec(self.registers.clone(), self.memory.clone())
+                .await;
         } else if let Ok(operation) = LoadHL8b::try_from_primitive(opcode) {
-            operation.exec(self.registers.clone(), self.memory.clone()).await;
+            operation
+                .exec(self.registers.clone(), self.memory.clone())
+                .await;
         } else if let Ok(operation) = LoadRegHL::try_from_primitive(opcode) {
-            operation.exec(self.registers.clone(), self.memory.clone()).await;
+            operation
+                .exec(self.registers.clone(), self.memory.clone())
+                .await;
         } else {
             println!("Not implemented!");
         }

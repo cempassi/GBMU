@@ -1,12 +1,12 @@
 pub mod area;
 pub mod bus;
 pub mod cpu;
+pub(crate) mod executor;
 mod flags;
 pub mod interface;
-mod opcodes;
 pub mod nextpc;
+mod opcodes;
 pub mod registers;
-pub(crate) mod executor;
 
 pub use crate::bus::RegisterBus;
 pub use crate::cpu::Cpu;

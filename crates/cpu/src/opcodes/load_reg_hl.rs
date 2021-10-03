@@ -53,9 +53,9 @@ impl LoadRegHL {
 mod test_instruction_load_reg_hl {
     use super::LoadRegHL;
     use crate::area::{Bits16, Bits8};
+    use crate::executor;
     use crate::{RegisterBus, Registers};
     use memory::Memory;
-    use crate::executor;
 
     #[test]
     fn test_load_reg_b_hl() {

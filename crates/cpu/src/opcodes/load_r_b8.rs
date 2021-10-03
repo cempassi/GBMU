@@ -52,9 +52,9 @@ impl LoadR8b {
 mod test_instruction_load_8bit_into_reg {
     use super::LoadR8b;
     use crate::area::Bits8;
+    use crate::executor;
     use crate::{RegisterBus, Registers};
     use memory::Memory;
-    use crate::executor;
 
     #[test]
     fn test_reg_b() {
