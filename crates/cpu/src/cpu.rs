@@ -44,27 +44,18 @@ impl Cpu {
             .unwrap();
 
         if let Ok(operation) = LoadR1R2::try_from_primitive(opcode) {
-            operation.exec(self.registers.clone());
+            operation.exec(self.registers);
         } else if let Ok(operation) = LoadR8b::try_from_primitive(opcode) {
-            operation
-                .exec(self.registers.clone(), self.memory.clone())
-                .await;
+            operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadRR16b::try_from_primitive(opcode.into()) {
-            operation
-                .exec(self.registers.clone(), self.memory.clone())
-                .await;
+            operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadHL8b::try_from_primitive(opcode) {
-            operation
-                .exec(self.registers.clone(), self.memory.clone())
-                .await;
+            operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadRegHL::try_from_primitive(opcode) {
-            operation
-                .exec(self.registers.clone(), self.memory.clone())
-                .await;
+            operation.exec(self.registers, self.memory).await;
         } else {
             println!("Not implemented!");
         }
-        println!("{:#?}", self.registers.borrow());
         8
     }
 }
