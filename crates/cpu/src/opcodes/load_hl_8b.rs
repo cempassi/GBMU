@@ -3,6 +3,7 @@ use crate::nextpc::NextPc;
 use crate::RegisterBus;
 use crate::Registers;
 use memory::Memory;
+use memory::Async;
 use num_enum::TryFromPrimitive;
 
 /// 1. LD HL,n
@@ -21,11 +22,9 @@ pub enum LoadHL8b {
 
 impl LoadHL8b {
     pub async fn exec(self, registers: Registers, memory: Memory) {
+        let dst = registers.borrow().get(Bits16::HL);
         let data = registers.clone().next_pc(memory.clone()).await.unwrap();
-        memory
-            .borrow_mut()
-            .set(registers.borrow().get(Bits16::HL), data)
-            .unwrap()
+        <Memory as Async>::set(memory,dst, data ).await.unwrap();
     }
 }
 
@@ -35,16 +34,16 @@ mod test_instruction_load_hl_8b {
     use crate::area::Bits16;
     use crate::{RegisterBus, Registers};
     use memory::Memory;
-    use async_std::task;
+    use crate::executor;
 
     #[test]
     fn test_load_hl_8b() {
         let register = Registers::default();
         let memory = Memory::default();
-        let ldhl8b = LoadHL8b::HL8b;
+        let instruction = LoadHL8b::HL8b;
         let byte = memory.borrow().get(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
-        task::block_on(ldhl8b.exec(register.clone(), memory.clone()));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(
             byte,
             memory

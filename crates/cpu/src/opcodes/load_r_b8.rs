@@ -54,7 +54,7 @@ mod test_instruction_load_8bit_into_reg {
     use crate::area::Bits8;
     use crate::{RegisterBus, Registers};
     use memory::Memory;
-    use async_std::task;
+    use crate::executor;
 
     #[test]
     fn test_reg_b() {
@@ -63,73 +63,8 @@ mod test_instruction_load_8bit_into_reg {
         let ldr8b = LoadR8b::B;
         let byte = memory.borrow().get(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
-        task::block_on(ldr8b.exec(register.clone(), memory.clone()));
+        let future = ldr8b.exec(register.clone(), memory.clone());
+        executor::execute(Box::pin(future));
         assert_eq!(byte, register.borrow().get(Bits8::B));
-    }
-
-    #[test]
-    fn test_reg_c() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let ldr8b = LoadR8b::C;
-        let byte = memory.borrow().get(register.borrow().pc).unwrap();
-        assert_eq!(byte, 0x31);
-        task::block_on(ldr8b.exec(register.clone(), memory.clone()));
-        assert_eq!(byte, register.borrow().get(Bits8::C));
-    }
-
-    #[test]
-    fn test_reg_d() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let ldr8b = LoadR8b::D;
-        let byte = memory.borrow().get(register.borrow().pc).unwrap();
-        assert_eq!(byte, 0x31);
-        task::block_on(ldr8b.exec(register.clone(), memory.clone()));
-        assert_eq!(byte, register.borrow().get(Bits8::D));
-    }
-
-    #[test]
-    fn test_reg_e() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let ldr8b = LoadR8b::E;
-        let byte = memory.borrow().get(register.borrow().pc).unwrap();
-        assert_eq!(byte, 0x31);
-        task::block_on(ldr8b.exec(register.clone(), memory.clone()));
-        assert_eq!(byte, register.borrow().get(Bits8::E));
-    }
-
-    #[test]
-    fn test_reg_h() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let ldr8b = LoadR8b::H;
-        let byte = memory.borrow().get(register.borrow().pc).unwrap();
-        assert_eq!(byte, 0x31);
-        task::block_on(ldr8b.exec(register.clone(), memory.clone()));
-        assert_eq!(byte, register.borrow().get(Bits8::H));
-    }
-
-    #[test]
-    fn test_reg_l() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let ldr8b = LoadR8b::L;
-        let byte = memory.borrow().get(register.borrow().pc).unwrap();
-        assert_eq!(byte, 0x31);
-        task::block_on(ldr8b.exec(register.clone(), memory.clone()));
-        assert_eq!(byte, register.borrow().get(Bits8::L));
-    }
-
-    #[test]
-    fn test_reg_a() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let ldr8b = LoadR8b::A;
-        let byte = memory.borrow().get(register.borrow().pc).unwrap();
-        assert_eq!(byte, 0x31);
-        task::block_on(ldr8b.exec(register.clone(), memory.clone()));
-        assert_eq!(byte, register.borrow().get(Bits8::A));
     }
 }

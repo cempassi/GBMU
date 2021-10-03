@@ -61,7 +61,7 @@ mod test_instruction_load_hl_reg {
         let memory = Memory::default();
         let instruction = LoadHLReg::HLB;
         register.borrow_mut().set(Bits16::HL, 0xc042);
-        instruction.exec(register.clone(), memory.clone());
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(
             register.borrow().get(Bits8::B),
             memory

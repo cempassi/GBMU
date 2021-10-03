@@ -54,15 +54,15 @@ mod test_instruction_load_reg_hl {
     use super::LoadRegHL;
     use crate::area::{Bits16, Bits8};
     use crate::{RegisterBus, Registers};
-    use async_std::task;
     use memory::Memory;
+    use crate::executor;
 
     #[test]
     fn test_load_reg_b_hl() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = LoadRegHL::BHL;
-        task::block_on(instruction.exec(register.clone(), memory.clone()));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(
             register.borrow().get(Bits8::B),
             memory

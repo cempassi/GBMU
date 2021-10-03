@@ -6,6 +6,7 @@ pub mod interface;
 mod opcodes;
 pub mod nextpc;
 pub mod registers;
+pub(crate) mod executor;
 
 pub use crate::bus::RegisterBus;
 pub use crate::cpu::Cpu;
