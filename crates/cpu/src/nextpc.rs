@@ -17,6 +17,13 @@ impl NextPc<u8> for Registers {
     }
 }
 
+impl NextPc<u16> for Registers {
+    fn next_pc(self, memory: Memory) -> Pin<Box<dyn Future<Output = Result<u16, Error>>>> {
+        let inner = Box::pin(next_16(self, memory));
+        Box::pin(Reader::new(inner))
+    }
+}
+
 pub struct Reader<T> {
     inner: Pin<Box<dyn Future<Output = Result<T, Error>>>>,
 }
@@ -53,11 +60,4 @@ async fn next_16(registers: Registers, memory: Memory) -> Result<u16, Error> {
     let right: u8 = <Memory as Async>::get(memory, pc).await?;
     registers.borrow_mut().pc = pc.wrapping_add(1);
     Ok((left as u16) << 8 | right as u16)
-}
-
-impl NextPc<u16> for Registers {
-    fn next_pc(self, memory: Memory) -> Pin<Box<dyn Future<Output = Result<u16, Error>>>> {
-        let inner = Box::pin(next_16(self, memory));
-        Box::pin(Reader::new(inner))
-    }
 }
