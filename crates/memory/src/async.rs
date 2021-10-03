@@ -1,4 +1,4 @@
-use super::waiter::{Getter, Setter};
+use super::futures::{Getter, Setter};
 use crate::Memory;
 
 pub trait Async {
