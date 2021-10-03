@@ -1,7 +1,8 @@
 use crate::area::Bits16;
-use crate::pc::NextPc;
+use crate::nextpc::NextPc;
 use crate::RegisterBus;
 use crate::Registers;
+use memory::Async;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
@@ -20,12 +21,10 @@ pub enum LoadHL8b {
 }
 
 impl LoadHL8b {
-    pub fn exec(self, registers: Registers, memory: Memory) {
-        let data = registers.borrow_mut().pc.next(memory.clone()).unwrap();
-        memory
-            .borrow_mut()
-            .set(registers.borrow().get(Bits16::HL), data)
-            .unwrap()
+    pub async fn exec(self, registers: Registers, memory: Memory) {
+        let dst = registers.borrow().get(Bits16::HL);
+        let data = registers.clone().next_pc(memory.clone()).await.unwrap();
+        <Memory as Async>::set(memory, dst, data).await.unwrap();
     }
 }
 
@@ -33,6 +32,7 @@ impl LoadHL8b {
 mod test_instruction_load_hl_8b {
     use super::LoadHL8b;
     use crate::area::Bits16;
+    use crate::executor;
     use crate::{RegisterBus, Registers};
     use memory::Memory;
 
@@ -40,10 +40,10 @@ mod test_instruction_load_hl_8b {
     fn test_load_hl_8b() {
         let register = Registers::default();
         let memory = Memory::default();
-        let ldhl8b = LoadHL8b::HL8b;
+        let instruction = LoadHL8b::HL8b;
         let byte = memory.borrow().get(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
-        ldhl8b.exec(register.clone(), memory.clone());
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(
             byte,
             memory

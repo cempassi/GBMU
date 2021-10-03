@@ -29,6 +29,7 @@ pub struct Debugger {
     pub staging_belt: StagingBelt,
     pub format: TextureFormat,
     pub format_pool: LocalPool,
+    pub soc: SOC,
 }
 
 fn init_device(
@@ -78,7 +79,7 @@ fn init_device(
 }
 
 impl Debugger {
-    pub fn new(event_loop: &EventLoop<()>, instance: &Instance, soc: &SOC) -> Self {
+    pub fn new(event_loop: &EventLoop<()>, instance: &Instance, soc: SOC) -> Self {
         let title = "Debugger";
         let window = Window::new(event_loop).unwrap();
         let modifiers = ModifiersState::default();
@@ -98,7 +99,7 @@ impl Debugger {
         let staging_belt = StagingBelt::new(5 * 1024);
         let format_pool = LocalPool::new();
 
-        let state = ui::Debugger::new(&window, &device, format, soc);
+        let state = ui::Debugger::new(&window, &device, format, &soc);
 
         Self {
             id,
@@ -112,6 +113,7 @@ impl Debugger {
             staging_belt,
             format,
             format_pool,
+            soc,
         }
     }
 

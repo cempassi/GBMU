@@ -53,7 +53,7 @@ $(HASKLIG_PATH):
 ### Bios ###
 
 $(BIOS): $(BIOS_PATH)
-	curl $(BIOS_URL)/$@ > $</$@
+	curl -k $(BIOS_URL)/$@ > $</$@
 
 $(BIOS_PATH):
 	mkdir -p $@
@@ -67,7 +67,7 @@ roms: roms.zip
 
 roms.zip:
 	curl -L $(ROMS_URL1) > $@
-	curl $(ROMS_URL2) > $(ROM2_ZIP)
+	curl -k $(ROMS_URL2) > $(ROM2_ZIP)
 
 ### utils ###
 

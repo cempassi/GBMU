@@ -5,12 +5,11 @@ use crate::opcodes::LoadR8b;
 use crate::opcodes::LoadRR16b;
 use crate::opcodes::LoadRegHL;
 
-use crate::pc::NextPc;
+use crate::nextpc::NextPc;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
-#[derive(Default)]
-#[allow(dead_code)]
+#[derive(Default, Clone)]
 pub struct Cpu {
     memory: Memory,
     registers: Registers,
@@ -36,25 +35,27 @@ impl Cpu {
     /// 2 - Convert Opcode With Tryfrom
     /// 3 - Tryfrom to Instruction
     /// 4 - Exec Instructions -> Do the Maths put in Dest and set Flags
-    pub fn run(&self) {
-        let opcode = self
+    pub async fn run(self) -> u8 {
+        let opcode: u8 = self
             .registers
-            .borrow_mut()
-            .pc
-            .next(self.memory.clone())
+            .clone()
+            .next_pc(self.memory.clone())
+            .await
             .unwrap();
 
         if let Ok(operation) = LoadR1R2::try_from_primitive(opcode) {
-            operation.exec(self.registers.clone());
+            operation.exec(self.registers);
         } else if let Ok(operation) = LoadR8b::try_from_primitive(opcode) {
-            operation.exec(self.registers.clone(), self.memory.clone());
+            operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadRR16b::try_from_primitive(opcode.into()) {
-            operation.exec(self.registers.clone(), self.memory.clone());
+            operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadHL8b::try_from_primitive(opcode) {
-            operation.exec(self.registers.clone(), self.memory.clone());
+            operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadRegHL::try_from_primitive(opcode) {
-            operation.exec(self.registers.clone(), self.memory.clone());
-        };
-        println!("{:#?}", self.registers.borrow());
+            operation.exec(self.registers, self.memory).await;
+        } else {
+            println!("Not implemented!");
+        }
+        8
     }
 }

@@ -2,6 +2,7 @@ use iced_wgpu::wgpu::Instance;
 use iced_winit::winit::event::Event;
 use iced_winit::winit::event_loop::EventLoop;
 use soc::SOC;
+use std::convert::TryFrom;
 
 use crate::debugger;
 //use crate::emulator;
@@ -9,16 +10,17 @@ use crate::debugger;
 pub struct Windows {}
 
 impl Windows {
-    pub fn run(mut soc: SOC) {
+    pub fn run(name: &str) {
+        let soc = SOC::try_from(name).unwrap();
         let event_loop = EventLoop::new();
         let instance = Instance::new(iced_wgpu::wgpu::Backends::PRIMARY);
-        let mut debugger = debugger::Debugger::new(&event_loop, &instance, &soc);
+        let mut debugger = debugger::Debugger::new(&event_loop, &instance, soc);
         //let mut emulator = emulator::Emulator::new(&event_loop, &instance);
 
         //let (emulator_id, mut emulator) = emulator::generate_emulator(&event_loop);
 
         event_loop.run(move |event, _, control_flow| {
-            soc.run_once();
+            debugger.soc.run();
             match event {
                 Event::LoopDestroyed => (),
                 Event::WindowEvent { event, window_id } if window_id == debugger.id => {
@@ -46,13 +48,5 @@ impl Windows {
                 _ => (),
             }
         })
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
     }
 }

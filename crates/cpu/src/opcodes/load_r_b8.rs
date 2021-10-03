@@ -1,5 +1,5 @@
 use crate::area::Bits8;
-use crate::pc::NextPc;
+use crate::nextpc::NextPc;
 use crate::RegisterBus;
 use crate::Registers;
 use memory::Memory;
@@ -33,8 +33,8 @@ pub enum LoadR8b {
 }
 
 impl LoadR8b {
-    pub fn exec(self, registers: Registers, memory: Memory) {
-        let data = registers.borrow_mut().pc.next(memory).unwrap();
+    pub async fn exec(self, registers: Registers, memory: Memory) {
+        let data = registers.clone().next_pc(memory).await.unwrap();
         let dst = match self {
             LoadR8b::A => Bits8::A,
             LoadR8b::B => Bits8::B,
@@ -52,6 +52,7 @@ impl LoadR8b {
 mod test_instruction_load_8bit_into_reg {
     use super::LoadR8b;
     use crate::area::Bits8;
+    use crate::executor;
     use crate::{RegisterBus, Registers};
     use memory::Memory;
 
@@ -62,73 +63,8 @@ mod test_instruction_load_8bit_into_reg {
         let ldr8b = LoadR8b::B;
         let byte = memory.borrow().get(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
-        ldr8b.exec(register.clone(), memory.clone());
+        let future = ldr8b.exec(register.clone(), memory.clone());
+        executor::execute(Box::pin(future));
         assert_eq!(byte, register.borrow().get(Bits8::B));
-    }
-
-    #[test]
-    fn test_reg_c() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let ldr8b = LoadR8b::C;
-        let byte = memory.borrow().get(register.borrow().pc).unwrap();
-        assert_eq!(byte, 0x31);
-        ldr8b.exec(register.clone(), memory.clone());
-        assert_eq!(byte, register.borrow().get(Bits8::C));
-    }
-
-    #[test]
-    fn test_reg_d() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let ldr8b = LoadR8b::D;
-        let byte = memory.borrow().get(register.borrow().pc).unwrap();
-        assert_eq!(byte, 0x31);
-        ldr8b.exec(register.clone(), memory.clone());
-        assert_eq!(byte, register.borrow().get(Bits8::D));
-    }
-
-    #[test]
-    fn test_reg_e() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let ldr8b = LoadR8b::E;
-        let byte = memory.borrow().get(register.borrow().pc).unwrap();
-        assert_eq!(byte, 0x31);
-        ldr8b.exec(register.clone(), memory.clone());
-        assert_eq!(byte, register.borrow().get(Bits8::E));
-    }
-
-    #[test]
-    fn test_reg_h() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let ldr8b = LoadR8b::H;
-        let byte = memory.borrow().get(register.borrow().pc).unwrap();
-        assert_eq!(byte, 0x31);
-        ldr8b.exec(register.clone(), memory.clone());
-        assert_eq!(byte, register.borrow().get(Bits8::H));
-    }
-
-    #[test]
-    fn test_reg_l() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let ldr8b = LoadR8b::L;
-        let byte = memory.borrow().get(register.borrow().pc).unwrap();
-        assert_eq!(byte, 0x31);
-        ldr8b.exec(register.clone(), memory.clone());
-        assert_eq!(byte, register.borrow().get(Bits8::L));
-    }
-
-    #[test]
-    fn test_reg_a() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let ldr8b = LoadR8b::A;
-        let byte = memory.borrow().get(register.borrow().pc).unwrap();
-        assert_eq!(byte, 0x31);
-        ldr8b.exec(register.clone(), memory.clone());
-        assert_eq!(byte, register.borrow().get(Bits8::A));
     }
 }
