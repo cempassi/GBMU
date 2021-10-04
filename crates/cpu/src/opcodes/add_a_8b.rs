@@ -12,7 +12,7 @@ use num_enum::TryFromPrimitive;
 /// Description:
 ///  Add n to A.
 /// Use with:
-///  n = A,B,C,D,E,H,L
+///  n = A,B,C,D,E,H,L,(HL),8b
 /// Flags affected:
 ///  Z - Set if result is zero.
 ///  N - Reset.
