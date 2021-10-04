@@ -8,11 +8,11 @@ use crate::Flags;
 use memory::{Async, Memory};
 use num_enum::TryFromPrimitive;
 
-/// 2. ADC A,n
+/// [ADD | ADC] A,n
 /// Description:
-///  Add n + Carry flag to A.
+///  Add [n | n + Carry flag] to A.
 /// Use with:
-///  n = A,B,C,D,E,H,L,(HL),#
+///  n = A,B,C,D,E,H,L,(HL),8b
 /// Flags affected:
 ///  Z - Set if result is zero.
 ///  N - Reset.
