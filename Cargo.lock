@@ -1449,6 +1449,11 @@ checksum = "7c9b1041b4387893b91ee6746cddfc28516aff326a3519fb2adf820932c5e6cb"
 [[package]]
 name = "ppu"
 version = "0.1.0"
+dependencies = [
+ "memory",
+ "modular-bitfield",
+ "shared",
+]
 
 [[package]]
 name = "ppv-lite86"
@@ -1733,6 +1738,7 @@ dependencies = [
  "cpu",
  "memory",
  "num_enum",
+ "ppu",
  "pretty-hex",
 ]
 
