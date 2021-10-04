@@ -1,16 +1,19 @@
-fn carry(byte: usize, nbr1: usize, nbr2: usize, c: usize) -> bool {
+#[allow(dead_code)]
+fn carry(shift: usize, nbr1: usize, nbr2: usize, c: usize) -> bool {
     let c = c as usize;
-    let max = (1 << byte) - 1;
+    let max = (1 << shift) - 1;
     (nbr1 & max) + (nbr2 & max) + (c & max) > max
 }
 
-fn borrow(byte: usize, nbr1: usize, nbr2: usize, c: usize) -> bool {
-    let max = (1 << byte) - 1;
+#[allow(dead_code)]
+fn borrow(shift: usize, nbr1: usize, nbr2: usize, c: usize) -> bool {
+    let max = (1 << shift) - 1;
     (nbr1 & max) < (nbr2 & max) + (c & max)
 }
 
+#[allow(dead_code)]
 fn add(
-    byte: usize,
+    shift: usize,
     nbr1: usize,
     nbr2: usize,
     c: bool,
@@ -18,7 +21,7 @@ fn add(
     cb: usize,
 ) -> (usize, bool, bool, bool) {
     let c = c as usize;
-    let max = (1 << byte) - 1;
+    let max = (1 << shift) - 1;
     let data = (nbr1 + nbr2 + c) & max;
     let h = carry(hb, nbr1, nbr2, c);
     let c = carry(cb, nbr1, nbr2, c);
@@ -26,8 +29,9 @@ fn add(
     (data, h, c, z)
 }
 
+#[allow(dead_code)]
 fn sub(
-    byte: usize,
+    shift: usize,
     nbr1: usize,
     nbr2: usize,
     c: bool,
@@ -35,7 +39,7 @@ fn sub(
     cb: usize,
 ) -> (usize, bool, bool, bool) {
     let c = c as usize;
-    let max = (1 << byte) - 1;
+    let max = (1 << shift) - 1;
     let data = (nbr1.wrapping_sub(nbr2).wrapping_sub(c)) & max;
     let h = borrow(hb, nbr1, nbr2, c);
     let c = borrow(cb, nbr1, nbr2, c);
@@ -43,6 +47,7 @@ fn sub(
     (data, h, c, z)
 }
 
+#[allow(dead_code)]
 pub fn signed(value: u8) -> u16 {
     if value & 0x80 != 0 {
         0xff00 | value as u16
@@ -51,21 +56,25 @@ pub fn signed(value: u8) -> u16 {
     }
 }
 
+#[allow(dead_code)]
 pub fn add8(nbr1: u8, nbr2: u8, c: bool) -> (u8, bool, bool, bool) {
     let (data, h, c, z) = add(8, nbr1 as usize, nbr2 as usize, c, 4, 8);
     (data as u8, h, c, z)
 }
 
+#[allow(dead_code)]
 pub fn sub8(nbr1: u8, nbr2: u8, c: bool) -> (u8, bool, bool, bool) {
     let (v, h, c, z) = sub(8, nbr1 as usize, nbr2 as usize, c, 4, 8);
     (v as u8, h, c, z)
 }
 
+#[allow(dead_code)]
 pub fn add16(nbr1: u16, nbr2: u16, c: bool) -> (u16, bool, bool, bool) {
     let (v, h, c, z) = add(16, nbr1 as usize, nbr2 as usize, c, 12, 16);
     (v as u16, h, c, z)
 }
 
+#[allow(dead_code)]
 pub fn add_signed16(nbr1: u16, nbr2: u8, c: bool) -> (u16, bool, bool, bool) {
     let (v, h, c, z) = add(16, nbr1 as usize, signed(nbr2) as usize, c, 4, 8);
     (v as u16, h, c, z)
