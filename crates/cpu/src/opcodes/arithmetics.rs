@@ -12,7 +12,8 @@ pub(crate) enum Data<T> {
 }
 
 impl Add<u8> for Data<u8> {
-    fn add(&self, nbr: u8) -> (u8, Flags) {
+    type Output = u16;
+    fn add(&self, nbr: u8) -> Self::Output {
         let (data, c) = match self {
             Data::Carry(data) => (*data as usize, 1),
             Data::NoCarry(data) => (*data as usize, 0),
@@ -26,16 +27,18 @@ impl Add<u8> for Data<u8> {
         flag.set_z(z);
         flag.set_h(h);
         flag.set_c(c);
-        (res as u8, flag)
+        (res as u16) << 8 | Flags::into_bytes(flag)[0] as u16
     }
 }
 
 pub trait Add<T> {
-    fn add(&self, data: T) -> (T, Flags);
+    type Output;
+    fn add(&self, data: T) -> Self::Output;
 }
 
 impl Add<u16> for Data<u16> {
-    fn add(&self, nbr: u16) -> (u16, Flags) {
+    type Output = (u16, Flags);
+    fn add(&self, nbr: u16) -> Self::Output {
         let (data, c) = match self {
             Data::Carry(data) => (*data as usize, 1),
             Data::NoCarry(data) => (*data as usize, 0),
@@ -61,16 +64,14 @@ mod test_arithmetics_functions {
 
     #[test]
     fn test_add_8b() {
-        let flag = Flags::default();
         let data: Data<u8> = Data::NoCarry(0x12);
-        assert_eq!(data.add(0x22), (0x34, flag));
+        assert_eq!(data.add(0x22), 0x3400);
     }
 
     #[test]
     fn test_add_with_carry_8b() {
-        let flag = Flags::default();
         let data: Data<u8> = Data::Carry(0x12);
-        assert_eq!(data.add(0x22), (0x35, flag));
+        assert_eq!(data.add(0x22), 0x3500);
     }
 
     #[test]
@@ -78,7 +79,7 @@ mod test_arithmetics_functions {
         let mut flag = Flags::default();
         let data: Data<u8> = Data::NoCarry(0x12);
         flag.set_h(true);
-        assert_eq!(data.add(0x2f), (0x41, flag));
+        assert_eq!(data.add(0x2f), 0x4140);
     }
 
     #[test]
@@ -86,7 +87,7 @@ mod test_arithmetics_functions {
         let mut flag = Flags::default();
         let data: Data<u8> = Data::NoCarry(0x12);
         flag.set_c(true);
-        assert_eq!(data.add(0xf0), (0x02, flag));
+        assert_eq!(data.add(0xf0), 0x0280);
     }
 
     #[test]
@@ -94,7 +95,7 @@ mod test_arithmetics_functions {
         let mut flag = Flags::default();
         let data: Data<u8> = Data::Carry(0x12);
         flag.set_c(true);
-        assert_eq!(data.add(0xf0), (0x03, flag));
+        assert_eq!(data.add(0xf0), 0x0380);
     }
 
     #[test]
@@ -102,7 +103,7 @@ mod test_arithmetics_functions {
         let mut flag = Flags::default();
         let data: Data<u8> = Data::Carry(0x12);
         flag.set_h(true);
-        assert_eq!(data.add(0x2f), (0x42, flag));
+        assert_eq!(data.add(0x2f), 0x4240);
     }
 
     #[test]
@@ -111,7 +112,7 @@ mod test_arithmetics_functions {
         let data: Data<u8> = Data::NoCarry(0x0a);
         flag.set_h(true);
         flag.set_c(true);
-        assert_eq!(data.add(0xfa), (0x04, flag));
+        assert_eq!(data.add(0xfa), 0x04c0);
     }
 
     #[test]
@@ -120,7 +121,7 @@ mod test_arithmetics_functions {
         let data: Data<u8> = Data::Carry(0x0a);
         flag.set_h(true);
         flag.set_c(true);
-        assert_eq!(data.add(0xfa), (0x05, flag));
+        assert_eq!(data.add(0xfa), 0x05c0);
     }
 
     #[test]
@@ -128,7 +129,7 @@ mod test_arithmetics_functions {
         let mut flag = Flags::default();
         let data: Data<u8> = Data::NoCarry(0x00);
         flag.set_z(true);
-        assert_eq!(data.add(0x00), (0x00, flag));
+        assert_eq!(data.add(0x00), 0x0010);
     }
 
     #[test]
@@ -137,7 +138,7 @@ mod test_arithmetics_functions {
         let data: Data<u8> = Data::NoCarry(0x20);
         flag.set_c(true);
         flag.set_z(true);
-        assert_eq!(data.add(0xe0), (0x00, flag));
+        assert_eq!(data.add(0xe0), 0x0090);
     }
 
     #[test]
@@ -147,7 +148,7 @@ mod test_arithmetics_functions {
         flag.set_z(true);
         flag.set_c(true);
         flag.set_h(true);
-        assert_eq!(data.add(0xf8), (0x00, flag));
+        assert_eq!(data.add(0xf8), 0x00d0);
     }
 
     #[test]
@@ -157,6 +158,6 @@ mod test_arithmetics_functions {
         flag.set_z(true);
         flag.set_c(true);
         flag.set_h(true);
-        assert_eq!(data.add(0xf8), (0x00, flag));
+        assert_eq!(data.add(0xf8), 0x00d0);
     }
 }

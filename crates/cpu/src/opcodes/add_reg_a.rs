@@ -5,7 +5,6 @@ use crate::cpu::Registers;
 use crate::nextpc::NextPc;
 use crate::opcodes::arithmetics::Data;
 use crate::opcodes::Add;
-use crate::Flags;
 use memory::{Async, Memory};
 use num_enum::TryFromPrimitive;
 
@@ -83,8 +82,7 @@ impl AddRegA {
                 Data::Carry(<Memory as Async>::get(memory, src).await.unwrap())
             }
         };
-        let (data, flag) = data.add(registers.borrow().get(Bits8::A));
-        let data = (data as u16) << 8 | Flags::into_bytes(flag)[0] as u16;
+        let data = data.add(registers.borrow().get(Bits8::A));
         registers.borrow_mut().set(Bits16::AF, data);
     }
 }
