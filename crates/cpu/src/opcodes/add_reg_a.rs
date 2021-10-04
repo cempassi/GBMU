@@ -84,7 +84,7 @@ impl AddRegA {
             }
         };
         let (data, flag) = data.add(registers.borrow().get(Bits8::A));
-        let data = (data << 8) as u16 | Flags::into_bytes(flag)[0] as u16;
+        let data = (data as u16) << 8 | Flags::into_bytes(flag)[0] as u16;
         registers.borrow_mut().set(Bits16::AF, data);
     }
 }
