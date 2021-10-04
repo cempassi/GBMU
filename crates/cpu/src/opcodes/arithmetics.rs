@@ -19,15 +19,15 @@ impl Add<u8> for Data<u8> {
             Data::NoCarry(data) => (*data as usize, 0),
         };
         let max: usize = (1 << 8) - 1;
-        let res = (data + nbr as usize + c) & max;
         let h = carry(4, data, nbr as usize, c as usize);
         let c = carry(8, data, nbr as usize, c as usize);
-        let z = res == 0;
+        let data = (data + nbr as usize + c as usize) & max;
+        let z = data == 0;
         let mut flag = Flags::default();
         flag.set_z(z);
         flag.set_h(h);
         flag.set_c(c);
-        (res as u16) << 8 | Flags::into_bytes(flag)[0] as u16
+        (data as u16) << 8 | Flags::into_bytes(flag)[0] as u16
     }
 }
 
@@ -44,15 +44,15 @@ impl Add<u16> for Data<u16> {
             Data::NoCarry(data) => (*data as usize, 0),
         };
         let max: usize = (1 << 16) - 1;
-        let res = (data + nbr as usize + c) & max;
         let h = carry(12, data, nbr as usize, c as usize);
         let c = carry(16, data, nbr as usize, c as usize);
-        let z = res == 0;
+        let data = (data + nbr as usize + c as usize) & max;
+        let z = data == 0;
         let mut flag = Flags::default();
         flag.set_z(z);
         flag.set_h(h);
         flag.set_c(c);
-        (res as u16, flag)
+        (data as u16, flag)
     }
 }
 
