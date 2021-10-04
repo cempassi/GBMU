@@ -3,8 +3,8 @@ use crate::area::Bits16;
 use crate::bus::RegisterBus;
 use crate::cpu::Registers;
 use crate::nextpc::NextPc;
-use crate::opcodes::arithmetics::Data;
-use crate::opcodes::Add;
+use crate::opcodes::data::arithmetic::Add;
+use crate::opcodes::data::Data;
 use memory::{Async, Memory};
 use num_enum::TryFromPrimitive;
 

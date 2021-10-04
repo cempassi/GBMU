@@ -1,3 +1,4 @@
+use crate::opcodes::data::Data;
 use crate::Flags;
 
 fn carry(shift: usize, nbr1: usize, nbr2: usize, c: usize) -> bool {
@@ -6,9 +7,9 @@ fn carry(shift: usize, nbr1: usize, nbr2: usize, c: usize) -> bool {
     (nbr1 & max) + (nbr2 & max) + (c & max) > max
 }
 
-pub(crate) enum Data<T> {
-    Carry(T),
-    NoCarry(T),
+pub trait Add<T> {
+    type Output;
+    fn add(&self, data: T) -> Self::Output;
 }
 
 impl Add<u8> for Data<u8> {
@@ -29,11 +30,6 @@ impl Add<u8> for Data<u8> {
         flag.set_c(c);
         (data as u16) << 8 | Flags::into_bytes(flag)[0] as u16
     }
-}
-
-pub trait Add<T> {
-    type Output;
-    fn add(&self, data: T) -> Self::Output;
 }
 
 impl Add<u16> for Data<u16> {
@@ -58,8 +54,8 @@ impl Add<u16> for Data<u16> {
 
 #[cfg(test)]
 mod test_arithmetics_functions {
-    use super::Add;
-    use super::Data;
+    use crate::opcodes::data::arithmetic::Add;
+    use crate::opcodes::data::Data;
     use crate::Flags;
 
     #[test]
