@@ -5,4 +5,4 @@ pub(crate) mod ppu;
 pub(crate) mod tile;
 pub(crate) mod transfert;
 
-pub use ppu::Ppu;
+pub use crate::ppu::Ppu;
