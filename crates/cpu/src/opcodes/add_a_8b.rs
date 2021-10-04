@@ -1,8 +1,10 @@
 use super::super::area::Bits8;
-use crate::area::{Bits16, Flag};
+use crate::area::Bits16;
 use crate::bus::RegisterBus;
 use crate::cpu::Registers;
+use crate::nextpc::NextPc;
 use crate::opcodes::add8;
+use crate::Flags;
 use memory::{Async, Memory};
 use num_enum::TryFromPrimitive;
 
@@ -51,21 +53,20 @@ impl AddRegA8b {
                 let src = registers.borrow().get(Bits16::HL);
                 <Memory as Async>::get(memory, src).await.unwrap()
             }
-            AddRegA8b::A8b => memory.borrow().get(registers.borrow().pc).unwrap(),
+            AddRegA8b::A8b => registers.clone().next_pc(memory.clone()).await.unwrap(),
         };
-        let (data, h, c, z) = add8(data, registers.borrow().get(Bits8::A), false);
+        let (data, flag) = add8(data, registers.borrow().get(Bits8::A), false);
         registers.borrow_mut().set(Bits8::A, data);
-        registers.borrow_mut().set(Flag::Z, z);
-        registers.borrow_mut().set(Flag::N, false);
-        registers.borrow_mut().set(Flag::H, h);
-        registers.borrow_mut().set(Flag::C, c)
+        registers
+            .borrow_mut()
+            .set(Bits8::F, Flags::into_bytes(flag)[0]);
     }
 }
 
 #[cfg(test)]
 mod test_instruction_add_reg_a_8b {
     use super::AddRegA8b;
-    use crate::area::{Bits16, Bits8};
+    use crate::area::{Bits16, Bits8, Flag};
     use crate::{executor, RegisterBus, Registers};
     use memory::Memory;
 
@@ -74,9 +75,10 @@ mod test_instruction_add_reg_a_8b {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = AddRegA8b::A8b;
-        register.borrow_mut().set(Bits8::A, 0x42);
+        register.borrow_mut().set(Bits8::A, 0x4f);
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0x73);
+        assert_eq!(register.borrow().get(Bits8::A), 0x80);
+        assert_eq!(register.borrow().get(Flag::H), true);
     }
 
     #[test]
@@ -84,10 +86,11 @@ mod test_instruction_add_reg_a_8b {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = AddRegA8b::A8b;
-        register.borrow_mut().set(Bits8::A, 0x42);
-        register.borrow_mut().set(Bits16::HL, 0xc042);
+        register.borrow_mut().set(Bits8::A, 0xf8);
+        register.borrow_mut().set(Bits16::HL, 0xc008);
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0x73);
+        assert_eq!(register.borrow().get(Bits8::A), 0x29);
+        assert_eq!(register.borrow().get(Flag::C), true);
     }
 
     #[test]
@@ -95,9 +98,8 @@ mod test_instruction_add_reg_a_8b {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = AddRegA8b::AB;
-        register.borrow_mut().set(Bits8::A, 0x42);
-        register.borrow_mut().set(Bits8::B, 0x24);
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0x66);
+        assert_eq!(register.borrow().get(Bits8::A), 0x00);
+        assert_eq!(register.borrow().get(Flag::Z), true);
     }
 }

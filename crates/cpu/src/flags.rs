@@ -3,14 +3,14 @@ use crate::RegisterBus;
 use modular_bitfield::{bitfield, specifiers::B4};
 
 #[bitfield]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Flags {
     #[skip]
-    unuzed: B4,
-    z: bool,
-    n: bool,
-    h: bool,
-    c: bool,
+    pub(crate) unuzed: B4,
+    pub(crate) z: bool,
+    pub(crate) n: bool,
+    pub(crate) h: bool,
+    pub(crate) c: bool,
 }
 
 impl Default for Flags {
