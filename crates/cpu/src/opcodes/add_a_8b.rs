@@ -3,6 +3,7 @@ use crate::area::Bits16;
 use crate::bus::RegisterBus;
 use crate::cpu::Registers;
 use crate::nextpc::NextPc;
+use crate::opcodes::arithmetics::Data;
 use crate::opcodes::Add;
 use crate::Flags;
 use memory::{Async, Memory};
@@ -56,39 +57,37 @@ pub enum AddRegA8b {
 
 impl AddRegA8b {
     pub async fn exec(self, registers: Registers, memory: Memory) {
-        let (data, carry) = match self {
-            AddRegA8b::AA => (registers.borrow().get(Bits8::A), false),
-            AddRegA8b::AB => (registers.borrow().get(Bits8::B), false),
-            AddRegA8b::AC => (registers.borrow().get(Bits8::C), false),
-            AddRegA8b::AD => (registers.borrow().get(Bits8::D), false),
-            AddRegA8b::AE => (registers.borrow().get(Bits8::E), false),
-            AddRegA8b::AH => (registers.borrow().get(Bits8::H), false),
-            AddRegA8b::AL => (registers.borrow().get(Bits8::L), false),
-            AddRegA8b::AcA => (registers.borrow().get(Bits8::A), true),
-            AddRegA8b::AcB => (registers.borrow().get(Bits8::B), true),
-            AddRegA8b::AcC => (registers.borrow().get(Bits8::C), true),
-            AddRegA8b::AcD => (registers.borrow().get(Bits8::D), true),
-            AddRegA8b::AcE => (registers.borrow().get(Bits8::E), true),
-            AddRegA8b::AcH => (registers.borrow().get(Bits8::H), true),
-            AddRegA8b::AcL => (registers.borrow().get(Bits8::L), true),
+        let data: Data<u8> = match self {
+            AddRegA8b::AA => Data::NoCarry(registers.borrow().get(Bits8::A)),
+            AddRegA8b::AB => Data::NoCarry(registers.borrow().get(Bits8::B)),
+            AddRegA8b::AC => Data::NoCarry(registers.borrow().get(Bits8::C)),
+            AddRegA8b::AD => Data::NoCarry(registers.borrow().get(Bits8::D)),
+            AddRegA8b::AE => Data::NoCarry(registers.borrow().get(Bits8::E)),
+            AddRegA8b::AH => Data::NoCarry(registers.borrow().get(Bits8::H)),
+            AddRegA8b::AL => Data::NoCarry(registers.borrow().get(Bits8::L)),
+            AddRegA8b::AcA => Data::Carry(registers.borrow().get(Bits8::A)),
+            AddRegA8b::AcB => Data::Carry(registers.borrow().get(Bits8::B)),
+            AddRegA8b::AcC => Data::Carry(registers.borrow().get(Bits8::C)),
+            AddRegA8b::AcD => Data::Carry(registers.borrow().get(Bits8::D)),
+            AddRegA8b::AcE => Data::Carry(registers.borrow().get(Bits8::E)),
+            AddRegA8b::AcH => Data::Carry(registers.borrow().get(Bits8::H)),
+            AddRegA8b::AcL => Data::Carry(registers.borrow().get(Bits8::L)),
+            AddRegA8b::Ac8b => {
+                Data::Carry(registers.clone().next_pc(memory.clone()).await.unwrap())
+            }
+            AddRegA8b::A8b => {
+                Data::NoCarry(registers.clone().next_pc(memory.clone()).await.unwrap())
+            }
             AddRegA8b::AHL => {
                 let src = registers.borrow().get(Bits16::HL);
-                (<Memory as Async>::get(memory, src).await.unwrap(), false)
+                Data::NoCarry(<Memory as Async>::get(memory, src).await.unwrap())
             }
             AddRegA8b::AcHL => {
                 let src = registers.borrow().get(Bits16::HL);
-                (<Memory as Async>::get(memory, src).await.unwrap(), true)
+                Data::Carry(<Memory as Async>::get(memory, src).await.unwrap())
             }
-            AddRegA8b::Ac8b => (
-                registers.clone().next_pc(memory.clone()).await.unwrap(),
-                true,
-            ),
-            AddRegA8b::A8b => (
-                registers.clone().next_pc(memory.clone()).await.unwrap(),
-                false,
-            ),
         };
-        let (data, flag) = data.add(registers.borrow().get(Bits8::A).into(), carry);
+        let (data, flag) = data.add(registers.borrow().get(Bits8::A));
         registers.borrow_mut().set(Bits8::A, data);
         registers
             .borrow_mut()
