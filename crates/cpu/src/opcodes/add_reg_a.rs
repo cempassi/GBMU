@@ -34,7 +34,7 @@ use num_enum::TryFromPrimitive;
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
-pub enum AddRegA8b {
+pub enum AddRegA {
     AA = 0x8f,
     AB = 0x88,
     AC = 0x89,
@@ -55,49 +55,43 @@ pub enum AddRegA8b {
     Ac8b = 0xc6,
 }
 
-impl AddRegA8b {
+impl AddRegA {
     pub async fn exec(self, registers: Registers, memory: Memory) {
         let data: Data<u8> = match self {
-            AddRegA8b::AA => Data::NoCarry(registers.borrow().get(Bits8::A)),
-            AddRegA8b::AB => Data::NoCarry(registers.borrow().get(Bits8::B)),
-            AddRegA8b::AC => Data::NoCarry(registers.borrow().get(Bits8::C)),
-            AddRegA8b::AD => Data::NoCarry(registers.borrow().get(Bits8::D)),
-            AddRegA8b::AE => Data::NoCarry(registers.borrow().get(Bits8::E)),
-            AddRegA8b::AH => Data::NoCarry(registers.borrow().get(Bits8::H)),
-            AddRegA8b::AL => Data::NoCarry(registers.borrow().get(Bits8::L)),
-            AddRegA8b::AcA => Data::Carry(registers.borrow().get(Bits8::A)),
-            AddRegA8b::AcB => Data::Carry(registers.borrow().get(Bits8::B)),
-            AddRegA8b::AcC => Data::Carry(registers.borrow().get(Bits8::C)),
-            AddRegA8b::AcD => Data::Carry(registers.borrow().get(Bits8::D)),
-            AddRegA8b::AcE => Data::Carry(registers.borrow().get(Bits8::E)),
-            AddRegA8b::AcH => Data::Carry(registers.borrow().get(Bits8::H)),
-            AddRegA8b::AcL => Data::Carry(registers.borrow().get(Bits8::L)),
-            AddRegA8b::Ac8b => {
-                Data::Carry(registers.clone().next_pc(memory.clone()).await.unwrap())
-            }
-            AddRegA8b::A8b => {
-                Data::NoCarry(registers.clone().next_pc(memory.clone()).await.unwrap())
-            }
-            AddRegA8b::AHL => {
+            AddRegA::AA => Data::NoCarry(registers.borrow().get(Bits8::A)),
+            AddRegA::AB => Data::NoCarry(registers.borrow().get(Bits8::B)),
+            AddRegA::AC => Data::NoCarry(registers.borrow().get(Bits8::C)),
+            AddRegA::AD => Data::NoCarry(registers.borrow().get(Bits8::D)),
+            AddRegA::AE => Data::NoCarry(registers.borrow().get(Bits8::E)),
+            AddRegA::AH => Data::NoCarry(registers.borrow().get(Bits8::H)),
+            AddRegA::AL => Data::NoCarry(registers.borrow().get(Bits8::L)),
+            AddRegA::AcA => Data::Carry(registers.borrow().get(Bits8::A)),
+            AddRegA::AcB => Data::Carry(registers.borrow().get(Bits8::B)),
+            AddRegA::AcC => Data::Carry(registers.borrow().get(Bits8::C)),
+            AddRegA::AcD => Data::Carry(registers.borrow().get(Bits8::D)),
+            AddRegA::AcE => Data::Carry(registers.borrow().get(Bits8::E)),
+            AddRegA::AcH => Data::Carry(registers.borrow().get(Bits8::H)),
+            AddRegA::AcL => Data::Carry(registers.borrow().get(Bits8::L)),
+            AddRegA::Ac8b => Data::Carry(registers.clone().next_pc(memory.clone()).await.unwrap()),
+            AddRegA::A8b => Data::NoCarry(registers.clone().next_pc(memory.clone()).await.unwrap()),
+            AddRegA::AHL => {
                 let src = registers.borrow().get(Bits16::HL);
                 Data::NoCarry(<Memory as Async>::get(memory, src).await.unwrap())
             }
-            AddRegA8b::AcHL => {
+            AddRegA::AcHL => {
                 let src = registers.borrow().get(Bits16::HL);
                 Data::Carry(<Memory as Async>::get(memory, src).await.unwrap())
             }
         };
         let (data, flag) = data.add(registers.borrow().get(Bits8::A));
-        registers.borrow_mut().set(Bits8::A, data);
-        registers
-            .borrow_mut()
-            .set(Bits8::F, Flags::into_bytes(flag)[0]);
+        let data = (data << 8) as u16 | Flags::into_bytes(flag)[0] as u16;
+        registers.borrow_mut().set(Bits16::AF, data);
     }
 }
 
 #[cfg(test)]
 mod test_instruction_add_reg_a_8b {
-    use super::AddRegA8b;
+    use super::AddRegA;
     use crate::area::{Bits16, Bits8, Flag};
     use crate::{executor, RegisterBus, Registers};
     use memory::Memory;
@@ -106,7 +100,7 @@ mod test_instruction_add_reg_a_8b {
     fn test_load_add_reg_a_8b() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = AddRegA8b::A8b;
+        let instruction = AddRegA::A8b;
         register.borrow_mut().set(Bits8::A, 0x4f);
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(register.borrow().get(Bits8::A), 0x80);
@@ -117,7 +111,7 @@ mod test_instruction_add_reg_a_8b {
     fn test_load_add_reg_a_hl() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = AddRegA8b::AHL;
+        let instruction = AddRegA::AHL;
         register.borrow_mut().set(Bits8::A, 0xf8);
         register.borrow_mut().set(Bits16::HL, 0xc008);
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
@@ -128,7 +122,7 @@ mod test_instruction_add_reg_a_8b {
     fn test_load_add_reg_a_reg_b() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = AddRegA8b::AB;
+        let instruction = AddRegA::AB;
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(register.borrow().get(Bits8::A), 0x00);
         assert_eq!(register.borrow().get(Flag::Z), true);
@@ -138,7 +132,7 @@ mod test_instruction_add_reg_a_8b {
     fn test_load_adc_reg_a_8b() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = AddRegA8b::Ac8b;
+        let instruction = AddRegA::Ac8b;
         register.borrow_mut().set(Bits8::A, 0x4f);
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(register.borrow().get(Bits8::A), 0x81);
@@ -149,7 +143,7 @@ mod test_instruction_add_reg_a_8b {
     fn test_load_adc_reg_a_hl() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = AddRegA8b::AcHL;
+        let instruction = AddRegA::AcHL;
         register.borrow_mut().set(Bits8::A, 0xf8);
         register.borrow_mut().set(Bits16::HL, 0xc008);
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
@@ -160,7 +154,7 @@ mod test_instruction_add_reg_a_8b {
     fn test_load_adc_reg_a_reg_b() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = AddRegA8b::AcB;
+        let instruction = AddRegA::AcB;
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(register.borrow().get(Bits8::A), 0x01);
     }
