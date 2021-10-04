@@ -1,4 +1,5 @@
 pub use crate::interface::{NewRegisters, Registers};
+use crate::opcodes::AddRegA8b;
 use crate::opcodes::LoadHL8b;
 use crate::opcodes::LoadR1R2;
 use crate::opcodes::LoadR8b;
@@ -52,6 +53,8 @@ impl Cpu {
         } else if let Ok(operation) = LoadHL8b::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadRegHL::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = AddRegA8b::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else {
             println!("Not implemented!");
