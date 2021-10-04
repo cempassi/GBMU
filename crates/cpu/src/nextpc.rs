@@ -61,3 +61,40 @@ async fn next_16(registers: Registers, memory: Memory) -> Result<u16, Error> {
     registers.borrow_mut().pc = pc.wrapping_add(1);
     Ok((left as u16) << 8 | right as u16)
 }
+
+#[cfg(test)]
+mod test_next_pc {
+    use memory::Memory;
+    use crate::nextpc::{next_16, next, NextPc};
+    use crate::Registers;
+
+    #[test]
+    fn test_fct_next_16() {
+        let register = Registers::default();
+        let memory = Memory::default();
+        async {
+            let short = next_16(register.clone(), memory.clone()).await.unwrap() ;
+            assert_eq!(short, 0x31fe);
+        };
+    }
+
+    #[test]
+    fn test_fct_next() {
+        let register = Registers::default();
+        let memory = Memory::default();
+        async {
+            let byte = next(register.clone(), memory.clone()).await.unwrap() ;
+            assert_eq!(byte, 0x00);
+        };
+    }
+
+    #[test]
+    fn test_fct_next_pc() {
+        let register = Registers::default();
+        let memory = Memory::default();
+        async {
+            let data: u16 = register.clone().next_pc(memory.clone()).await.unwrap();
+            assert_eq!(data, 0x31ff);
+        };
+    }
+}
