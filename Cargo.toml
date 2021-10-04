@@ -8,5 +8,6 @@ members = [
   "crates/memory",
   "crates/shared",
   "crates/soc",
+  "crates/ppu"
 ]
 resolver = "2"
