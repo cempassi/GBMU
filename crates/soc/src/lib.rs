@@ -1,4 +1,5 @@
 mod header;
+pub(crate) mod processor;
 pub mod soc;
 pub(crate) mod waker;
 
