@@ -3,7 +3,7 @@ use crate::area::Bits16;
 use crate::bus::RegisterBus;
 use crate::cpu::Registers;
 use crate::nextpc::NextPc;
-use crate::opcodes::add8;
+use crate::opcodes::Add;
 use crate::Flags;
 use memory::{Async, Memory};
 use num_enum::TryFromPrimitive;
@@ -20,14 +20,16 @@ use num_enum::TryFromPrimitive;
 ///  C - Set if carry from bit 7.
 /// Opcodes:
 /// Instruction Parameters Opcode Cycles | Instruction Parameters Opcode Cycles
-/// ADD         A,A        0x87   4        ADD         A,E        83     4
-/// ADD         A,B        0x80   4        ADD         A,H        84     4
-/// ADD         A,C        0x81   4        ADD         A,L        85     4
-/// ADD         A,D        0x82   4
+/// ADD         A,A        0x87   4        ADD         A,E        0x83   4
+/// ADD         A,B        0x80   4        ADD         A,H        0x84   4
+/// ADD         A,C        0x81   4        ADD         A,L        0x85   4
+/// ADD         A,D        0x82   4        ADD         A,(HL)     0x86   8
+/// ADD         A,8b       0xc6   8
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum AddRegA8b {
+    AA = 0x87,
     AB = 0x80,
     AC = 0x81,
     AD = 0x82,
@@ -35,7 +37,6 @@ pub enum AddRegA8b {
     AH = 0x84,
     AL = 0x85,
     AHL = 0x86,
-    AA = 0x87,
     A8b = 0xc6,
 }
 
@@ -55,7 +56,7 @@ impl AddRegA8b {
             }
             AddRegA8b::A8b => registers.clone().next_pc(memory.clone()).await.unwrap(),
         };
-        let (data, flag) = add8(data, registers.borrow().get(Bits8::A), false);
+        let (data, flag) = data.add(registers.borrow().get(Bits8::A).into(), false);
         registers.borrow_mut().set(Bits8::A, data);
         registers
             .borrow_mut()
