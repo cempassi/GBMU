@@ -6,7 +6,7 @@ const MAX_BIT3: usize = (1 << 4) - 1;
 const MAX_BIT11: usize = (1 << 12) - 1;
 const MAX_BIT15: usize = (1 << 16) - 1;
 
-fn carry(value:usize, nbr:usize, c:usize, max_c: usize, max_h: usize) -> (usize, Flags) {
+fn carry(value: usize, nbr: usize, c: usize, max_c: usize, max_h: usize) -> (usize, Flags) {
     let data = (value + nbr as usize + c as usize) & max_c;
     let mut flag = Flags::default();
     flag.set_z(data == 0);
@@ -15,14 +15,14 @@ fn carry(value:usize, nbr:usize, c:usize, max_c: usize, max_h: usize) -> (usize,
     (data, flag)
 }
 
-fn borrow(value:usize, nbr:usize, c:usize, max_c: usize, max_h: usize) -> (usize, Flags) {
-        let data = (value.wrapping_sub(nbr as usize).wrapping_sub(c)) & max_c;
-        let mut flag = Flags::default();
-        flag.set_z(data == 0);
-        flag.set_n(true);
-        flag.set_h((value & max_h) < (nbr & max_h) + (c & max_h));
-        flag.set_c((value & max_c) < (nbr & max_c) + (c & max_c));
-        (data, flag)
+fn borrow(value: usize, nbr: usize, c: usize, max_c: usize, max_h: usize) -> (usize, Flags) {
+    let data = (value.wrapping_sub(nbr as usize).wrapping_sub(c)) & max_c;
+    let mut flag = Flags::default();
+    flag.set_z(data == 0);
+    flag.set_n(true);
+    flag.set_h((value & max_h) < (nbr & max_h) + (c & max_h));
+    flag.set_c((value & max_c) < (nbr & max_c) + (c & max_c));
+    (data, flag)
 }
 
 pub trait Sub<T> {
