@@ -15,14 +15,14 @@ pub trait Add<T> {
 impl Add<u8> for Data<u8> {
     type Output = u16;
     fn add(&self, nbr: u8) -> Self::Output {
-        let (data, c) = match self {
-            Data::Carry(data) => (*data as usize, 1),
-            Data::NoCarry(data) => (*data as usize, 0),
+        let (value, c) = match self {
+            Data::Carry(value) => (*value as usize, 1),
+            Data::NoCarry(value) => (*value as usize, 0),
         };
         let max: usize = (1 << 8) - 1;
-        let h = carry(4, data, nbr as usize, c as usize);
-        let c = carry(8, data, nbr as usize, c as usize);
-        let data = (data + nbr as usize + c as usize) & max;
+        let data = (value + nbr as usize + c as usize) & max;
+        let h = carry(4, value, nbr as usize, c as usize);
+        let c = carry(8, value, nbr as usize, c as usize);
         let z = data == 0;
         let mut flag = Flags::default();
         flag.set_z(z);
@@ -35,14 +35,14 @@ impl Add<u8> for Data<u8> {
 impl Add<u16> for Data<u16> {
     type Output = (u16, Flags);
     fn add(&self, nbr: u16) -> Self::Output {
-        let (data, c) = match self {
-            Data::Carry(data) => (*data as usize, 1),
-            Data::NoCarry(data) => (*data as usize, 0),
+        let (value, c) = match self {
+            Data::Carry(value) => (*value as usize, 1),
+            Data::NoCarry(value) => (*value as usize, 0),
         };
         let max: usize = (1 << 16) - 1;
-        let h = carry(12, data, nbr as usize, c as usize);
-        let c = carry(16, data, nbr as usize, c as usize);
-        let data = (data + nbr as usize + c as usize) & max;
+        let data = (value + nbr as usize + c) & max;
+        let h = carry(12, value, nbr as usize, c as usize);
+        let c = carry(16, value, nbr as usize, c as usize);
         let z = data == 0;
         let mut flag = Flags::default();
         flag.set_z(z);
