@@ -7,6 +7,7 @@ use crate::opcodes::LoadRR16b;
 use crate::opcodes::LoadRegHL;
 use crate::opcodes::RotateLeft;
 use crate::opcodes::SubRegA;
+use crate::opcodes::SCF;
 
 use crate::nextpc::NextPc;
 use memory::Memory;
@@ -75,6 +76,8 @@ impl Cpu {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = SubRegA::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = SCF::try_from_primitive(opcode) {
+            operation.exec(self.registers).await;
         } else {
             println!("Not implemented!");
         }
