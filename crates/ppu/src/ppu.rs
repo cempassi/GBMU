@@ -1,29 +1,26 @@
 use crate::blanks::{Blank, HBLANK, VBLANK};
+use crate::interface::{Registers, Vram};
 use crate::oam::Oam;
+use crate::registers::LCDOperation;
 use crate::transfert::Pixel;
-use memory::Memory;
 
 #[derive(Default, Clone)]
 pub struct Ppu {
-    memory: Memory,
-    ly: u8,
+    vram: Vram,
+    registers: Registers,
 }
 
 impl Ppu {
-    pub fn new(memory: Memory) -> Self {
-        Self { memory, ly: 0 }
-    }
-
-    pub async fn run(mut self) -> u8 {
+    pub async fn run(self) -> u8 {
         println!("Running the ppu!");
-        while self.ly < 144 {
-            Oam::search(self.memory.clone()).await;
-            Pixel::transfert(self.memory.clone()).await;
-            self.ly += 1;
+        while self.registers.borrow_mut().is_lower(LCDOperation::Ly, 144) {
+            Oam::search(self.registers.clone(), self.vram.clone()).await;
+            Pixel::transfert(self.registers.clone(), self.vram.clone()).await;
+            self.registers.borrow_mut().increase(LCDOperation::Ly);
             Blank::new(HBLANK).await;
         }
         Blank::new(VBLANK).await;
-        self.ly = 0;
+        self.registers.borrow_mut().clear(LCDOperation::Ly);
         42
     }
 }

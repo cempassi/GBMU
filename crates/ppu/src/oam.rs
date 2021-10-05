@@ -2,21 +2,23 @@ use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
-use memory::Memory;
-
 use crate::cycle::Cycle;
+use crate::interface::{Registers, Vram};
 
+#[allow(dead_code)]
 pub struct Oam {
     cycle: Cycle,
-    //memory: Memory
+    registers: Registers,
+    vram: Vram,
 }
 
 impl Oam {
-    pub fn search(_memory: Memory) -> Self {
+    pub fn search(registers: Registers, vram: Vram) -> Self {
         let cycle = Cycle::Ppu(0);
         Self {
             cycle,
-            //memory
+            vram,
+            registers,
         }
     }
 }

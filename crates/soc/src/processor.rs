@@ -14,8 +14,8 @@ pub enum Processor {
 
 impl Processor {
     pub fn init(memory: Memory) -> Vec<Self> {
-        let cpu = Processor::Cpu(Cpu::new(memory.clone()), None);
-        let ppu = Processor::Ppu(Ppu::new(memory), None);
+        let cpu = Processor::Cpu(Cpu::new(memory), None);
+        let ppu = Processor::Ppu(Ppu::default(), None);
         vec![cpu, ppu]
     }
 
