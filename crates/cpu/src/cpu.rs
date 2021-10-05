@@ -1,5 +1,6 @@
 pub use crate::interface::{NewRegisters, Registers};
 use crate::opcodes::AddRegA;
+use crate::opcodes::CPLRegA;
 use crate::opcodes::LoadHL8b;
 use crate::opcodes::LoadR1R2;
 use crate::opcodes::LoadR8b;
@@ -59,6 +60,8 @@ impl Cpu {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = SubRegA::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = CPLRegA::try_from_primitive(opcode) {
+            operation.exec(self.registers).await;
         } else {
             println!("Not implemented!");
         }
