@@ -70,9 +70,17 @@ impl Add<u16> for Data<u16> {
     }
 }
 
+pub fn signed(value: u8) -> u16 {
+    if value & 0x80 != 0 {
+        0xff00 | value as u16
+    } else {
+        value as u16
+    }
+}
+
 #[cfg(test)]
 mod test_arithmetics_functions {
-    use crate::opcodes::data::arithmetic::{Add, Sub};
+    use crate::opcodes::data::arithmetic::{signed, Add, Sub};
     use crate::opcodes::data::Data;
 
     #[test]
@@ -193,5 +201,11 @@ mod test_arithmetics_functions {
     fn test_sub_carry_all_flags() {
         let data: Data<u8> = Data::Carry(0x88);
         assert_eq!(data.sub(0x87), 0x0030);
+    }
+
+    #[test]
+    fn test_signed() {
+        assert_eq!(signed(0x0a), 0x000a);
+        assert_eq!(signed(0x8a), 0xff8a);
     }
 }
