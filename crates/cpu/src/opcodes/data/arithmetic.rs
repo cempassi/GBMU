@@ -74,6 +74,7 @@ impl Add<u16> for Data<u16> {
 mod test_arithmetics_functions {
     use crate::opcodes::data::arithmetic::{Add, Sub};
     use crate::opcodes::data::Data;
+    use crate::Flags;
 
     #[test]
     fn test_add_8b() {
@@ -193,5 +194,61 @@ mod test_arithmetics_functions {
     fn test_sub_carry_all_flags() {
         let data: Data<u8> = Data::Carry(0x88);
         assert_eq!(data.sub(0x87), 0x0030);
+    }
+
+    #[test]
+    fn test_add16() {
+        let data: Data<u16> = Data::NoCarry(0x1200);
+        let (data, _) = data.add(0x1000);
+        assert_eq!(data, 0x2200);
+    }
+
+    #[test]
+    fn test_add16_carry() {
+        let data: Data<u16> = Data::Carry(0x1134);
+        let (data, _) = data.add(0x1222);
+        assert_eq!(data, 0x2357);
+    }
+
+    #[test]
+    fn test_add16_c_flag() {
+        let data: Data<u16> = Data::NoCarry(0xf231);
+        let mut flag = Flags::default();
+        flag.set_c(true);
+        let (data, new_flags) = data.add(0x2a13);
+        assert_eq!(data, 0x1c44);
+        assert_eq!(flag, new_flags);
+    }
+
+    #[test]
+    fn test_add16_carry_c_flag() {
+        let data: Data<u16> = Data::Carry(0xf231);
+        let mut flag = Flags::default();
+        flag.set_c(true);
+        let (data, new_flags) = data.add(0x2a13);
+        assert_eq!(data, 0x1c45);
+        assert_eq!(flag, new_flags);
+    }
+
+    #[test]
+    fn test_add16_ch_flag() {
+        let data: Data<u16> = Data::NoCarry(0xf631);
+        let mut flag = Flags::default();
+        flag.set_h(true);
+        flag.set_c(true);
+        let (data, new_flags) = data.add(0x2a03);
+        assert_eq!(data, 0x2034);
+        assert_eq!(flag, new_flags);
+    }
+
+    #[test]
+    fn test_add16_carry_ch_flag() {
+        let data: Data<u16> = Data::Carry(0xf631);
+        let mut flag = Flags::default();
+        flag.set_h(true);
+        flag.set_c(true);
+        let (data, new_flags) = data.add(0x2a03);
+        assert_eq!(data, 0x2035);
+        assert_eq!(flag, new_flags);
     }
 }
