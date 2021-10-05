@@ -1,14 +1,28 @@
 use crate::opcodes::data::Data;
 use crate::Flags;
 
-fn carry(shift: usize, nbr1: usize, nbr2: usize, c: usize) -> bool {
-    let max = (1 << shift) - 1;
-    (nbr1 & max) + (nbr2 & max) + (c & max) > max
+const MAX_BIT7: usize = (1 << 8) - 1;
+const MAX_BIT3: usize = (1 << 4) - 1;
+const MAX_BIT11: usize = (1 << 12) - 1;
+const MAX_BIT15: usize = (1 << 16) - 1;
+
+fn carry(value:usize, nbr:usize, c:usize, max_c: usize, max_h: usize) -> (usize, Flags) {
+    let data = (value + nbr as usize + c as usize) & max_c;
+    let mut flag = Flags::default();
+    flag.set_z(data == 0);
+    flag.set_h((value & max_h) + (nbr & max_h) + (c & max_h) > max_h);
+    flag.set_c((value & max_c) + (nbr & max_c) + (c & max_c) > max_c);
+    (data, flag)
 }
 
-fn borrow(shift: usize, nbr1: usize, nbr2: usize, c: usize) -> bool {
-    let max = (1 << shift) - 1;
-    (nbr1 & max) < (nbr2 & max) + (c & max)
+fn borrow(value:usize, nbr:usize, c:usize, max_c: usize, max_h: usize) -> (usize, Flags) {
+        let data = (value.wrapping_sub(nbr as usize).wrapping_sub(c)) & max_c;
+        let mut flag = Flags::default();
+        flag.set_z(data == 0);
+        flag.set_n(true);
+        flag.set_h((value & max_h) < (nbr & max_h) + (c & max_h));
+        flag.set_c((value & max_c) < (nbr & max_c) + (c & max_c));
+        (data, flag)
 }
 
 pub trait Sub<T> {
@@ -23,16 +37,7 @@ impl Sub<u8> for Data<u8> {
             Data::Carry(value) => (*value as usize, 1),
             Data::NoCarry(value) => (*value as usize, 0),
         };
-        let max: usize = (1 << 8) - 1;
-        let data = (value.wrapping_sub(nbr as usize).wrapping_sub(c)) & max;
-        let h = borrow(4, value, nbr as usize, c as usize);
-        let c = borrow(8, value, nbr as usize, c as usize);
-        let z = data == 0;
-        let mut flag = Flags::default();
-        flag.set_z(z);
-        flag.set_n(true);
-        flag.set_h(h);
-        flag.set_c(c);
+        let (data, flag) = borrow(value, nbr as usize, c, MAX_BIT7, MAX_BIT3);
         (data as u16) << 8 | Flags::into_bytes(flag)[0] as u16
     }
 }
@@ -49,15 +54,7 @@ impl Add<u8> for Data<u8> {
             Data::Carry(value) => (*value as usize, 1),
             Data::NoCarry(value) => (*value as usize, 0),
         };
-        let max: usize = (1 << 8) - 1;
-        let data = (value + nbr as usize + c as usize) & max;
-        let h = carry(4, value, nbr as usize, c as usize);
-        let c = carry(8, value, nbr as usize, c as usize);
-        let z = data == 0;
-        let mut flag = Flags::default();
-        flag.set_z(z);
-        flag.set_h(h);
-        flag.set_c(c);
+        let (data, flag) = carry(value, nbr as usize, c, MAX_BIT7, MAX_BIT3);
         (data as u16) << 8 | Flags::into_bytes(flag)[0] as u16
     }
 }
@@ -69,15 +66,7 @@ impl Add<u16> for Data<u16> {
             Data::Carry(value) => (*value as usize, 1),
             Data::NoCarry(value) => (*value as usize, 0),
         };
-        let max: usize = (1 << 16) - 1;
-        let data = (value + nbr as usize + c) & max;
-        let h = carry(12, value, nbr as usize, c as usize);
-        let c = carry(16, value, nbr as usize, c as usize);
-        let z = data == 0;
-        let mut flag = Flags::default();
-        flag.set_z(z);
-        flag.set_h(h);
-        flag.set_c(c);
+        let (data, flag) = carry(value, nbr as usize, c, MAX_BIT15, MAX_BIT11);
         (data as u16, flag)
     }
 }
