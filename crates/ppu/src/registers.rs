@@ -70,7 +70,6 @@ pub struct Registers {
     // hdma5: u8,
 }
 
-
 impl Registers {
     fn ly_cmp(&mut self) {
         if self.ly == self.lycompare {
