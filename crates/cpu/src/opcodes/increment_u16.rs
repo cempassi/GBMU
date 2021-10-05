@@ -27,24 +27,13 @@ pub enum IncRegNN {
 
 impl IncRegNN {
     pub async fn exec(self, registers: Registers) {
-        let (dst, data) = match self {
-            IncRegNN::BC => (
-                Bits16::BC,
-                registers.borrow().get(Bits16::BC).wrapping_add(1),
-            ),
-            IncRegNN::DE => (
-                Bits16::DE,
-                registers.borrow().get(Bits16::DE).wrapping_add(1),
-            ),
-            IncRegNN::HL => (
-                Bits16::HL,
-                registers.borrow().get(Bits16::HL).wrapping_add(1),
-            ),
-            IncRegNN::SP => (
-                Bits16::SP,
-                registers.borrow().get(Bits16::SP).wrapping_add(1),
-            ),
+        let dst = match self {
+            IncRegNN::BC => Bits16::BC,
+            IncRegNN::DE => Bits16::DE,
+            IncRegNN::HL => Bits16::HL,
+            IncRegNN::SP => Bits16::SP,
         };
+        let data = registers.borrow().get(dst).wrapping_add(1);
         registers.borrow_mut().set(dst, data);
     }
 }

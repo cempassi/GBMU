@@ -27,24 +27,13 @@ pub enum DecRegNN {
 
 impl DecRegNN {
     pub async fn exec(self, registers: Registers) {
-        let (dst, data) = match self {
-            DecRegNN::BC => (
-                Bits16::BC,
-                registers.borrow().get(Bits16::BC).wrapping_sub(1),
-            ),
-            DecRegNN::DE => (
-                Bits16::DE,
-                registers.borrow().get(Bits16::DE).wrapping_sub(1),
-            ),
-            DecRegNN::HL => (
-                Bits16::HL,
-                registers.borrow().get(Bits16::HL).wrapping_sub(1),
-            ),
-            DecRegNN::SP => (
-                Bits16::SP,
-                registers.borrow().get(Bits16::SP).wrapping_sub(1),
-            ),
+        let dst = match self {
+            DecRegNN::BC => Bits16::BC,
+            DecRegNN::DE => Bits16::DE,
+            DecRegNN::HL => Bits16::HL,
+            DecRegNN::SP => Bits16::SP,
         };
+        let data = registers.borrow().get(dst).wrapping_sub(1);
         registers.borrow_mut().set(dst, data);
     }
 }
