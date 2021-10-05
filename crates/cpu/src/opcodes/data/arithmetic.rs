@@ -15,14 +15,14 @@ fn carry(value: usize, nbr: usize, c: usize, max_c: usize, max_h: usize) -> (usi
     (data, flag)
 }
 
-fn borrow(value: usize, nbr: usize, c: usize, max_c: usize, max_h: usize) -> (usize, Flags) {
+fn borrow(value: usize, nbr: usize, c: usize, max_c: usize, max_h: usize) -> u16 {
     let data = (value.wrapping_sub(nbr as usize).wrapping_sub(c)) & max_c;
     let mut flag = Flags::default();
     flag.set_z(data == 0);
     flag.set_n(true);
     flag.set_h((value & max_h) < (nbr & max_h) + (c & max_h));
     flag.set_c((value & max_c) < (nbr & max_c) + (c & max_c));
-    (data, flag)
+    (data as u16) << 8 | Flags::into_bytes(flag)[0] as u16
 }
 
 pub trait Sub<T> {
@@ -37,8 +37,7 @@ impl Sub<u8> for Data<u8> {
             Data::Carry(value) => (*value as usize, 1),
             Data::NoCarry(value) => (*value as usize, 0),
         };
-        let (data, flag) = borrow(value, nbr as usize, c, MAX_BIT7, MAX_BIT3);
-        (data as u16) << 8 | Flags::into_bytes(flag)[0] as u16
+        borrow(value, nbr as usize, c, MAX_BIT7, MAX_BIT3)
     }
 }
 
