@@ -50,3 +50,12 @@
 //     #[skip]
 //     unused: bool,
 // }
+
+pub enum Register {
+    Xscroll,
+    Yscroll,
+    Ly,
+    LyCmp,
+    Ywindow,
+    Xwindow,
+}

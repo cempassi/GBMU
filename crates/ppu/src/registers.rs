@@ -1,5 +1,7 @@
-mod lcd;
+pub(crate) mod lcd;
 mod palette;
+
+pub use lcd::Register;
 
 // /// 1 LCD Control Register
 // ///
@@ -68,14 +70,6 @@ pub struct Registers {
     // hdma5: u8,
 }
 
-pub enum LCDOperation {
-    Xscroll,
-    Yscroll,
-    Ly,
-    LyCmp,
-    Ywindow,
-    Xwindow,
-}
 
 impl Registers {
     fn ly_cmp(&mut self) {
@@ -84,71 +78,71 @@ impl Registers {
         }
     }
 
-    pub fn increase(&mut self, operation: LCDOperation) {
+    pub fn increase(&mut self, operation: Register) {
         match operation {
-            LCDOperation::Xscroll => self.xscroll += 1,
-            LCDOperation::Yscroll => self.yscroll += 1,
-            LCDOperation::Ly => {
+            Register::Xscroll => self.xscroll += 1,
+            Register::Yscroll => self.yscroll += 1,
+            Register::Ly => {
                 self.ly += 1;
                 self.ly_cmp();
             }
-            LCDOperation::LyCmp => {
+            Register::LyCmp => {
                 self.lycompare += 1;
                 self.ly_cmp();
             }
-            LCDOperation::Ywindow => self.ywindow += 1,
-            LCDOperation::Xwindow => self.xwindow += 1,
+            Register::Ywindow => self.ywindow += 1,
+            Register::Xwindow => self.xwindow += 1,
         }
     }
 
-    pub fn is_equal(&mut self, operation: LCDOperation, value: u8) -> bool {
+    pub fn is_equal(&mut self, operation: Register, value: u8) -> bool {
         match operation {
-            LCDOperation::Xscroll => self.xscroll == value,
-            LCDOperation::Yscroll => self.yscroll == value,
-            LCDOperation::Ly => {
+            Register::Xscroll => self.xscroll == value,
+            Register::Yscroll => self.yscroll == value,
+            Register::Ly => {
                 self.ly_cmp();
                 self.ly == value
             }
-            LCDOperation::LyCmp => {
+            Register::LyCmp => {
                 self.ly_cmp();
                 self.lycompare == value
             }
-            LCDOperation::Ywindow => self.ywindow == value,
-            LCDOperation::Xwindow => self.xwindow == value,
+            Register::Ywindow => self.ywindow == value,
+            Register::Xwindow => self.xwindow == value,
         }
     }
 
-    pub fn is_lower(&mut self, operation: LCDOperation, value: u8) -> bool {
+    pub fn is_lower(&mut self, operation: Register, value: u8) -> bool {
         match operation {
-            LCDOperation::Xscroll => self.xscroll < value,
-            LCDOperation::Yscroll => self.yscroll < value,
-            LCDOperation::Ly => {
+            Register::Xscroll => self.xscroll < value,
+            Register::Yscroll => self.yscroll < value,
+            Register::Ly => {
                 self.ly_cmp();
                 self.ly < value
             }
-            LCDOperation::LyCmp => {
+            Register::LyCmp => {
                 self.ly_cmp();
                 self.lycompare < value
             }
-            LCDOperation::Ywindow => self.ywindow < value,
-            LCDOperation::Xwindow => self.xwindow < value,
+            Register::Ywindow => self.ywindow < value,
+            Register::Xwindow => self.xwindow < value,
         }
     }
 
-    pub fn clear(&mut self, operation: LCDOperation) {
+    pub fn clear(&mut self, operation: Register) {
         match operation {
-            LCDOperation::Xscroll => self.xscroll = 0,
-            LCDOperation::Yscroll => self.yscroll = 0,
-            LCDOperation::Ly => {
+            Register::Xscroll => self.xscroll = 0,
+            Register::Yscroll => self.yscroll = 0,
+            Register::Ly => {
                 self.ly = 0;
                 self.ly_cmp();
             }
-            LCDOperation::LyCmp => {
+            Register::LyCmp => {
                 self.lycompare = 0;
                 self.ly_cmp();
             }
-            LCDOperation::Ywindow => self.ywindow = 0,
-            LCDOperation::Xwindow => self.xwindow = 0,
+            Register::Ywindow => self.ywindow = 0,
+            Register::Xwindow => self.xwindow = 0,
         }
     }
 }
