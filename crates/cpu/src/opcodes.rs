@@ -1,7 +1,7 @@
 mod add_reg_a;
 mod data;
-mod decrement;
-mod increment;
+mod decrement_u8;
+mod increment_u8;
 mod load_hl_8b;
 mod load_r_b8;
 mod load_r_r;
@@ -11,8 +11,8 @@ mod sub_reg_a;
 
 pub use add_reg_a::AddRegA;
 pub use data::Data;
-pub use decrement::Decrement;
-pub use increment::Increment;
+pub use decrement_u8::Decrement;
+pub use increment_u8::Increment;
 pub use load_hl_8b::LoadHL8b;
 pub use load_r_b8::LoadR8b;
 pub use load_r_r::LoadR1R2;
