@@ -1,7 +1,7 @@
 use crate::area::{Bits16, Bits8};
 use crate::RegisterBus;
 use crate::Registers;
-use memory::Memory;
+use memory::{Async, Memory};
 use num_enum::TryFromPrimitive;
 
 /// LD nn, A
@@ -22,16 +22,14 @@ pub enum LoadBCDERegA {
 }
 
 impl LoadBCDERegA {
-    pub fn exec(self, registers: Registers, memory: Memory) {
+    pub async fn exec(self, registers: Registers, memory: Memory) {
         let dst = match self {
             LoadBCDERegA::BCA => Bits16::BC,
             LoadBCDERegA::DEA => Bits16::DE,
         };
+        let dst = registers.borrow().get(dst);
         let data = registers.borrow().get(Bits8::A);
-        memory
-            .borrow_mut()
-            .set(registers.borrow().get(dst), data)
-            .unwrap()
+        <Memory as Async>::set(memory, dst, data).await.unwrap();
     }
 }
 
@@ -39,7 +37,7 @@ impl LoadBCDERegA {
 mod test_instruction_load_bc_de_reg_a {
     use super::LoadBCDERegA;
     use crate::area::{Bits16, Bits8};
-    use crate::{RegisterBus, Registers};
+    use crate::{executor, RegisterBus, Registers};
     use memory::{Area, Memory};
 
     #[test]
@@ -52,8 +50,7 @@ mod test_instruction_load_bc_de_reg_a {
         register.borrow_mut().set(Bits16::BC, wram_address);
         assert_eq!(register.borrow_mut().get(Bits8::A), 1);
         assert_eq!(register.borrow_mut().get(Bits16::BC), wram_address);
-
-        instruction.exec(register.clone(), memory.clone());
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(
             memory.borrow().get(0xc042).unwrap(),
             register.borrow().get(Bits8::A)
@@ -71,7 +68,7 @@ mod test_instruction_load_bc_de_reg_a {
         assert_eq!(register.borrow_mut().get(Bits8::A), 1);
         assert_eq!(register.borrow_mut().get(Bits16::DE), wram_address);
 
-        instruction.exec(register.clone(), memory.clone());
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(
             memory.borrow().get(0xc042).unwrap(),
             register.borrow().get(Bits8::A)
