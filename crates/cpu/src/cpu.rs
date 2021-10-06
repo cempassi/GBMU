@@ -6,6 +6,7 @@ use crate::opcodes::LoadR1R2;
 use crate::opcodes::LoadR8b;
 use crate::opcodes::LoadRR16b;
 use crate::opcodes::LoadRegHL;
+use crate::opcodes::RotateLeft;
 use crate::opcodes::SubRegA;
 
 use crate::nextpc::NextPc;
@@ -34,6 +35,19 @@ impl Cpu {
         self.registers.clone()
     }
 
+    async fn prefix_cb(self) {
+        let opcode: u8 = self
+            .registers
+            .clone()
+            .next_pc(self.memory.clone())
+            .await
+            .unwrap();
+
+        if let Ok(operation) = RotateLeft::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        }
+    }
+
     /// 1 - Get OpCode from PC
     /// 2 - Convert Opcode With Tryfrom
     /// 3 - Tryfrom to Instruction
@@ -46,7 +60,9 @@ impl Cpu {
             .await
             .unwrap();
 
-        if let Ok(operation) = LoadR1R2::try_from_primitive(opcode) {
+        if opcode == 0xCB {
+            self.prefix_cb().await;
+        } else if let Ok(operation) = LoadR1R2::try_from_primitive(opcode) {
             operation.exec(self.registers);
         } else if let Ok(operation) = LoadR8b::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
