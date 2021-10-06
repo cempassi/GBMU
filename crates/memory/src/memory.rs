@@ -65,6 +65,26 @@ impl Memory {
         }
     }
 
+    pub fn get_16(&self, address: u16) -> Result<u16, Error> {
+        match self.get(address) {
+            Ok(left) => match self.get(address) {
+                Ok(right) => Ok((left as u16) << 8 | right as u16),
+                Err(error) => Err(error),
+            },
+            Err(error) => Err(error),
+        }
+    }
+
+    pub fn set_16(&mut self, address: u16, data: u16) -> Result<(), Error> {
+        match self.set(address, data as u8) {
+            Ok(_) => match self.set(address + 1, (data >> 8) as u8) {
+                Ok(_) => Ok(()),
+                Err(error) => Err(error),
+            },
+            Err(error) => Err(error),
+        }
+    }
+
     pub fn get_area(&self, area: Area) -> Bus {
         match area {
             Area::Bios => self.bios.clone(),
@@ -144,5 +164,17 @@ mod test_memory {
 
         assert!(read.is_ok());
         assert_eq!(read.unwrap(), 42);
+    }
+
+    #[test]
+    fn test_write_read_u16() {
+        let mut memory = super::Memory::default();
+
+        assert!(memory.set_16(0xc010, 0x4242).is_ok());
+
+        let read = memory.get_16(0xc010);
+
+        assert!(read.is_ok());
+        assert_eq!(read.unwrap(), 0x4242);
     }
 }
