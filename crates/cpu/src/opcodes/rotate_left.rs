@@ -38,22 +38,22 @@ use num_enum::TryFromPrimitive;
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum RotateLeft {
-    B = 0x00,
-    C = 0x01,
-    D = 0x02,
-    E = 0x03,
-    H = 0x04,
-    L = 0x05,
-    HL = 0x06,
-    A = 0x07,
-    CB = 0x10,
-    CC = 0x11,
-    CD = 0x12,
-    CE = 0x13,
-    CH = 0x14,
-    CL = 0x15,
-    CHL = 0x16,
-    CA = 0x17,
+    CB = 0x00,
+    CC = 0x01,
+    CD = 0x02,
+    CE = 0x03,
+    CH = 0x04,
+    CL = 0x05,
+    CHL = 0x06,
+    CA = 0x07,
+    B = 0x10,
+    C = 0x11,
+    D = 0x12,
+    E = 0x13,
+    H = 0x14,
+    L = 0x15,
+    HL = 0x16,
+    A = 0x17,
 }
 
 fn rotate_carry(registers: Registers, area: Bits8) {
