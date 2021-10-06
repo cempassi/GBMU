@@ -1,11 +1,13 @@
 mod add_reg_a;
 mod complement_carry_flag;
+mod consts;
 mod data;
 mod load_hl_8b;
 mod load_r_b8;
 mod load_r_r;
 mod load_reg_hl;
 mod load_rr_b16;
+mod rotate_left;
 mod sub_reg_a;
 
 pub use add_reg_a::AddRegA;
@@ -16,4 +18,5 @@ pub use load_r_b8::LoadR8b;
 pub use load_r_r::LoadR1R2;
 pub use load_reg_hl::LoadRegHL;
 pub use load_rr_b16::LoadRR16b;
+pub use rotate_left::RotateLeft;
 pub use sub_reg_a::SubRegA;
