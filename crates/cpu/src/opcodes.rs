@@ -1,6 +1,6 @@
 mod add_reg_a;
-mod consts;
 mod cmp_reg_a;
+mod consts;
 mod data;
 mod load_hl_8b;
 mod load_r_b8;
