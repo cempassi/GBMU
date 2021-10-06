@@ -3,22 +3,20 @@ use std::pin::Pin;
 use std::task::{Context, Poll};
 
 use crate::cycle::Cycle;
-use crate::interface::{Registers, Vram};
+use crate::Ppu;
 
 #[allow(dead_code)]
 pub struct Oam {
     cycle: Cycle,
-    registers: Registers,
-    vram: Vram,
+    ppu: Ppu
 }
 
 impl Oam {
-    pub fn search(registers: Registers, vram: Vram) -> Self {
+    pub fn search(ppu: Ppu) -> Self {
         let cycle = Cycle::Ppu(0);
         Self {
             cycle,
-            vram,
-            registers,
+            ppu
         }
     }
 }

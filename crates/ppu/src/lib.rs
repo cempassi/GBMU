@@ -1,6 +1,5 @@
 pub(crate) mod blanks;
 pub(crate) mod cycle;
-pub mod interface;
 pub(crate) mod oam;
 pub(crate) mod ppu;
 pub mod registers;
