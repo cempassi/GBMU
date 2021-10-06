@@ -1,5 +1,4 @@
-use super::consts::BIT0;
-use super::Data;
+use super::consts::{BIT0, CARRY, NO_CARRY};
 use crate::area::{Bits16, Bits8, Flag};
 use crate::bus::RegisterBus;
 use crate::cpu::Registers;
@@ -57,36 +56,28 @@ pub enum RotateRight {
     A = 0x1F,
 }
 
-fn rotate(registers: Registers, dst: Data<Bits8>) {
-    let area = match dst {
-        Data::Carry(area) => area,
-        Data::NoCarry(area) => area,
-    };
+fn rotate(registers: Registers, area: Bits8, is_carried: bool) {
     let mut data = registers.borrow().get(area);
     let carry = (data & BIT0) != 0;
     data >>= 1;
-    match dst {
-        Data::Carry(_) => data |= (registers.borrow().get(Flag::C) as u8) << 7,
-        Data::NoCarry(_) => data |= (carry as u8) << 7,
+    match is_carried {
+        true => data |= (registers.borrow().get(Flag::C) as u8) << 7,
+        false => data |= (carry as u8) << 7,
     };
     registers.borrow_mut().set(area, data);
     registers.borrow_mut().set(Flag::C, carry);
 }
 
-async fn rotate_hl(registers: Registers, dst: Data<Memory>) {
-    let memory = match dst {
-        Data::Carry(ref memory) => memory,
-        Data::NoCarry(ref memory) => memory,
-    };
+async fn rotate_hl(registers: Registers, memory: Memory, is_carried: bool) {
     let address = registers.borrow().get(Bits16::HL);
     let mut data = <Memory as Async>::get(memory.clone(), address)
         .await
         .unwrap();
     let carry = (data & BIT0) != 0;
     data >>= 1;
-    match dst {
-        Data::Carry(_) => data |= (registers.borrow().get(Flag::C) as u8) << 7,
-        Data::NoCarry(_) => data |= (carry as u8) << 7,
+    match is_carried {
+        true => data |= (registers.borrow().get(Flag::C) as u8) << 7,
+        false => data |= (carry as u8) << 7,
     };
     <Memory as Async>::set(memory.clone(), address, data)
         .await
@@ -97,22 +88,22 @@ async fn rotate_hl(registers: Registers, dst: Data<Memory>) {
 impl RotateRight {
     pub async fn exec(self, registers: Registers, memory: Memory) {
         match self {
-            RotateRight::A => rotate(registers, Data::Carry(Bits8::A)),
-            RotateRight::B => rotate(registers, Data::Carry(Bits8::B)),
-            RotateRight::C => rotate(registers, Data::Carry(Bits8::C)),
-            RotateRight::D => rotate(registers, Data::Carry(Bits8::D)),
-            RotateRight::E => rotate(registers, Data::Carry(Bits8::E)),
-            RotateRight::H => rotate(registers, Data::Carry(Bits8::H)),
-            RotateRight::L => rotate(registers, Data::Carry(Bits8::L)),
-            RotateRight::HL => rotate_hl(registers, Data::Carry(memory)).await,
-            RotateRight::CA => rotate(registers, Data::NoCarry(Bits8::A)),
-            RotateRight::CB => rotate(registers, Data::NoCarry(Bits8::B)),
-            RotateRight::CC => rotate(registers, Data::NoCarry(Bits8::C)),
-            RotateRight::CD => rotate(registers, Data::NoCarry(Bits8::D)),
-            RotateRight::CE => rotate(registers, Data::NoCarry(Bits8::E)),
-            RotateRight::CH => rotate(registers, Data::NoCarry(Bits8::H)),
-            RotateRight::CL => rotate(registers, Data::NoCarry(Bits8::L)),
-            RotateRight::CHL => rotate_hl(registers, Data::NoCarry(memory)).await,
+            RotateRight::A => rotate(registers, Bits8::A, CARRY),
+            RotateRight::B => rotate(registers, Bits8::B, CARRY),
+            RotateRight::C => rotate(registers, Bits8::C, CARRY),
+            RotateRight::D => rotate(registers, Bits8::D, CARRY),
+            RotateRight::E => rotate(registers, Bits8::E, CARRY),
+            RotateRight::H => rotate(registers, Bits8::H, CARRY),
+            RotateRight::L => rotate(registers, Bits8::L, CARRY),
+            RotateRight::HL => rotate_hl(registers, memory, CARRY).await,
+            RotateRight::CA => rotate(registers, Bits8::A, NO_CARRY),
+            RotateRight::CB => rotate(registers, Bits8::B, NO_CARRY),
+            RotateRight::CC => rotate(registers, Bits8::C, NO_CARRY),
+            RotateRight::CD => rotate(registers, Bits8::D, NO_CARRY),
+            RotateRight::CE => rotate(registers, Bits8::E, NO_CARRY),
+            RotateRight::CH => rotate(registers, Bits8::H, NO_CARRY),
+            RotateRight::CL => rotate(registers, Bits8::L, NO_CARRY),
+            RotateRight::CHL => rotate_hl(registers, memory, NO_CARRY).await,
         };
     }
 }
