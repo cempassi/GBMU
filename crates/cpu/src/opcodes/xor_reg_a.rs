@@ -55,7 +55,7 @@ impl XorRegA {
                 <Memory as Async>::get(memory, src).await.unwrap()
             }
         };
-        let data = xor(data, registers.borrow().get(Bits8::A));
+        let data = xor(registers.borrow().get(Bits8::A), data);
         registers.borrow_mut().set(Bits16::AF, data);
     }
 }
