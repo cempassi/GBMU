@@ -54,7 +54,7 @@ impl Cpu {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadHL8b::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
-        } else if let Ok(operation) = LoadRegHL::try_from_primitive(opcode) {s
+        } else if let Ok(operation) = LoadRegHL::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = AddRegA::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
