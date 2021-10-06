@@ -9,6 +9,7 @@ pub(crate) mod mbc;
 pub mod memory;
 pub(crate) mod state;
 pub(crate) mod wram;
+pub(crate) mod ppu;
 
 pub use area::Area;
 pub use bus::MemoryBus;

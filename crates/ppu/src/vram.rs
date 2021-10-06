@@ -1,5 +1,6 @@
 const VRAM_SIZE: usize = 8192;
 
+#[derive(Debug)]
 pub struct Vram {
     data: Vec<u8>,
 }
