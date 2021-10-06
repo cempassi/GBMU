@@ -18,4 +18,5 @@ pub use load_r_r::LoadR1R2;
 pub use load_reg_hl::LoadRegHL;
 pub use load_rr_b16::LoadRR16b;
 pub use rotate_left::RotateLeft;
+pub use rotate_right::RotateRight;
 pub use sub_reg_a::SubRegA;

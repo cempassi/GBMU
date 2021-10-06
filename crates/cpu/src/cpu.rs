@@ -6,6 +6,7 @@ use crate::opcodes::LoadR8b;
 use crate::opcodes::LoadRR16b;
 use crate::opcodes::LoadRegHL;
 use crate::opcodes::RotateLeft;
+use crate::opcodes::RotateRight;
 use crate::opcodes::SubRegA;
 
 use crate::nextpc::NextPc;
@@ -43,6 +44,8 @@ impl Cpu {
             .unwrap();
 
         if let Ok(operation) = RotateLeft::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = RotateRight::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         }
     }
