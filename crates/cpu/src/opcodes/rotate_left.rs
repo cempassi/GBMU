@@ -66,6 +66,9 @@ fn rotate(registers: Registers, area: Bits8, is_carried: bool) {
     };
     registers.borrow_mut().set(area, data);
     registers.borrow_mut().set(Flag::C, carry);
+    if data == 0 {
+        registers.borrow_mut().set(Flag::Z, true);
+    };
 }
 
 async fn rotate_hl(registers: Registers, memory: Memory, is_carried: bool) {
@@ -83,6 +86,9 @@ async fn rotate_hl(registers: Registers, memory: Memory, is_carried: bool) {
         .await
         .unwrap();
     registers.borrow_mut().set(Flag::C, carry);
+    if data == 0 {
+        registers.borrow_mut().set(Flag::Z, true);
+    };
 }
 
 impl RotateLeft {
