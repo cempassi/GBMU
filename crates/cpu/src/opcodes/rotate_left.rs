@@ -67,10 +67,11 @@ fn rotate_carry(registers: Registers, area: Bits8) {
 
 fn rotate(registers: Registers, area: Bits8) {
     let mut data = registers.borrow().get(area);
-    let holder = (data & BIT7) != 0;
+    let carry = (data & BIT7) != 0;
     data <<= 1;
-    data |= holder as u8;
+    data |= carry as u8;
     registers.borrow_mut().set(area, data);
+    registers.borrow_mut().set(Flag::C, carry);
 }
 
 impl RotateLeft {
@@ -96,16 +97,17 @@ impl RotateLeft {
                 let carry = (data & BIT7) != 0;
                 data <<= 1;
                 data |= registers.borrow().get(Flag::C) as u8;
+                <Memory as Async>::set(memory, dst, data).await.unwrap();
                 registers.borrow_mut().set(Flag::C, carry);
-                <Memory as Async>::set(memory, dst, data).await.unwrap()
             }
             RotateLeft::CHL => {
                 let dst = registers.borrow().get(Bits16::HL);
                 let mut data = <Memory as Async>::get(memory.clone(), dst).await.unwrap();
-                let holder = (data & BIT7) != 0;
+                let carry = (data & BIT7) != 0;
                 data <<= 1;
-                data |= holder as u8;
-                <Memory as Async>::set(memory, dst, data).await.unwrap()
+                data |= carry as u8;
+                <Memory as Async>::set(memory, dst, data).await.unwrap();
+                registers.borrow_mut().set(Flag::C, carry);
             }
         };
     }
@@ -130,9 +132,12 @@ mod test_rotate_left {
         executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         let result = register.borrow().get(Bits8::A);
+        let carry = register.borrow_mut().get(Flag::C);
         println!("result  : {:#b}", result);
         println!("expected: {:#b}", expected);
+        println!("carry is {} and should be true", carry);
         assert_eq!(result, expected);
+        assert_eq!(carry, true);
     }
 
     #[test]
@@ -169,9 +174,12 @@ mod test_rotate_left {
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
 
         let result = memory.borrow_mut().get(hl).unwrap();
+        let carry = register.borrow_mut().get(Flag::C);
         println!("result  : {:#b}", result);
         println!("expected: {:#b}", expected);
+        println!("carry is {} and should be true", carry);
         assert_eq!(result, expected);
+        assert_eq!(carry, true);
     }
 
     #[test]
