@@ -1,7 +1,7 @@
 use crate::area::{Bits16, Bits8};
 use crate::RegisterBus;
 use crate::Registers;
-use memory::Memory;
+use memory::{Async, Memory};
 use num_enum::TryFromPrimitive;
 
 /// LD A,(HLI)
@@ -25,11 +25,11 @@ pub enum LoadRegAHLP {
 }
 
 impl LoadRegAHLP {
-    pub fn exec(self, registers: Registers, memory: Memory) {
-        let hl = registers.borrow().get(Bits16::HL);
-        let data = memory.borrow().get(hl).unwrap();
+    pub async fn exec(self, registers: Registers, memory: Memory) {
+        let src = registers.borrow().get(Bits16::HL);
+        let data = <Memory as Async>::get(memory, src).await.unwrap();
         registers.borrow_mut().set(Bits8::A, data);
-        registers.borrow_mut().set(Bits16::HL, hl.wrapping_add(1));
+        registers.borrow_mut().set(Bits16::HL, src.wrapping_add(1));
     }
 }
 
@@ -37,7 +37,7 @@ impl LoadRegAHLP {
 mod test_instruction_load_reg_a_hl_plus {
     use super::LoadRegAHLP;
     use crate::area::{Bits16, Bits8};
-    use crate::{RegisterBus, Registers};
+    use crate::{executor, RegisterBus, Registers};
     use memory::Memory;
 
     #[test]
@@ -46,7 +46,7 @@ mod test_instruction_load_reg_a_hl_plus {
         let memory = Memory::default();
         let instruction = LoadRegAHLP::AHLP;
         let hl = register.borrow().get(Bits16::HL);
-        instruction.exec(register.clone(), memory.clone());
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(
             register.borrow().get(Bits8::A),
             memory.borrow().get(hl).unwrap()
