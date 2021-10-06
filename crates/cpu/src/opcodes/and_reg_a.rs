@@ -55,7 +55,7 @@ impl AndRegA {
             }
             AndRegA::A8b => registers.clone().next_pc(memory.clone()).await.unwrap(),
         };
-        let data = and(data, registers.borrow().get(Bits8::A));
+        let data = and(registers.borrow().get(Bits8::A), data);
         registers.borrow_mut().set(Bits16::AF, data);
     }
 }
