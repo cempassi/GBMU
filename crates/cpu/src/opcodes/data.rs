@@ -1,4 +1,5 @@
 pub(crate) mod arithmetic;
+pub(crate) mod consts;
 
 pub use arithmetic::Add;
 

@@ -1,10 +1,6 @@
+use crate::opcodes::data::consts::{MAX_BIT11, MAX_BIT15, MAX_BIT3, MAX_BIT7};
 use crate::opcodes::data::Data;
 use crate::Flags;
-
-const MAX_BIT7: usize = (1 << 8) - 1;
-const MAX_BIT3: usize = (1 << 4) - 1;
-const MAX_BIT11: usize = (1 << 12) - 1;
-const MAX_BIT15: usize = (1 << 16) - 1;
 
 fn carry(value: usize, nbr: usize, c: usize, max_c: usize, max_h: usize) -> (usize, Flags) {
     let data = (value + nbr as usize + c as usize) & max_c;

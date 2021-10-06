@@ -1,12 +1,10 @@
 use super::super::area::Bits8;
-use crate::area::Bits16;
+use crate::area::{Bits16, Flag};
 use crate::bus::RegisterBus;
 use crate::cpu::Registers;
-use crate::Flags;
+use crate::opcodes::data::consts::MAX_BIT3;
 use memory::{Async, Memory};
 use num_enum::TryFromPrimitive;
-
-const MAX_BIT2: u8 = (1 << 3) - 1;
 
 /// INC n
 /// Description:
@@ -37,43 +35,36 @@ pub enum Increment {
     HL = 0x34,
 }
 
-fn increment_reg(dst: Bits8, register: Registers) -> Flags {
-    let mut flag = Flags::default();
-    let data = register.borrow().get(dst);
-    flag.set_h((data & MAX_BIT2) + (0x01 & MAX_BIT2) > MAX_BIT2);
-    let data = data.wrapping_add(1);
-    register.borrow_mut().set(dst, data);
-    flag.set_z(data == 0);
-    flag.set_n(false);
-    flag
-}
-
 impl Increment {
     pub async fn exec(self, registers: Registers, memory: Memory) {
-        let flag = match self {
-            Increment::A => increment_reg(Bits8::A, registers.clone()),
-            Increment::B => increment_reg(Bits8::B, registers.clone()),
-            Increment::C => increment_reg(Bits8::C, registers.clone()),
-            Increment::D => increment_reg(Bits8::D, registers.clone()),
-            Increment::E => increment_reg(Bits8::E, registers.clone()),
-            Increment::H => increment_reg(Bits8::H, registers.clone()),
-            Increment::L => increment_reg(Bits8::L, registers.clone()),
-            Increment::HL => {
-                let mut flag = Flags::default();
-                let dst = registers.borrow().get(Bits16::HL);
-                let data = <Memory as Async>::get(memory.clone(), dst).await.unwrap();
-                flag.set_h((data & MAX_BIT2) + (0x01 & MAX_BIT2) > MAX_BIT2);
-                let data = data.wrapping_add(1);
-                <Memory as Async>::set(memory, dst, data).await.unwrap();
-                flag.set_z(data == 0);
-                flag.set_n(false);
-                flag
-            }
+        let data = if self == Increment::HL {
+            let src = registers.borrow().get(Bits16::HL);
+            let data = <Memory as Async>::get(memory.clone(), src).await.unwrap();
+            <Memory as Async>::set(memory.clone(), src, data.wrapping_add(1))
+                .await
+                .unwrap();
+            data
+        } else {
+            let src = match self {
+                Increment::A => Bits8::A,
+                Increment::B => Bits8::B,
+                Increment::C => Bits8::C,
+                Increment::D => Bits8::D,
+                Increment::E => Bits8::E,
+                Increment::H => Bits8::H,
+                Increment::L => Bits8::L,
+                Increment::HL => unreachable!(),
+            };
+            let data = registers.borrow_mut().get(src);
+            registers.borrow_mut().set(src, data.wrapping_add(1));
+            data
         };
-        let old_flag = registers.borrow().get(Bits8::F);
-        registers
-            .borrow_mut()
-            .set(Bits8::F, old_flag | Flags::into_bytes(flag)[0]); //flag 'not affected' C-a-d OU avec le nouveau flag et l'ancien ..
+        registers.borrow_mut().set(Flag::Z, data == 0);
+        registers.borrow_mut().set(
+            Flag::H,
+            (data & MAX_BIT3 as u8) + (1 & MAX_BIT3 as u8) > MAX_BIT3 as u8,
+        );
+        registers.borrow_mut().set(Flag::N, false);
     }
 }
 
