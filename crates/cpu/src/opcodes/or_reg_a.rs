@@ -59,7 +59,7 @@ impl OrRegA {
                 <Memory as Async>::get(memory, src).await.unwrap()
             }
         };
-        let data = or(data, registers.borrow().get(Bits8::A));
+        let data = or(registers.borrow().get(Bits8::A), data);
         registers.borrow_mut().set(Bits16::AF, data);
     }
 }
