@@ -61,7 +61,7 @@ impl Cpu {
         } else if let Ok(operation) = SubRegA::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadRegABCDE::try_from_primitive(opcode) {
-            operation.exec(self.registers, self.memory);
+            operation.exec(self.registers, self.memory).await;
         } else {
             println!("Not implemented!");
         }
