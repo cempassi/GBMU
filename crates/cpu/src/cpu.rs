@@ -52,29 +52,12 @@ impl Cpu {
     /// JPC = 0xda
     pub fn flags_conditions(opcode: u8, registers: Registers) -> bool {
         match opcode {
-            0xc2 => {
-                if registers.borrow().get(Flag::Z) {
-                    return false;
-                }
-            }
-            0xca => {
-                if !registers.borrow().get(Flag::Z) {
-                    return false;
-                }
-            }
-            0xd2 => {
-                if registers.borrow().get(Flag::C) {
-                    return false;
-                }
-            }
-            0xda => {
-                if !registers.borrow().get(Flag::C) {
-                    return false;
-                }
-            }
-            _ => unreachable!(), // return false
+            0xc2 => !registers.borrow().get(Flag::Z),
+            0xca => registers.borrow().get(Flag::Z),
+            0xd2 => !registers.borrow().get(Flag::C),
+            0xda => registers.borrow().get(Flag::C),
+            _ => false,
         }
-        true
     }
 
     /// Pops a 16-bit value from the stack, updating the stack pointer register.

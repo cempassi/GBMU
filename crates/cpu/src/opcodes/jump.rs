@@ -1,5 +1,6 @@
 use crate::area::Bits16;
 use crate::cpu::Registers;
+use crate::nextpc::NextPc;
 use crate::{Cpu, RegisterBus};
 use memory::{Async, Memory};
 use num_enum::TryFromPrimitive;
@@ -38,13 +39,54 @@ impl Jump {
                 if !Cpu::flags_conditions(self as u8, registers.clone()) {
                     return;
                 }
-                Bits16::PC
+                registers.clone().next_pc(memory.clone()).await.unwrap()
             }
-            Jump::JPNN => Bits16::PC,
-            Jump::JPHL => Bits16::HL,
+            Jump::JPNN => registers.clone().next_pc(memory.clone()).await.unwrap(),
+            Jump::JPHL => registers.borrow().get(Bits16::HL),
         };
-        let src = registers.borrow().get(src);
         let data = <Memory as Async<u16>>::get(memory, src).await.unwrap();
         Cpu::jump(registers.clone(), data);
+    }
+}
+
+#[cfg(test)]
+mod test_instruction_jump {
+    use super::Jump;
+    use crate::area::{Bits16, Flag};
+    use crate::{executor, RegisterBus, Registers};
+    use memory::Memory;
+
+    #[test]
+    fn test_jump_hl() {
+        let register = Registers::default();
+        let memory = Memory::default();
+        let instruction = Jump::JPHL;
+        register.borrow_mut().set(Bits16::HL, 0x0042);
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        assert_eq!(register.borrow().get(Bits16::PC), 0xea10);
+    }
+
+    #[test]
+    fn test_jump_if_c() {
+        let register = Registers::default();
+        let memory = Memory::default();
+        let instruction = Jump::JPC;
+        register.borrow_mut().set(Flag::C, true);
+        register.borrow_mut().set(Bits16::PC, 0x4242);
+        assert_eq!(register.borrow().get(Bits16::PC), 0x4242);
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        assert_eq!(register.borrow().get(Bits16::PC), 0x31fe);
+    }
+
+    #[test]
+    fn test_jump_if_no_z() {
+        let register = Registers::default();
+        let memory = Memory::default();
+        let instruction = Jump::JPNZ;
+        register.borrow_mut().set(Flag::Z, true);
+        register.borrow_mut().set(Bits16::PC, 0x4242);
+        assert_eq!(register.borrow().get(Bits16::PC), 0x4242);
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        assert_eq!(register.borrow().get(Bits16::PC), 0x4242);
     }
 }
