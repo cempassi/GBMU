@@ -1,4 +1,5 @@
 pub use crate::interface::{NewRegisters, Registers};
+use crate::opcodes::Call;
 use crate::opcodes::Jump;
 use crate::opcodes::Pop;
 use crate::opcodes::Push;
@@ -109,6 +110,8 @@ impl Cpu {
 
         if opcode == 0xCB {
             self.prefix_cb().await;
+        } else if let Ok(operation) = Call::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = Pop::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = Push::try_from_primitive(opcode) {

@@ -1,3 +1,4 @@
+mod call;
 mod consts;
 mod jump;
 mod pop;
@@ -6,6 +7,7 @@ mod rel_jump;
 mod returns;
 mod rotate_left;
 
+pub use call::Call;
 pub use jump::Jump;
 pub use pop::Pop;
 pub use push::Push;
