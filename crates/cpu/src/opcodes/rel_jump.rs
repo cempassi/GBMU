@@ -1,7 +1,8 @@
 use crate::area::Bits16;
 use crate::bus::RegisterBus;
-use crate::cpu::{signed, Registers};
+use crate::cpu::Registers;
 use crate::nextpc::NextPc;
+use crate::opcodes::data::arithmetic::signed;
 use crate::Cpu;
 use memory::Memory;
 use num_enum::TryFromPrimitive;

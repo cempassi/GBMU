@@ -1,4 +1,6 @@
 pub use crate::interface::{NewRegisters, Registers};
+use crate::opcodes::consts;
+use crate::opcodes::AddRegA;
 use crate::opcodes::Call;
 use crate::opcodes::Jump;
 use crate::opcodes::Pop;
@@ -20,15 +22,6 @@ pub struct Cpu {
     memory: Memory,
     registers: Registers,
     interrupts: bool,
-}
-
-/// Temporary here till i do the Alu Instruction
-pub fn signed(value: u8) -> u16 {
-    if value & 0x80 != 0 {
-        0xff00 | value as u16
-    } else {
-        value as u16
-    }
 }
 
 impl Cpu {
@@ -67,10 +60,10 @@ impl Cpu {
     /// JPC = 0xda      RETC = 0xd8,
     pub fn flags_conditions(opcode: u8, registers: Registers) -> bool {
         match opcode {
-            0xc2 | 0xc0 => !registers.borrow().get(Flag::Z),
-            0xca | 0xd0 => registers.borrow().get(Flag::Z),
-            0xd2 | 0xc8 => !registers.borrow().get(Flag::C),
-            0xda | 0xd8 => registers.borrow().get(Flag::C),
+            consts::JUMP_NO_Z | consts::RET_NO_Z => !registers.borrow().get(Flag::Z),
+            consts::JUMP_Z | consts::RET_Z => registers.borrow().get(Flag::Z),
+            consts::JUMP_NO_C | consts::RET_NO_C => !registers.borrow().get(Flag::C),
+            consts::JUMP_C | consts::RET_C => registers.borrow().get(Flag::C),
             _ => false,
         }
     }
@@ -112,6 +105,8 @@ impl Cpu {
         if opcode == 0xCB {
             self.prefix_cb().await;
         } else if let Ok(operation) = Call::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = AddRegA::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = Pop::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;

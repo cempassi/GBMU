@@ -1,5 +1,7 @@
+mod add_reg_a;
 mod call;
-mod consts;
+pub(crate) mod consts;
+mod data;
 mod jump;
 mod pop;
 mod push;
@@ -8,6 +10,7 @@ mod restart;
 mod returns;
 mod rotate_left;
 
+pub use add_reg_a::AddRegA;
 pub use call::Call;
 pub use jump::Jump;
 pub use pop::Pop;

@@ -1,3 +1,13 @@
 pub const CARRY: bool = true;
 pub const NO_CARRY: bool = false;
 pub const BIT7: u8 = 0b10000000;
+pub const BIT7_MINUS_1: usize = (1 << 8) - 1; //0x7f;
+pub const BIT3_MINUS_1: usize = (1 << 4) - 1; //0x0f;
+pub const JUMP_NO_Z: u8 = 0xc2;
+pub const JUMP_Z: u8 = 0xca;
+pub const JUMP_NO_C: u8 = 0xd2;
+pub const JUMP_C: u8 = 0xda;
+pub const RET_NO_Z: u8 = 0xc0;
+pub const RET_NO_C: u8 = 0xd0;
+pub const RET_Z: u8 = 0xc8;
+pub const RET_C: u8 = 0xd8;
