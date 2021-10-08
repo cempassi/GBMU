@@ -1,12 +1,13 @@
 pub use crate::interface::{NewRegisters, Registers};
+use crate::opcodes::Jump;
 use crate::opcodes::Pop;
 use crate::opcodes::Push;
 use crate::opcodes::RotateLeft;
 
-use crate::area::Bits16;
+use crate::area::{Bits16, Flag};
 use crate::nextpc::NextPc;
 use crate::RegisterBus;
-use memory::Memory;
+use memory::{Async, Memory};
 use num_enum::TryFromPrimitive;
 use shared::Error;
 
@@ -45,18 +46,57 @@ impl Cpu {
         }
     }
 
+    /// JPNZ = 0xc2
+    /// JPZ = 0xcA
+    /// JPNC = 0xd2
+    /// JPC = 0xda
+    pub fn flags_conditions(opcode: u8, registers: Registers) -> bool {
+        match opcode {
+            0xc2 => {
+                if registers.borrow().get(Flag::Z) {
+                    return false;
+                }
+            }
+            0xca => {
+                if !registers.borrow().get(Flag::Z) {
+                    return false;
+                }
+            }
+            0xd2 => {
+                if registers.borrow().get(Flag::C) {
+                    return false;
+                }
+            }
+            0xda => {
+                if !registers.borrow().get(Flag::C) {
+                    return false;
+                }
+            }
+            _ => unreachable!(), // return false
+        }
+        true
+    }
+
     /// Pops a 16-bit value from the stack, updating the stack pointer register.
     pub async fn pop(registers: Registers, memory: Memory) -> Result<u16, Error> {
-        let data = registers.borrow().get(Bits16::SP);
-        registers.borrow_mut().set(Bits16::SP, data.wrapping_add(2));
-        memory.borrow().get_u16(data)
+        let dst = registers.borrow().get(Bits16::SP);
+        registers.borrow_mut().set(Bits16::SP, dst.wrapping_add(2));
+        Ok(<Memory as Async<u16>>::get(memory, dst).await.unwrap())
     }
 
     /// Pushes a 16-bit value to the stack, updating the stack pointer register.
     pub async fn push(registers: Registers, memory: Memory, data: u16) -> Result<(), Error> {
         let dst = registers.borrow().get(Bits16::SP);
         registers.borrow_mut().set(Bits16::SP, dst.wrapping_sub(2));
-        memory.borrow_mut().set_u16(dst, data)
+        <Memory as Async<u16>>::set(memory, dst, data)
+            .await
+            .unwrap();
+        Ok(())
+    }
+
+    ///Jump to a 16 bit Address pointed by Data
+    pub fn jump(registers: Registers, data: u16) {
+        registers.borrow_mut().set(Bits16::PC, data);
     }
 
     /// 1 - Get OpCode from PC
@@ -76,6 +116,8 @@ impl Cpu {
         } else if let Ok(operation) = Pop::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = Push::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = Jump::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else {
             println!("Not implemented!");
