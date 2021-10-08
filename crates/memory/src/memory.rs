@@ -32,7 +32,7 @@ impl Default for Memory {
 }
 
 impl Memory {
-    pub fn get(&self, address: u16) -> Result<u8, Error> {
+    pub fn get_u8(&self, address: u16) -> Result<u8, Error> {
         match address {
             consts::BIOS_MIN..=consts::BIOS_MAX if self.state == state::Rom::Bios => {
                 Ok(self.bios.borrow().get(Area::Bios.relative(address)))
@@ -47,7 +47,7 @@ impl Memory {
         }
     }
 
-    pub fn set(&mut self, address: u16, data: u8) -> Result<(), Error> {
+    pub fn set_u8(&mut self, address: u16, data: u8) -> Result<(), Error> {
         match address {
             consts::WRAM_MIN..=consts::WRAM_MAX => {
                 self.wram
@@ -65,9 +65,9 @@ impl Memory {
         }
     }
 
-    pub fn get_16(&self, address: u16) -> Result<u16, Error> {
-        match self.get(address) {
-            Ok(left) => match self.get(address) {
+    pub fn get_u16(&self, address: u16) -> Result<u16, Error> {
+        match self.get_u8(address) {
+            Ok(left) => match self.get_u8(address + 1) {
                 Ok(right) => Ok((left as u16) << 8 | right as u16),
                 Err(error) => Err(error),
             },
@@ -75,9 +75,9 @@ impl Memory {
         }
     }
 
-    pub fn set_16(&mut self, address: u16, data: u16) -> Result<(), Error> {
-        match self.set(address, data as u8) {
-            Ok(_) => match self.set(address + 1, (data >> 8) as u8) {
+    pub fn set_u16(&mut self, address: u16, data: u16) -> Result<(), Error> {
+        match self.set_u8(address, data as u8) {
+            Ok(_) => match self.set_u8(address + 1, (data >> 8) as u8) {
                 Ok(_) => Ok(()),
                 Err(error) => Err(error),
             },
@@ -130,37 +130,37 @@ mod test_memory {
     fn test_invalid_read() {
         let memory = super::Memory::default();
 
-        assert!(memory.get(0xfea1).is_err())
+        assert!(memory.get_u8(0xfea1).is_err())
     }
 
     #[test]
     fn test_invalid_write() {
         let mut memory = super::Memory::default();
 
-        assert!(memory.set(0xfea1, 42).is_err())
+        assert!(memory.set_u8(0xfea1, 42).is_err())
     }
 
     #[test]
     fn test_read_wram() {
         let memory = super::Memory::default();
 
-        assert!(memory.get(0xc010).is_ok());
+        assert!(memory.get_u8(0xc010).is_ok());
     }
 
     #[test]
     fn test_write_wram() {
         let mut memory = super::Memory::default();
 
-        assert!(memory.set(0xc010, 42).is_ok());
+        assert!(memory.set_u8(0xc010, 42).is_ok());
     }
 
     #[test]
     fn test_write_read_wram() {
         let mut memory = super::Memory::default();
 
-        assert!(memory.set(0xc010, 42).is_ok());
+        assert!(memory.set_u8(0xc010, 42).is_ok());
 
-        let read = memory.get(0xc010);
+        let read = memory.get_u8(0xc010);
 
         assert!(read.is_ok());
         assert_eq!(read.unwrap(), 42);
@@ -170,9 +170,9 @@ mod test_memory {
     fn test_write_read_u16() {
         let mut memory = super::Memory::default();
 
-        assert!(memory.set_16(0xc010, 0x4242).is_ok());
+        assert!(memory.set_u16(0xc010, 0x4242).is_ok());
 
-        let read = memory.get_16(0xc010);
+        let read = memory.get_u16(0xc010);
 
         assert!(read.is_ok());
         assert_eq!(read.unwrap(), 0x4242);

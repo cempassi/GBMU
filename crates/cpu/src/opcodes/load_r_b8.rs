@@ -61,7 +61,7 @@ mod test_instruction_load_8bit_into_reg {
         let register = Registers::default();
         let memory = Memory::default();
         let ldr8b = LoadR8b::B;
-        let byte = memory.borrow().get(register.borrow().pc).unwrap();
+        let byte = memory.borrow().get_u8(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
         let future = ldr8b.exec(register.clone(), memory.clone());
         executor::execute(Box::pin(future));

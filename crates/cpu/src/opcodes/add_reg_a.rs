@@ -75,11 +75,11 @@ impl AddRegA {
             AddRegA::A8b => Data::NoCarry(registers.clone().next_pc(memory.clone()).await.unwrap()),
             AddRegA::AHL => {
                 let src = registers.borrow().get(Bits16::HL);
-                Data::NoCarry(<Memory as Async>::get(memory, src).await.unwrap())
+                Data::NoCarry(<Memory as Async<u8>>::get(memory, src).await.unwrap())
             }
             AddRegA::AcHL => {
                 let src = registers.borrow().get(Bits16::HL);
-                Data::Carry(<Memory as Async>::get(memory, src).await.unwrap())
+                Data::Carry(<Memory as Async<u8>>::get(memory, src).await.unwrap())
             }
         };
         let data = data.add(registers.borrow().get(Bits8::A));

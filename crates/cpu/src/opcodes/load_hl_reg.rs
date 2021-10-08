@@ -44,7 +44,7 @@ impl LoadHLReg {
         };
         let data = registers.borrow_mut().get(src);
         let dst = registers.borrow().get(Bits16::HL);
-        memory.borrow_mut().set(dst, data).unwrap()
+        memory.borrow_mut().set_u8(dst, data).unwrap()
     }
 }
 

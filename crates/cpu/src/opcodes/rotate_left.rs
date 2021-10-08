@@ -73,7 +73,7 @@ fn rotate(registers: Registers, area: Bits8, is_carried: bool) {
 
 async fn rotate_hl(registers: Registers, memory: Memory, is_carried: bool) {
     let address = registers.borrow().get(Bits16::HL);
-    let mut data = <Memory as Async>::get(memory.clone(), address)
+    let mut data = <Memory as Async<u8>>::get(memory.clone(), address)
         .await
         .unwrap();
     let carry = (data & BIT7) != 0;
@@ -82,7 +82,7 @@ async fn rotate_hl(registers: Registers, memory: Memory, is_carried: bool) {
         true => data |= registers.borrow().get(Flag::C) as u8,
         false => data |= carry as u8,
     };
-    <Memory as Async>::set(memory.clone(), address, data)
+    <Memory as Async<u8>>::set(memory.clone(), address, data)
         .await
         .unwrap();
     registers.borrow_mut().set(Flag::C, carry);
@@ -170,11 +170,11 @@ mod test_rotate_left {
         let memory = Memory::default();
         let instruction = RotateLeft::CHL;
         register.borrow_mut().set(Bits16::HL, hl);
-        memory.borrow_mut().set(hl, src).unwrap();
+        memory.borrow_mut().set_u8(hl, src).unwrap();
 
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
 
-        let result = memory.borrow_mut().get(hl).unwrap();
+        let result = memory.borrow().get_u8(hl).unwrap();
         let carry = register.borrow_mut().get(Flag::C);
         println!("result  : {:#b}", result);
         println!("expected: {:#b}", expected);
@@ -192,11 +192,11 @@ mod test_rotate_left {
         let memory = Memory::default();
         let instruction = RotateLeft::HL;
         register.borrow_mut().set(Bits16::HL, hl);
-        memory.borrow_mut().set(hl, src).unwrap();
+        memory.borrow_mut().set_u8(hl, src).unwrap();
 
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
 
-        let result = memory.borrow_mut().get(hl).unwrap();
+        let result = memory.borrow().get_u8(hl).unwrap();
         let carry = register.borrow_mut().get(Flag::C);
         println!("result  : {:#b}", result);
         println!("expected: {:#b}", expected);
