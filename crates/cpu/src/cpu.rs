@@ -2,6 +2,7 @@ pub use crate::interface::{NewRegisters, Registers};
 use crate::opcodes::Jump;
 use crate::opcodes::Pop;
 use crate::opcodes::Push;
+use crate::opcodes::Return;
 use crate::opcodes::RotateLeft;
 
 use crate::area::{Bits16, Flag};
@@ -15,6 +16,7 @@ use shared::Error;
 pub struct Cpu {
     memory: Memory,
     registers: Registers,
+    interrupts: bool,
 }
 
 impl Cpu {
@@ -22,6 +24,7 @@ impl Cpu {
         Self {
             memory,
             registers: <Registers as NewRegisters>::new(),
+            interrupts: false,
         }
     }
 
@@ -46,16 +49,16 @@ impl Cpu {
         }
     }
 
-    /// JPNZ = 0xc2
-    /// JPZ = 0xcA
-    /// JPNC = 0xd2
-    /// JPC = 0xda
+    /// JPNZ = 0xc2     RETNZ = 0xc0,
+    /// JPZ = 0xcA      RETNC = 0xd0,
+    /// JPNC = 0xd2     RETZ = 0xc8,
+    /// JPC = 0xda      RETC = 0xd8,
     pub fn flags_conditions(opcode: u8, registers: Registers) -> bool {
         match opcode {
-            0xc2 => !registers.borrow().get(Flag::Z),
-            0xca => registers.borrow().get(Flag::Z),
-            0xd2 => !registers.borrow().get(Flag::C),
-            0xda => registers.borrow().get(Flag::C),
+            0xc2 | 0xc0 => !registers.borrow().get(Flag::Z),
+            0xca | 0xd0 => registers.borrow().get(Flag::Z),
+            0xd2 | 0xc8 => !registers.borrow().get(Flag::C),
+            0xda | 0xd8 => registers.borrow().get(Flag::C),
             _ => false,
         }
     }
@@ -86,7 +89,7 @@ impl Cpu {
     /// 2 - Convert Opcode With Tryfrom
     /// 3 - Tryfrom to Instruction
     /// 4 - Exec Instructions -> Do the Maths put in Dest and set Flags
-    pub async fn run(self) -> u8 {
+    pub async fn run(mut self) -> u8 {
         let opcode: u8 = self
             .registers
             .clone()
@@ -102,6 +105,10 @@ impl Cpu {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = Jump::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = Return::try_from_primitive(opcode) {
+            operation
+                .exec(self.registers, self.memory, &mut self.interrupts)
+                .await;
         } else {
             println!("Not implemented!");
         }

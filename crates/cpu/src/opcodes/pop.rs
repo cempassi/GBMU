@@ -33,7 +33,6 @@ impl Pop {
             Pop::HL => Bits16::HL,
         };
         let data = Cpu::pop(registers.clone(), memory.clone()).await.unwrap();
-        dbg!("data {:?}", data);
         registers.borrow_mut().set(dst, data);
     }
 }
