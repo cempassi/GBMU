@@ -4,6 +4,7 @@ use crate::opcodes::Jump;
 use crate::opcodes::Pop;
 use crate::opcodes::Push;
 use crate::opcodes::RelJump;
+use crate::opcodes::Restart;
 use crate::opcodes::Return;
 use crate::opcodes::RotateLeft;
 
@@ -119,6 +120,8 @@ impl Cpu {
         } else if let Ok(operation) = Jump::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = RelJump::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = Restart::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = Return::try_from_primitive(opcode) {
             if opcode == 0xd9 {
