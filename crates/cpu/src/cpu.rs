@@ -1,9 +1,13 @@
 pub use crate::interface::{NewRegisters, Registers};
+use crate::opcodes::Pop;
 use crate::opcodes::RotateLeft;
 
+use crate::area::Bits16;
 use crate::nextpc::NextPc;
+use crate::RegisterBus;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
+use shared::Error;
 
 #[derive(Default, Clone)]
 pub struct Cpu {
@@ -40,6 +44,13 @@ impl Cpu {
         }
     }
 
+    /// Pops a 16-bit value from the stack, updating the stack pointer register.
+    pub async fn pop(registers: Registers, memory: Memory) -> Result<u16, Error> {
+        let data = registers.borrow().get(Bits16::SP);
+        registers.borrow_mut().set(Bits16::SP, data.wrapping_add(2));
+        memory.borrow().get_u16(data)
+    }
+
     /// 1 - Get OpCode from PC
     /// 2 - Convert Opcode With Tryfrom
     /// 3 - Tryfrom to Instruction
@@ -54,6 +65,8 @@ impl Cpu {
 
         if opcode == 0xCB {
             self.prefix_cb().await;
+        } else if let Ok(operation) = Pop::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
         } else {
             println!("Not implemented!");
         }
