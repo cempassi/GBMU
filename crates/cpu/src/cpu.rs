@@ -1,5 +1,6 @@
 pub use crate::interface::{NewRegisters, Registers};
 use crate::opcodes::Pop;
+use crate::opcodes::Push;
 use crate::opcodes::RotateLeft;
 
 use crate::area::Bits16;
@@ -51,6 +52,13 @@ impl Cpu {
         memory.borrow().get_u16(data)
     }
 
+    /// Pushes a 16-bit value to the stack, updating the stack pointer register.
+    pub async fn push(registers: Registers, memory: Memory, data: u16) -> Result<(), Error> {
+        let dst = registers.borrow().get(Bits16::SP);
+        registers.borrow_mut().set(Bits16::SP, dst.wrapping_sub(2));
+        memory.borrow_mut().set_u16(dst, data)
+    }
+
     /// 1 - Get OpCode from PC
     /// 2 - Convert Opcode With Tryfrom
     /// 3 - Tryfrom to Instruction
@@ -66,6 +74,8 @@ impl Cpu {
         if opcode == 0xCB {
             self.prefix_cb().await;
         } else if let Ok(operation) = Pop::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = Push::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else {
             println!("Not implemented!");
