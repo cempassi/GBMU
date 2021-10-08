@@ -36,17 +36,15 @@ pub enum Return {
 }
 
 impl Return {
-    pub async fn exec(self, registers: Registers, memory: Memory, interrupt: &mut bool) {
+    pub async fn exec(self, registers: Registers, memory: Memory) {
         match self {
             Return::RETNZ | Return::RETZ | Return::RETNC | Return::RETC => {
                 if !Cpu::flags_conditions(self as u8, registers.clone()) {
                     return;
                 }
             }
-            Return::RETI => *interrupt = true,
-            Return::RETNN => (),
+            Return::RETNN | Return::RETI => (),
         };
-        dbg!("interrupt {:?}", interrupt);
         let data = Cpu::pop(registers.clone(), memory.clone()).await.unwrap();
         registers.borrow_mut().set(Bits16::PC, data);
         Jump::JPNN.exec(registers.clone(), memory.clone()).await;
@@ -61,18 +59,12 @@ mod test_instruction_return {
     use memory::Memory;
 
     #[test]
-    fn test_return_interrupt() {
+    fn test_return() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Return::RETI;
-        let interrupt = false;
-        executor::execute(Box::pin(instruction.exec(
-            register.clone(),
-            memory.clone(),
-            &mut interrupt.clone(),
-        )));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(register.borrow().get(Bits16::PC), 0x31fe);
-        assert_eq!(interrupt, true); // NOT WORKING
     }
 
     #[test]
@@ -81,11 +73,7 @@ mod test_instruction_return {
         let memory = Memory::default();
         let instruction = Return::RETZ;
         register.borrow_mut().set(Flag::Z, true);
-        executor::execute(Box::pin(instruction.exec(
-            register.clone(),
-            memory.clone(),
-            &mut false,
-        )));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(register.borrow().get(Bits16::PC), 0x31fe);
     }
 }

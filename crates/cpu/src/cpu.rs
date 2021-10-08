@@ -106,9 +106,10 @@ impl Cpu {
         } else if let Ok(operation) = Jump::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = Return::try_from_primitive(opcode) {
-            operation
-                .exec(self.registers, self.memory, &mut self.interrupts)
-                .await;
+            if opcode == 0xd9 {
+                self.interrupts = true
+            }
+            operation.exec(self.registers, self.memory).await;
         } else {
             println!("Not implemented!");
         }
