@@ -72,10 +72,10 @@ mod test_instruction_jump {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = RelJump::JRNZ;
-        register.borrow_mut().set(Flag::Z, true);
+        register.borrow_mut().set(Flag::Z, false);
         register.borrow_mut().set(Bits16::PC, 0x4242);
         assert_eq!(register.borrow().get(Bits16::PC), 0x4242);
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits16::PC), 0x4242);
+        assert_eq!(register.borrow().get(Bits16::PC), 0);
     }
 }

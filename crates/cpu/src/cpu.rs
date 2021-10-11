@@ -103,16 +103,24 @@ impl Cpu {
         }
     }
 
-    /// JPNZ = 0xc2     RETNZ = 0xc0,
-    /// JPZ = 0xcA      RETNC = 0xd0,
-    /// JPNC = 0xd2     RETZ = 0xc8,
-    /// JPC = 0xda      RETC = 0xd8,
+    /// JPNZ = 0xc2     RETNZ = 0xc0    JRNZ = 0x20
+    /// JPZ  = 0xcA     RETNC = 0xd0    JRZ  = 0x28
+    /// JPNC = 0xd2     RETZ  = 0xc8    JRNC = 0x30
+    /// JPC  = 0xda     RETC  = 0xd8    JRC  = 0x38
     pub fn flags_conditions(opcode: u8, registers: Registers) -> bool {
         match opcode {
-            consts::JUMP_NO_Z | consts::RET_NO_Z => !registers.borrow().get(Flag::Z),
-            consts::JUMP_Z | consts::RET_Z => registers.borrow().get(Flag::Z),
-            consts::JUMP_NO_C | consts::RET_NO_C => !registers.borrow().get(Flag::C),
-            consts::JUMP_C | consts::RET_C => registers.borrow().get(Flag::C),
+            consts::RELATIVE_JUMP_NO_Z | consts::JUMP_NO_Z | consts::RET_NO_Z => {
+                !registers.borrow().get(Flag::Z)
+            }
+            consts::RELATIVE_JUMP_Z | consts::JUMP_Z | consts::RET_Z => {
+                registers.borrow().get(Flag::Z)
+            }
+            consts::RELATIVE_JUMP_NO_C | consts::JUMP_NO_C | consts::RET_NO_C => {
+                !registers.borrow().get(Flag::C)
+            }
+            consts::RELATIVE_JUMP_C | consts::JUMP_C | consts::RET_C => {
+                registers.borrow().get(Flag::C)
+            }
             _ => false,
         }
     }
