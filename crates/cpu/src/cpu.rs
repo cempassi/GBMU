@@ -45,9 +45,7 @@ use crate::opcodes::CCF;
 use crate::opcodes::SCF;
 
 use crate::area::{Bits16, Flag};
-use crate::consts::{
-    DI_INSTRUCTION, EI_INSTRUCTION, HALT_INSTRUCTION, NOP_INSTRUCTION, STOP_INSTRUCTION,
-};
+use crate::consts::{DI_INSTRUCTION, EI_INSTRUCTION, HALT_INSTRUCTION, NOP_INSTRUCTION, PREFIX_CB_INSTRUCTIONS, STOP_INSTRUCTION};
 use crate::nextpc::NextPc;
 use crate::RegisterBus;
 use memory::{Async, Memory};
@@ -141,7 +139,7 @@ impl Cpu {
             .await
             .unwrap();
 
-        if opcode == 0xCB {
+        if opcode == PREFIX_CB_INSTRUCTIONS {
             self.prefix_cb().await;
         } else if opcode == NOP_INSTRUCTION {
             dbg!("NOP Instruction does nothing");
