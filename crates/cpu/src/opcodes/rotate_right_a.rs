@@ -37,20 +37,18 @@ impl RotateRightA {
 #[cfg(test)]
 mod test_rotate_right_register_a {
     use super::RotateRightA;
-    use crate::area::{Bits16, Bits8, Flag};
+    use crate::area::{Bits8, Flag};
     use crate::{executor, RegisterBus, Registers};
-    use memory::Memory;
 
     #[test]
     fn test_rotate_right_register_a_no_carry() {
         let src = 0b00010001;
         let expected = 0b10001000;
         let register = Registers::default();
-        let memory = Memory::default();
         let instruction = RotateRightA::RRA;
         register.borrow_mut().set(Bits8::A, src);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(register.clone())));
 
         let result = register.borrow().get(Bits8::A);
         let carry = register.borrow_mut().get(Flag::C);
@@ -66,12 +64,11 @@ mod test_rotate_right_register_a {
         let src = 0b00010000;
         let expected = 0b10001000;
         let register = Registers::default();
-        let memory = Memory::default();
         let instruction = RotateRightA::RRCA;
         register.borrow_mut().set(Flag::C, true);
         register.borrow_mut().set(Bits8::A, src);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(register.clone())));
 
         let result = register.borrow_mut().get(Bits8::A);
         let carry = register.borrow_mut().get(Flag::C);
