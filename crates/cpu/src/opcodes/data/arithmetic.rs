@@ -1,4 +1,4 @@
-use crate::opcodes::consts::{BIT3_MINUS_1, BIT7_MINUS_1};
+use crate::opcodes::consts::{BIT11_MINUS_1, BIT15_MINUS_1, BIT3_MINUS_1, BIT7_MINUS_1};
 use crate::opcodes::data::Data;
 use crate::Flags;
 
@@ -32,6 +32,18 @@ impl Add<u8> for Data<u8> {
         };
         let (data, flag) = carry(value, nbr as usize, c, BIT7_MINUS_1, BIT3_MINUS_1);
         (data as u16) << 8 | Flags::into_bytes(flag)[0] as u16
+    }
+}
+
+impl Add<u16> for Data<u16> {
+    type Output = (u16, Flags);
+    fn add(&self, nbr: u16) -> Self::Output {
+        let (value, c) = match self {
+            Data::Carry(value) => (*value as usize, 1),
+            Data::NoCarry(value) => (*value as usize, 0),
+        };
+        let (data, flag) = carry(value, nbr as usize, c, BIT15_MINUS_1, BIT11_MINUS_1);
+        (data as u16, flag)
     }
 }
 
