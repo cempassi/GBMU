@@ -13,6 +13,7 @@ use crate::opcodes::IncRegN;
 use crate::opcodes::IncRegNN;
 use crate::opcodes::Jump;
 use crate::opcodes::LoadBCDERegA;
+use crate::opcodes::LoadHL8b;
 use crate::opcodes::LoadHLMRegA;
 use crate::opcodes::LoadHLPRegA;
 use crate::opcodes::LoadMem16bRegA;
@@ -227,6 +228,8 @@ impl Cpu {
         } else if let Ok(operation) = CmpRegA::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadR8b::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = LoadHL8b::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else {
             println!("Not implemented!");
