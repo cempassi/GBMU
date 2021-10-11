@@ -1,7 +1,3 @@
-pub const CARRY: bool = true;
-pub const NO_CARRY: bool = false;
-pub const BIT0: u8 = 0b00000001;
-pub const BIT7: u8 = 0b10000000;
 pub const BIT7_MINUS_1: usize = (1 << 8) - 1; //0x7f;
 pub const BIT3_MINUS_1: usize = (1 << 4) - 1; //0x0f;
 pub const BIT11_MINUS_1: usize = (1 << 11) - 1; //0x0fff;
