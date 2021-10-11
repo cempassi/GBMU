@@ -5,6 +5,7 @@ use crate::opcodes::Call;
 use crate::opcodes::Jump;
 use crate::opcodes::LoadMem8bRegA;
 use crate::opcodes::LoadMemCRegA;
+use crate::opcodes::LoadRegAMem8b;
 use crate::opcodes::LoadRegAMemC;
 use crate::opcodes::Pop;
 use crate::opcodes::Push;
@@ -134,6 +135,8 @@ impl Cpu {
         } else if let Ok(operation) = LoadMemCRegA::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadMem8bRegA::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = LoadRegAMem8b::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else {
             println!("Not implemented!");
