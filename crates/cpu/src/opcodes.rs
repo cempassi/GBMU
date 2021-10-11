@@ -12,12 +12,14 @@ mod restart;
 mod returns;
 mod rotate_left;
 mod sub_reg_a;
+mod load_mem_8b_reg_a;
 
 pub use add_reg_a::AddRegA;
 pub use call::Call;
 pub use jump::Jump;
 pub use load_reg_a_mem_c::LoadRegAMemC;
 pub use load_mem_c_reg_a::LoadMemCRegA;
+pub use load_mem_8b_reg_a::LoadMem8bRegA;
 pub use pop::Pop;
 pub use push::Push;
 pub use rel_jump::RelJump;
