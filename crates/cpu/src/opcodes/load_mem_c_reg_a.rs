@@ -26,7 +26,7 @@ impl LoadMemCRegA {
 }
 
 #[cfg(test)]
-mod test_instruction_memory_c_reg_a {
+mod test_instruction_load_memory_c_reg_a {
     use super::LoadMemCRegA;
     use super::ADDRESS_OFFSET;
     use crate::area::Bits8;
@@ -34,7 +34,7 @@ mod test_instruction_memory_c_reg_a {
     use memory::Memory;
 
     #[test]
-    fn test_memory_c_reg_a() {
+    fn test_load_memory_c_reg_a() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = LoadMemCRegA::CA;

@@ -35,7 +35,7 @@ mod test_instruction_load_reg_a_memory_c {
     use memory::Memory;
 
     #[test]
-    fn test_reg_a_memory_c() {
+    fn test_load_reg_a_memory_c() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = LoadRegAMemC::AC;

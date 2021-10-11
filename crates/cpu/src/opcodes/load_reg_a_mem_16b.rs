@@ -29,14 +29,14 @@ impl LoadMem16bRegA {
 }
 
 #[cfg(test)]
-mod test_instruction_memory_8bit_reg_a {
+mod test_instruction_load_memory_8bit_reg_a {
     use super::LoadMem16bRegA;
     use crate::area::Bits8;
     use crate::{executor, RegisterBus, Registers};
     use memory::Memory;
 
     #[test]
-    fn test_memory_16b_reg_a() {
+    fn test_load_memory_16b_reg_a() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = LoadMem16bRegA::LDRegA16b;
