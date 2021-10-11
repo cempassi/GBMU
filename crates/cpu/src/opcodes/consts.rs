@@ -11,3 +11,4 @@ pub const RET_NO_Z: u8 = 0xc0;
 pub const RET_NO_C: u8 = 0xd0;
 pub const RET_Z: u8 = 0xc8;
 pub const RET_C: u8 = 0xd8;
+pub const C_ADDRESS_OFFSET: u16 = 0xff00;
