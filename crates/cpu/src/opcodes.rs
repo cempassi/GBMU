@@ -2,6 +2,8 @@ mod add_reg_a;
 mod call;
 pub(crate) mod consts;
 mod data;
+mod decrement_u16;
+mod increment_u16;
 mod jump;
 mod load_mem_8b_reg_a;
 mod load_mem_c_reg_a;
@@ -17,6 +19,8 @@ mod sub_reg_a;
 
 pub use add_reg_a::AddRegA;
 pub use call::Call;
+pub use decrement_u16::DecRegNN;
+pub use increment_u16::IncRegNN;
 pub use jump::Jump;
 pub use load_mem_8b_reg_a::LoadMem8bRegA;
 pub use load_mem_c_reg_a::LoadMemCRegA;
