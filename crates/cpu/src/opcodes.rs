@@ -45,6 +45,7 @@ mod rotate_left;
 mod set_carry_flag;
 mod sub_reg_a;
 mod xor_reg_a;
+mod rotate_right;
 
 pub use add_reg_a::AddRegA;
 pub use add_reg_hl::AddRegHL;
@@ -84,6 +85,7 @@ pub use load_sp_hl::LoadRegSPRegHL;
 pub use or_reg_a::OrRegA;
 pub use pop::Pop;
 pub use push::Push;
+pub use rotate_right::RotateRight;
 pub use rel_jump::RelJump;
 pub use restart::Restart;
 pub use returns::Return;

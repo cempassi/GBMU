@@ -8,6 +8,8 @@ use crate::opcodes::CPLRegA;
 use crate::opcodes::Call;
 use crate::opcodes::CmpRegA;
 use crate::opcodes::DecAdjustRegA;
+use crate::opcodes::RotateLeft;
+use crate::opcodes::RotateRight;
 use crate::opcodes::DecRegN;
 use crate::opcodes::DecRegNN;
 use crate::opcodes::IncRegN;
@@ -93,6 +95,10 @@ impl Cpu {
 
         if let Ok(operation) = RotateLeft::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = RotateRight::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else {
+            println!("This prefix_cb {:?} is not implemented!", opcode);
         }
     }
 
