@@ -24,6 +24,7 @@ use crate::opcodes::LoadMemCRegA;
 use crate::opcodes::LoadR1R2;
 use crate::opcodes::LoadR8b;
 use crate::opcodes::LoadRR16b;
+use crate::opcodes::LoadRegABCDE;
 use crate::opcodes::LoadRegAHLM;
 use crate::opcodes::LoadRegAHLP;
 use crate::opcodes::LoadRegAMem16b;
@@ -45,7 +46,10 @@ use crate::opcodes::CCF;
 use crate::opcodes::SCF;
 
 use crate::area::{Bits16, Flag};
-use crate::consts::{DI_INSTRUCTION, EI_INSTRUCTION, HALT_INSTRUCTION, NOP_INSTRUCTION, PREFIX_CB_INSTRUCTIONS, STOP_INSTRUCTION};
+use crate::consts::{
+    DI_INSTRUCTION, EI_INSTRUCTION, HALT_INSTRUCTION, NOP_INSTRUCTION, PREFIX_CB_INSTRUCTIONS,
+    STOP_INSTRUCTION,
+};
 use crate::nextpc::NextPc;
 use crate::RegisterBus;
 use memory::{Async, Memory};
@@ -240,6 +244,8 @@ impl Cpu {
         } else if let Ok(operation) = LoadRegHL::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadRR16b::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = LoadRegABCDE::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else {
             println!("Not implemented!");
