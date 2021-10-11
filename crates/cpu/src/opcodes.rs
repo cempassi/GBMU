@@ -25,6 +25,7 @@ mod restart;
 mod returns;
 mod rotate_left;
 mod sub_reg_a;
+mod xor_reg_a;
 
 pub use add_reg_a::AddRegA;
 pub use and_reg_a::AndRegA;
@@ -51,3 +52,4 @@ pub use restart::Restart;
 pub use returns::Return;
 pub use rotate_left::RotateLeft;
 pub use sub_reg_a::SubRegA;
+pub use xor_reg_a::XorRegA;

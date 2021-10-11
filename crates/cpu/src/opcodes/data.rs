@@ -2,7 +2,7 @@ pub(crate) mod arithmetic;
 pub(crate) mod logical;
 
 pub use arithmetic::Add;
-pub use logical::{and, or};
+pub use logical::{and, or, xor};
 
 pub enum Data<T> {
     Carry(T),
