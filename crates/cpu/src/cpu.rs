@@ -9,6 +9,7 @@ use crate::opcodes::RelJump;
 use crate::opcodes::Restart;
 use crate::opcodes::Return;
 use crate::opcodes::RotateLeft;
+use crate::opcodes::SubRegA;
 
 use crate::area::{Bits16, Flag};
 use crate::nextpc::NextPc;
@@ -122,6 +123,8 @@ impl Cpu {
             if opcode == 0xd9 {
                 self.interrupts = true
             }
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = SubRegA::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else {
             println!("Not implemented!");

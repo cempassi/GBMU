@@ -9,6 +9,7 @@ mod rel_jump;
 mod restart;
 mod returns;
 mod rotate_left;
+mod sub_reg_a;
 
 pub use add_reg_a::AddRegA;
 pub use call::Call;
@@ -19,3 +20,4 @@ pub use rel_jump::RelJump;
 pub use restart::Restart;
 pub use returns::Return;
 pub use rotate_left::RotateLeft;
+pub use sub_reg_a::SubRegA;

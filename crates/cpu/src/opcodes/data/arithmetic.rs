@@ -2,21 +2,20 @@ use crate::opcodes::consts::{BIT3_MINUS_1, BIT7_MINUS_1};
 use crate::opcodes::data::Data;
 use crate::Flags;
 
-pub fn signed(value: u8) -> u16 {
-    if value & 0x80 != 0 {
-        0xff00 | value as u16
-    } else {
-        value as u16
-    }
+pub trait Sub<T> {
+    type Output;
+    fn sub(&self, data: T) -> Self::Output;
 }
 
-fn carry(value: usize, nbr: usize, c: usize, max_c: usize, max_h: usize) -> (usize, Flags) {
-    let data = (value + nbr as usize + c as usize) & max_c;
-    let mut flag = Flags::default();
-    flag.set_z(data == 0);
-    flag.set_h((value & max_h) + (nbr & max_h) + (c & max_h) > max_h);
-    flag.set_c((value & max_c) + (nbr & max_c) + (c & max_c) > max_c);
-    (data, flag)
+impl Sub<u8> for Data<u8> {
+    type Output = u16;
+    fn sub(&self, nbr: u8) -> Self::Output {
+        let (value, c) = match self {
+            Data::Carry(value) => (*value as usize, 1),
+            Data::NoCarry(value) => (*value as usize, 0),
+        };
+        borrow(value, nbr as usize, c, BIT7_MINUS_1, BIT3_MINUS_1)
+    }
 }
 
 pub trait Add<T> {
@@ -36,9 +35,36 @@ impl Add<u8> for Data<u8> {
     }
 }
 
+pub fn signed(value: u8) -> u16 {
+    if value & 0x80 != 0 {
+        0xff00 | value as u16
+    } else {
+        value as u16
+    }
+}
+
+fn carry(value: usize, nbr: usize, c: usize, max_c: usize, max_h: usize) -> (usize, Flags) {
+    let data = (value + nbr as usize + c as usize) & max_c;
+    let mut flag = Flags::default();
+    flag.set_z(data == 0);
+    flag.set_h((value & max_h) + (nbr & max_h) + (c & max_h) > max_h);
+    flag.set_c((value & max_c) + (nbr & max_c) + (c & max_c) > max_c);
+    (data, flag)
+}
+
+fn borrow(value: usize, nbr: usize, c: usize, max_c: usize, max_h: usize) -> u16 {
+    let data = (value.wrapping_sub(nbr as usize).wrapping_sub(c)) & max_c;
+    let mut flag = Flags::default();
+    flag.set_z(data == 0);
+    flag.set_n(true);
+    flag.set_h((value & max_h) < (nbr & max_h) + (c & max_h));
+    flag.set_c((value & max_c) < (nbr & max_c) + (c & max_c));
+    (data as u16) << 8 | Flags::into_bytes(flag)[0] as u16
+}
+
 #[cfg(test)]
 mod test_arithmetics_functions {
-    use crate::opcodes::data::arithmetic::Add;
+    use crate::opcodes::data::arithmetic::{Add, Sub};
     use crate::opcodes::data::Data;
 
     #[test]
@@ -111,5 +137,53 @@ mod test_arithmetics_functions {
     fn test_add_with_carry_8b_all_flags() {
         let data: Data<u8> = Data::Carry(0x07);
         assert_eq!(data.add(0xf8), 0x00d0);
+    }
+
+    #[test]
+    fn test_sub_no_carry() {
+        let data: Data<u8> = Data::NoCarry(0x12);
+        assert_eq!(data.sub(0x10), 0x0220);
+    }
+
+    #[test]
+    fn test_sub_carry() {
+        let data: Data<u8> = Data::Carry(0x34);
+        assert_eq!(data.sub(0x22), 0x1120);
+    }
+
+    #[test]
+    fn test_sub_no_carry_h_flag() {
+        let data: Data<u8> = Data::NoCarry(0x32);
+        assert_eq!(data.sub(0x2f), 0x0360);
+    }
+
+    #[test]
+    fn test_sub_carry_h_flag() {
+        let data: Data<u8> = Data::Carry(0x32);
+        assert_eq!(data.sub(0x2e), 0x0360);
+    }
+
+    #[test]
+    fn test_sub_no_carry_c_flag() {
+        let data: Data<u8> = Data::NoCarry(0x12);
+        assert_eq!(data.sub(0xf0), 0x22a0);
+    }
+
+    #[test]
+    fn test_sub_carry_c_flag() {
+        let data: Data<u8> = Data::Carry(0x12);
+        assert_eq!(data.sub(0xe0), 0x31a0);
+    }
+
+    #[test]
+    fn test_sub_no_carry_all_flags() {
+        let data: Data<u8> = Data::NoCarry(0x12);
+        assert_eq!(data.sub(0x12), 0x0030);
+    }
+
+    #[test]
+    fn test_sub_carry_all_flags() {
+        let data: Data<u8> = Data::Carry(0x88);
+        assert_eq!(data.sub(0x87), 0x0030);
     }
 }
