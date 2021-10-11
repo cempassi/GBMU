@@ -29,6 +29,7 @@ mod rel_jump;
 mod restart;
 mod returns;
 mod rotate_left;
+mod set_carry_flag;
 mod sub_reg_a;
 mod xor_reg_a;
 
@@ -61,5 +62,6 @@ pub use rel_jump::RelJump;
 pub use restart::Restart;
 pub use returns::Return;
 pub use rotate_left::RotateLeft;
+pub use set_carry_flag::SCF;
 pub use sub_reg_a::SubRegA;
 pub use xor_reg_a::XorRegA;
