@@ -1,6 +1,7 @@
 pub use crate::interface::{NewRegisters, Registers};
 use crate::opcodes::consts;
 use crate::opcodes::AddRegA;
+use crate::opcodes::AddRegHL;
 use crate::opcodes::AddRegSP;
 use crate::opcodes::AndRegA;
 use crate::opcodes::Call;
@@ -183,6 +184,8 @@ impl Cpu {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = AddRegSP::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = AddRegHL::try_from_primitive(opcode) {
+            operation.exec(self.registers).await;
         } else {
             println!("Not implemented!");
         }

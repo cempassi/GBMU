@@ -1,4 +1,5 @@
 mod add_reg_a;
+mod add_reg_hl;
 mod add_reg_sp;
 mod and_reg_a;
 mod call;
@@ -31,6 +32,7 @@ mod sub_reg_a;
 mod xor_reg_a;
 
 pub use add_reg_a::AddRegA;
+pub use add_reg_hl::AddRegHL;
 pub use add_reg_sp::AddRegSP;
 pub use and_reg_a::AndRegA;
 pub use call::Call;
