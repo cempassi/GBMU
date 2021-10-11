@@ -4,6 +4,7 @@ use crate::opcodes::AddRegA;
 use crate::opcodes::AddRegHL;
 use crate::opcodes::AddRegSP;
 use crate::opcodes::AndRegA;
+use crate::opcodes::CPLRegA;
 use crate::opcodes::Call;
 use crate::opcodes::CmpRegA;
 use crate::opcodes::DecAdjustRegA;
@@ -247,6 +248,8 @@ impl Cpu {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadRegABCDE::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = CPLRegA::try_from_primitive(opcode) {
+            operation.exec(self.registers).await;
         } else {
             println!("Not implemented!");
         }
