@@ -20,6 +20,7 @@ use crate::opcodes::LoadMem16bRegA;
 use crate::opcodes::LoadMem16bRegSP;
 use crate::opcodes::LoadMem8bRegA;
 use crate::opcodes::LoadMemCRegA;
+use crate::opcodes::LoadR1R2;
 use crate::opcodes::LoadR8b;
 use crate::opcodes::LoadRegAHLM;
 use crate::opcodes::LoadRegAHLP;
@@ -231,6 +232,8 @@ impl Cpu {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadHL8b::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = LoadR1R2::try_from_primitive(opcode) {
+            operation.exec(self.registers).await;
         } else {
             println!("Not implemented!");
         }
