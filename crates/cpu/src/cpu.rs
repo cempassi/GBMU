@@ -38,6 +38,9 @@ use crate::opcodes::CCF;
 use crate::opcodes::SCF;
 
 use crate::area::{Bits16, Flag};
+use crate::consts::{
+    DI_INSTRUCTION, EI_INSTRUCTION, HALT_INSTRUCTION, NOP_INSTRUCTION, STOP_INSTRUCTION,
+};
 use crate::nextpc::NextPc;
 use crate::RegisterBus;
 use memory::{Async, Memory};
@@ -49,6 +52,7 @@ pub struct Cpu {
     memory: Memory,
     registers: Registers,
     interrupts: bool,
+    halt: bool,
 }
 
 impl Cpu {
@@ -57,6 +61,7 @@ impl Cpu {
             memory,
             registers: <Registers as NewRegisters>::new(),
             interrupts: false,
+            halt: false,
         }
     }
 
@@ -131,6 +136,19 @@ impl Cpu {
 
         if opcode == 0xCB {
             self.prefix_cb().await;
+        } else if opcode == NOP_INSTRUCTION {
+            dbg!("NOP Instruction does nothing");
+        } else if opcode == STOP_INSTRUCTION {
+            dbg!("STOP Instruction i dont know yet what to do..");
+        } else if opcode == HALT_INSTRUCTION {
+            dbg!("HALT Instruction... Wait until an interrupt occurs");
+            self.halt = true;
+        } else if opcode == DI_INSTRUCTION {
+            dbg!("Disable Interrupt Instruction");
+            self.interrupts = false;
+        } else if opcode == EI_INSTRUCTION {
+            dbg!("Enable Interrupt Instruction");
+            self.interrupts = true;
         } else if let Ok(operation) = Call::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = AddRegA::try_from_primitive(opcode) {

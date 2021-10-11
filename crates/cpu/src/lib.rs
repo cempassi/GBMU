@@ -1,5 +1,6 @@
 pub mod area;
 pub mod bus;
+pub(crate) mod consts;
 pub mod cpu;
 pub(crate) mod executor;
 mod flags;
