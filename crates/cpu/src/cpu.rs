@@ -42,6 +42,7 @@ use crate::opcodes::Restart;
 use crate::opcodes::Return;
 use crate::opcodes::RotateLeft;
 use crate::opcodes::RotateRight;
+use crate::opcodes::RotateRightA;
 use crate::opcodes::SubRegA;
 use crate::opcodes::XorRegA;
 use crate::opcodes::CCF;
@@ -254,6 +255,8 @@ impl Cpu {
         } else if let Ok(operation) = LoadRegABCDE::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = CPLRegA::try_from_primitive(opcode) {
+            operation.exec(self.registers).await;
+        } else if let Ok(operation) = RotateRightA::try_from_primitive(opcode) {
             operation.exec(self.registers).await;
         } else {
             println!("Not implemented!");
