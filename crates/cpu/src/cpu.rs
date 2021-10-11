@@ -5,6 +5,7 @@ use crate::opcodes::AddRegHL;
 use crate::opcodes::AddRegSP;
 use crate::opcodes::AndRegA;
 use crate::opcodes::Call;
+use crate::opcodes::DecAdjustRegA;
 use crate::opcodes::DecRegN;
 use crate::opcodes::DecRegNN;
 use crate::opcodes::IncRegN;
@@ -191,6 +192,8 @@ impl Cpu {
         } else if let Ok(operation) = CCF::try_from_primitive(opcode) {
             operation.exec(self.registers).await;
         } else if let Ok(operation) = SCF::try_from_primitive(opcode) {
+            operation.exec(self.registers).await;
+        } else if let Ok(operation) = DecAdjustRegA::try_from_primitive(opcode) {
             operation.exec(self.registers).await;
         } else {
             println!("Not implemented!");
