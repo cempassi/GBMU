@@ -3,7 +3,9 @@ use crate::opcodes::consts;
 use crate::opcodes::AddRegA;
 use crate::opcodes::AndRegA;
 use crate::opcodes::Call;
+use crate::opcodes::DecRegN;
 use crate::opcodes::DecRegNN;
+use crate::opcodes::IncRegN;
 use crate::opcodes::IncRegNN;
 use crate::opcodes::Jump;
 use crate::opcodes::LoadBCDERegA;
@@ -173,6 +175,10 @@ impl Cpu {
         } else if let Ok(operation) = OrRegA::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = XorRegA::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = IncRegN::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = DecRegN::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else {
             println!("Not implemented!");
