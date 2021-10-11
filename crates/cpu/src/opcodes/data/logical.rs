@@ -1,6 +1,6 @@
 use crate::area::{Bits8, Flag};
 use crate::opcodes::consts::BIT3_MINUS_1;
-use crate::opcodes::prefix_cb::consts::BIT0;
+use crate::opcodes::prefix_cb::consts::{BIT0, BIT7};
 use crate::{Flags, RegisterBus, Registers};
 
 pub fn rotate_right(registers: Registers, area: Bits8, is_carried: bool) {
@@ -10,6 +10,21 @@ pub fn rotate_right(registers: Registers, area: Bits8, is_carried: bool) {
     match is_carried {
         true => data |= (registers.borrow().get(Flag::C) as u8) << 7,
         false => data |= (carry as u8) << 7,
+    };
+    registers.borrow_mut().set(area, data);
+    registers.borrow_mut().set(Flag::C, carry);
+    registers.borrow_mut().set(Flag::Z, false);
+    registers.borrow_mut().set(Flag::H, false);
+    registers.borrow_mut().set(Flag::N, false);
+}
+
+pub fn rotate_left(registers: Registers, area: Bits8, is_carried: bool) {
+    let mut data = registers.borrow().get(area);
+    let carry = (data & BIT7) != 0;
+    data <<= 1;
+    match is_carried {
+        true => data |= registers.borrow().get(Flag::C) as u8,
+        false => data |= carry as u8,
     };
     registers.borrow_mut().set(area, data);
     registers.borrow_mut().set(Flag::C, carry);
