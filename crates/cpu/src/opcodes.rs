@@ -1,4 +1,5 @@
 mod add_reg_a;
+mod and_reg_a;
 mod call;
 pub(crate) mod consts;
 mod data;
@@ -25,6 +26,7 @@ mod rotate_left;
 mod sub_reg_a;
 
 pub use add_reg_a::AddRegA;
+pub use and_reg_a::AndRegA;
 pub use call::Call;
 pub use decrement_u16::DecRegNN;
 pub use increment_u16::IncRegNN;
