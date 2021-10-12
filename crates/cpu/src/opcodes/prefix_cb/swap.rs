@@ -36,19 +36,14 @@ pub enum Swap {
     HL = 0x36,
 }
 
-fn swap(registers: Registers, area: Bits8) {
+fn swap(registers: Registers, area: Bits8) -> u8 {
     let mut data = registers.borrow().get(area);
     data = (data & 0x0F) << 4 | (data & 0xF0) >> 4;
     registers.borrow_mut().set(area, data);
-    registers.borrow_mut().set(Flag::C, false);
-    registers.borrow_mut().set(Flag::H, false);
-    registers.borrow_mut().set(Flag::N, false);
-    if data == 0 {
-        registers.borrow_mut().set(Flag::Z, true);
-    }
+    data
 }
 
-async fn swap_hl(registers: Registers, memory: Memory) {
+async fn swap_hl(registers: Registers, memory: Memory) -> u8 {
     let address = registers.borrow().get(Bits16::HL);
     let mut data = <Memory as Async<u8>>::get(memory.clone(), address)
         .await
@@ -57,17 +52,12 @@ async fn swap_hl(registers: Registers, memory: Memory) {
     <Memory as Async<u8>>::set(memory.clone(), address, data)
         .await
         .unwrap();
-    registers.borrow_mut().set(Flag::C, false);
-    registers.borrow_mut().set(Flag::H, false);
-    registers.borrow_mut().set(Flag::N, false);
-    if data == 0 {
-        registers.borrow_mut().set(Flag::Z, true);
-    }
+    data
 }
 
 impl Swap {
     pub async fn exec(self, registers: Registers, memory: Memory) {
-        match self {
+        let data = match self {
             Swap::A => swap(registers, Bits8::A),
             Swap::B => swap(registers, Bits8::B),
             Swap::C => swap(registers, Bits8::C),
@@ -76,6 +66,12 @@ impl Swap {
             Swap::H => swap(registers, Bits8::H),
             Swap::L => swap(registers, Bits8::L),
             Swap::HL => swap_hl(registers, memory).await,
+        };
+        registers.borrow_mut().set(Flag::C, false);
+        registers.borrow_mut().set(Flag::H, false);
+        registers.borrow_mut().set(Flag::N, false);
+        if data == 0 {
+            registers.borrow_mut().set(Flag::Z, true);
         }
     }
 }
