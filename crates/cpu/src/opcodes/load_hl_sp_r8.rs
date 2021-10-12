@@ -46,20 +46,20 @@ impl LoadRegHLRegSPr8 {
     }
 }
 
-#[cfg(test)]
-mod test_instruction_load_reg_hl_reg_sp_r8 {
-    use super::LoadRegHLRegSPr8;
-    use crate::area::Bits16;
-    use crate::{executor, RegisterBus, Registers};
-    use memory::Memory;
-
-    #[test]
-    fn test_load_reg_hl_reg_sp_r8() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let instruction = LoadRegHLRegSPr8::LDSPr8;
-        register.borrow_mut().set(Bits16::SP, 0x4242);
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits16::HL), 0x4273);
-    }
-}
+// #[cfg(test)]
+// mod test_instruction_load_reg_hl_reg_sp_r8 {
+//     use super::LoadRegHLRegSPr8;
+//     use crate::area::Bits16;
+//     use crate::{executor, RegisterBus, Registers};
+//     use memory::Memory;
+//
+//     #[test]
+//     fn test_load_reg_hl_reg_sp_r8() {
+//         let register = Registers::default();
+//         let memory = Memory::default();
+//         let instruction = LoadRegHLRegSPr8::LDSPr8;
+//         register.borrow_mut().set(Bits16::SP, 0x4242);
+//         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+//         assert_eq!(register.borrow().get(Bits16::HL), 0x4273);
+//     }
+// }

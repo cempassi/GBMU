@@ -32,23 +32,23 @@ impl LoadMem16bRegSP {
     }
 }
 
-#[cfg(test)]
-mod test_instruction_load_memory_16bit_reg_sp {
-    use super::LoadMem16bRegSP;
-    use crate::area::Bits16;
-    use crate::executor;
-    use crate::{RegisterBus, Registers};
-    use memory::Memory;
-
-    #[test]
-    fn test_load_memory_16bit_reg_sp() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let instruction = LoadMem16bRegSP::LD16bSP;
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(
-            register.borrow().get(Bits16::SP),
-            memory.borrow().get_u16(0x31fe).unwrap()
-        );
-    }
-}
+// #[cfg(test)]
+// mod test_instruction_load_memory_16bit_reg_sp {
+//     use super::LoadMem16bRegSP;
+//     use crate::area::Bits16;
+//     use crate::executor;
+//     use crate::{RegisterBus, Registers};
+//     use memory::Memory;
+//
+//     #[test]
+//     fn test_load_memory_16bit_reg_sp() {
+//         let register = Registers::default();
+//         let memory = Memory::default();
+//         let instruction = LoadMem16bRegSP::LD16bSP;
+//         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+//         assert_eq!(
+//             register.borrow().get(Bits16::SP),
+//             memory.borrow().get_u16(0x31fe).unwrap()
+//         );
+//     }
+// }

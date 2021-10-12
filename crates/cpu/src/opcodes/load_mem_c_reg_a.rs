@@ -25,24 +25,24 @@ impl LoadMemCRegA {
     }
 }
 
-#[cfg(test)]
-mod test_instruction_load_memory_c_reg_a {
-    use super::LoadMemCRegA;
-    use super::ADDRESS_OFFSET;
-    use crate::area::Bits8;
-    use crate::{executor, RegisterBus, Registers};
-    use memory::Memory;
-
-    #[test]
-    fn test_load_memory_c_reg_a() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let instruction = LoadMemCRegA::CA;
-        let dst = ADDRESS_OFFSET + (register.borrow().get(Bits8::C) as u16);
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(
-            register.borrow().get(Bits8::A),
-            memory.borrow().get_u8(dst).unwrap()
-        );
-    }
-}
+// #[cfg(test)]
+// mod test_instruction_load_memory_c_reg_a {
+//     use super::LoadMemCRegA;
+//     use super::ADDRESS_OFFSET;
+//     use crate::area::Bits8;
+//     use crate::{executor, RegisterBus, Registers};
+//     use memory::Memory;
+//
+//     #[test]
+//     fn test_load_memory_c_reg_a() {
+//         let register = Registers::default();
+//         let memory = Memory::default();
+//         let instruction = LoadMemCRegA::CA;
+//         let dst = ADDRESS_OFFSET + (register.borrow().get(Bits8::C) as u16);
+//         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+//         assert_eq!(
+//             register.borrow().get(Bits8::A),
+//             memory.borrow().get_u8(dst).unwrap()
+//         );
+//     }
+// }

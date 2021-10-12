@@ -29,22 +29,22 @@ impl LoadMem8bRegA {
     }
 }
 
-#[cfg(test)]
-mod test_instruction_load_memory_8bit_reg_a {
-    use super::LoadMem8bRegA;
-    use crate::area::Bits8;
-    use crate::{executor, RegisterBus, Registers};
-    use memory::Memory;
-
-    #[test]
-    fn test_load_memory_8b_reg_a() {
-        let register = Registers::default();
-        let memory = Memory::default();
-        let instruction = LoadMem8bRegA::HnA;
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(
-            register.borrow().get(Bits8::A),
-            memory.borrow().get_u8(0xff31).unwrap()
-        );
-    }
-}
+// #[cfg(test)]
+// mod test_instruction_load_memory_8bit_reg_a {
+//     use super::LoadMem8bRegA;
+//     use crate::area::Bits8;
+//     use crate::{executor, RegisterBus, Registers};
+//     use memory::Memory;
+//
+//     #[test]
+//     fn test_load_memory_8b_reg_a() {
+//         let register = Registers::default();
+//         let memory = Memory::default();
+//         let instruction = LoadMem8bRegA::HnA;
+//         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+//         assert_eq!(
+//             register.borrow().get(Bits8::A),
+//             memory.borrow().get_u8(0xff31).unwrap()
+//         );
+//     }
+// }
