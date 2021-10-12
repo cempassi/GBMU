@@ -1,9 +1,8 @@
-use crate::area::{Bits16, Bits8, Flag};
+use crate::area::{Bits16, Flag};
 use crate::bus::RegisterBus;
 use crate::cpu::Registers;
 use crate::opcodes::data::arithmetic::Add;
 use crate::opcodes::data::Data;
-use crate::Flags;
 use num_enum::TryFromPrimitive;
 
 ///1. ADD HL,n
