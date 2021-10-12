@@ -4,7 +4,7 @@ use crate::cpu::Registers;
 use crate::nextpc::NextPc;
 use crate::opcodes::data::arithmetic::signed;
 use crate::Cpu;
-use memory::Memory;
+use memory::{Async, Memory};
 use num_enum::TryFromPrimitive;
 
 /// [JR n] | [JR cc,n]
@@ -46,7 +46,7 @@ impl RelJump {
         };
         let src: u8 = registers.clone().next_pc(memory.clone()).await.unwrap();
         let src = signed(src) + registers.borrow().get(Bits16::PC);
-        let data = memory.borrow_mut().get_u16(src).unwrap();
+        let data = <Memory as Async<u16>>::get(memory, src).await.unwrap();
         Cpu::jump(registers.clone(), data);
     }
 }

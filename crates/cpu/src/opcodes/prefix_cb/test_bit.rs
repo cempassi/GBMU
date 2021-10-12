@@ -101,93 +101,90 @@ pub enum TestBit {
     HL7 = 0x7e,
 }
 
-fn test_bit(registers: Registers, area: Bits8, bit: u8) {
+fn test_bit(registers: Registers, area: Bits8, bit: u8) -> bool {
     let data = registers.borrow().get(area);
-    let z = data & (1 << bit) == 0;
-    registers.borrow_mut().set(Flag::H, true);
-    registers.borrow_mut().set(Flag::N, false);
-    registers.borrow_mut().set(Flag::Z, z);
+    data & (1 << bit) == 0
 }
 
-async fn test_bit_hl(registers: Registers, memory: Memory, bit: u8) {
+async fn test_bit_hl(registers: Registers, memory: Memory, bit: u8) -> bool {
     let address = registers.borrow().get(Bits16::HL);
     let data = <Memory as Async<u8>>::get(memory.clone(), address)
         .await
         .unwrap();
-    let z = data & (1 << bit) == 0;
-    registers.borrow_mut().set(Flag::H, true);
-    registers.borrow_mut().set(Flag::N, false);
-    registers.borrow_mut().set(Flag::Z, z);
+    data & (1 << bit) == 0
 }
 
 impl TestBit {
     pub async fn exec(self, registers: Registers, memory: Memory) {
-        match self {
-            TestBit::A0 => test_bit(registers, Bits8::A, 0),
-            TestBit::A1 => test_bit(registers, Bits8::A, 1),
-            TestBit::A2 => test_bit(registers, Bits8::A, 2),
-            TestBit::A3 => test_bit(registers, Bits8::A, 3),
-            TestBit::A4 => test_bit(registers, Bits8::A, 4),
-            TestBit::A5 => test_bit(registers, Bits8::A, 5),
-            TestBit::A6 => test_bit(registers, Bits8::A, 6),
-            TestBit::A7 => test_bit(registers, Bits8::A, 7),
-            TestBit::B0 => test_bit(registers, Bits8::B, 0),
-            TestBit::B1 => test_bit(registers, Bits8::B, 1),
-            TestBit::B2 => test_bit(registers, Bits8::B, 2),
-            TestBit::B3 => test_bit(registers, Bits8::B, 3),
-            TestBit::B4 => test_bit(registers, Bits8::B, 4),
-            TestBit::B5 => test_bit(registers, Bits8::B, 5),
-            TestBit::B6 => test_bit(registers, Bits8::B, 6),
-            TestBit::B7 => test_bit(registers, Bits8::B, 7),
-            TestBit::C0 => test_bit(registers, Bits8::C, 0),
-            TestBit::C1 => test_bit(registers, Bits8::C, 1),
-            TestBit::C2 => test_bit(registers, Bits8::C, 2),
-            TestBit::C3 => test_bit(registers, Bits8::C, 3),
-            TestBit::C4 => test_bit(registers, Bits8::C, 4),
-            TestBit::C5 => test_bit(registers, Bits8::C, 5),
-            TestBit::C6 => test_bit(registers, Bits8::C, 6),
-            TestBit::C7 => test_bit(registers, Bits8::C, 7),
-            TestBit::D0 => test_bit(registers, Bits8::D, 0),
-            TestBit::D1 => test_bit(registers, Bits8::D, 1),
-            TestBit::D2 => test_bit(registers, Bits8::D, 2),
-            TestBit::D3 => test_bit(registers, Bits8::D, 3),
-            TestBit::D4 => test_bit(registers, Bits8::D, 4),
-            TestBit::D5 => test_bit(registers, Bits8::D, 5),
-            TestBit::D6 => test_bit(registers, Bits8::D, 6),
-            TestBit::D7 => test_bit(registers, Bits8::D, 7),
-            TestBit::E0 => test_bit(registers, Bits8::E, 0),
-            TestBit::E1 => test_bit(registers, Bits8::E, 1),
-            TestBit::E2 => test_bit(registers, Bits8::E, 2),
-            TestBit::E3 => test_bit(registers, Bits8::E, 3),
-            TestBit::E4 => test_bit(registers, Bits8::E, 4),
-            TestBit::E5 => test_bit(registers, Bits8::E, 5),
-            TestBit::E6 => test_bit(registers, Bits8::E, 6),
-            TestBit::E7 => test_bit(registers, Bits8::E, 7),
-            TestBit::H0 => test_bit(registers, Bits8::H, 0),
-            TestBit::H1 => test_bit(registers, Bits8::H, 1),
-            TestBit::H2 => test_bit(registers, Bits8::H, 2),
-            TestBit::H3 => test_bit(registers, Bits8::H, 3),
-            TestBit::H4 => test_bit(registers, Bits8::H, 4),
-            TestBit::H5 => test_bit(registers, Bits8::H, 5),
-            TestBit::H6 => test_bit(registers, Bits8::H, 6),
-            TestBit::H7 => test_bit(registers, Bits8::H, 7),
-            TestBit::L0 => test_bit(registers, Bits8::L, 0),
-            TestBit::L1 => test_bit(registers, Bits8::L, 1),
-            TestBit::L2 => test_bit(registers, Bits8::L, 2),
-            TestBit::L3 => test_bit(registers, Bits8::L, 3),
-            TestBit::L4 => test_bit(registers, Bits8::L, 4),
-            TestBit::L5 => test_bit(registers, Bits8::L, 5),
-            TestBit::L6 => test_bit(registers, Bits8::L, 6),
-            TestBit::L7 => test_bit(registers, Bits8::L, 7),
-            TestBit::HL0 => test_bit_hl(registers, memory, 0).await,
-            TestBit::HL1 => test_bit_hl(registers, memory, 1).await,
-            TestBit::HL2 => test_bit_hl(registers, memory, 2).await,
-            TestBit::HL3 => test_bit_hl(registers, memory, 3).await,
-            TestBit::HL4 => test_bit_hl(registers, memory, 4).await,
-            TestBit::HL5 => test_bit_hl(registers, memory, 5).await,
-            TestBit::HL6 => test_bit_hl(registers, memory, 6).await,
-            TestBit::HL7 => test_bit_hl(registers, memory, 7).await,
-        }
+        let z = match self {
+            TestBit::A0 => test_bit(registers.clone(), Bits8::A, 0),
+            TestBit::A1 => test_bit(registers.clone(), Bits8::A, 1),
+            TestBit::A2 => test_bit(registers.clone(), Bits8::A, 2),
+            TestBit::A3 => test_bit(registers.clone(), Bits8::A, 3),
+            TestBit::A4 => test_bit(registers.clone(), Bits8::A, 4),
+            TestBit::A5 => test_bit(registers.clone(), Bits8::A, 5),
+            TestBit::A6 => test_bit(registers.clone(), Bits8::A, 6),
+            TestBit::A7 => test_bit(registers.clone(), Bits8::A, 7),
+            TestBit::B0 => test_bit(registers.clone(), Bits8::B, 0),
+            TestBit::B1 => test_bit(registers.clone(), Bits8::B, 1),
+            TestBit::B2 => test_bit(registers.clone(), Bits8::B, 2),
+            TestBit::B3 => test_bit(registers.clone(), Bits8::B, 3),
+            TestBit::B4 => test_bit(registers.clone(), Bits8::B, 4),
+            TestBit::B5 => test_bit(registers.clone(), Bits8::B, 5),
+            TestBit::B6 => test_bit(registers.clone(), Bits8::B, 6),
+            TestBit::B7 => test_bit(registers.clone(), Bits8::B, 7),
+            TestBit::C0 => test_bit(registers.clone(), Bits8::C, 0),
+            TestBit::C1 => test_bit(registers.clone(), Bits8::C, 1),
+            TestBit::C2 => test_bit(registers.clone(), Bits8::C, 2),
+            TestBit::C3 => test_bit(registers.clone(), Bits8::C, 3),
+            TestBit::C4 => test_bit(registers.clone(), Bits8::C, 4),
+            TestBit::C5 => test_bit(registers.clone(), Bits8::C, 5),
+            TestBit::C6 => test_bit(registers.clone(), Bits8::C, 6),
+            TestBit::C7 => test_bit(registers.clone(), Bits8::C, 7),
+            TestBit::D0 => test_bit(registers.clone(), Bits8::D, 0),
+            TestBit::D1 => test_bit(registers.clone(), Bits8::D, 1),
+            TestBit::D2 => test_bit(registers.clone(), Bits8::D, 2),
+            TestBit::D3 => test_bit(registers.clone(), Bits8::D, 3),
+            TestBit::D4 => test_bit(registers.clone(), Bits8::D, 4),
+            TestBit::D5 => test_bit(registers.clone(), Bits8::D, 5),
+            TestBit::D6 => test_bit(registers.clone(), Bits8::D, 6),
+            TestBit::D7 => test_bit(registers.clone(), Bits8::D, 7),
+            TestBit::E0 => test_bit(registers.clone(), Bits8::E, 0),
+            TestBit::E1 => test_bit(registers.clone(), Bits8::E, 1),
+            TestBit::E2 => test_bit(registers.clone(), Bits8::E, 2),
+            TestBit::E3 => test_bit(registers.clone(), Bits8::E, 3),
+            TestBit::E4 => test_bit(registers.clone(), Bits8::E, 4),
+            TestBit::E5 => test_bit(registers.clone(), Bits8::E, 5),
+            TestBit::E6 => test_bit(registers.clone(), Bits8::E, 6),
+            TestBit::E7 => test_bit(registers.clone(), Bits8::E, 7),
+            TestBit::H0 => test_bit(registers.clone(), Bits8::H, 0),
+            TestBit::H1 => test_bit(registers.clone(), Bits8::H, 1),
+            TestBit::H2 => test_bit(registers.clone(), Bits8::H, 2),
+            TestBit::H3 => test_bit(registers.clone(), Bits8::H, 3),
+            TestBit::H4 => test_bit(registers.clone(), Bits8::H, 4),
+            TestBit::H5 => test_bit(registers.clone(), Bits8::H, 5),
+            TestBit::H6 => test_bit(registers.clone(), Bits8::H, 6),
+            TestBit::H7 => test_bit(registers.clone(), Bits8::H, 7),
+            TestBit::L0 => test_bit(registers.clone(), Bits8::L, 0),
+            TestBit::L1 => test_bit(registers.clone(), Bits8::L, 1),
+            TestBit::L2 => test_bit(registers.clone(), Bits8::L, 2),
+            TestBit::L3 => test_bit(registers.clone(), Bits8::L, 3),
+            TestBit::L4 => test_bit(registers.clone(), Bits8::L, 4),
+            TestBit::L5 => test_bit(registers.clone(), Bits8::L, 5),
+            TestBit::L6 => test_bit(registers.clone(), Bits8::L, 6),
+            TestBit::L7 => test_bit(registers.clone(), Bits8::L, 7),
+            TestBit::HL0 => test_bit_hl(registers.clone(), memory, 0).await,
+            TestBit::HL1 => test_bit_hl(registers.clone(), memory, 1).await,
+            TestBit::HL2 => test_bit_hl(registers.clone(), memory, 2).await,
+            TestBit::HL3 => test_bit_hl(registers.clone(), memory, 3).await,
+            TestBit::HL4 => test_bit_hl(registers.clone(), memory, 4).await,
+            TestBit::HL5 => test_bit_hl(registers.clone(), memory, 5).await,
+            TestBit::HL6 => test_bit_hl(registers.clone(), memory, 6).await,
+            TestBit::HL7 => test_bit_hl(registers.clone(), memory, 7).await,
+        };
+        registers.borrow_mut().set(Flag::H, true);
+        registers.borrow_mut().set(Flag::N, false);
+        registers.borrow_mut().set(Flag::Z, z);
     }
 }
 

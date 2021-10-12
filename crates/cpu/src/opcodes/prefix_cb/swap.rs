@@ -58,14 +58,14 @@ async fn swap_hl(registers: Registers, memory: Memory) -> u8 {
 impl Swap {
     pub async fn exec(self, registers: Registers, memory: Memory) {
         let data = match self {
-            Swap::A => swap(registers, Bits8::A),
-            Swap::B => swap(registers, Bits8::B),
-            Swap::C => swap(registers, Bits8::C),
-            Swap::D => swap(registers, Bits8::D),
-            Swap::E => swap(registers, Bits8::E),
-            Swap::H => swap(registers, Bits8::H),
-            Swap::L => swap(registers, Bits8::L),
-            Swap::HL => swap_hl(registers, memory).await,
+            Swap::A => swap(registers.clone(), Bits8::A),
+            Swap::B => swap(registers.clone(), Bits8::B),
+            Swap::C => swap(registers.clone(), Bits8::C),
+            Swap::D => swap(registers.clone(), Bits8::D),
+            Swap::E => swap(registers.clone(), Bits8::E),
+            Swap::H => swap(registers.clone(), Bits8::H),
+            Swap::L => swap(registers.clone(), Bits8::L),
+            Swap::HL => swap_hl(registers.clone(), memory).await,
         };
         registers.borrow_mut().set(Flag::C, false);
         registers.borrow_mut().set(Flag::H, false);
