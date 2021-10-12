@@ -21,7 +21,7 @@ use num_enum::TryFromPrimitive;
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum DecAdjustRegA {
-    DAA = 0x2f,
+    DAA = 0x27,
 }
 
 impl DecAdjustRegA {
