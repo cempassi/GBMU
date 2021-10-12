@@ -38,6 +38,7 @@ use crate::opcodes::OrRegA;
 use crate::opcodes::Pop;
 use crate::opcodes::Push;
 use crate::opcodes::RelJump;
+use crate::opcodes::ResetBit;
 use crate::opcodes::Restart;
 use crate::opcodes::Return;
 use crate::opcodes::RotateLeft;
@@ -112,6 +113,8 @@ impl Cpu {
         } else if let Ok(operation) = Swap::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = TestBit::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = ResetBit::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else {
             println!("This prefix_cb {:?} is not implemented!", opcode);

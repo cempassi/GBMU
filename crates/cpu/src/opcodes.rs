@@ -85,6 +85,7 @@ pub use load_rr_b16::LoadRR16b;
 pub use load_sp_hl::LoadRegSPRegHL;
 pub use or_reg_a::OrRegA;
 pub use pop::Pop;
+pub use prefix_cb::ResetBit;
 pub use prefix_cb::RotateLeft;
 pub use prefix_cb::RotateRight;
 pub use prefix_cb::ShiftLeft;

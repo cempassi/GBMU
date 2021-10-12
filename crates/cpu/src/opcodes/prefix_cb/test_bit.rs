@@ -104,7 +104,6 @@ pub enum TestBit {
 fn test_bit(registers: Registers, area: Bits8, bit: u8) {
     let data = registers.borrow().get(area);
     let z = data & (1 << bit) == 0;
-    registers.borrow_mut().set(area, data);
     registers.borrow_mut().set(Flag::H, true);
     registers.borrow_mut().set(Flag::N, false);
     registers.borrow_mut().set(Flag::Z, z);
@@ -200,7 +199,7 @@ mod test_instruction_test_bit {
     use memory::Memory;
 
     #[test]
-    fn test_instruction_test_bit() {
+    fn test_instruction_test_bit_2_reg_a() {
         let src = 0b0000_0100;
         let register = Registers::default();
         let memory = Memory::default();
@@ -211,7 +210,7 @@ mod test_instruction_test_bit {
     }
 
     #[test]
-    fn test_shift_memory_hl_right_logically() {
+    fn test_instruction_test_bit_7_hl() {
         let hl = 0xc008;
         let src = 0b0000_0000;
         let register = Registers::default();
