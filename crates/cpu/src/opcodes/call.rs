@@ -2,7 +2,7 @@ use crate::area::Bits16;
 use crate::bus::RegisterBus;
 use crate::cpu::Registers;
 use crate::Cpu;
-use memory::Memory;
+use memory::{Async, Memory};
 use num_enum::TryFromPrimitive;
 
 /// CALL nn
@@ -22,9 +22,8 @@ pub enum Call {
 
 impl Call {
     pub async fn exec(self, registers: Registers, memory: Memory) {
-        let data = memory
-            .borrow_mut()
-            .get_u16(registers.borrow().get(Bits16::PC))
+        let data = <Memory as Async<u16>>::get(memory.clone(), registers.borrow().get(Bits16::PC))
+            .await
             .unwrap();
         Cpu::push(registers.clone(), memory.clone(), data)
             .await
