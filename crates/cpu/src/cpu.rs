@@ -44,6 +44,7 @@ use crate::opcodes::RotateLeft;
 use crate::opcodes::RotateLeftA;
 use crate::opcodes::RotateRight;
 use crate::opcodes::RotateRightA;
+use crate::opcodes::ShiftLeft;
 use crate::opcodes::SubRegA;
 use crate::opcodes::XorRegA;
 use crate::opcodes::CCF;
@@ -97,6 +98,8 @@ impl Cpu {
         if let Ok(operation) = RotateLeft::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = RotateRight::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = ShiftLeft::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else {
             println!("This prefix_cb {:?} is not implemented!", opcode);
