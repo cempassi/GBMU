@@ -49,6 +49,7 @@ use crate::opcodes::ShiftRight;
 use crate::opcodes::ShiftRightLogical;
 use crate::opcodes::SubRegA;
 use crate::opcodes::Swap;
+use crate::opcodes::TestBit;
 use crate::opcodes::XorRegA;
 use crate::opcodes::CCF;
 use crate::opcodes::SCF;
@@ -109,6 +110,8 @@ impl Cpu {
         } else if let Ok(operation) = ShiftRightLogical::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = Swap::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = TestBit::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else {
             println!("This prefix_cb {:?} is not implemented!", opcode);

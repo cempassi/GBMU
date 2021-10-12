@@ -91,6 +91,7 @@ pub use prefix_cb::ShiftLeft;
 pub use prefix_cb::ShiftRight;
 pub use prefix_cb::ShiftRightLogical;
 pub use prefix_cb::Swap;
+pub use prefix_cb::TestBit;
 pub use push::Push;
 pub use rel_jump::RelJump;
 pub use restart::Restart;
