@@ -1,4 +1,4 @@
-use crate::area::{Bits16, Bits8};
+use crate::area::{Bits16, Bits8, Flag};
 use crate::bus::RegisterBus;
 use crate::cpu::Registers;
 use crate::opcodes::data::arithmetic::Add;
@@ -42,13 +42,9 @@ impl AddRegHL {
         };
         let (data, flag) = data.add(registers.borrow().get(Bits16::HL));
         registers.borrow_mut().set(Bits16::HL, data);
-        let mut old_flag = Flags::from_bytes([registers.borrow().get(Bits8::F)]);
-        old_flag.set_h(flag.h());
-        old_flag.set_n(flag.n());
-        old_flag.set_c(flag.c());
-        registers
-            .borrow_mut()
-            .set(Bits8::F, Flags::into_bytes(old_flag)[0]);
+        registers.borrow_mut().set(Flag::H, flag.h());
+        registers.borrow_mut().set(Flag::C, flag.c());
+        registers.borrow_mut().set(Flag::N, flag.n());
     }
 }
 
