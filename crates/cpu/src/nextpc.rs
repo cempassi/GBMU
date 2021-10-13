@@ -38,26 +38,20 @@ impl<T> Future for Reader<T> {
     type Output = Result<T, Error>;
 
     fn poll(mut self: Pin<&mut Self>, context: &mut Context<'_>) -> Poll<Self::Output> {
-        match self.inner.as_mut().poll(context) {
-            Poll::Pending => Poll::Pending,
-            Poll::Ready(data) => Poll::Ready(data),
-        }
+        self.inner.as_mut().poll(context)
     }
 }
 
 async fn next(registers: Registers, memory: Memory) -> Result<u8, Error> {
     let pc = registers.borrow().pc;
-    let byte: u8 = <Memory as Async>::get(memory, pc).await?;
+    let data = memory.get::<u8>(pc).await?;
     registers.borrow_mut().pc = pc.wrapping_add(1);
-    Ok(byte)
+    Ok(data)
 }
 
 async fn next_16(registers: Registers, memory: Memory) -> Result<u16, Error> {
     let pc = registers.borrow().pc;
-    let left: u8 = <Memory as Async>::get(memory.clone(), pc).await?;
-    registers.borrow_mut().pc = pc.wrapping_add(1);
-    let pc = registers.borrow().pc;
-    let right: u8 = <Memory as Async>::get(memory, pc).await?;
-    registers.borrow_mut().pc = pc.wrapping_add(1);
-    Ok((left as u16) << 8 | right as u16)
+    let data = memory.get::<u16>(pc).await?;
+    registers.borrow_mut().pc = pc.wrapping_add(2);
+    Ok(data)
 }
