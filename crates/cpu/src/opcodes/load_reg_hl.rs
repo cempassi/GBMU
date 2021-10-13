@@ -44,7 +44,7 @@ impl LoadRegHL {
             LoadRegHL::AHL => Bits8::A,
         };
         let src = registers.borrow().get(Bits16::HL);
-        let data = <Memory as Async>::get(memory, src).await.unwrap();
+        let data = memory.get::<u8>(src).await.unwrap();
         registers.borrow_mut().set(dst, data);
     }
 }
@@ -67,7 +67,7 @@ mod test_instruction_load_reg_hl {
             register.borrow().get(Bits8::B),
             memory
                 .borrow()
-                .get(register.borrow().get(Bits16::HL))
+                .get_u8(register.borrow().get(Bits16::HL))
                 .unwrap()
         );
     }

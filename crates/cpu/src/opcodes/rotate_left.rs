@@ -73,18 +73,14 @@ fn rotate(registers: Registers, area: Bits8, is_carried: bool) {
 
 async fn rotate_hl(registers: Registers, memory: Memory, is_carried: bool) {
     let address = registers.borrow().get(Bits16::HL);
-    let mut data = <Memory as Async>::get(memory.clone(), address)
-        .await
-        .unwrap();
+    let mut data = memory.clone().get::<u8>(address).await.unwrap();
     let carry = (data & BIT7) != 0;
     data <<= 1;
     match is_carried {
         true => data |= registers.borrow().get(Flag::C) as u8,
         false => data |= carry as u8,
     };
-    <Memory as Async>::set(memory.clone(), address, data)
-        .await
-        .unwrap();
+    memory.set(address, data).await.unwrap();
     registers.borrow_mut().set(Flag::C, carry);
     if data == 0 {
         registers.borrow_mut().set(Flag::Z, true);
@@ -170,11 +166,11 @@ mod test_rotate_left {
         let memory = Memory::default();
         let instruction = RotateLeft::CHL;
         register.borrow_mut().set(Bits16::HL, hl);
-        memory.borrow_mut().set(hl, src).unwrap();
+        memory.borrow_mut().set_u8(hl, src).unwrap();
 
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
 
-        let result = memory.borrow_mut().get(hl).unwrap();
+        let result = memory.borrow_mut().get_u8(hl).unwrap();
         let carry = register.borrow_mut().get(Flag::C);
         println!("result  : {:#b}", result);
         println!("expected: {:#b}", expected);
@@ -192,11 +188,11 @@ mod test_rotate_left {
         let memory = Memory::default();
         let instruction = RotateLeft::HL;
         register.borrow_mut().set(Bits16::HL, hl);
-        memory.borrow_mut().set(hl, src).unwrap();
+        memory.borrow_mut().set_u8(hl, src).unwrap();
 
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
 
-        let result = memory.borrow_mut().get(hl).unwrap();
+        let result = memory.borrow_mut().get_u8(hl).unwrap();
         let carry = register.borrow_mut().get(Flag::C);
         println!("result  : {:#b}", result);
         println!("expected: {:#b}", expected);

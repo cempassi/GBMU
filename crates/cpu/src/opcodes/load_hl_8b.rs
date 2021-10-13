@@ -24,7 +24,7 @@ impl LoadHL8b {
     pub async fn exec(self, registers: Registers, memory: Memory) {
         let dst = registers.borrow().get(Bits16::HL);
         let data = registers.clone().next_pc(memory.clone()).await.unwrap();
-        <Memory as Async>::set(memory, dst, data).await.unwrap();
+        memory.set::<u8>(dst, data).await.unwrap();
     }
 }
 
@@ -41,14 +41,14 @@ mod test_instruction_load_hl_8b {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = LoadHL8b::HL8b;
-        let byte = memory.borrow().get(register.borrow().pc).unwrap();
+        let byte = memory.borrow().get_u8(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(
             byte,
             memory
                 .borrow()
-                .get(register.borrow().get(Bits16::HL))
+                .get_u8(register.borrow().get(Bits16::HL))
                 .unwrap()
         );
     }
