@@ -18,6 +18,7 @@ pub struct Memory {
     pub(crate) bios: Bus,
     pub(crate) rom: Rom,
     pub(crate) wram: Bus,
+    // pub(crate) interrupts: Interrupts
 }
 
 impl Default for Memory {
@@ -27,6 +28,7 @@ impl Default for Memory {
             bios: Rc::new(RefCell::new(Box::new(Bios::new()))),
             wram: Rc::new(RefCell::new(Box::new(Wram::default()))),
             rom: Rom::default(),
+            // interrupts: Interrupt::default();
         }
     }
 }
@@ -43,6 +45,9 @@ impl Memory {
             consts::WRAM_MIN..=consts::WRAM_MAX => {
                 Ok(self.wram.borrow().get(Area::Wram.relative(address)))
             }
+            // consts::INTERUPT_ENABLE => {
+            //     Ok(self.interrupts.borrow.get(Area::Interrupt.relative(address)))
+            // }
             _ => Err(Error::SegmentationFault(address)),
         }
     }

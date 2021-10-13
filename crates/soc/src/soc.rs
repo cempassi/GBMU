@@ -74,7 +74,7 @@ impl SOC {
         let waker = crate::waker::create();
         let mut context = Context::from_waker(&waker);
 
-        if self.clock < 20 {
+        if self.clock < 40 {
             self.clock += 1;
             for processor in &mut self.processors {
                 processor.run(&mut context);
