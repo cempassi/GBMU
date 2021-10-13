@@ -2,8 +2,10 @@ use crate::area::{Bits16, Flag};
 use crate::bus::RegisterBus;
 use crate::cpu::Registers;
 use crate::nextpc::NextPc;
+use crate::opcodes::consts::{BIT3_MINUS_1, BIT7_MINUS_1};
 use crate::opcodes::data::arithmetic::signed;
-use crate::opcodes::data::{Add, Data};
+use crate::opcodes::data::carry;
+use crate::Flags;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
@@ -28,14 +30,17 @@ pub enum LoadRegHLRegSPr8 {
     LDSPr8 = 0xf8,
 }
 
-/// IL Y A UN PB CAR suite a signed la data passe en u16 et le add<u16> ne set pas les meme flags
-/// que le add<u8> or il faut les flags du add<u8> la.......
-/// NEED TO CHECK LATER
+fn add_u16_signed(value: u16, nbr: u16) -> (u16, Flags) {
+    let (value, c) = (value as usize, 0);
+    let (data, flag) = carry(value, nbr as usize, c, BIT7_MINUS_1, BIT3_MINUS_1);
+    (data as u16, flag)
+}
+
 impl LoadRegHLRegSPr8 {
     pub async fn exec(self, registers: Registers, memory: Memory) {
-        let src = Data::NoCarry(registers.borrow().get(Bits16::SP));
+        let src = registers.borrow().get(Bits16::SP);
         let data = signed(registers.clone().next_pc(memory.clone()).await.unwrap());
-        let (data, flag) = src.add(data);
+        let (data, flag) = add_u16_signed(data, src);
         registers.borrow_mut().set(Bits16::HL, data);
         registers.borrow_mut().set(Flag::Z, false);
         registers.borrow_mut().set(Flag::N, false);

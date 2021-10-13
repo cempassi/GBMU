@@ -55,7 +55,7 @@ pub fn signed(value: u8) -> u16 {
     }
 }
 
-fn carry(value: usize, nbr: usize, c: usize, max_c: usize, max_h: usize) -> (usize, Flags) {
+pub fn carry(value: usize, nbr: usize, c: usize, max_c: usize, max_h: usize) -> (usize, Flags) {
     let data = (value + nbr as usize + c as usize) & max_c;
     let mut flag = Flags::default();
     flag.set_z(data == 0);
