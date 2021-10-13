@@ -5,23 +5,42 @@ use crate::Cpu;
 use memory::{Async, Memory};
 use num_enum::TryFromPrimitive;
 
-/// CALL nn
+/// [CALL nn] | [CALL cc,nn]
 /// Description:
-///  Push address of next instruction onto stack and then jump to address nn.
+/// [CALL nn]       => Push address of next instruction onto stack and then jump to address nn.
+/// [CALL cc,nn]    => Call address n if following condition is true:
 /// Use with:
+///  cc = NZ, Call if Z flag is reset.
+///  cc = Z, Call if Z flag is set.
+///  cc = NC, Call if C flag is reset.
+///  cc = C, Call if C flag is set.
 ///  nn = two byte immediate value. (LS byte first.)
 /// Opcodes:
 /// Instruction Parameters Opcode Cycles
-///  CALL nn CD 12
+/// CALL        nn         0xCD   12
+/// CALL        NZ,nn      0xC4   12
+/// CALL        Z,nn       0xCC   12
+/// CALL        NC,nn      0xD4   12
+/// CALL        C,nn       0xDC   12
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Call {
     CALL = 0xcd,
+    CALLNZ = 0xc4,
+    CALLZ = 0xcc,
+    CALLNC = 0xd4,
+    CALLC = 0xdc,
 }
 
 impl Call {
     pub async fn exec(self, registers: Registers, memory: Memory) {
+        match self {
+            Call::CALL => (),
+            Call::CALLNZ | Call::CALLZ | Call::CALLNC | Call::CALLC => if !Cpu::flags_conditions(self as u8, registers.clone()) {
+                    return;
+                }
+        }
         let data = <Memory as Async<u16>>::get(memory.clone(), registers.borrow().get(Bits16::PC))
             .await
             .unwrap();

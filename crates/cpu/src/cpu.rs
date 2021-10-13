@@ -59,7 +59,7 @@ use crate::opcodes::SCF;
 use crate::area::{Bits16, Flag};
 use crate::consts::{
     DI_INSTRUCTION, EI_INSTRUCTION, HALT_INSTRUCTION, NOP_INSTRUCTION, PREFIX_CB_INSTRUCTIONS,
-    STOP_INSTRUCTION,
+    STOP_INSTRUCTION, CALL_C, CALL_Z, CALL_NO_Z, CALL_NO_C, JUMP_Z, JUMP_C, JUMP_NO_Z, JUMP_NO_C, RELATIVE_JUMP_C, RELATIVE_JUMP_Z, RELATIVE_JUMP_NO_Z, RELATIVE_JUMP_NO_C, RET_NO_Z, RET_NO_C, RET_C, RET_Z
 };
 use crate::nextpc::NextPc;
 use crate::RegisterBus;
@@ -125,22 +125,22 @@ impl Cpu {
         }
     }
 
-    /// JPNZ = 0xc2     RETNZ = 0xc0    JRNZ = 0x20
-    /// JPZ  = 0xcA     RETNC = 0xd0    JRZ  = 0x28
-    /// JPNC = 0xd2     RETZ  = 0xc8    JRNC = 0x30
-    /// JPC  = 0xda     RETC  = 0xd8    JRC  = 0x38
+    /// JPNZ = 0xc2     RETNZ = 0xc0    JRNZ = 0x20     CALLNZ = 0xc4
+    /// JPZ  = 0xcA     RETNC = 0xd0    JRZ  = 0x28     CALLZ  = 0xcc
+    /// JPNC = 0xd2     RETZ  = 0xc8    JRNC = 0x30     CALLNC = 0xd4
+    /// JPC  = 0xda     RETC  = 0xd8    JRC  = 0x38     CALLC  = 0xdc
     pub fn flags_conditions(opcode: u8, registers: Registers) -> bool {
         match opcode {
-            consts::RELATIVE_JUMP_NO_Z | consts::JUMP_NO_Z | consts::RET_NO_Z => {
+            CALL_NO_Z| RELATIVE_JUMP_NO_Z | JUMP_NO_Z | RET_NO_Z => {
                 !registers.borrow().get(Flag::Z)
             }
-            consts::RELATIVE_JUMP_Z | consts::JUMP_Z | consts::RET_Z => {
+            CALL_Z| RELATIVE_JUMP_Z | JUMP_Z | RET_Z => {
                 registers.borrow().get(Flag::Z)
             }
-            consts::RELATIVE_JUMP_NO_C | consts::JUMP_NO_C | consts::RET_NO_C => {
+            CALL_NO_C| RELATIVE_JUMP_NO_C | JUMP_NO_C | RET_NO_C => {
                 !registers.borrow().get(Flag::C)
             }
-            consts::RELATIVE_JUMP_C | consts::JUMP_C | consts::RET_C => {
+            CALL_C| RELATIVE_JUMP_C | JUMP_C | RET_C => {
                 registers.borrow().get(Flag::C)
             }
             _ => false,
