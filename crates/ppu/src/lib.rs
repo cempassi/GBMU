@@ -6,6 +6,5 @@ pub(crate) mod ppu;
 pub mod registers;
 pub(crate) mod tile;
 pub(crate) mod transfert;
-pub mod vram;
 
 pub use crate::ppu::Ppu;
