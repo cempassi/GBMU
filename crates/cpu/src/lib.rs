@@ -3,12 +3,12 @@ pub mod bus;
 pub mod cpu;
 pub(crate) mod executor;
 mod flags;
-pub mod get_at;
 pub mod interface;
 pub mod nextpc;
 mod opcodes;
-pub mod reader;
 pub mod registers;
+pub mod get_at;
+pub mod reader;
 
 pub use crate::bus::RegisterBus;
 pub use crate::cpu::Cpu;

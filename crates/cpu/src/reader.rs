@@ -1,7 +1,7 @@
-use shared::Error;
 use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
+use shared::Error;
 
 pub struct Reader<T> {
     inner: Pin<Box<dyn Future<Output = Result<T, Error>>>>,
