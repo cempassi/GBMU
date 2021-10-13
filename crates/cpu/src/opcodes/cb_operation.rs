@@ -1,34 +1,32 @@
 use crate::bus::RegisterBus;
-use crate::{GetAt, SetAt};
-use memory::Memory;
 use crate::{
-    area::{Bits8, Bits16, Flag},
+    area::{Bits16, Bits8, Flag},
     Registers,
 };
+use crate::{GetAt, SetAt};
+use memory::Memory;
 
 use super::consts::{BIT0, BIT7};
 
 #[derive(Debug, Eq, PartialEq)]
-pub enum CBOperation {
-    RotateLeftCarry,
-    RotateLeftNoCarry,
-    RotateRightCarry,
-    RotateRightNoCarry,
+pub enum Rotation {
+    Left,
+    LeftNoCarry,
+    Right,
+    RightNoCarry,
 }
 
-impl CBOperation {
+impl Rotation {
     fn rotation(self, registers: &Registers, data: u8) -> u8 {
         let carry = match self {
-            CBOperation::RotateLeftCarry | CBOperation::RotateLeftNoCarry  =>  (data & BIT7) != 0,
-            CBOperation::RotateRightCarry | CBOperation::RotateRightNoCarry  => (data & BIT0) != 0,
+            Rotation::Left | Rotation::LeftNoCarry => (data & BIT7) != 0,
+            Rotation::Right | Rotation::RightNoCarry => (data & BIT0) != 0,
         };
         let data = match self {
-            CBOperation::RotateLeftCarry => (data << 1) | registers.borrow().get(Flag::C) as u8,
-            CBOperation::RotateLeftNoCarry => (data << 1) | carry as u8,
-            CBOperation::RotateRightCarry => {
-                (data >> 1) | ((registers.borrow().get(Flag::C) as u8) << 7)
-            }
-            CBOperation::RotateRightNoCarry => (data >> 1) | ((carry as u8) << 7),
+            Rotation::Left => (data << 1) | registers.borrow().get(Flag::C) as u8,
+            Rotation::LeftNoCarry => (data << 1) | carry as u8,
+            Rotation::Right => (data >> 1) | ((registers.borrow().get(Flag::C) as u8) << 7),
+            Rotation::RightNoCarry => (data >> 1) | ((carry as u8) << 7),
         };
         registers.borrow_mut().set(Flag::C, carry);
         if data == 0 {
@@ -44,7 +42,11 @@ impl CBOperation {
     }
 
     pub async fn rotate_hl(self, registers: Registers, memory: Memory) {
-        let data = registers.clone().get_at(memory.clone(), Bits16::HL).await.unwrap();
+        let data = registers
+            .clone()
+            .get_at(memory.clone(), Bits16::HL)
+            .await
+            .unwrap();
         let data = self.rotation(&registers, data);
         registers.set_at(memory, Bits16::HL, data).await.unwrap();
     }

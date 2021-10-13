@@ -1,8 +1,8 @@
+use super::cb_operation::Rotation;
 use crate::area::Bits8;
 use crate::cpu::Registers;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
-use super::cb_operation::CBOperation;
 
 /// RR r8
 /// Rotate bits in register r8 right through carry.
@@ -51,7 +51,6 @@ use super::cb_operation::CBOperation;
 /// H - Unused
 /// C - Set according to result.
 
-
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
@@ -93,38 +92,38 @@ pub enum Rotate {
 impl Rotate {
     pub async fn exec(self, registers: Registers, memory: Memory) {
         match self {
-            Rotate::LA => CBOperation::RotateLeftCarry.rotate(registers, Bits8::A),
-            Rotate::LB => CBOperation::RotateLeftCarry.rotate(registers, Bits8::B),
-            Rotate::LC => CBOperation::RotateLeftCarry.rotate(registers, Bits8::C),
-            Rotate::LD => CBOperation::RotateLeftCarry.rotate(registers, Bits8::D),
-            Rotate::LE => CBOperation::RotateLeftCarry.rotate(registers, Bits8::E),
-            Rotate::LH => CBOperation::RotateLeftCarry.rotate(registers, Bits8::H),
-            Rotate::LL => CBOperation::RotateLeftCarry.rotate(registers, Bits8::L),
-            Rotate::LHL =>  CBOperation::RotateLeftCarry.rotate_hl(registers, memory).await,
-            Rotate::LCA => CBOperation::RotateLeftNoCarry.rotate(registers, Bits8::A),
-            Rotate::LCB => CBOperation::RotateLeftNoCarry.rotate(registers, Bits8::B),
-            Rotate::LCC => CBOperation::RotateLeftNoCarry.rotate(registers, Bits8::C),
-            Rotate::LCD => CBOperation::RotateLeftNoCarry.rotate(registers, Bits8::D),
-            Rotate::LCE => CBOperation::RotateLeftNoCarry.rotate(registers, Bits8::E),
-            Rotate::LCH => CBOperation::RotateLeftNoCarry.rotate(registers, Bits8::H),
-            Rotate::LCL => CBOperation::RotateLeftNoCarry.rotate(registers, Bits8::L),
-            Rotate::LCHL => CBOperation::RotateLeftNoCarry.rotate_hl(registers, memory).await,
-            Rotate::RA => CBOperation::RotateRightCarry.rotate(registers, Bits8::A),
-            Rotate::RB => CBOperation::RotateRightCarry.rotate(registers, Bits8::B),
-            Rotate::RC => CBOperation::RotateRightCarry.rotate(registers, Bits8::C),
-            Rotate::RD => CBOperation::RotateRightCarry.rotate(registers, Bits8::D),
-            Rotate::RE => CBOperation::RotateRightCarry.rotate(registers, Bits8::E),
-            Rotate::RH => CBOperation::RotateRightCarry.rotate(registers, Bits8::H),
-            Rotate::RL => CBOperation::RotateRightCarry.rotate(registers, Bits8::L),
-            Rotate::RHL => CBOperation::RotateRightCarry.rotate_hl(registers, memory).await,
-            Rotate::RCA => CBOperation::RotateRightNoCarry.rotate(registers, Bits8::A),
-            Rotate::RCB => CBOperation::RotateRightNoCarry.rotate(registers, Bits8::B),
-            Rotate::RCC => CBOperation::RotateRightNoCarry.rotate(registers, Bits8::C),
-            Rotate::RCD => CBOperation::RotateRightNoCarry.rotate(registers, Bits8::D),
-            Rotate::RCE => CBOperation::RotateRightNoCarry.rotate(registers, Bits8::E),
-            Rotate::RCH => CBOperation::RotateRightNoCarry.rotate(registers, Bits8::H),
-            Rotate::RCL => CBOperation::RotateRightNoCarry.rotate(registers, Bits8::L),
-            Rotate::RCHL => CBOperation::RotateRightNoCarry.rotate_hl(registers, memory).await,
+            Rotate::LA => Rotation::Left.rotate(registers, Bits8::A),
+            Rotate::LB => Rotation::Left.rotate(registers, Bits8::B),
+            Rotate::LC => Rotation::Left.rotate(registers, Bits8::C),
+            Rotate::LD => Rotation::Left.rotate(registers, Bits8::D),
+            Rotate::LE => Rotation::Left.rotate(registers, Bits8::E),
+            Rotate::LH => Rotation::Left.rotate(registers, Bits8::H),
+            Rotate::LL => Rotation::Left.rotate(registers, Bits8::L),
+            Rotate::LHL => Rotation::Left.rotate_hl(registers, memory).await,
+            Rotate::LCA => Rotation::LeftNoCarry.rotate(registers, Bits8::A),
+            Rotate::LCB => Rotation::LeftNoCarry.rotate(registers, Bits8::B),
+            Rotate::LCC => Rotation::LeftNoCarry.rotate(registers, Bits8::C),
+            Rotate::LCD => Rotation::LeftNoCarry.rotate(registers, Bits8::D),
+            Rotate::LCE => Rotation::LeftNoCarry.rotate(registers, Bits8::E),
+            Rotate::LCH => Rotation::LeftNoCarry.rotate(registers, Bits8::H),
+            Rotate::LCL => Rotation::LeftNoCarry.rotate(registers, Bits8::L),
+            Rotate::LCHL => Rotation::LeftNoCarry.rotate_hl(registers, memory).await,
+            Rotate::RA => Rotation::Right.rotate(registers, Bits8::A),
+            Rotate::RB => Rotation::Right.rotate(registers, Bits8::B),
+            Rotate::RC => Rotation::Right.rotate(registers, Bits8::C),
+            Rotate::RD => Rotation::Right.rotate(registers, Bits8::D),
+            Rotate::RE => Rotation::Right.rotate(registers, Bits8::E),
+            Rotate::RH => Rotation::Right.rotate(registers, Bits8::H),
+            Rotate::RL => Rotation::Right.rotate(registers, Bits8::L),
+            Rotate::RHL => Rotation::Right.rotate_hl(registers, memory).await,
+            Rotate::RCA => Rotation::RightNoCarry.rotate(registers, Bits8::A),
+            Rotate::RCB => Rotation::RightNoCarry.rotate(registers, Bits8::B),
+            Rotate::RCC => Rotation::RightNoCarry.rotate(registers, Bits8::C),
+            Rotate::RCD => Rotation::RightNoCarry.rotate(registers, Bits8::D),
+            Rotate::RCE => Rotation::RightNoCarry.rotate(registers, Bits8::E),
+            Rotate::RCH => Rotation::RightNoCarry.rotate(registers, Bits8::H),
+            Rotate::RCL => Rotation::RightNoCarry.rotate(registers, Bits8::L),
+            Rotate::RCHL => Rotation::RightNoCarry.rotate_hl(registers, memory).await,
         };
     }
 }
