@@ -37,9 +37,11 @@ impl Call {
     pub async fn exec(self, registers: Registers, memory: Memory) {
         match self {
             Call::CALL => (),
-            Call::CALLNZ | Call::CALLZ | Call::CALLNC | Call::CALLC => if !Cpu::flags_conditions(self as u8, registers.clone()) {
+            Call::CALLNZ | Call::CALLZ | Call::CALLNC | Call::CALLC => {
+                if !Cpu::flags_conditions(self as u8, registers.clone()) {
                     return;
                 }
+            }
         }
         let data = <Memory as Async<u16>>::get(memory.clone(), registers.borrow().get(Bits16::PC))
             .await

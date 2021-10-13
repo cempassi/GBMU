@@ -1,5 +1,4 @@
 pub use crate::interface::{NewRegisters, Registers};
-use crate::opcodes::consts;
 use crate::opcodes::AddRegA;
 use crate::opcodes::AddRegHL;
 use crate::opcodes::AddRegSP;
@@ -58,8 +57,10 @@ use crate::opcodes::SCF;
 
 use crate::area::{Bits16, Flag};
 use crate::consts::{
-    DI_INSTRUCTION, EI_INSTRUCTION, HALT_INSTRUCTION, NOP_INSTRUCTION, PREFIX_CB_INSTRUCTIONS,
-    STOP_INSTRUCTION, CALL_C, CALL_Z, CALL_NO_Z, CALL_NO_C, JUMP_Z, JUMP_C, JUMP_NO_Z, JUMP_NO_C, RELATIVE_JUMP_C, RELATIVE_JUMP_Z, RELATIVE_JUMP_NO_Z, RELATIVE_JUMP_NO_C, RET_NO_Z, RET_NO_C, RET_C, RET_Z
+    CALL_C, CALL_NO_C, CALL_NO_Z, CALL_Z, DI_INSTRUCTION, EI_INSTRUCTION, HALT_INSTRUCTION, JUMP_C,
+    JUMP_NO_C, JUMP_NO_Z, JUMP_Z, NOP_INSTRUCTION, PREFIX_CB_INSTRUCTIONS, RELATIVE_JUMP_C,
+    RELATIVE_JUMP_NO_C, RELATIVE_JUMP_NO_Z, RELATIVE_JUMP_Z, RET_C, RET_NO_C, RET_NO_Z, RET_Z,
+    STOP_INSTRUCTION,
 };
 use crate::nextpc::NextPc;
 use crate::RegisterBus;
@@ -131,18 +132,14 @@ impl Cpu {
     /// JPC  = 0xda     RETC  = 0xd8    JRC  = 0x38     CALLC  = 0xdc
     pub fn flags_conditions(opcode: u8, registers: Registers) -> bool {
         match opcode {
-            CALL_NO_Z| RELATIVE_JUMP_NO_Z | JUMP_NO_Z | RET_NO_Z => {
+            CALL_NO_Z | RELATIVE_JUMP_NO_Z | JUMP_NO_Z | RET_NO_Z => {
                 !registers.borrow().get(Flag::Z)
             }
-            CALL_Z| RELATIVE_JUMP_Z | JUMP_Z | RET_Z => {
-                registers.borrow().get(Flag::Z)
-            }
-            CALL_NO_C| RELATIVE_JUMP_NO_C | JUMP_NO_C | RET_NO_C => {
+            CALL_Z | RELATIVE_JUMP_Z | JUMP_Z | RET_Z => registers.borrow().get(Flag::Z),
+            CALL_NO_C | RELATIVE_JUMP_NO_C | JUMP_NO_C | RET_NO_C => {
                 !registers.borrow().get(Flag::C)
             }
-            CALL_C| RELATIVE_JUMP_C | JUMP_C | RET_C => {
-                registers.borrow().get(Flag::C)
-            }
+            CALL_C | RELATIVE_JUMP_C | JUMP_C | RET_C => registers.borrow().get(Flag::C),
             _ => false,
         }
     }

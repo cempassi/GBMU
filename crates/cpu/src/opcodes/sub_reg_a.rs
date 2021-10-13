@@ -51,7 +51,6 @@ pub enum SubRegA {
     AcA = 0x9F,
     A8b = 0xd6,
     Ac8b = 0xde,
-
 }
 
 impl SubRegA {

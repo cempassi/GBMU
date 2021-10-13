@@ -30,7 +30,6 @@ pub enum LoadRegHLRegSPr8 {
 
 /// IL Y A UN PB CAR suite a signed la data passe en u16 et le add<u16> ne set pas les meme flags
 /// que le add<u8> or il faut les flags du add<u8> la.......
-/// du coup faut split le u16 faire le add u8 sur le lower byte et add u16 sur le upper byte du short
 /// NEED TO CHECK LATER
 impl LoadRegHLRegSPr8 {
     pub async fn exec(self, registers: Registers, memory: Memory) {
