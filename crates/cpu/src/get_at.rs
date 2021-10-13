@@ -1,11 +1,11 @@
-use crate::{Reader, Registers, RegisterBus};
-use memory::{Memory, Async};
 use super::area::Bits16;
+use crate::{Reader, RegisterBus, Registers};
+use memory::{Async, Memory};
 use shared::Error;
-use std::pin::Pin;
 use std::future::Future;
+use std::pin::Pin;
 
-type F =  Pin<Box<dyn Future<Output = Result<u8, Error>>>>;
+type F = Pin<Box<dyn Future<Output = Result<u8, Error>>>>;
 
 pub(crate) trait GetAt {
     fn get_at(self, memory: Memory, area: Bits16) -> F;

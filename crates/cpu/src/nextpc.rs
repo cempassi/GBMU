@@ -5,7 +5,6 @@ use shared::Error;
 use std::future::Future;
 use std::pin::Pin;
 
-
 pub(crate) trait NextPc<T> {
     fn next_pc(self, memory: Memory) -> Pin<Box<dyn Future<Output = Result<T, Error>>>>;
 }
