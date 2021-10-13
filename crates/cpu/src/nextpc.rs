@@ -1,10 +1,10 @@
-use crate::Registers;
+use crate::{Reader, Registers};
 use memory::Async;
 use memory::Memory;
 use shared::Error;
 use std::future::Future;
 use std::pin::Pin;
-use std::task::{Context, Poll};
+
 
 pub(crate) trait NextPc<T> {
     fn next_pc(self, memory: Memory) -> Pin<Box<dyn Future<Output = Result<T, Error>>>>;
@@ -21,24 +21,6 @@ impl NextPc<u16> for Registers {
     fn next_pc(self, memory: Memory) -> Pin<Box<dyn Future<Output = Result<u16, Error>>>> {
         let inner = Box::pin(next_16(self, memory));
         Box::pin(Reader::new(inner))
-    }
-}
-
-pub struct Reader<T> {
-    inner: Pin<Box<dyn Future<Output = Result<T, Error>>>>,
-}
-
-impl<T> Reader<T> {
-    pub fn new(inner: Pin<Box<dyn Future<Output = Result<T, Error>>>>) -> Self {
-        Self { inner }
-    }
-}
-
-impl<T> Future for Reader<T> {
-    type Output = Result<T, Error>;
-
-    fn poll(mut self: Pin<&mut Self>, context: &mut Context<'_>) -> Poll<Self::Output> {
-        self.inner.as_mut().poll(context)
     }
 }
 
