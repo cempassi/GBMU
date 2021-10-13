@@ -50,6 +50,8 @@ pub enum SubRegA {
     AcHL = 0x9E,
     AcA = 0x9F,
     A8b = 0xd6,
+    Ac8b = 0xde,
+
 }
 
 impl SubRegA {
@@ -70,6 +72,7 @@ impl SubRegA {
             SubRegA::AcH => Data::Carry(registers.borrow().get(Bits8::H)),
             SubRegA::AcL => Data::Carry(registers.borrow().get(Bits8::L)),
             SubRegA::A8b => Data::NoCarry(registers.clone().next_pc(memory.clone()).await.unwrap()),
+            SubRegA::Ac8b => Data::Carry(registers.clone().next_pc(memory.clone()).await.unwrap()),
             SubRegA::AHL => {
                 let src = registers.borrow().get(Bits16::HL);
                 Data::NoCarry(<Memory as Async<u8>>::get(memory, src).await.unwrap())
