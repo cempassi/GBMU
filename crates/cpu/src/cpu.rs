@@ -1,10 +1,8 @@
 pub use crate::interface::{NewRegisters, Registers};
 use crate::opcodes::AddRegA;
 use crate::opcodes::LoadHL8b;
-use crate::opcodes::LoadR1R2;
-use crate::opcodes::LoadR8b;
 use crate::opcodes::LoadRR16b;
-use crate::opcodes::LoadRegHL;
+use crate::opcodes::LoadRegister;
 use crate::opcodes::Rotate;
 use crate::opcodes::SubRegA;
 
@@ -61,15 +59,11 @@ impl Cpu {
 
         if opcode == 0xCB {
             self.prefix_cb().await;
-        } else if let Ok(operation) = LoadR1R2::try_from_primitive(opcode) {
-            operation.exec(self.registers);
-        } else if let Ok(operation) = LoadR8b::try_from_primitive(opcode) {
+        } else if let Ok(operation) = LoadRegister::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadRR16b::try_from_primitive(opcode.into()) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadHL8b::try_from_primitive(opcode) {
-            operation.exec(self.registers, self.memory).await;
-        } else if let Ok(operation) = LoadRegHL::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = AddRegA::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
