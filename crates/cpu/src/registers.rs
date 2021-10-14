@@ -26,7 +26,7 @@ impl Arithmetic<Bits8> for Registers {
     fn increase(&mut self, area: Bits8) {
         match area {
             Bits8::A => self.a += 1,
-            Bits8::F => self.f = self.f,
+            Bits8::F => (),
             Bits8::B => self.b += 1,
             Bits8::C => self.c += 1,
             Bits8::D => self.d += 1,
@@ -39,7 +39,7 @@ impl Arithmetic<Bits8> for Registers {
     fn decrease(&mut self, area: Bits8) {
         match area {
             Bits8::A => self.a -= 1,
-            Bits8::F => self.f = self.f,
+            Bits8::F => (),
             Bits8::B => self.b -= 1,
             Bits8::C => self.c -= 1,
             Bits8::D => self.d -= 1,
