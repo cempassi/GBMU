@@ -1,26 +1,36 @@
-use crate::blanks::{Blank, HBLANK, VBLANK};
-use crate::interface::{Registers, Vram};
-use crate::oam::Oam;
 use crate::registers::lcd::Register;
-use crate::transfert::Pixel;
+use crate::registers::Registers;
 
-#[derive(Default, Clone)]
+#[derive(Debug, Default)]
 pub struct Ppu {
-    vram: Vram,
+    vram: Vec<u8>,
     registers: Registers,
 }
 
+impl AsRef<Vec<u8>> for Ppu {
+    fn as_ref(&self) -> &Vec<u8> {
+        self.vram.as_ref()
+    }
+}
+
 impl Ppu {
-    pub async fn run(self) -> u8 {
-        println!("Running the ppu!");
-        while self.registers.borrow_mut().is_lower(Register::Ly, 144) {
-            Oam::search(self.registers.clone(), self.vram.clone()).await;
-            Pixel::transfert(self.registers.clone(), self.vram.clone()).await;
-            self.registers.borrow_mut().increase(Register::Ly);
-            Blank::new(HBLANK).await;
-        }
-        Blank::new(VBLANK).await;
-        self.registers.borrow_mut().clear(Register::Ly);
-        42
+    pub fn get_vram(&self, address: usize) -> u8 {
+        self.vram[address]
+    }
+
+    pub fn set_vram(&mut self, address: usize, data: u8) {
+        self.vram[address] = data;
+    }
+
+    pub fn is_lower(&mut self, register: Register, nbr: u8) -> bool {
+        self.registers.is_lower(register, nbr)
+    }
+
+    pub fn increase(&mut self, register: Register) {
+        self.registers.increase(register);
+    }
+
+    pub fn clear(&mut self, register: Register) {
+        self.registers.clear(register);
     }
 }

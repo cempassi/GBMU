@@ -1,6 +1,6 @@
 use cpu::cpu::Cpu;
 use memory::Memory;
-use ppu::Ppu;
+use ppu::{Ppu, Run};
 use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
@@ -14,8 +14,9 @@ pub enum Processor {
 
 impl Processor {
     pub fn init(memory: Memory) -> Vec<Self> {
+        let ppu = memory.borrow().get_ppu();
+        let ppu = Processor::Ppu(ppu, None);
         let cpu = Processor::Cpu(Cpu::new(memory), None);
-        let ppu = Processor::Ppu(Ppu::default(), None);
         vec![cpu, ppu]
     }
 

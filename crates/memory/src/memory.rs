@@ -10,6 +10,7 @@ use crate::interface::{Bus, Rom};
 use crate::mbc::default::RomDefault;
 use crate::state;
 use crate::wram::Wram;
+use ppu::Ppu;
 use shared::Error;
 
 #[derive(Debug)]
@@ -18,6 +19,7 @@ pub struct Memory {
     pub(crate) bios: Bus,
     pub(crate) rom: Rom,
     pub(crate) wram: Bus,
+    pub(crate) ppu: Ppu,
 }
 
 impl Default for Memory {
@@ -26,6 +28,7 @@ impl Default for Memory {
             state: state::Rom::Bios,
             bios: Rc::new(RefCell::new(Box::new(Bios::new()))),
             wram: Rc::new(RefCell::new(Box::new(Wram::default()))),
+            ppu: Ppu::default(),
             rom: Rom::default(),
         }
     }
@@ -40,6 +43,7 @@ impl Memory {
             consts::ROM_MIN..=consts::ROM_MAX => {
                 Ok(self.rom.borrow().get(Area::Rom.relative(address)))
             }
+            consts::VRAM_MIN..=consts::VRAM_MAX => Ok(self.ppu.borrow().get(address.into())),
             consts::WRAM_MIN..=consts::WRAM_MAX => {
                 Ok(self.wram.borrow().get(Area::Wram.relative(address)))
             }
@@ -59,6 +63,10 @@ impl Memory {
                 self.wram
                     .borrow_mut()
                     .set(Area::Rom.relative(address), data);
+                Ok(())
+            }
+            consts::VRAM_MIN..=consts::VRAM_MAX => {
+                self.ppu.borrow_mut().set(address.into(), data);
                 Ok(())
             }
             _ => Err(Error::SegmentationFault(address)),
@@ -89,14 +97,17 @@ impl Memory {
         match area {
             Area::Bios => self.bios.clone(),
             Area::Rom => todo!(),
-            Area::_Vram => todo!(),
-            Area::_ExtRam => todo!(),
+            Area::Vram | Area::_ExtRam => todo!(),
             Area::Wram => self.wram.clone(),
             Area::_EchoRam => todo!(),
             Area::_Oam => todo!(),
             Area::_IOReg => todo!(),
             Area::_HighRam => todo!(),
         }
+    }
+
+    pub fn get_ppu(&self) -> Ppu {
+        self.ppu.clone()
     }
 }
 
@@ -115,11 +126,13 @@ impl Memory {
         let bios = Rc::new(RefCell::new(bios));
         let wram: Box<dyn MemoryBus> = Box::new(Wram::default());
         let wram = Rc::new(RefCell::new(wram));
+        let ppu = Ppu::default();
         Rc::new(RefCell::new(Self {
             state,
             bios,
             rom,
             wram,
+            ppu,
         }))
     }
 }

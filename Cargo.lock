@@ -1089,6 +1089,7 @@ name = "memory"
 version = "0.1.0"
 dependencies = [
  "num_enum",
+ "ppu",
  "shared",
 ]
 
@@ -1450,7 +1451,6 @@ checksum = "7c9b1041b4387893b91ee6746cddfc28516aff326a3519fb2adf820932c5e6cb"
 name = "ppu"
 version = "0.1.0"
 dependencies = [
- "memory",
  "modular-bitfield",
  "shared",
 ]

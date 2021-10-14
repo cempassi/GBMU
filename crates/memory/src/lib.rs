@@ -7,6 +7,7 @@ pub mod futures;
 pub mod interface;
 pub(crate) mod mbc;
 pub mod memory;
+pub(crate) mod ppu;
 pub(crate) mod state;
 pub(crate) mod wram;
 

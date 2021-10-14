@@ -7,4 +7,5 @@ edition = "2018"
 
 [dependencies]
 num_enum = "0.5.3"
+ppu = { path = "../ppu" }
 shared = { path = "../shared" }

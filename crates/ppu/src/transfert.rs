@@ -3,23 +3,18 @@ use std::pin::Pin;
 use std::task::{Context, Poll};
 
 use crate::cycle::Cycle;
-use crate::interface::{Registers, Vram};
+use crate::Ppu;
 
 #[allow(dead_code)]
 pub struct Pixel {
     cycle: Cycle,
-    registers: Registers,
-    vram: Vram,
+    ppu: Ppu,
 }
 
 impl Pixel {
-    pub fn transfert(registers: Registers, vram: Vram) -> Self {
+    pub fn transfert(ppu: Ppu) -> Self {
         let cycle = Cycle::Ppu(0);
-        Self {
-            cycle,
-            vram,
-            registers,
-        }
+        Self { cycle, ppu }
     }
 }
 
