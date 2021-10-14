@@ -1,8 +1,8 @@
 use crate::area::{Bits16, Bits8};
-use crate::nextpc::NextPc;
-use crate::futures::GetAt;
 use crate::bus::RegisterBus;
 use crate::cpu::Registers;
+use crate::futures::GetAt;
+use crate::nextpc::NextPc;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
@@ -53,6 +53,7 @@ use num_enum::TryFromPrimitive;
 /// LD          A,(HL)     0x7E   8
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u8)]
+#[allow(clippy::upper_case_acronyms)]
 pub enum LoadRegister {
     B = 0x06,
     C = 0x0e,
@@ -116,15 +117,15 @@ pub enum LoadRegister {
 pub enum Load {
     Register,
     Address,
-    Next
+    Next,
 }
 
 impl Load {
     pub async fn load(self, registers: Registers, memory: Memory, src: Option<Bits8>, dst: Bits8) {
         let data = match self {
-            Load::Register =>  registers.borrow().get(src.unwrap()) ,
+            Load::Register => registers.borrow().get(src.unwrap()),
             Load::Address => registers.clone().get_at(memory, Bits16::HL).await.unwrap(),
-            Load::Next =>  registers.clone().next_pc(memory).await.unwrap(),
+            Load::Next => registers.clone().next_pc(memory).await.unwrap(),
         };
         registers.borrow_mut().set(dst, data);
     }
@@ -190,7 +191,8 @@ impl LoadRegister {
             LoadRegister::H => Load::Next.load(registers, memory, None, Bits8::H),
             LoadRegister::L => Load::Next.load(registers, memory, None, Bits8::L),
             LoadRegister::A => Load::Next.load(registers, memory, None, Bits8::A),
-        }.await;
+        }
+        .await;
     }
 }
 
@@ -198,8 +200,8 @@ impl LoadRegister {
 mod test_instruction_load_reg_reg {
     use super::LoadRegister;
     use crate::area::{Bits16, Bits8};
-    use crate::{RegisterBus, Registers};
     use crate::executor;
+    use crate::{RegisterBus, Registers};
     use memory::Memory;
 
     #[test]

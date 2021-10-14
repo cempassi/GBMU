@@ -1,8 +1,8 @@
 pub use crate::interface::{NewRegisters, Registers};
 use crate::opcodes::AddRegA;
-use crate::opcodes::LoadRegister;
 use crate::opcodes::LoadHL8b;
 use crate::opcodes::LoadRR16b;
+use crate::opcodes::LoadRegister;
 use crate::opcodes::Rotate;
 use crate::opcodes::SubRegA;
 
