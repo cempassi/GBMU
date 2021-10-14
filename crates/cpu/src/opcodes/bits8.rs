@@ -1,3 +1,3 @@
-mod load_register;
+mod load;
 
-pub use load_register::LoadRegister;
+pub use load::Load;
