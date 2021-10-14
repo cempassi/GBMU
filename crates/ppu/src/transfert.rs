@@ -8,16 +8,13 @@ use crate::Ppu;
 #[allow(dead_code)]
 pub struct Pixel {
     cycle: Cycle,
-    ppu: Ppu
+    ppu: Ppu,
 }
 
 impl Pixel {
     pub fn transfert(ppu: Ppu) -> Self {
         let cycle = Cycle::Ppu(0);
-        Self {
-            cycle,
-            ppu
-        }
+        Self { cycle, ppu }
     }
 }
 
