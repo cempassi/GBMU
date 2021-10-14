@@ -1,4 +1,4 @@
-use crate::area::{Bits8, Bits16};
+use crate::area::{Bits16, Bits8};
 use crate::bus::RegisterBus;
 use crate::cpu::Registers;
 use crate::futures::GetAt;
