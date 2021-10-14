@@ -3,6 +3,7 @@ use crate::bus::RegisterBus;
 use crate::cpu::Registers;
 use crate::futures::{GetAt, SetAt};
 use crate::nextpc::NextPc;
+use crate::registers::Arithmetic;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
@@ -91,6 +92,22 @@ use num_enum::TryFromPrimitive;
 /// Instruction Parameters Opcode Cycles
 /// LD          A, (BC)     0x0A     8
 /// LD          A, (DE)     0x1A     8
+
+/// 1. LD (HL+/-), A
+/// Description:
+/// Store value in register A into byte pointed to by register HL, then (increase/decrease) HL.
+/// Opcodes:
+/// Instruction Parameters Opcode Cycles
+/// LD          (HL+), A     0x22     8
+/// LD          (HL-), A     0x32     8
+
+/// 1. LD A, (HL+/-)
+/// Description:
+/// Store value in byte pointed to by register (HL) in register A, then (increase/decrease) HL.
+/// Opcodes:
+/// Instruction Parameters Opcode Cycles
+/// LD          A, (HL+)      0x2A     8
+/// LD          A, (HL-)      0x3A     8
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
@@ -164,6 +181,10 @@ pub enum Load {
     DEA = 0x12,
     ABC = 0x0A,
     ADE = 0x1A,
+    HLPA = 0x22,
+    HLMA = 0x32,
+    AHLP = 0x2A,
+    AHLM = 0x3A,
 }
 
 #[derive(Clone, Copy)]
@@ -171,11 +192,15 @@ enum Src {
     Register,
     Pointer,
     Next,
+    Increase,
+    Decrease,
 }
 
 enum Dst {
     Register(Bits8),
     Pointer(Bits16),
+    Increase(Bits16),
+    Decrease(Bits16),
 }
 
 impl Dst {
@@ -188,10 +213,36 @@ impl Dst {
                 .await
                 .unwrap(),
             Src::Next => registers.clone().next_pc(memory.clone()).await.unwrap(),
+            Src::Increase => {
+                let data = registers
+                    .clone()
+                    .get_at(memory.clone(), Bits16::HL)
+                    .await
+                    .unwrap();
+                registers.borrow_mut().increase(Bits16::HL);
+                data
+            }
+            Src::Decrease => {
+                let data = registers
+                    .clone()
+                    .get_at(memory.clone(), Bits16::HL)
+                    .await
+                    .unwrap();
+                registers.borrow_mut().increase(Bits16::HL);
+                data
+            }
         };
         match self {
             Dst::Register(dst) => registers.borrow_mut().set(dst, data),
             Dst::Pointer(dst) => registers.set_at(memory, dst, data).await.unwrap(),
+            Dst::Increase(dst) => {
+                registers.borrow_mut().increase(Bits16::HL);
+                registers.set_at(memory, dst, data).await.unwrap();
+            }
+            Dst::Decrease(dst) => {
+                registers.borrow_mut().decrease(Bits16::HL);
+                registers.set_at(memory, dst, data).await.unwrap();
+            }
         };
     }
 }
@@ -390,6 +441,14 @@ impl Load {
             Load::ADE => {
                 Dst::Register(Bits8::A).load(Src::Pointer, Some(Bits8::D), registers, memory)
             }
+            Load::HLPA => {
+                Dst::Increase(Bits16::HL).load(Src::Register, Some(Bits8::A), registers, memory)
+            }
+            Load::HLMA => {
+                Dst::Decrease(Bits16::HL).load(Src::Register, Some(Bits8::A), registers, memory)
+            }
+            Load::AHLP => Dst::Register(Bits8::A).load(Src::Increase, None, registers, memory),
+            Load::AHLM => Dst::Register(Bits8::A).load(Src::Decrease, None, registers, memory),
         }
         .await;
     }
