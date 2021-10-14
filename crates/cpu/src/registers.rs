@@ -16,6 +16,50 @@ pub struct Registers {
     pub pc: u16,
 }
 
+pub trait Arithmetic<T> {
+    fn increase(&mut self, _: T);
+
+    fn decrease(&mut self, _: T);
+}
+
+impl Arithmetic<Bits8> for Registers {
+    fn increase(&mut self, area: Bits8) {
+        match area {
+            Bits8::A => self.a += 1,
+            Bits8::F => self.f = self.f,
+            Bits8::B => self.b += 1,
+            Bits8::C => self.c += 1,
+            Bits8::D => self.d += 1,
+            Bits8::E => self.e += 1,
+            Bits8::H => self.h += 1,
+            Bits8::L => self.l += 1,
+        };
+    }
+
+    fn decrease(&mut self, area: Bits8) {
+        match area {
+            Bits8::A => self.a -= 1,
+            Bits8::F => self.f = self.f,
+            Bits8::B => self.b -= 1,
+            Bits8::C => self.c -= 1,
+            Bits8::D => self.d -= 1,
+            Bits8::E => self.e -= 1,
+            Bits8::H => self.h -= 1,
+            Bits8::L => self.l -= 1,
+        };
+    }
+}
+
+impl Arithmetic<Bits16> for Registers {
+    fn increase(&mut self, area: Bits16) {
+        self.set(area, self.get(area) + 1)
+    }
+
+    fn decrease(&mut self, area: Bits16) {
+        self.set(area, self.get(area) - 1)
+    }
+}
+
 impl RegisterBus<Bits8, u8> for Registers {
     fn get(&self, area: Bits8) -> u8 {
         match area {
@@ -93,6 +137,8 @@ impl RegisterBus<Flag, bool> for Registers {
         self.f.set(flag, data)
     }
 }
+
+impl Registers {}
 
 #[cfg(test)]
 mod test_registers {

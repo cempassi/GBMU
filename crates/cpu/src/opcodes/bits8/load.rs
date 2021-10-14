@@ -1,7 +1,7 @@
 use crate::area::{Bits16, Bits8};
 use crate::bus::RegisterBus;
 use crate::cpu::Registers;
-use crate::futures::GetAt;
+use crate::futures::{GetAt, SetAt};
 use crate::nextpc::NextPc;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
@@ -51,10 +51,50 @@ use num_enum::TryFromPrimitive;
 /// LD          H,(HL)     0x66   8
 /// LD          L,(HL)     0x6E   8
 /// LD          A,(HL)     0x7E   8
+
+/// LD (HL), n
+/// Description:
+///  Put value n into (HL).
+/// Use with:
+///  n = B,C,D,E,H,L,A
+/// Opcodes:
+/// Instruction Parameters Opcode Cycles
+///  LD          (HL),B     0x70     8
+///  LD          (HL),C     0x71     8
+///  LD          (HL),D     0x72     8
+///  LD          (HL),E     0x73     8
+///  LD          (HL),H     0x74     8
+///  LD          (HL),L     0x75     8
+///  LD          (HL),A     0x77     8
+
+/// 1. LD HL,n
+/// Description:
+///  Put value n into HL.
+/// Use with:
+///  n = 8 bit immediate value
+/// Opcodes:
+/// Instruction Parameters Opcode Cycles
+/// LD          (HL),n     0x36     12
+
+/// 1. LD [r16], A
+/// Description:
+/// Store value in register A into byte pointed to by register r16.
+/// Opcodes:
+/// Instruction Parameters Opcode Cycles
+/// LD          (BC), A     0x02     8
+/// LD          (DE), A     0x12     8
+
+/// 1. LD A, [r16]
+/// Description:
+/// Store value in byte pointed to by register r16 in register A .
+/// Opcodes:
+/// Instruction Parameters Opcode Cycles
+/// LD          A, (BC)     0x0A     8
+/// LD          A, (DE)     0x1A     8
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
-pub enum LoadRegister {
+pub enum Load {
     B = 0x06,
     C = 0x0e,
     D = 0x16,
@@ -112,85 +152,244 @@ pub enum LoadRegister {
     HHL = 0x66,
     LHL = 0x6E,
     AHL = 0x7E,
+    HLB = 0x70,
+    HLC = 0x71,
+    HLD = 0x72,
+    HLE = 0x73,
+    HLH = 0x74,
+    HLL = 0x75,
+    HLA = 0x77,
+    HL8b = 0x36,
+    BCA = 0x02,
+    DEA = 0x12,
+    ABC = 0x0A,
+    ADE = 0x1A,
 }
 
-enum Load {
+#[derive(Clone, Copy)]
+enum Src {
     Register,
     Pointer,
     Next,
 }
 
-impl Load {
-    pub async fn load(self, registers: Registers, memory: Memory, src: Option<Bits8>, dst: Bits8) {
-        let data = match self {
-            Load::Register => registers.borrow().get(src.unwrap()),
-            Load::Pointer => registers.clone().get_at(memory, Bits16::HL).await.unwrap(),
-            Load::Next => registers.clone().next_pc(memory).await.unwrap(),
+enum Dst {
+    Register(Bits8),
+    Pointer(Bits16),
+}
+
+impl Dst {
+    pub async fn load(self, source: Src, src: Option<Bits8>, registers: Registers, memory: Memory) {
+        let data = match source {
+            Src::Register => registers.borrow().get(src.unwrap()),
+            Src::Pointer => registers
+                .clone()
+                .get_at(memory.clone(), Bits16::from(src.unwrap()))
+                .await
+                .unwrap(),
+            Src::Next => registers.clone().next_pc(memory.clone()).await.unwrap(),
         };
-        registers.borrow_mut().set(dst, data);
+        match self {
+            Dst::Register(dst) => registers.borrow_mut().set(dst, data),
+            Dst::Pointer(dst) => registers.set_at(memory, dst, data).await.unwrap(),
+        };
     }
 }
 
-impl LoadRegister {
+impl Load {
     pub async fn exec(self, registers: Registers, memory: Memory) {
         match self {
-            LoadRegister::AA => Load::Register.load(registers, memory, Some(Bits8::A), Bits8::A),
-            LoadRegister::AB => Load::Register.load(registers, memory, Some(Bits8::A), Bits8::B),
-            LoadRegister::AC => Load::Register.load(registers, memory, Some(Bits8::A), Bits8::C),
-            LoadRegister::AD => Load::Register.load(registers, memory, Some(Bits8::A), Bits8::D),
-            LoadRegister::AE => Load::Register.load(registers, memory, Some(Bits8::A), Bits8::E),
-            LoadRegister::AH => Load::Register.load(registers, memory, Some(Bits8::A), Bits8::H),
-            LoadRegister::AL => Load::Register.load(registers, memory, Some(Bits8::A), Bits8::L),
-            LoadRegister::BB => Load::Register.load(registers, memory, Some(Bits8::B), Bits8::B),
-            LoadRegister::BC => Load::Register.load(registers, memory, Some(Bits8::B), Bits8::C),
-            LoadRegister::BD => Load::Register.load(registers, memory, Some(Bits8::B), Bits8::D),
-            LoadRegister::BE => Load::Register.load(registers, memory, Some(Bits8::B), Bits8::E),
-            LoadRegister::BH => Load::Register.load(registers, memory, Some(Bits8::B), Bits8::H),
-            LoadRegister::BL => Load::Register.load(registers, memory, Some(Bits8::B), Bits8::L),
-            LoadRegister::CB => Load::Register.load(registers, memory, Some(Bits8::C), Bits8::B),
-            LoadRegister::CC => Load::Register.load(registers, memory, Some(Bits8::C), Bits8::C),
-            LoadRegister::CD => Load::Register.load(registers, memory, Some(Bits8::C), Bits8::D),
-            LoadRegister::CE => Load::Register.load(registers, memory, Some(Bits8::C), Bits8::E),
-            LoadRegister::CH => Load::Register.load(registers, memory, Some(Bits8::C), Bits8::H),
-            LoadRegister::CL => Load::Register.load(registers, memory, Some(Bits8::C), Bits8::L),
-            LoadRegister::DB => Load::Register.load(registers, memory, Some(Bits8::D), Bits8::B),
-            LoadRegister::DC => Load::Register.load(registers, memory, Some(Bits8::D), Bits8::C),
-            LoadRegister::DD => Load::Register.load(registers, memory, Some(Bits8::D), Bits8::D),
-            LoadRegister::DE => Load::Register.load(registers, memory, Some(Bits8::D), Bits8::E),
-            LoadRegister::DH => Load::Register.load(registers, memory, Some(Bits8::D), Bits8::H),
-            LoadRegister::DL => Load::Register.load(registers, memory, Some(Bits8::D), Bits8::L),
-            LoadRegister::EB => Load::Register.load(registers, memory, Some(Bits8::E), Bits8::B),
-            LoadRegister::EC => Load::Register.load(registers, memory, Some(Bits8::E), Bits8::C),
-            LoadRegister::ED => Load::Register.load(registers, memory, Some(Bits8::E), Bits8::D),
-            LoadRegister::EE => Load::Register.load(registers, memory, Some(Bits8::E), Bits8::E),
-            LoadRegister::EH => Load::Register.load(registers, memory, Some(Bits8::E), Bits8::H),
-            LoadRegister::EL => Load::Register.load(registers, memory, Some(Bits8::E), Bits8::L),
-            LoadRegister::HB => Load::Register.load(registers, memory, Some(Bits8::H), Bits8::B),
-            LoadRegister::HC => Load::Register.load(registers, memory, Some(Bits8::H), Bits8::C),
-            LoadRegister::HD => Load::Register.load(registers, memory, Some(Bits8::H), Bits8::D),
-            LoadRegister::HE => Load::Register.load(registers, memory, Some(Bits8::H), Bits8::E),
-            LoadRegister::HH => Load::Register.load(registers, memory, Some(Bits8::H), Bits8::H),
-            LoadRegister::HL => Load::Register.load(registers, memory, Some(Bits8::H), Bits8::L),
-            LoadRegister::LB => Load::Register.load(registers, memory, Some(Bits8::L), Bits8::B),
-            LoadRegister::LC => Load::Register.load(registers, memory, Some(Bits8::L), Bits8::C),
-            LoadRegister::LD => Load::Register.load(registers, memory, Some(Bits8::L), Bits8::D),
-            LoadRegister::LE => Load::Register.load(registers, memory, Some(Bits8::L), Bits8::E),
-            LoadRegister::LH => Load::Register.load(registers, memory, Some(Bits8::L), Bits8::H),
-            LoadRegister::LL => Load::Register.load(registers, memory, Some(Bits8::L), Bits8::L),
-            LoadRegister::BHL => Load::Pointer.load(registers, memory, None, Bits8::B),
-            LoadRegister::CHL => Load::Pointer.load(registers, memory, None, Bits8::C),
-            LoadRegister::DHL => Load::Pointer.load(registers, memory, None, Bits8::D),
-            LoadRegister::EHL => Load::Pointer.load(registers, memory, None, Bits8::E),
-            LoadRegister::HHL => Load::Pointer.load(registers, memory, None, Bits8::H),
-            LoadRegister::LHL => Load::Pointer.load(registers, memory, None, Bits8::L),
-            LoadRegister::AHL => Load::Pointer.load(registers, memory, None, Bits8::A),
-            LoadRegister::B => Load::Next.load(registers, memory, None, Bits8::B),
-            LoadRegister::C => Load::Next.load(registers, memory, None, Bits8::C),
-            LoadRegister::D => Load::Next.load(registers, memory, None, Bits8::D),
-            LoadRegister::E => Load::Next.load(registers, memory, None, Bits8::E),
-            LoadRegister::H => Load::Next.load(registers, memory, None, Bits8::H),
-            LoadRegister::L => Load::Next.load(registers, memory, None, Bits8::L),
-            LoadRegister::A => Load::Next.load(registers, memory, None, Bits8::A),
+            Load::B => Dst::Register(Bits8::B).load(Src::Next, None, registers, memory),
+            Load::C => Dst::Register(Bits8::C).load(Src::Next, None, registers, memory),
+            Load::D => Dst::Register(Bits8::D).load(Src::Next, None, registers, memory),
+            Load::E => Dst::Register(Bits8::E).load(Src::Next, None, registers, memory),
+            Load::H => Dst::Register(Bits8::H).load(Src::Next, None, registers, memory),
+            Load::L => Dst::Register(Bits8::L).load(Src::Next, None, registers, memory),
+            Load::A => Dst::Register(Bits8::A).load(Src::Next, None, registers, memory),
+            Load::HL8b => Dst::Pointer(Bits16::HL).load(Src::Next, None, registers, memory),
+            Load::BHL => {
+                Dst::Register(Bits8::B).load(Src::Pointer, Some(Bits8::H), registers, memory)
+            }
+            Load::CHL => {
+                Dst::Register(Bits8::C).load(Src::Pointer, Some(Bits8::H), registers, memory)
+            }
+            Load::DHL => {
+                Dst::Register(Bits8::D).load(Src::Pointer, Some(Bits8::H), registers, memory)
+            }
+            Load::EHL => {
+                Dst::Register(Bits8::E).load(Src::Pointer, Some(Bits8::H), registers, memory)
+            }
+            Load::HHL => {
+                Dst::Register(Bits8::H).load(Src::Pointer, Some(Bits8::H), registers, memory)
+            }
+            Load::LHL => {
+                Dst::Register(Bits8::L).load(Src::Pointer, Some(Bits8::H), registers, memory)
+            }
+            Load::AHL => {
+                Dst::Register(Bits8::A).load(Src::Pointer, Some(Bits8::H), registers, memory)
+            }
+            Load::AA => {
+                Dst::Register(Bits8::A).load(Src::Register, Some(Bits8::A), registers, memory)
+            }
+            Load::AB => {
+                Dst::Register(Bits8::B).load(Src::Register, Some(Bits8::A), registers, memory)
+            }
+            Load::AC => {
+                Dst::Register(Bits8::C).load(Src::Register, Some(Bits8::A), registers, memory)
+            }
+            Load::AD => {
+                Dst::Register(Bits8::D).load(Src::Register, Some(Bits8::A), registers, memory)
+            }
+            Load::AE => {
+                Dst::Register(Bits8::E).load(Src::Register, Some(Bits8::A), registers, memory)
+            }
+            Load::AH => {
+                Dst::Register(Bits8::H).load(Src::Register, Some(Bits8::A), registers, memory)
+            }
+            Load::AL => {
+                Dst::Register(Bits8::L).load(Src::Register, Some(Bits8::A), registers, memory)
+            }
+            Load::BB => {
+                Dst::Register(Bits8::B).load(Src::Register, Some(Bits8::B), registers, memory)
+            }
+            Load::BC => {
+                Dst::Register(Bits8::C).load(Src::Register, Some(Bits8::B), registers, memory)
+            }
+            Load::BD => {
+                Dst::Register(Bits8::D).load(Src::Register, Some(Bits8::B), registers, memory)
+            }
+            Load::BE => {
+                Dst::Register(Bits8::E).load(Src::Register, Some(Bits8::B), registers, memory)
+            }
+            Load::BH => {
+                Dst::Register(Bits8::H).load(Src::Register, Some(Bits8::B), registers, memory)
+            }
+            Load::BL => {
+                Dst::Register(Bits8::L).load(Src::Register, Some(Bits8::B), registers, memory)
+            }
+            Load::CB => {
+                Dst::Register(Bits8::B).load(Src::Register, Some(Bits8::C), registers, memory)
+            }
+            Load::CC => {
+                Dst::Register(Bits8::C).load(Src::Register, Some(Bits8::C), registers, memory)
+            }
+            Load::CD => {
+                Dst::Register(Bits8::D).load(Src::Register, Some(Bits8::C), registers, memory)
+            }
+            Load::CE => {
+                Dst::Register(Bits8::E).load(Src::Register, Some(Bits8::C), registers, memory)
+            }
+            Load::CH => {
+                Dst::Register(Bits8::H).load(Src::Register, Some(Bits8::C), registers, memory)
+            }
+            Load::CL => {
+                Dst::Register(Bits8::L).load(Src::Register, Some(Bits8::C), registers, memory)
+            }
+            Load::DB => {
+                Dst::Register(Bits8::B).load(Src::Register, Some(Bits8::D), registers, memory)
+            }
+            Load::DC => {
+                Dst::Register(Bits8::C).load(Src::Register, Some(Bits8::D), registers, memory)
+            }
+            Load::DD => {
+                Dst::Register(Bits8::D).load(Src::Register, Some(Bits8::D), registers, memory)
+            }
+            Load::DE => {
+                Dst::Register(Bits8::E).load(Src::Register, Some(Bits8::D), registers, memory)
+            }
+            Load::DH => {
+                Dst::Register(Bits8::H).load(Src::Register, Some(Bits8::D), registers, memory)
+            }
+            Load::DL => {
+                Dst::Register(Bits8::L).load(Src::Register, Some(Bits8::D), registers, memory)
+            }
+            Load::EB => {
+                Dst::Register(Bits8::B).load(Src::Register, Some(Bits8::E), registers, memory)
+            }
+            Load::EC => {
+                Dst::Register(Bits8::C).load(Src::Register, Some(Bits8::E), registers, memory)
+            }
+            Load::ED => {
+                Dst::Register(Bits8::D).load(Src::Register, Some(Bits8::E), registers, memory)
+            }
+            Load::EE => {
+                Dst::Register(Bits8::E).load(Src::Register, Some(Bits8::E), registers, memory)
+            }
+            Load::EH => {
+                Dst::Register(Bits8::H).load(Src::Register, Some(Bits8::E), registers, memory)
+            }
+            Load::EL => {
+                Dst::Register(Bits8::L).load(Src::Register, Some(Bits8::E), registers, memory)
+            }
+            Load::HB => {
+                Dst::Register(Bits8::B).load(Src::Register, Some(Bits8::H), registers, memory)
+            }
+            Load::HC => {
+                Dst::Register(Bits8::C).load(Src::Register, Some(Bits8::H), registers, memory)
+            }
+            Load::HD => {
+                Dst::Register(Bits8::D).load(Src::Register, Some(Bits8::H), registers, memory)
+            }
+            Load::HE => {
+                Dst::Register(Bits8::E).load(Src::Register, Some(Bits8::H), registers, memory)
+            }
+            Load::HH => {
+                Dst::Register(Bits8::H).load(Src::Register, Some(Bits8::H), registers, memory)
+            }
+            Load::HL => {
+                Dst::Register(Bits8::L).load(Src::Register, Some(Bits8::H), registers, memory)
+            }
+            Load::LB => {
+                Dst::Register(Bits8::B).load(Src::Register, Some(Bits8::L), registers, memory)
+            }
+            Load::LC => {
+                Dst::Register(Bits8::C).load(Src::Register, Some(Bits8::L), registers, memory)
+            }
+            Load::LD => {
+                Dst::Register(Bits8::D).load(Src::Register, Some(Bits8::L), registers, memory)
+            }
+            Load::LE => {
+                Dst::Register(Bits8::E).load(Src::Register, Some(Bits8::L), registers, memory)
+            }
+            Load::LH => {
+                Dst::Register(Bits8::H).load(Src::Register, Some(Bits8::L), registers, memory)
+            }
+            Load::LL => {
+                Dst::Register(Bits8::L).load(Src::Register, Some(Bits8::L), registers, memory)
+            }
+            Load::HLB => {
+                Dst::Pointer(Bits16::HL).load(Src::Register, Some(Bits8::B), registers, memory)
+            }
+            Load::HLC => {
+                Dst::Pointer(Bits16::HL).load(Src::Register, Some(Bits8::C), registers, memory)
+            }
+            Load::HLD => {
+                Dst::Pointer(Bits16::HL).load(Src::Register, Some(Bits8::D), registers, memory)
+            }
+            Load::HLE => {
+                Dst::Pointer(Bits16::HL).load(Src::Register, Some(Bits8::E), registers, memory)
+            }
+            Load::HLH => {
+                Dst::Pointer(Bits16::HL).load(Src::Register, Some(Bits8::H), registers, memory)
+            }
+            Load::HLL => {
+                Dst::Pointer(Bits16::HL).load(Src::Register, Some(Bits8::L), registers, memory)
+            }
+            Load::HLA => {
+                Dst::Pointer(Bits16::HL).load(Src::Register, Some(Bits8::A), registers, memory)
+            }
+            Load::BCA => {
+                Dst::Pointer(Bits16::BC).load(Src::Register, Some(Bits8::A), registers, memory)
+            }
+            Load::DEA => {
+                Dst::Pointer(Bits16::DE).load(Src::Register, Some(Bits8::A), registers, memory)
+            }
+            Load::ABC => {
+                Dst::Register(Bits8::A).load(Src::Pointer, Some(Bits8::B), registers, memory)
+            }
+            Load::ADE => {
+                Dst::Register(Bits8::A).load(Src::Pointer, Some(Bits8::D), registers, memory)
+            }
         }
         .await;
     }
@@ -198,7 +397,7 @@ impl LoadRegister {
 
 #[cfg(test)]
 mod test_instruction_load_reg_reg {
-    use super::LoadRegister;
+    use super::Load;
     use crate::area::{Bits16, Bits8};
     use crate::executor;
     use crate::{RegisterBus, Registers};
@@ -208,7 +407,7 @@ mod test_instruction_load_reg_reg {
     fn test_load_l_from_h() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = LoadRegister::HL;
+        let instruction = Load::HL;
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(
             register.borrow().get(Bits8::H),
@@ -220,7 +419,7 @@ mod test_instruction_load_reg_reg {
     fn test_load_b_from_hl() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = LoadRegister::BHL;
+        let instruction = Load::BHL;
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(
             register.borrow().get(Bits8::B),
@@ -232,14 +431,47 @@ mod test_instruction_load_reg_reg {
     }
 
     #[test]
-    fn test_reg_b() {
+    fn test_load_reg_b_from_next_byte() {
         let register = Registers::default();
         let memory = Memory::default();
-        let ldr8b = LoadRegister::B;
+        let ldr8b = Load::B;
         let byte = memory.borrow().get_u8(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
         let future = ldr8b.exec(register.clone(), memory.clone());
         executor::execute(Box::pin(future));
         assert_eq!(byte, register.borrow().get(Bits8::B));
+    }
+
+    #[test]
+    fn test_load_hl_from_reg_b() {
+        let register = Registers::default();
+        let memory = Memory::default();
+        let instruction = Load::HLB;
+        register.borrow_mut().set(Bits16::HL, 0xc042);
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        assert_eq!(
+            register.borrow().get(Bits8::B),
+            memory
+                .borrow()
+                .get_u8(register.borrow().get(Bits16::HL))
+                .unwrap()
+        );
+    }
+
+    #[test]
+    fn test_load_hl_8b() {
+        let register = Registers::default();
+        let memory = Memory::default();
+        let instruction = Load::HL8b;
+        let byte = memory.borrow().get_u8(register.borrow().pc).unwrap();
+        assert_eq!(byte, 0x31);
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        assert_eq!(
+            byte,
+            memory
+                .borrow()
+                .get_u8(register.borrow().get(Bits16::HL))
+                .unwrap()
+        );
     }
 }
