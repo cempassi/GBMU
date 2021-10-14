@@ -114,9 +114,9 @@ pub enum LoadRegister {
     AHL = 0x7E,
 }
 
-pub enum Load {
+enum Load {
     Register,
-    Address,
+    Pointer,
     Next,
 }
 
@@ -124,7 +124,7 @@ impl Load {
     pub async fn load(self, registers: Registers, memory: Memory, src: Option<Bits8>, dst: Bits8) {
         let data = match self {
             Load::Register => registers.borrow().get(src.unwrap()),
-            Load::Address => registers.clone().get_at(memory, Bits16::HL).await.unwrap(),
+            Load::Pointer => registers.clone().get_at(memory, Bits16::HL).await.unwrap(),
             Load::Next => registers.clone().next_pc(memory).await.unwrap(),
         };
         registers.borrow_mut().set(dst, data);
@@ -177,13 +177,13 @@ impl LoadRegister {
             LoadRegister::LE => Load::Register.load(registers, memory, Some(Bits8::L), Bits8::E),
             LoadRegister::LH => Load::Register.load(registers, memory, Some(Bits8::L), Bits8::H),
             LoadRegister::LL => Load::Register.load(registers, memory, Some(Bits8::L), Bits8::L),
-            LoadRegister::BHL => Load::Address.load(registers, memory, None, Bits8::B),
-            LoadRegister::CHL => Load::Address.load(registers, memory, None, Bits8::C),
-            LoadRegister::DHL => Load::Address.load(registers, memory, None, Bits8::D),
-            LoadRegister::EHL => Load::Address.load(registers, memory, None, Bits8::E),
-            LoadRegister::HHL => Load::Address.load(registers, memory, None, Bits8::H),
-            LoadRegister::LHL => Load::Address.load(registers, memory, None, Bits8::L),
-            LoadRegister::AHL => Load::Address.load(registers, memory, None, Bits8::A),
+            LoadRegister::BHL => Load::Pointer.load(registers, memory, None, Bits8::B),
+            LoadRegister::CHL => Load::Pointer.load(registers, memory, None, Bits8::C),
+            LoadRegister::DHL => Load::Pointer.load(registers, memory, None, Bits8::D),
+            LoadRegister::EHL => Load::Pointer.load(registers, memory, None, Bits8::E),
+            LoadRegister::HHL => Load::Pointer.load(registers, memory, None, Bits8::H),
+            LoadRegister::LHL => Load::Pointer.load(registers, memory, None, Bits8::L),
+            LoadRegister::AHL => Load::Pointer.load(registers, memory, None, Bits8::A),
             LoadRegister::B => Load::Next.load(registers, memory, None, Bits8::B),
             LoadRegister::C => Load::Next.load(registers, memory, None, Bits8::C),
             LoadRegister::D => Load::Next.load(registers, memory, None, Bits8::D),
