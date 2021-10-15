@@ -1,6 +1,6 @@
 use super::{GetAt, SetAt};
 use crate::area::Bits16;
-use crate::registers::Arithmetic;
+use crate::Arithmetic;
 use crate::{Reader, RegisterBus, Registers};
 use memory::Memory;
 use shared::Error;

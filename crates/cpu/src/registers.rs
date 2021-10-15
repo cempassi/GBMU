@@ -16,51 +16,6 @@ pub struct Registers {
     pub pc: u16,
 }
 
-pub trait Arithmetic<T, U> {
-    fn increase(&mut self, _: T, n: U);
-
-    fn decrease(&mut self, _: T, n: U);
-}
-
-impl Arithmetic<Bits8, u8> for Registers {
-    fn increase(&mut self, area: Bits8, n: u8) {
-        match area {
-            Bits8::A => self.a = self.a.wrapping_add(n),
-            Bits8::F => (),
-            Bits8::B => self.b = self.b.wrapping_add(n),
-            Bits8::C => self.c = self.c.wrapping_add(n),
-            Bits8::D => self.d = self.d.wrapping_add(n),
-            Bits8::E => self.e = self.e.wrapping_add(n),
-            Bits8::H => self.h = self.h.wrapping_add(n),
-            Bits8::L => self.l = self.l.wrapping_add(n),
-        };
-    }
-
-    fn decrease(&mut self, area: Bits8, n: u8) {
-        match area {
-            Bits8::A => self.a = self.a.wrapping_sub(n),
-            Bits8::F => (),
-            Bits8::B => self.b = self.b.wrapping_sub(n),
-            Bits8::C => self.c = self.c.wrapping_sub(n),
-            Bits8::D => self.d = self.d.wrapping_sub(n),
-            Bits8::E => self.e = self.e.wrapping_sub(n),
-            Bits8::H => self.h = self.h.wrapping_sub(n),
-            Bits8::L => self.l = self.l.wrapping_sub(n),
-        };
-    }
-}
-
-impl Arithmetic<Bits16, u16> for Registers {
-    fn increase(&mut self, area: Bits16, n: u16) {
-        let data = self.get(area).wrapping_add(n);
-        self.set(area, data)
-    }
-
-    fn decrease(&mut self, area: Bits16, n: u16) {
-        let data = self.get(area).wrapping_sub(n);
-        self.set(area, data)
-    }
-}
 
 impl RegisterBus<Bits8, u8> for Registers {
     fn get(&self, area: Bits8) -> u8 {

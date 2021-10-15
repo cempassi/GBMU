@@ -3,7 +3,7 @@ use crate::bus::RegisterBus;
 use crate::cpu::Registers;
 use crate::futures::{GetAt, SetAt};
 use crate::nextpc::NextPc;
-use crate::registers::Arithmetic;
+use crate::Arithmetic;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
