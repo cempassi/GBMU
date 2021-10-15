@@ -219,7 +219,7 @@ impl Dst {
                     .get_at(memory.clone(), Bits16::HL)
                     .await
                     .unwrap();
-                registers.borrow_mut().increase(Bits16::HL);
+                registers.borrow_mut().increase(Bits16::HL, 1);
                 data
             }
             Src::Decrease => {
@@ -228,7 +228,7 @@ impl Dst {
                     .get_at(memory.clone(), Bits16::HL)
                     .await
                     .unwrap();
-                registers.borrow_mut().increase(Bits16::HL);
+                registers.borrow_mut().decrease(Bits16::HL, 1);
                 data
             }
         };
@@ -236,11 +236,11 @@ impl Dst {
             Dst::Register(dst) => registers.borrow_mut().set(dst, data),
             Dst::Pointer(dst) => registers.set_at(memory, dst, data).await.unwrap(),
             Dst::Increase(dst) => {
-                registers.borrow_mut().increase(Bits16::HL);
+                registers.borrow_mut().increase(Bits16::HL, 1);
                 registers.set_at(memory, dst, data).await.unwrap();
             }
             Dst::Decrease(dst) => {
-                registers.borrow_mut().decrease(Bits16::HL);
+                registers.borrow_mut().decrease(Bits16::HL, 1);
                 registers.set_at(memory, dst, data).await.unwrap();
             }
         };
