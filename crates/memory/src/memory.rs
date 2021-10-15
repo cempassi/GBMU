@@ -76,7 +76,7 @@ impl Memory {
     pub fn get_u16(&self, address: u16) -> Result<u16, Error> {
         match self.get_u8(address) {
             Ok(left) => match self.get_u8(address + 1) {
-                Ok(right) => Ok((left as u16) << 8 | right as u16),
+                Ok(right) => Ok((right as u16) << 8 | left as u16),
                 Err(error) => Err(error),
             },
             Err(error) => Err(error),
@@ -183,11 +183,11 @@ mod test_memory {
     fn test_write_read_u16() {
         let mut memory = super::Memory::default();
 
-        assert!(memory.set_u16(0xc010, 0x4242).is_ok());
+        assert!(memory.set_u16(0xc010, 0x2242).is_ok());
 
         let read = memory.get_u16(0xc010);
 
         assert!(read.is_ok());
-        assert_eq!(read.unwrap(), 0x4242);
+        assert_eq!(read.unwrap(), 0x2242);
     }
 }
