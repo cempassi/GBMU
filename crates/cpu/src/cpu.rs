@@ -3,6 +3,7 @@ use crate::opcodes::Arithmetic;
 use crate::opcodes::Load;
 use crate::opcodes::LoadRR16b;
 use crate::opcodes::Rotate;
+use crate::opcodes::Stack;
 
 use crate::nextpc::NextPc;
 use memory::Memory;
@@ -58,6 +59,8 @@ impl Cpu {
         if opcode == 0xCB {
             self.prefix_cb().await;
         } else if let Ok(operation) = Load::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = Stack::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = LoadRR16b::try_from_primitive(opcode.into()) {
             operation.exec(self.registers, self.memory).await;
