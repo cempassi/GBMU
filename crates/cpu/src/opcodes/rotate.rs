@@ -148,9 +148,6 @@ mod test_rotate {
 
         let result = register.borrow().get(Bits8::A);
         let carry = register.borrow_mut().get(Flag::C);
-        println!("result  : {:#b}", result);
-        println!("expected: {:#b}", expected);
-        println!("carry is {} and should be true", carry);
         assert_eq!(result, expected);
         assert_eq!(carry, true);
     }
@@ -169,9 +166,6 @@ mod test_rotate {
 
         let result = register.borrow_mut().get(Bits8::A);
         let carry = register.borrow_mut().get(Flag::C);
-        println!("result  : {:#b}", result);
-        println!("expected: {:#b}", expected);
-        println!("carry is {} and should be false", carry);
         assert_eq!(result, expected);
         assert_eq!(carry, false);
     }
@@ -191,9 +185,6 @@ mod test_rotate {
 
         let result = memory.borrow_mut().get_u8(hl).unwrap();
         let carry = register.borrow_mut().get(Flag::C);
-        println!("result  : {:#b}", result);
-        println!("expected: {:#b}", expected);
-        println!("carry is {} and should be true", carry);
         assert_eq!(result, expected);
         assert_eq!(carry, true);
     }
@@ -214,9 +205,6 @@ mod test_rotate {
 
         let result = memory.borrow_mut().get_u8(hl).unwrap();
         let carry = register.borrow_mut().get(Flag::C);
-        println!("result  : {:#b}", result);
-        println!("expected: {:#b}", expected);
-        println!("carry is {} and should be false", carry);
         assert_eq!(result, expected);
         assert_eq!(carry, false);
     }
@@ -234,9 +222,6 @@ mod test_rotate {
 
         let result = register.borrow().get(Bits8::A);
         let carry = register.borrow_mut().get(Flag::C);
-        println!("result  : {:#b}", result);
-        println!("expected: {:#b}", expected);
-        println!("carry is {} and should be true", carry);
         assert_eq!(result, expected);
         assert_eq!(carry, true);
     }
@@ -254,9 +239,6 @@ mod test_rotate {
 
         let result = register.borrow_mut().get(Bits8::A);
         let carry = register.borrow_mut().get(Flag::C);
-        println!("result  : {:#b}", result);
-        println!("expected: {:#b}", expected);
-        println!("carry is {} and should be true", carry);
         assert_eq!(result, expected);
         assert_eq!(carry, true);
     }
@@ -276,9 +258,6 @@ mod test_rotate {
 
         let result = memory.borrow_mut().get_u8(hl).unwrap();
         let carry = register.borrow_mut().get(Flag::C);
-        println!("result  : {:#b}", result);
-        println!("expected: {:#b}", expected);
-        println!("carry is {} and should be true", carry);
         assert_eq!(result, expected);
         assert_eq!(carry, true);
     }
@@ -298,9 +277,6 @@ mod test_rotate {
 
         let result = memory.borrow_mut().get_u8(hl).unwrap();
         let carry = register.borrow_mut().get(Flag::C);
-        println!("result  : {:#b}", result);
-        println!("expected: {:#b}", expected);
-        println!("carry is {} and should be true", carry);
         assert_eq!(result, expected);
         assert_eq!(carry, true);
     }
