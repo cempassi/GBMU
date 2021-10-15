@@ -1,6 +1,6 @@
+use super::area::{Bits16, Bits8};
 use crate::registers::Registers;
 use crate::RegisterBus;
-use super::area::{Bits16, Bits8};
 
 pub trait Arithmetic<T, U> {
     fn increase(&mut self, _: T, n: U);

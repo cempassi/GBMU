@@ -16,7 +16,6 @@ pub struct Registers {
     pub pc: u16,
 }
 
-
 impl RegisterBus<Bits8, u8> for Registers {
     fn get(&self, area: Bits8) -> u8 {
         match area {

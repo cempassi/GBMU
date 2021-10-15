@@ -1,5 +1,5 @@
 use crate::area::{Bits16, Bits8};
-use crate::{Reader, RegisterBus, Registers, nextpc::NextPc};
+use crate::{nextpc::NextPc, Reader, RegisterBus, Registers};
 use memory::{Async, Memory};
 use shared::Error;
 use std::future::Future;
@@ -11,13 +11,13 @@ pub(crate) trait LoadData<T> {
     fn load_data(self, memory: Memory, area: T) -> Loader;
 }
 
-async fn load_u8(registers: Registers, memory: Memory, area:Bits8) -> Result<(), Error> {
+async fn load_u8(registers: Registers, memory: Memory, area: Bits8) -> Result<(), Error> {
     let data = registers.clone().next_pc(memory.clone()).await?;
     registers.borrow_mut().set(area, data);
     Ok(())
 }
 
-async fn load_u16(registers: Registers, memory: Memory, area:Bits16) -> Result<(), Error> {
+async fn load_u16(registers: Registers, memory: Memory, area: Bits16) -> Result<(), Error> {
     let data = registers.clone().next_pc(memory.clone()).await?;
     registers.borrow_mut().set(area, data);
     Ok(())

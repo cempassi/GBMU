@@ -1,4 +1,5 @@
 pub mod area;
+pub(crate) mod arithmetic;
 pub mod bus;
 pub mod cpu;
 pub(crate) mod executor;
@@ -9,12 +10,11 @@ pub mod nextpc;
 mod opcodes;
 pub mod reader;
 pub mod registers;
-pub(crate) mod arithmetic;
 
+pub(crate) use crate::arithmetic::Arithmetic;
 pub use crate::bus::RegisterBus;
 pub use crate::cpu::Cpu;
 pub(crate) use crate::futures::{GetAt, SetAt};
 pub use crate::interface::{NewRegisters, Registers};
 pub(crate) use crate::reader::Reader;
 pub(crate) use flags::Flags;
-pub(crate) use crate::arithmetic::Arithmetic;
