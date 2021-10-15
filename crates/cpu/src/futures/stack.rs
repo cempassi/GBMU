@@ -15,10 +15,10 @@ pub(crate) trait Push {
 }
 
 async fn push(registers: Registers, memory: Memory, area: Bits16) -> Result<(), Error> {
-        let data = registers.borrow().get(area);
-        registers.clone().set_at(memory, Bits16::SP, data).await?;
-        registers.borrow_mut().increase(Bits16::SP, 2);
-        Ok(())
+    let data = registers.borrow().get(area);
+    registers.clone().set_at(memory, Bits16::SP, data).await?;
+    registers.borrow_mut().increase(Bits16::SP, 2);
+    Ok(())
 }
 
 impl Push for Registers {

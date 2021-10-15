@@ -1,6 +1,6 @@
 use crate::area::Bits16;
 use crate::futures::{Pop, Push};
-use crate::{RegisterBus, Registers};
+use crate::Registers;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 

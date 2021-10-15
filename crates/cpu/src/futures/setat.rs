@@ -1,5 +1,4 @@
 use crate::area::Bits16;
-use crate::registers::Arithmetic;
 use crate::{Reader, RegisterBus, Registers};
 use memory::{Async, Memory};
 use shared::Error;
