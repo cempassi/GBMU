@@ -3,6 +3,7 @@ use crate::opcodes::Arithmetic;
 use crate::opcodes::Load;
 use crate::opcodes::Load16b;
 use crate::opcodes::Rotate;
+use crate::opcodes::Logic;
 
 use crate::nextpc::NextPc;
 use memory::Memory;
@@ -62,6 +63,8 @@ impl Cpu {
         } else if let Ok(operation) = Load16b::try_from_primitive(opcode.into()) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = Arithmetic::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = Logic::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else {
             println!("Not implemented!");
