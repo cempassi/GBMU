@@ -1,5 +1,6 @@
 use crate::area::{Bits8, Flag};
 use crate::registers::Registers;
+use crate::Arithmetic;
 use crate::RegisterBus;
 
 pub trait Logical<T> {
@@ -32,10 +33,9 @@ impl Logical<Bits8> for Registers {
     }
 
     fn compare(&mut self, src: Bits8) {
-        let data = self.get(Bits8::A) - self.get(src);
+        let data = self.get(Bits8::A);
+        self.sub(self.get(src), false);
         self.set(Bits8::A, data);
-        self.set(Flag::Z, data == 0);
-        self.set(Flag::H, true);
     }
 }
 
@@ -62,9 +62,8 @@ impl Logical<u8> for Registers {
     }
 
     fn compare(&mut self, src: u8) {
-        let data = self.get(Bits8::A) - src;
+        let data = self.get(Bits8::A);
+        self.sub(src, false);
         self.set(Bits8::A, data);
-        self.set(Flag::Z, data == 0);
-        self.set(Flag::H, true);
     }
 }
