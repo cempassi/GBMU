@@ -1,4 +1,4 @@
-use super::area::{Bits16, Bits8};
+use super::area::{Bits16, Bits8, Flag};
 use crate::registers::Registers;
 use crate::RegisterBus;
 
@@ -7,21 +7,25 @@ pub trait Arithmetic<T, U> {
 
     fn decrease(&mut self, _: T, n: U);
 
-    fn add(&mut self, lhs: T, rhs: T);
+    fn add_carry(&mut self, lhs: T, rhs: T);
 }
 
 impl Arithmetic<Bits8, u8> for Registers {
     fn increase(&mut self, area: Bits8, n: u8) {
         let data = self.get(area).wrapping_add(n);
-        self.set(area, data)
+        self.set(area, data);
+        self.set(Flag::N, false);
+        self.set(Flag::Z, data == 0)
     }
 
     fn decrease(&mut self, area: Bits8, n: u8) {
         let data = self.get(area).wrapping_sub(n);
-        self.set(area, data)
+        self.set(area, data);
+        self.set(Flag::N, true);
+        self.set(Flag::Z, data == 0)
     }
 
-    fn add(&mut self, lhs: Bits8, rhs: Bits8) {
+    fn add_carry(&mut self, lhs: Bits8, rhs: Bits8) {
         let data = self.get(lhs).wrapping_add(self.get(rhs));
         self.set(lhs, data);
     }
@@ -38,7 +42,7 @@ impl Arithmetic<Bits16, u16> for Registers {
         self.set(area, data)
     }
 
-    fn add(&mut self, lhs: Bits16, rhs: Bits16) {
+    fn add_carry(&mut self, lhs: Bits16, rhs: Bits16) {
         let data = self.get(lhs).wrapping_add(self.get(rhs));
         self.set(lhs, data);
     }
