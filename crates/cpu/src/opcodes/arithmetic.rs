@@ -3,8 +3,7 @@ use crate::bus::RegisterBus;
 use crate::cpu::Registers;
 use crate::futures::GetAt;
 use crate::nextpc::NextPc;
-use crate::opcodes::data::arithmetic::{Add, Sub};
-use crate::opcodes::data::Data;
+use crate::Arithmetic as A;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
@@ -118,19 +117,17 @@ impl Operation {
         memory: Memory,
         src: Option<Bits8>,
     ) {
-        let dst = registers.borrow().get(Bits8::A);
         let data = match source {
             Src::Register => registers.borrow().get(src.unwrap()),
             Src::Pointer => registers.clone().get_at(memory, Bits16::HL).await.unwrap(),
             Src::Next => registers.clone().next_pc(memory.clone()).await.unwrap(),
         };
-        let data = match self {
-            Operation::Addition(Carry::Carry) => Data::Carry(data).add(dst),
-            Operation::Addition(Carry::NoCarry) => Data::NoCarry(data).add(dst),
-            Operation::Substraction(Carry::Carry) => Data::Carry(data).sub(dst),
-            Operation::Substraction(Carry::NoCarry) => Data::NoCarry(data).sub(dst),
+        match self {
+            Operation::Addition(Carry::Carry) => registers.borrow_mut().add(data, true),
+            Operation::Addition(Carry::NoCarry) => registers.borrow_mut().add(data, false),
+            Operation::Substraction(Carry::Carry) => registers.borrow_mut().sub(data, true),
+            Operation::Substraction(Carry::NoCarry) => registers.borrow_mut().sub(data, false),
         };
-        registers.borrow_mut().set(Bits16::AF, data);
     }
 }
 
@@ -338,124 +335,175 @@ impl Arithmetic {
 }
 
 #[cfg(test)]
-mod test_instruction_add_reg_a_8b {
+mod test_arithmetic {
     use super::Arithmetic;
     use crate::area::{Bits16, Bits8, Flag};
     use crate::{executor, RegisterBus, Registers};
     use memory::Memory;
 
     #[test]
-    fn test_load_add_reg_a_8b() {
+    fn test_add_next_byte_without_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::AA8b;
+
         register.borrow_mut().set(Bits8::A, 0x4f);
+        register.borrow_mut().set(Flag::C, true);
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+
         assert_eq!(register.borrow().get(Bits8::A), 0x80);
         assert_eq!(register.borrow().get(Flag::H), true);
     }
 
     #[test]
-    fn test_load_add_reg_a_hl() {
+    fn test_add_byte_at_address_hl_without_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::AAHL;
+
         register.borrow_mut().set(Bits8::A, 0xf8);
         register.borrow_mut().set(Bits16::HL, 0xc008);
+        register.borrow_mut().set(Flag::C, true);
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(register.borrow().get(Bits8::A), 0xf8);
     }
 
     #[test]
-    fn test_load_add_reg_a_reg_b() {
+    fn test_add_byte_in_register_b_without_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::AAB;
+
+        register.borrow_mut().set(Flag::C, true);
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+
         assert_eq!(register.borrow().get(Bits8::A), 0x00);
         assert_eq!(register.borrow().get(Flag::Z), true);
     }
 
     #[test]
-    fn test_load_adc_reg_a_8b() {
+    fn test_add_next_byte_with_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::AAc8b;
+
         register.borrow_mut().set(Bits8::A, 0x4f);
+        register.borrow_mut().set(Bits16::PC, 0xc000);
+        register.borrow_mut().set(Flag::C, true);
+        memory.borrow_mut().set_u8(0xc000, 0x2F).unwrap();
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0x81);
-        assert_eq!(register.borrow().get(Flag::H), true);
+
+        assert_eq!(register.borrow().get(Bits8::A), 0x7F);
     }
 
     #[test]
-    fn test_load_adc_reg_a_hl() {
+    fn test_add_byte_at_address_hl_with_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::AAcHL;
-        register.borrow_mut().set(Bits8::A, 0xf8);
+
+        register.borrow_mut().set(Bits8::A, 0x2a);
         register.borrow_mut().set(Bits16::HL, 0xc008);
+        register.borrow_mut().set(Flag::C, true);
+        memory.borrow_mut().set_u8(0xc008, 0x2d).unwrap();
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0xf9);
+
+        assert_eq!(register.borrow().get(Bits8::A), 0x58);
     }
 
     #[test]
-    fn test_load_adc_reg_a_reg_b() {
+    fn test_add_byte_in_register_c_with_carry() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = Arithmetic::AAcB;
+        let instruction = Arithmetic::AAcC;
+
+        register.borrow_mut().set(Bits8::A, 0x2B);
+        register.borrow_mut().set(Bits8::C, 0xAA);
+        register.borrow_mut().set(Flag::C, true);
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0x01);
+
+        assert_eq!(register.borrow().get(Bits8::A), 0xD6);
     }
 
     #[test]
-    fn test_load_sub_reg_a_8b() {
+    fn test_sub_next_byte_without_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::SA8b;
+
         register.borrow_mut().set(Bits8::A, 0x4f);
+        register.borrow_mut().set(Bits16::PC, 0xc000);
+        register.borrow_mut().set(Flag::C, true);
+        memory.borrow_mut().set_u8(0xc000, 0x2F).unwrap();
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0xe2);
-        assert_eq!(register.borrow().get(Flag::H), true);
+
+        assert_eq!(register.borrow().get(Bits8::A), 0x20);
     }
 
     #[test]
-    fn test_load_sub_reg_a_hl() {
+    fn test_sub_byte_at_address_hl_without_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::SAHL;
+
         register.borrow_mut().set(Bits8::A, 0xf8);
+        register.borrow_mut().set(Flag::C, true);
         register.borrow_mut().set(Bits16::HL, 0xc008);
+        memory.borrow_mut().set_u8(0xc008, 0xaa).unwrap();
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0x08);
+
+        assert_eq!(register.borrow().get(Bits8::A), 0x4e);
     }
 
     #[test]
-    fn test_load_sub_reg_a_reg_b() {
+    fn test_sub_byte_in_register_b_without_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::SAB;
+
+        register.borrow_mut().set(Flag::C, true);
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(register.borrow().get(Bits8::A), 0x00);
         assert_eq!(register.borrow().get(Flag::Z), true);
     }
 
     #[test]
-    fn test_load_sbc_reg_a_hl() {
+    fn test_sub_byte_at_address_hl_with_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::SAcHL;
+
         register.borrow_mut().set(Bits8::A, 0xf8);
+        register.borrow_mut().set(Flag::C, true);
         register.borrow_mut().set(Bits16::HL, 0xc008);
+        memory.borrow_mut().set_u8(0xc008, 0xaa).unwrap();
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0x07);
+
+        assert_eq!(register.borrow().get(Bits8::A), 0x4d);
     }
 
     #[test]
-    fn test_load_sbc_reg_a_reg_b() {
+    fn test_sub_byte_in_register_l_with_carry() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = Arithmetic::SAcB;
+        let instruction = Arithmetic::SAcL;
+
+        register.borrow_mut().set(Bits8::A, 0xF8);
+        register.borrow_mut().set(Bits8::L, 0xAB);
+        register.borrow_mut().set(Flag::C, true);
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0xff);
+
+        assert_eq!(register.borrow().get(Bits8::A), 0x4C);
     }
 }

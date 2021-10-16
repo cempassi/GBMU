@@ -185,6 +185,7 @@ mod test_logic_opcodes {
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
 
         assert_eq!(register.borrow().get(Bits8::A), 0x0f);
+        assert_eq!(register.borrow().get(Flag::H), true);
     }
 
     #[test]
@@ -200,25 +201,86 @@ mod test_logic_opcodes {
     }
 
     #[test]
-    fn test_or_a_e() {
+    fn test_or_a_b() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = Logic::OrAE;
+        let instruction = Logic::OrAB;
+        register.borrow_mut().set(Bits8::A, 0x4A);
+        register.borrow_mut().set(Bits8::B, 0xF2);
 
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
 
-        assert_eq!(register.borrow().get(Bits16::AF), 0x0010);
-        assert_eq!(register.borrow().get(Flag::Z), true);
+        assert_eq!(register.borrow().get(Bits8::A), 0xFA);
     }
 
     #[test]
-    fn test_or_reg_a_8b() {
+    fn test_or_next_byte() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Logic::OrA8b;
 
+        register.borrow_mut().set(Bits8::A, 0x4A);
+        register.borrow_mut().set(Bits16::PC, 0xc000);
+        memory.borrow_mut().set_u8(0xc000, 0xF2).unwrap();
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
 
-        assert_eq!(register.borrow().get(Bits16::AF), 0x3100);
+        assert_eq!(register.borrow().get(Bits8::A), 0xFA);
+    }
+
+    #[test]
+    fn test_xor_a_d() {
+        let register = Registers::default();
+        let memory = Memory::default();
+        let instruction = Logic::XorAD;
+        register.borrow_mut().set(Bits8::A, 0x4A);
+        register.borrow_mut().set(Bits8::D, 0xF2);
+
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+
+        assert_eq!(register.borrow().get(Bits8::A), 0xB8);
+    }
+
+    #[test]
+    fn test_xor_hl() {
+        let register = Registers::default();
+        let memory = Memory::default();
+        let instruction = Logic::XorAHL;
+
+        register.borrow_mut().set(Bits8::A, 0x4A);
+        register.borrow_mut().set(Bits16::HL, 0xc000);
+        memory.borrow_mut().set_u8(0xc000, 0xF2).unwrap();
+
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+
+        assert_eq!(register.borrow().get(Bits8::A), 0xB8);
+    }
+
+    #[test]
+    fn test_compare_a_l() {
+        let register = Registers::default();
+        let memory = Memory::default();
+        let instruction = Logic::CmpAL;
+        register.borrow_mut().set(Bits8::A, 0x4A);
+        register.borrow_mut().set(Bits8::L, 0xF2);
+
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+
+        assert_eq!(register.borrow().get(Bits8::A), 0x4A);
+    }
+
+    #[test]
+    fn test_compare_hl() {
+        let register = Registers::default();
+        let memory = Memory::default();
+        let instruction = Logic::CmpAHL;
+
+        register.borrow_mut().set(Bits8::A, 0x4A);
+        register.borrow_mut().set(Bits16::HL, 0xc000);
+        memory.borrow_mut().set_u8(0xc000, 0xF2).unwrap();
+
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+
+        assert_eq!(register.borrow().get(Bits8::A), 0x4A);
     }
 }
