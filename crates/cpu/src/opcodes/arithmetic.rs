@@ -3,8 +3,7 @@ use crate::bus::RegisterBus;
 use crate::cpu::Registers;
 use crate::futures::GetAt;
 use crate::nextpc::NextPc;
-use crate::opcodes::data::arithmetic::{Add, Sub};
-use crate::opcodes::data::Data;
+use crate::Arithmetic as A;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
@@ -95,367 +94,398 @@ pub enum Arithmetic {
 }
 
 enum Src {
-    Register,
+    Register(Bits8),
     Pointer,
     Next,
 }
 
-enum Carry {
-    Carry,
-    NoCarry,
-}
-
-enum Operation {
-    Addition(Carry),
-    Substraction(Carry),
-}
-
-impl Operation {
-    pub async fn operate(
-        self,
-        source: Src,
-        registers: Registers,
-        memory: Memory,
-        src: Option<Bits8>,
-    ) {
-        let dst = registers.borrow().get(Bits8::A);
-        let data = match source {
-            Src::Register => registers.borrow().get(src.unwrap()),
+impl Src {
+    pub async fn data(self, registers: Registers, memory: Memory) -> u8 {
+        match self {
+            Src::Register(src) => registers.borrow().get(src),
             Src::Pointer => registers.clone().get_at(memory, Bits16::HL).await.unwrap(),
             Src::Next => registers.clone().next_pc(memory.clone()).await.unwrap(),
-        };
-        let data = match self {
-            Operation::Addition(Carry::Carry) => Data::Carry(data).add(dst),
-            Operation::Addition(Carry::NoCarry) => Data::NoCarry(data).add(dst),
-            Operation::Substraction(Carry::Carry) => Data::Carry(data).sub(dst),
-            Operation::Substraction(Carry::NoCarry) => Data::NoCarry(data).sub(dst),
-        };
-        registers.borrow_mut().set(Bits16::AF, data);
+        }
     }
 }
 
 impl Arithmetic {
     pub async fn exec(self, registers: Registers, memory: Memory) {
         match self {
-            Arithmetic::AAA => Operation::Addition(Carry::NoCarry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::A),
-            ),
-            Arithmetic::AAB => Operation::Addition(Carry::NoCarry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::B),
-            ),
-            Arithmetic::AAC => Operation::Addition(Carry::NoCarry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::C),
-            ),
-            Arithmetic::AAD => Operation::Addition(Carry::NoCarry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::D),
-            ),
-            Arithmetic::AAE => Operation::Addition(Carry::NoCarry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::E),
-            ),
-            Arithmetic::AAH => Operation::Addition(Carry::NoCarry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::H),
-            ),
-            Arithmetic::AAL => Operation::Addition(Carry::NoCarry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::L),
-            ),
-            Arithmetic::AAcA => Operation::Addition(Carry::Carry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::A),
-            ),
-            Arithmetic::AAcB => Operation::Addition(Carry::Carry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::B),
-            ),
-            Arithmetic::AAcC => Operation::Addition(Carry::Carry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::C),
-            ),
-            Arithmetic::AAcD => Operation::Addition(Carry::Carry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::D),
-            ),
-            Arithmetic::AAcE => Operation::Addition(Carry::Carry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::E),
-            ),
-            Arithmetic::AAcH => Operation::Addition(Carry::Carry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::H),
-            ),
-            Arithmetic::AAcL => Operation::Addition(Carry::Carry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::L),
-            ),
+            Arithmetic::AAA => {
+                let data = Src::Register(Bits8::A)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().add(data, false);
+            }
+            Arithmetic::AAB => {
+                let data = Src::Register(Bits8::B)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().add(data, false);
+            }
+            Arithmetic::AAC => {
+                let data = Src::Register(Bits8::C)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().add(data, false);
+            }
+            Arithmetic::AAD => {
+                let data = Src::Register(Bits8::D)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().add(data, false);
+            }
+            Arithmetic::AAE => {
+                let data = Src::Register(Bits8::E)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().add(data, false);
+            }
+            Arithmetic::AAH => {
+                let data = Src::Register(Bits8::H)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().add(data, false);
+            }
+            Arithmetic::AAL => {
+                let data = Src::Register(Bits8::L)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().add(data, false);
+            }
+            Arithmetic::AAcA => {
+                let data = Src::Register(Bits8::A)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().add(data, true);
+            }
+            Arithmetic::AAcB => {
+                let data = Src::Register(Bits8::B)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().add(data, true);
+            }
+            Arithmetic::AAcC => {
+                let data = Src::Register(Bits8::C)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().add(data, true);
+            }
+            Arithmetic::AAcD => {
+                let data = Src::Register(Bits8::D)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().add(data, true);
+            }
+            Arithmetic::AAcE => {
+                let data = Src::Register(Bits8::E)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().add(data, true);
+            }
+            Arithmetic::AAcH => {
+                let data = Src::Register(Bits8::H)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().add(data, true);
+            }
+            Arithmetic::AAcL => {
+                let data = Src::Register(Bits8::L)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().add(data, true);
+            }
             Arithmetic::AAc8b => {
-                Operation::Addition(Carry::Carry).operate(Src::Next, registers, memory, None)
+                let data = Src::Next.data(registers.clone(), memory).await;
+                registers.borrow_mut().add(data, true);
             }
             Arithmetic::AA8b => {
-                Operation::Addition(Carry::NoCarry).operate(Src::Next, registers, memory, None)
+                let data = Src::Next.data(registers.clone(), memory).await;
+                registers.borrow_mut().add(data, false);
             }
             Arithmetic::AAHL => {
-                Operation::Addition(Carry::NoCarry).operate(Src::Pointer, registers, memory, None)
+                let data = Src::Pointer.data(registers.clone(), memory).await;
+                registers.borrow_mut().add(data, false);
             }
             Arithmetic::AAcHL => {
-                Operation::Addition(Carry::Carry).operate(Src::Pointer, registers, memory, None)
+                let data = Src::Pointer.data(registers.clone(), memory).await;
+                registers.borrow_mut().add(data, true);
             }
-            Arithmetic::SAB => Operation::Substraction(Carry::NoCarry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::B),
-            ),
-            Arithmetic::SAC => Operation::Substraction(Carry::NoCarry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::C),
-            ),
-            Arithmetic::SAD => Operation::Substraction(Carry::NoCarry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::D),
-            ),
-            Arithmetic::SAE => Operation::Substraction(Carry::NoCarry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::E),
-            ),
-            Arithmetic::SAH => Operation::Substraction(Carry::NoCarry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::H),
-            ),
-            Arithmetic::SAL => Operation::Substraction(Carry::NoCarry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::L),
-            ),
-            Arithmetic::SAA => Operation::Substraction(Carry::NoCarry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::A),
-            ),
-            Arithmetic::SAHL => Operation::Substraction(Carry::NoCarry).operate(
-                Src::Pointer,
-                registers,
-                memory,
-                None,
-            ),
-            Arithmetic::SAcB => Operation::Substraction(Carry::Carry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::B),
-            ),
-            Arithmetic::SAcC => Operation::Substraction(Carry::Carry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::C),
-            ),
-            Arithmetic::SAcD => Operation::Substraction(Carry::Carry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::D),
-            ),
-            Arithmetic::SAcE => Operation::Substraction(Carry::Carry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::E),
-            ),
-            Arithmetic::SAcH => Operation::Substraction(Carry::Carry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::H),
-            ),
-            Arithmetic::SAcL => Operation::Substraction(Carry::Carry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::L),
-            ),
-            Arithmetic::SAcA => Operation::Substraction(Carry::Carry).operate(
-                Src::Register,
-                registers,
-                memory,
-                Some(Bits8::A),
-            ),
+            Arithmetic::SAB => {
+                let data = Src::Register(Bits8::B)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().sub(data, false);
+            }
+            Arithmetic::SAC => {
+                let data = Src::Register(Bits8::C)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().sub(data, false);
+            }
+            Arithmetic::SAD => {
+                let data = Src::Register(Bits8::D)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().sub(data, false);
+            }
+            Arithmetic::SAE => {
+                let data = Src::Register(Bits8::E)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().sub(data, false);
+            }
+            Arithmetic::SAH => {
+                let data = Src::Register(Bits8::H)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().sub(data, false);
+            }
+            Arithmetic::SAL => {
+                let data = Src::Register(Bits8::L)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().sub(data, false);
+            }
+            Arithmetic::SAA => {
+                let data = Src::Register(Bits8::A)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().sub(data, false);
+            }
+            Arithmetic::SAcB => {
+                let data = Src::Register(Bits8::B)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().sub(data, true);
+            }
+            Arithmetic::SAcC => {
+                let data = Src::Register(Bits8::C)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().sub(data, true);
+            }
+            Arithmetic::SAcD => {
+                let data = Src::Register(Bits8::D)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().sub(data, true);
+            }
+            Arithmetic::SAcE => {
+                let data = Src::Register(Bits8::E)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().sub(data, true);
+            }
+            Arithmetic::SAcH => {
+                let data = Src::Register(Bits8::H)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().sub(data, true);
+            }
+            Arithmetic::SAcL => {
+                let data = Src::Register(Bits8::L)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().sub(data, true);
+            }
+            Arithmetic::SAcA => {
+                let data = Src::Register(Bits8::A)
+                    .data(registers.clone(), memory)
+                    .await;
+                registers.borrow_mut().sub(data, true);
+            }
+            Arithmetic::SAHL => {
+                let data = Src::Pointer.data(registers.clone(), memory).await;
+                registers.borrow_mut().sub(data, false);
+            }
             Arithmetic::SAcHL => {
-                Operation::Substraction(Carry::Carry).operate(Src::Pointer, registers, memory, None)
+                let data = Src::Pointer.data(registers.clone(), memory).await;
+                registers.borrow_mut().sub(data, true);
             }
             Arithmetic::SA8b => {
-                Operation::Substraction(Carry::NoCarry).operate(Src::Next, registers, memory, None)
+                let data = Src::Next.data(registers.clone(), memory).await;
+                registers.borrow_mut().sub(data, false);
             }
             Arithmetic::SAc8b => {
-                Operation::Substraction(Carry::Carry).operate(Src::Next, registers, memory, None)
+                let data = Src::Next.data(registers.clone(), memory).await;
+                registers.borrow_mut().sub(data, true);
             }
         }
-        .await;
     }
 }
 
 #[cfg(test)]
-mod test_instruction_add_reg_a_8b {
+mod test_arithmetic {
     use super::Arithmetic;
     use crate::area::{Bits16, Bits8, Flag};
     use crate::{executor, RegisterBus, Registers};
     use memory::Memory;
 
     #[test]
-    fn test_load_add_reg_a_8b() {
+    fn test_add_next_byte_without_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::AA8b;
+
         register.borrow_mut().set(Bits8::A, 0x4f);
+        register.borrow_mut().set(Flag::C, true);
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+
         assert_eq!(register.borrow().get(Bits8::A), 0x80);
         assert_eq!(register.borrow().get(Flag::H), true);
     }
 
     #[test]
-    fn test_load_add_reg_a_hl() {
+    fn test_add_byte_at_address_hl_without_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::AAHL;
+
         register.borrow_mut().set(Bits8::A, 0xf8);
         register.borrow_mut().set(Bits16::HL, 0xc008);
+        register.borrow_mut().set(Flag::C, true);
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(register.borrow().get(Bits8::A), 0xf8);
     }
 
     #[test]
-    fn test_load_add_reg_a_reg_b() {
+    fn test_add_byte_in_register_b_without_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::AAB;
+
+        register.borrow_mut().set(Flag::C, true);
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+
         assert_eq!(register.borrow().get(Bits8::A), 0x00);
         assert_eq!(register.borrow().get(Flag::Z), true);
     }
 
     #[test]
-    fn test_load_adc_reg_a_8b() {
+    fn test_add_next_byte_with_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::AAc8b;
+
         register.borrow_mut().set(Bits8::A, 0x4f);
+        register.borrow_mut().set(Bits16::PC, 0xc000);
+        register.borrow_mut().set(Flag::C, true);
+        memory.borrow_mut().set_u8(0xc000, 0x2F).unwrap();
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0x81);
-        assert_eq!(register.borrow().get(Flag::H), true);
+
+        assert_eq!(register.borrow().get(Bits8::A), 0x7F);
     }
 
     #[test]
-    fn test_load_adc_reg_a_hl() {
+    fn test_add_byte_at_address_hl_with_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::AAcHL;
-        register.borrow_mut().set(Bits8::A, 0xf8);
+
+        register.borrow_mut().set(Bits8::A, 0x2a);
         register.borrow_mut().set(Bits16::HL, 0xc008);
+        register.borrow_mut().set(Flag::C, true);
+        memory.borrow_mut().set_u8(0xc008, 0x2d).unwrap();
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0xf9);
+
+        assert_eq!(register.borrow().get(Bits8::A), 0x58);
     }
 
     #[test]
-    fn test_load_adc_reg_a_reg_b() {
+    fn test_add_byte_in_register_c_with_carry() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = Arithmetic::AAcB;
+        let instruction = Arithmetic::AAcC;
+
+        register.borrow_mut().set(Bits8::A, 0x2B);
+        register.borrow_mut().set(Bits8::C, 0xAA);
+        register.borrow_mut().set(Flag::C, true);
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0x01);
+
+        assert_eq!(register.borrow().get(Bits8::A), 0xD6);
     }
 
     #[test]
-    fn test_load_sub_reg_a_8b() {
+    fn test_sub_next_byte_without_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::SA8b;
+
         register.borrow_mut().set(Bits8::A, 0x4f);
+        register.borrow_mut().set(Bits16::PC, 0xc000);
+        register.borrow_mut().set(Flag::C, true);
+        memory.borrow_mut().set_u8(0xc000, 0x2F).unwrap();
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0xe2);
-        assert_eq!(register.borrow().get(Flag::H), true);
+
+        assert_eq!(register.borrow().get(Bits8::A), 0x20);
     }
 
     #[test]
-    fn test_load_sub_reg_a_hl() {
+    fn test_sub_byte_at_address_hl_without_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::SAHL;
+
         register.borrow_mut().set(Bits8::A, 0xf8);
+        register.borrow_mut().set(Flag::C, true);
         register.borrow_mut().set(Bits16::HL, 0xc008);
+        memory.borrow_mut().set_u8(0xc008, 0xaa).unwrap();
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0x08);
+
+        assert_eq!(register.borrow().get(Bits8::A), 0x4e);
     }
 
     #[test]
-    fn test_load_sub_reg_a_reg_b() {
+    fn test_sub_byte_in_register_b_without_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::SAB;
+
+        register.borrow_mut().set(Flag::C, true);
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(register.borrow().get(Bits8::A), 0x00);
         assert_eq!(register.borrow().get(Flag::Z), true);
     }
 
     #[test]
-    fn test_load_sbc_reg_a_hl() {
+    fn test_sub_byte_at_address_hl_with_carry() {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Arithmetic::SAcHL;
+
         register.borrow_mut().set(Bits8::A, 0xf8);
+        register.borrow_mut().set(Flag::C, true);
         register.borrow_mut().set(Bits16::HL, 0xc008);
+        memory.borrow_mut().set_u8(0xc008, 0xaa).unwrap();
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0x07);
+
+        assert_eq!(register.borrow().get(Bits8::A), 0x4d);
     }
 
     #[test]
-    fn test_load_sbc_reg_a_reg_b() {
+    fn test_sub_byte_in_register_l_with_carry() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = Arithmetic::SAcB;
+        let instruction = Arithmetic::SAcL;
+
+        register.borrow_mut().set(Bits8::A, 0xF8);
+        register.borrow_mut().set(Bits8::L, 0xAB);
+        register.borrow_mut().set(Flag::C, true);
+
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(register.borrow().get(Bits8::A), 0xff);
+
+        assert_eq!(register.borrow().get(Bits8::A), 0x4C);
     }
 }
