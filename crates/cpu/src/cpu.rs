@@ -2,8 +2,8 @@ pub use crate::interface::{NewRegisters, Registers};
 use crate::opcodes::Arithmetic;
 use crate::opcodes::Load;
 use crate::opcodes::Load16b;
-use crate::opcodes::Rotate;
 use crate::opcodes::Logic;
+use crate::opcodes::Rotate;
 
 use crate::nextpc::NextPc;
 use memory::Memory;

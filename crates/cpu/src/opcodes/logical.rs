@@ -170,7 +170,7 @@ impl Logic {
 #[cfg(test)]
 mod test_logic_opcodes {
     use super::Logic;
-    use crate::area::{Bits8, Bits16, Flag};
+    use crate::area::{Bits16, Bits8, Flag};
     use crate::{executor, RegisterBus, Registers};
     use memory::Memory;
 
