@@ -1,5 +1,5 @@
 use super::{NextPc, Reader};
-use crate::area::Bits16;
+use crate::registers::Bits16;
 use crate::{RegisterBus, Registers};
 use memory::{Async, Memory};
 use shared::Error;

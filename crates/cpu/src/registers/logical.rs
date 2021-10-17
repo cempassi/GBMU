@@ -1,6 +1,5 @@
-use crate::area::{Bits8, Flag};
+use super::{Bits8, Flag, Arithmetic};
 use crate::registers::Registers;
-use crate::Arithmetic;
 use crate::RegisterBus;
 
 pub trait Logical<T> {

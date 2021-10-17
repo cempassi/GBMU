@@ -1,5 +1,5 @@
-use crate::area::Flag;
-use crate::registers::Registers;
+use super::Flag;
+use super::Registers;
 use crate::RegisterBus;
 
 const BIT7: u8 = 0x80;

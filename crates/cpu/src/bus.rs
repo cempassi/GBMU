@@ -1,7 +1,5 @@
 use std::fmt::Debug;
-use super::registers::Registers;
-use super::area::{Bits16, Bits8, Flag};
-use crate::Flags;
+use crate::registers::{Registers, Bits16, Bits8, Flags,  Flag};
 
 pub trait RegisterBus<T, O>: Debug {
     fn get(&self, _: T) -> O;

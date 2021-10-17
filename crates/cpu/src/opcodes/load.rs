@@ -1,8 +1,7 @@
-use crate::area::{Bits16, Bits8};
+use crate::registers::{Bits16, Bits8, Arithmetic};
 use crate::bus::RegisterBus;
 use crate::cpu::Registers;
 use crate::futures::{GetAt, NextPc, SetAt};
-use crate::Arithmetic;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
@@ -330,7 +329,7 @@ impl Load {
 #[cfg(test)]
 mod test_instruction_load_reg_reg {
     use super::Load;
-    use crate::area::{Bits16, Bits8};
+    use crate::registers::{Bits16, Bits8};
     use crate::executor;
     use crate::{RegisterBus, Registers};
     use memory::Memory;

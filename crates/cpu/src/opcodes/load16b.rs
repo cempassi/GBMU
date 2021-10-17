@@ -1,4 +1,4 @@
-use crate::area::Bits16;
+use crate::registers::Bits16;
 use crate::futures::{LoadData, Pop, Push, SetData};
 use crate::Registers;
 use memory::Memory;
@@ -86,7 +86,7 @@ impl Load16b {
 #[cfg(test)]
 mod test_load_register_u16 {
     use super::Load16b;
-    use crate::area::Bits16;
+    use crate::registers::Bits16;
     use crate::{executor, RegisterBus, Registers};
     use memory::Memory;
 

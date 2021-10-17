@@ -1,8 +1,7 @@
-use crate::area::{Bits16, Bits8};
+use crate::registers::{Bits16, Bits8, Arithmetic as A};
 use crate::bus::RegisterBus;
 use crate::cpu::Registers;
 use crate::futures::{GetAt, NextPc};
-use crate::Arithmetic as A;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
@@ -318,7 +317,7 @@ impl Arithmetic {
 #[cfg(test)]
 mod test_arithmetic {
     use super::Arithmetic;
-    use crate::area::{Bits16, Bits8, Flag};
+    use crate::registers::{Bits16, Bits8, Flag};
     use crate::{executor, RegisterBus, Registers};
     use memory::Memory;
 
