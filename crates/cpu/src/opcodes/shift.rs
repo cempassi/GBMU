@@ -1,7 +1,6 @@
-use crate::area::Bits8;
 use crate::cpu::Registers;
 use crate::opcodes::Src;
-use crate::shift::Shift as S;
+use crate::registers::{Bits8, Shift as S};
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
@@ -137,8 +136,8 @@ impl Shift {
 #[cfg(test)]
 mod test_shift_left {
     use super::Shift;
-    use crate::area::{Bits16, Bits8, Flag};
-    use crate::{executor, RegisterBus, Registers};
+    use crate::registers::{Bits16, Bits8, Bus, Flag};
+    use crate::{executor, Registers};
     use memory::Memory;
 
     #[test]

@@ -1,6 +1,6 @@
 use super::register::{Merge, RegisterMsg, Split, View};
 use crate::style::Theme;
-use cpu::area::{Bits16, Bits8};
+use cpu::registers::{Bits16, Bits8};
 use cpu::Registers;
 use enum_iterator::IntoEnumIterator;
 use iced_wgpu::{Checkbox, Column, Renderer, Row};

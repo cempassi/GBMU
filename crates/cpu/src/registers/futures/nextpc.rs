@@ -1,4 +1,5 @@
-use crate::{Reader, Registers};
+use super::Reader;
+use crate::Registers;
 use memory::Async;
 use memory::Memory;
 use shared::Error;

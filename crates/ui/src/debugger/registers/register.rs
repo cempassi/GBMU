@@ -1,13 +1,12 @@
 use crate::style::fonts;
 use crate::style::{Register, Style, Theme};
-use cpu::RegisterBus;
 use cpu::Registers;
 use iced_wgpu::{Container, Renderer, Row, Text};
 use iced_winit::{
     alignment::Alignment, alignment::Horizontal, alignment::Vertical, Element, Length, Space,
 };
 
-use cpu::area::{Bits16, Bits8};
+use cpu::registers::{Bits16, Bits8, Bus};
 
 #[derive(Debug, Clone)]
 pub enum RegisterMsg {

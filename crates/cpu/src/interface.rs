@@ -4,11 +4,11 @@ use std::rc::Rc;
 
 pub type Registers = Rc<RefCell<registers::Registers>>;
 
-pub trait NewRegisters {
+pub trait New {
     fn new() -> Self;
 }
 
-impl NewRegisters for Registers {
+impl New for Registers {
     fn new() -> Self {
         Rc::new(RefCell::new(registers::Registers::default()))
     }

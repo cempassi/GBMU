@@ -1,4 +1,4 @@
-pub use crate::interface::{NewRegisters, Registers};
+pub use crate::interface::{New, Registers};
 use crate::opcodes::Arithmetic;
 use crate::opcodes::Load;
 use crate::opcodes::Load16b;
@@ -6,7 +6,7 @@ use crate::opcodes::Logic;
 use crate::opcodes::Rotate;
 use crate::opcodes::Shift;
 
-use crate::nextpc::NextPc;
+use crate::registers::futures::NextPc;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
@@ -20,7 +20,7 @@ impl Cpu {
     pub fn new(memory: Memory) -> Self {
         Self {
             memory,
-            registers: <Registers as NewRegisters>::new(),
+            registers: New::new(),
         }
     }
 

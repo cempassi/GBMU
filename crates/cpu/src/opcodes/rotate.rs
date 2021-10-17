@@ -1,8 +1,6 @@
-use super::consts::{BIT0, BIT7};
-use crate::bus::RegisterBus;
 use crate::opcodes::Src;
 use crate::{
-    area::{Bits8, Flag},
+    registers::{Bits8, Bus, Flag},
     Registers,
 };
 use memory::Memory;
@@ -54,6 +52,9 @@ use num_enum::TryFromPrimitive;
 /// N - Unused
 /// H - Unused
 /// C - Set according to result.
+
+const BIT0: u8 = 0b0000_0001;
+const BIT7: u8 = 0x80;
 
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u8)]
@@ -181,8 +182,8 @@ impl Rotate {
 #[cfg(test)]
 mod test_rotate {
     use super::Rotate;
-    use crate::area::{Bits16, Bits8, Flag};
-    use crate::{executor, RegisterBus, Registers};
+    use crate::registers::{Bits16, Bits8, Bus, Flag};
+    use crate::{executor, Registers};
     use memory::Memory;
 
     #[test]
