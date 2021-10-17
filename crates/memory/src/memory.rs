@@ -116,7 +116,7 @@ impl Memory {
         let rom: Rom = Rc::new(RefCell::new(match mbc {
             Cartridge::Mbc0 => Mbc0::new(data),
             Cartridge::Mbc1 => Mbc1::new(data),
-            Cartridge::Mbc2 => Mbc2::new(data),
+            Cartridge::Mbc2 | Cartridge::Mbc2Battery => Mbc2::new(data),
             Cartridge::Mbc3 => Mbc3::new(data),
             Cartridge::Mbc5 => Mbc5::new(data),
             _ => unimplemented!(),
