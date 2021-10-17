@@ -1,6 +1,6 @@
 use crate::registers::{Bits8, Logical};
 use crate::cpu::Registers;
-use crate::futures::{LogicalHL, LogicalNext, Operation};
+use crate::registers::futures::{LogicalHL, LogicalNext, Operation};
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
@@ -170,7 +170,7 @@ impl Logic {
 mod test_logic_opcodes {
     use super::Logic;
     use crate::registers::{Bits16, Bits8, Flag};
-    use crate::{executor, RegisterBus, Registers};
+    use crate::{executor, Bus, Registers};
     use memory::Memory;
 
     #[test]

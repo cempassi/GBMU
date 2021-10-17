@@ -1,7 +1,7 @@
 use crate::registers::{Bits16, Bits8};
-use crate::bus::RegisterBus;
+use crate::bus::Bus;
 use crate::cpu::Registers;
-use crate::futures::{GetAt, SetAt};
+use crate::registers::futures::{GetAt, SetAt};
 use memory::Memory;
 
 pub(crate) enum Src {

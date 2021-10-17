@@ -1,5 +1,5 @@
 use crate::registers::Bits16;
-use crate::futures::{LoadData, Pop, Push, SetData};
+use crate::registers::futures::{LoadData, Pop, Push, SetData};
 use crate::Registers;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
@@ -87,7 +87,7 @@ impl Load16b {
 mod test_load_register_u16 {
     use super::Load16b;
     use crate::registers::Bits16;
-    use crate::{executor, RegisterBus, Registers};
+    use crate::{executor, Bus, Registers};
     use memory::Memory;
 
     #[test]

@@ -3,9 +3,10 @@ pub(crate) mod shift;
 pub(crate) mod arithmetic;
 pub(crate) mod logical;
 pub(crate) mod flags;
+pub(crate) mod futures;
 
 pub(crate) use flags::Flags;
-pub(crate) use area::{Bits8, Bits16, Flag};
+pub use area::{Bits8, Bits16, Flag};
 pub(crate) use shift::Shift;
 pub(crate) use arithmetic::Arithmetic;
 pub(crate) use logical::Logical;

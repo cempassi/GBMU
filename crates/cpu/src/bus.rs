@@ -1,13 +1,13 @@
 use std::fmt::Debug;
 use crate::registers::{Registers, Bits16, Bits8, Flags,  Flag};
 
-pub trait RegisterBus<T, O>: Debug {
+pub trait Bus<T, O>: Debug {
     fn get(&self, _: T) -> O;
 
     fn set(&mut self, _: T, data: O);
 }
 
-impl RegisterBus<Bits8, u8> for Registers {
+impl Bus<Bits8, u8> for Registers {
     fn get(&self, area: Bits8) -> u8 {
         match area {
             Bits8::A => self.a,
@@ -35,7 +35,7 @@ impl RegisterBus<Bits8, u8> for Registers {
     }
 }
 
-impl RegisterBus<Bits16, u16> for Registers {
+impl Bus<Bits16, u16> for Registers {
     fn get(&self, area: Bits16) -> u16 {
         match area {
             Bits16::SP => self.sp,
@@ -75,7 +75,7 @@ impl RegisterBus<Bits16, u16> for Registers {
     }
 }
 
-impl RegisterBus<Flag, bool> for Registers {
+impl Bus<Flag, bool> for Registers {
     fn get(&self, flag: Flag) -> bool {
         self.f.get(flag)
     }
@@ -89,7 +89,7 @@ impl RegisterBus<Flag, bool> for Registers {
 mod test_registers {
     use super::Registers;
     use super::{Bits16, Bits8};
-    use crate::RegisterBus;
+    use crate::Bus;
 
     #[test]
     fn test_valid_write_read_8bits() {

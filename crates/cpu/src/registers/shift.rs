@@ -1,6 +1,6 @@
 use super::Flag;
 use super::Registers;
-use crate::RegisterBus;
+use crate::Bus;
 
 const BIT7: u8 = 0x80;
 const BIT0: u8 = 0x1;

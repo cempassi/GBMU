@@ -1,6 +1,6 @@
 use super::{NextPc, Reader};
 use crate::registers::{Bits16, Bits8};
-use crate::{RegisterBus, Registers};
+use crate::{Bus, Registers};
 use memory::{Async, Memory};
 use shared::Error;
 use std::future::Future;

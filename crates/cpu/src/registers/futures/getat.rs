@@ -1,6 +1,6 @@
 use super::Reader;
 use crate::registers::Bits16;
-use crate::{RegisterBus, Registers};
+use crate::{Bus, Registers};
 use memory::{Async, Memory};
 use shared::Error;
 use std::future::Future;

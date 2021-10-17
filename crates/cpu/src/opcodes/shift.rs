@@ -137,7 +137,7 @@ impl Shift {
 mod test_shift_left {
     use super::Shift;
     use crate::registers::{Bits16, Bits8, Flag};
-    use crate::{executor, RegisterBus, Registers};
+    use crate::{executor, Bus, Registers};
     use memory::Memory;
 
     #[test]

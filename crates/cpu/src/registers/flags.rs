@@ -1,5 +1,5 @@
 use super::area::Flag;
-use crate::RegisterBus;
+use crate::Bus;
 use modular_bitfield::{bitfield, specifiers::B4};
 
 #[bitfield]
@@ -19,7 +19,7 @@ impl Default for Flags {
     }
 }
 
-impl RegisterBus<Flag, bool> for Flags {
+impl Bus<Flag, bool> for Flags {
     fn get(&self, flag: Flag) -> bool {
         match flag {
             Flag::Z => self.z(),
@@ -43,7 +43,7 @@ impl RegisterBus<Flag, bool> for Flags {
 mod test_flags {
     use super::Flag;
     use super::Flags;
-    use crate::RegisterBus;
+    use crate::Bus;
 
     #[test]
     fn test_valid_flag_set_get() {
