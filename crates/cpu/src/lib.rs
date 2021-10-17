@@ -11,6 +11,7 @@ pub mod nextpc;
 mod opcodes;
 pub mod reader;
 pub mod registers;
+pub(crate) mod shift;
 
 pub(crate) use crate::arithmetic::Arithmetic;
 pub use crate::bus::RegisterBus;
