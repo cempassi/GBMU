@@ -128,7 +128,7 @@ impl Shift {
             Shift::LD => Type::Left.shift(Src::Register(Bits8::D), registers, memory),
             Shift::LE => Type::Left.shift(Src::Register(Bits8::E), registers, memory),
             Shift::LH => Type::Left.shift(Src::Register(Bits8::H), registers, memory),
-            Shift::LL => Type::Left.shift(Src::Register(Bits8::H), registers, memory),
+            Shift::LL => Type::Left.shift(Src::Register(Bits8::L), registers, memory),
             Shift::LA => Type::Left.shift(Src::Register(Bits8::A), registers, memory),
             Shift::LHL => Type::Left.shift(Src::Pointer, registers, memory),
             Shift::SB => Type::Swap.shift(Src::Register(Bits8::B), registers, memory),
@@ -136,7 +136,7 @@ impl Shift {
             Shift::SD => Type::Swap.shift(Src::Register(Bits8::D), registers, memory),
             Shift::SE => Type::Swap.shift(Src::Register(Bits8::E), registers, memory),
             Shift::SH => Type::Swap.shift(Src::Register(Bits8::H), registers, memory),
-            Shift::SL => Type::Swap.shift(Src::Register(Bits8::H), registers, memory),
+            Shift::SL => Type::Swap.shift(Src::Register(Bits8::L), registers, memory),
             Shift::SA => Type::Swap.shift(Src::Register(Bits8::A), registers, memory),
             Shift::SHL => Type::Swap.shift(Src::Pointer, registers, memory),
             Shift::RAB => Type::Arithmetic.shift(Src::Register(Bits8::B), registers, memory),
@@ -144,7 +144,7 @@ impl Shift {
             Shift::RAD => Type::Arithmetic.shift(Src::Register(Bits8::D), registers, memory),
             Shift::RAE => Type::Arithmetic.shift(Src::Register(Bits8::E), registers, memory),
             Shift::RAH => Type::Arithmetic.shift(Src::Register(Bits8::H), registers, memory),
-            Shift::RAL => Type::Arithmetic.shift(Src::Register(Bits8::H), registers, memory),
+            Shift::RAL => Type::Arithmetic.shift(Src::Register(Bits8::L), registers, memory),
             Shift::RAA => Type::Arithmetic.shift(Src::Register(Bits8::A), registers, memory),
             Shift::RAHL => Type::Arithmetic.shift(Src::Pointer, registers, memory),
             Shift::RLB => Type::Logic.shift(Src::Register(Bits8::B), registers, memory),
@@ -152,7 +152,7 @@ impl Shift {
             Shift::RLD => Type::Logic.shift(Src::Register(Bits8::D), registers, memory),
             Shift::RLE => Type::Logic.shift(Src::Register(Bits8::E), registers, memory),
             Shift::RLH => Type::Logic.shift(Src::Register(Bits8::H), registers, memory),
-            Shift::RLL => Type::Logic.shift(Src::Register(Bits8::H), registers, memory),
+            Shift::RLL => Type::Logic.shift(Src::Register(Bits8::L), registers, memory),
             Shift::RLA => Type::Logic.shift(Src::Register(Bits8::A), registers, memory),
             Shift::RLHL => Type::Logic.shift(Src::Pointer, registers, memory),
         }
@@ -235,11 +235,26 @@ mod test_shift_left {
 
         let result = memory.borrow_mut().get_u8(hl).unwrap();
         let carry = register.borrow_mut().get(Flag::C);
+        assert_eq!(result, expected);
+        assert_eq!(carry, true);
+    }
+
+    #[test]
+    fn test_swap_register_l() {
+        let src = 0b1010_0110;
+        let expected = 0b0110_1010;
+        let register = Registers::default();
+        let memory = Memory::default();
+        let instruction = Shift::SL;
+        register.borrow_mut().set(Bits8::L, src);
+
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+
+        let result = register.borrow().get(Bits8::L);
+
         println!("Src     : {:08b}", src);
         println!("result  : {:08b}", result);
         println!("expected: {:08b}", expected);
-        println!("carry is {} and should be true", carry);
         assert_eq!(result, expected);
-        assert_eq!(carry, true);
     }
 }

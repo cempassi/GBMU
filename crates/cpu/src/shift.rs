@@ -4,6 +4,7 @@ use crate::RegisterBus;
 
 const BIT7: u8 = 0x80;
 const BIT0: u8 = 0x1;
+
 const LOWER_HALF: u8 = 0xF;
 const UPPER_HALF: u8 = 0xF0;
 
