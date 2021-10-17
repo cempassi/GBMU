@@ -4,6 +4,7 @@ use crate::opcodes::Load;
 use crate::opcodes::Load16b;
 use crate::opcodes::Logic;
 use crate::opcodes::Rotate;
+use crate::opcodes::Shift;
 
 use crate::nextpc::NextPc;
 use memory::Memory;
@@ -40,6 +41,8 @@ impl Cpu {
             .unwrap();
 
         if let Ok(operation) = Rotate::try_from_primitive(opcode) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = Shift::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         }
     }
