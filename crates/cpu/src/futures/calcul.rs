@@ -1,8 +1,8 @@
-use super::GetAt;
+use super::{GetAt, Reader};
 use crate::area::Bits16;
 use crate::logical::Logical;
 use crate::nextpc::NextPc;
-use crate::{Reader, Registers};
+use crate::Registers;
 use memory::Memory;
 use shared::Error;
 use std::future::Future;

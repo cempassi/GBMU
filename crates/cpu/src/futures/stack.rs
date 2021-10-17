@@ -1,7 +1,7 @@
-use super::{GetAt, SetAt};
+use super::{GetAt, Reader, SetAt};
 use crate::area::Bits16;
 use crate::Arithmetic;
-use crate::{Reader, RegisterBus, Registers};
+use crate::{RegisterBus, Registers};
 use memory::Memory;
 use shared::Error;
 use std::future::Future;
