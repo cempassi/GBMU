@@ -1,7 +1,6 @@
-use crate::area::{Bits16, Bits8};
-use crate::bus::RegisterBus;
+use crate::area::Bits8;
 use crate::cpu::Registers;
-use crate::futures::{GetAt, SetAt};
+use crate::opcodes::Src;
 use crate::shift::Shift as S;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
@@ -73,31 +72,6 @@ pub enum Shift {
     RLL = 0x3D,
     RLHL = 0x3E,
     RLA = 0x3F,
-}
-
-enum Src {
-    Register(Bits8),
-    Pointer,
-}
-
-impl Src {
-    pub async fn get(&self, registers: Registers, memory: Memory) -> u8 {
-        match self {
-            Src::Register(src) => registers.borrow().get(*src),
-            Src::Pointer => registers.clone().get_at(memory, Bits16::HL).await.unwrap(),
-        }
-    }
-
-    pub async fn set(&self, registers: Registers, memory: Memory, data: u8) {
-        match self {
-            Src::Register(src) => registers.borrow_mut().set(*src, data),
-            Src::Pointer => registers
-                .clone()
-                .set_at(memory, Bits16::HL, data)
-                .await
-                .unwrap(),
-        }
-    }
 }
 
 enum Type {
