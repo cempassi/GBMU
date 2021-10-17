@@ -1,4 +1,3 @@
-use super::consts::{BIT0, BIT7};
 use crate::opcodes::Src;
 use crate::{
     registers::{Bits8, Bus, Flag},
@@ -53,6 +52,9 @@ use num_enum::TryFromPrimitive;
 /// N - Unused
 /// H - Unused
 /// C - Set according to result.
+
+const BIT0: u8 = 0b0000_0001;
+const BIT7: u8 = 0x80;
 
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u8)]

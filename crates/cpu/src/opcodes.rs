@@ -1,5 +1,4 @@
 mod arithmetic;
-mod consts;
 mod load;
 mod load16b;
 mod logical;
