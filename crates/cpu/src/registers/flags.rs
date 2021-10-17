@@ -1,5 +1,4 @@
-use super::area::Flag;
-use crate::Bus;
+use super::{Bus, Flag};
 use modular_bitfield::{bitfield, specifiers::B4};
 
 #[bitfield]
@@ -41,9 +40,7 @@ impl Bus<Flag, bool> for Flags {
 
 #[cfg(test)]
 mod test_flags {
-    use super::Flag;
-    use super::Flags;
-    use crate::Bus;
+    use super::{Bus, Flag, Flags};
 
     #[test]
     fn test_valid_flag_set_get() {

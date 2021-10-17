@@ -1,15 +1,17 @@
 pub(crate) mod area;
-pub(crate) mod shift;
 pub(crate) mod arithmetic;
-pub(crate) mod logical;
+pub mod bus;
 pub(crate) mod flags;
 pub(crate) mod futures;
+pub(crate) mod logical;
+pub(crate) mod shift;
 
-pub(crate) use flags::Flags;
-pub use area::{Bits8, Bits16, Flag};
-pub(crate) use shift::Shift;
+pub use area::{Bits16, Bits8, Flag};
 pub(crate) use arithmetic::Arithmetic;
+pub use bus::Bus;
+pub(crate) use flags::Flags;
 pub(crate) use logical::Logical;
+pub(crate) use shift::Shift;
 
 #[derive(Debug, Default)]
 pub struct Registers {

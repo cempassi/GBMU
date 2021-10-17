@@ -1,6 +1,6 @@
 use super::{GetAt, Reader, SetAt};
-use crate::registers::{Arithmetic, Bits16};
-use crate::{Bus, Registers};
+use crate::registers::{Arithmetic, Bits16, Bus};
+use crate::Registers;
 use memory::Memory;
 use shared::Error;
 use std::future::Future;

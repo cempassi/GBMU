@@ -1,5 +1,5 @@
+use crate::registers::{Bits16, Bits8, Flag, Flags, Registers};
 use std::fmt::Debug;
-use crate::registers::{Registers, Bits16, Bits8, Flags,  Flag};
 
 pub trait Bus<T, O>: Debug {
     fn get(&self, _: T) -> O;
@@ -87,9 +87,7 @@ impl Bus<Flag, bool> for Registers {
 
 #[cfg(test)]
 mod test_registers {
-    use super::Registers;
-    use super::{Bits16, Bits8};
-    use crate::Bus;
+    use super::{Bits16, Bits8, Bus, Registers};
 
     #[test]
     fn test_valid_write_read_8bits() {

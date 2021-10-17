@@ -1,6 +1,5 @@
-use super::{Bits8, Flag, Arithmetic};
+use super::{Arithmetic, Bits8, Bus, Flag};
 use crate::registers::Registers;
-use crate::Bus;
 
 pub trait Logical<T> {
     fn and(&mut self, area: T);

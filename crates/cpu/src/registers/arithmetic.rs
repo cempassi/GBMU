@@ -1,6 +1,4 @@
-use super::area::{Bits16, Bits8, Flag};
-use crate::registers::Registers;
-use crate::Bus;
+use super::{Bits16, Bits8, Bus, Flag, Registers};
 
 const HALF_U8: u8 = 0xF;
 const HALF_U16: u16 = 0xFF;

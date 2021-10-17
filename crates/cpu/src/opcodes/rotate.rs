@@ -1,8 +1,7 @@
 use super::consts::{BIT0, BIT7};
-use crate::bus::Bus;
 use crate::opcodes::Src;
 use crate::{
-    registers::{Bits8, Flag},
+    registers::{Bits8, Bus, Flag},
     Registers,
 };
 use memory::Memory;
@@ -181,8 +180,8 @@ impl Rotate {
 #[cfg(test)]
 mod test_rotate {
     use super::Rotate;
-    use crate::registers::{Bits16, Bits8, Flag};
-    use crate::{executor, Bus, Registers};
+    use crate::registers::{Bits16, Bits8, Bus, Flag};
+    use crate::{executor, Registers};
     use memory::Memory;
 
     #[test]
