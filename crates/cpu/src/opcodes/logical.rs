@@ -1,6 +1,6 @@
 use crate::area::Bits8;
 use crate::cpu::Registers;
-use crate::futures::{CalculHL, CalculNext, Operation};
+use crate::futures::{LogicalHL, LogicalNext, Operation};
 use crate::logical::Logical;
 use memory::Memory;
 use num_enum::TryFromPrimitive;

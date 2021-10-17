@@ -17,11 +17,11 @@ pub enum Operation {
     Comapre,
 }
 
-pub(crate) trait CalculHL {
+pub(crate) trait LogicalHL {
     fn do_hl(self, memory: Memory, operation: Operation) -> Calculation;
 }
 
-pub(crate) trait CalculNext {
+pub(crate) trait LogicalNext {
     fn do_next(self, memory: Memory, operation: Operation) -> Calculation;
 }
 
@@ -46,14 +46,14 @@ async fn get_next(registers: Registers, memory: Memory, operation: Operation) ->
     calculate(registers, data, operation)
 }
 
-impl CalculHL for Registers {
+impl LogicalHL for Registers {
     fn do_hl(self, memory: Memory, operation: Operation) -> Calculation {
         let inner = Box::pin(get_hl(self, memory, operation));
         Box::pin(Reader::new(inner))
     }
 }
 
-impl CalculNext for Registers {
+impl LogicalNext for Registers {
     fn do_next(self, memory: Memory, operation: Operation) -> Calculation {
         let inner = Box::pin(get_next(self, memory, operation));
         Box::pin(Reader::new(inner))
