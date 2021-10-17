@@ -189,8 +189,8 @@ pub enum Load {
 
 #[derive(Clone, Copy)]
 enum Src {
-    Register,
-    Pointer,
+    Register(Bits8),
+    Pointer(Bits16),
     Next,
     Increase,
     Decrease,
@@ -204,14 +204,10 @@ enum Dst {
 }
 
 impl Dst {
-    pub async fn load(self, source: Src, src: Option<Bits8>, registers: Registers, memory: Memory) {
+    pub async fn load(self, source: Src, registers: Registers, memory: Memory) {
         let data = match source {
-            Src::Register => registers.borrow().get(src.unwrap()),
-            Src::Pointer => registers
-                .clone()
-                .get_at(memory.clone(), Bits16::from(src.unwrap()))
-                .await
-                .unwrap(),
+            Src::Register(src) => registers.borrow().get(src),
+            Src::Pointer(src) => registers.clone().get_at(memory.clone(), src).await.unwrap(),
             Src::Next => registers.clone().next_pc(memory.clone()).await.unwrap(),
             Src::Increase => {
                 let data = registers
@@ -250,205 +246,83 @@ impl Dst {
 impl Load {
     pub async fn exec(self, registers: Registers, memory: Memory) {
         match self {
-            Load::B => Dst::Register(Bits8::B).load(Src::Next, None, registers, memory),
-            Load::C => Dst::Register(Bits8::C).load(Src::Next, None, registers, memory),
-            Load::D => Dst::Register(Bits8::D).load(Src::Next, None, registers, memory),
-            Load::E => Dst::Register(Bits8::E).load(Src::Next, None, registers, memory),
-            Load::H => Dst::Register(Bits8::H).load(Src::Next, None, registers, memory),
-            Load::L => Dst::Register(Bits8::L).load(Src::Next, None, registers, memory),
-            Load::A => Dst::Register(Bits8::A).load(Src::Next, None, registers, memory),
-            Load::HL8b => Dst::Pointer(Bits16::HL).load(Src::Next, None, registers, memory),
-            Load::BHL => {
-                Dst::Register(Bits8::B).load(Src::Pointer, Some(Bits8::H), registers, memory)
-            }
-            Load::CHL => {
-                Dst::Register(Bits8::C).load(Src::Pointer, Some(Bits8::H), registers, memory)
-            }
-            Load::DHL => {
-                Dst::Register(Bits8::D).load(Src::Pointer, Some(Bits8::H), registers, memory)
-            }
-            Load::EHL => {
-                Dst::Register(Bits8::E).load(Src::Pointer, Some(Bits8::H), registers, memory)
-            }
-            Load::HHL => {
-                Dst::Register(Bits8::H).load(Src::Pointer, Some(Bits8::H), registers, memory)
-            }
-            Load::LHL => {
-                Dst::Register(Bits8::L).load(Src::Pointer, Some(Bits8::H), registers, memory)
-            }
-            Load::AHL => {
-                Dst::Register(Bits8::A).load(Src::Pointer, Some(Bits8::H), registers, memory)
-            }
-            Load::AA => {
-                Dst::Register(Bits8::A).load(Src::Register, Some(Bits8::A), registers, memory)
-            }
-            Load::AB => {
-                Dst::Register(Bits8::B).load(Src::Register, Some(Bits8::A), registers, memory)
-            }
-            Load::AC => {
-                Dst::Register(Bits8::C).load(Src::Register, Some(Bits8::A), registers, memory)
-            }
-            Load::AD => {
-                Dst::Register(Bits8::D).load(Src::Register, Some(Bits8::A), registers, memory)
-            }
-            Load::AE => {
-                Dst::Register(Bits8::E).load(Src::Register, Some(Bits8::A), registers, memory)
-            }
-            Load::AH => {
-                Dst::Register(Bits8::H).load(Src::Register, Some(Bits8::A), registers, memory)
-            }
-            Load::AL => {
-                Dst::Register(Bits8::L).load(Src::Register, Some(Bits8::A), registers, memory)
-            }
-            Load::BB => {
-                Dst::Register(Bits8::B).load(Src::Register, Some(Bits8::B), registers, memory)
-            }
-            Load::BC => {
-                Dst::Register(Bits8::C).load(Src::Register, Some(Bits8::B), registers, memory)
-            }
-            Load::BD => {
-                Dst::Register(Bits8::D).load(Src::Register, Some(Bits8::B), registers, memory)
-            }
-            Load::BE => {
-                Dst::Register(Bits8::E).load(Src::Register, Some(Bits8::B), registers, memory)
-            }
-            Load::BH => {
-                Dst::Register(Bits8::H).load(Src::Register, Some(Bits8::B), registers, memory)
-            }
-            Load::BL => {
-                Dst::Register(Bits8::L).load(Src::Register, Some(Bits8::B), registers, memory)
-            }
-            Load::CB => {
-                Dst::Register(Bits8::B).load(Src::Register, Some(Bits8::C), registers, memory)
-            }
-            Load::CC => {
-                Dst::Register(Bits8::C).load(Src::Register, Some(Bits8::C), registers, memory)
-            }
-            Load::CD => {
-                Dst::Register(Bits8::D).load(Src::Register, Some(Bits8::C), registers, memory)
-            }
-            Load::CE => {
-                Dst::Register(Bits8::E).load(Src::Register, Some(Bits8::C), registers, memory)
-            }
-            Load::CH => {
-                Dst::Register(Bits8::H).load(Src::Register, Some(Bits8::C), registers, memory)
-            }
-            Load::CL => {
-                Dst::Register(Bits8::L).load(Src::Register, Some(Bits8::C), registers, memory)
-            }
-            Load::DB => {
-                Dst::Register(Bits8::B).load(Src::Register, Some(Bits8::D), registers, memory)
-            }
-            Load::DC => {
-                Dst::Register(Bits8::C).load(Src::Register, Some(Bits8::D), registers, memory)
-            }
-            Load::DD => {
-                Dst::Register(Bits8::D).load(Src::Register, Some(Bits8::D), registers, memory)
-            }
-            Load::DE => {
-                Dst::Register(Bits8::E).load(Src::Register, Some(Bits8::D), registers, memory)
-            }
-            Load::DH => {
-                Dst::Register(Bits8::H).load(Src::Register, Some(Bits8::D), registers, memory)
-            }
-            Load::DL => {
-                Dst::Register(Bits8::L).load(Src::Register, Some(Bits8::D), registers, memory)
-            }
-            Load::EB => {
-                Dst::Register(Bits8::B).load(Src::Register, Some(Bits8::E), registers, memory)
-            }
-            Load::EC => {
-                Dst::Register(Bits8::C).load(Src::Register, Some(Bits8::E), registers, memory)
-            }
-            Load::ED => {
-                Dst::Register(Bits8::D).load(Src::Register, Some(Bits8::E), registers, memory)
-            }
-            Load::EE => {
-                Dst::Register(Bits8::E).load(Src::Register, Some(Bits8::E), registers, memory)
-            }
-            Load::EH => {
-                Dst::Register(Bits8::H).load(Src::Register, Some(Bits8::E), registers, memory)
-            }
-            Load::EL => {
-                Dst::Register(Bits8::L).load(Src::Register, Some(Bits8::E), registers, memory)
-            }
-            Load::HB => {
-                Dst::Register(Bits8::B).load(Src::Register, Some(Bits8::H), registers, memory)
-            }
-            Load::HC => {
-                Dst::Register(Bits8::C).load(Src::Register, Some(Bits8::H), registers, memory)
-            }
-            Load::HD => {
-                Dst::Register(Bits8::D).load(Src::Register, Some(Bits8::H), registers, memory)
-            }
-            Load::HE => {
-                Dst::Register(Bits8::E).load(Src::Register, Some(Bits8::H), registers, memory)
-            }
-            Load::HH => {
-                Dst::Register(Bits8::H).load(Src::Register, Some(Bits8::H), registers, memory)
-            }
-            Load::HL => {
-                Dst::Register(Bits8::L).load(Src::Register, Some(Bits8::H), registers, memory)
-            }
-            Load::LB => {
-                Dst::Register(Bits8::B).load(Src::Register, Some(Bits8::L), registers, memory)
-            }
-            Load::LC => {
-                Dst::Register(Bits8::C).load(Src::Register, Some(Bits8::L), registers, memory)
-            }
-            Load::LD => {
-                Dst::Register(Bits8::D).load(Src::Register, Some(Bits8::L), registers, memory)
-            }
-            Load::LE => {
-                Dst::Register(Bits8::E).load(Src::Register, Some(Bits8::L), registers, memory)
-            }
-            Load::LH => {
-                Dst::Register(Bits8::H).load(Src::Register, Some(Bits8::L), registers, memory)
-            }
-            Load::LL => {
-                Dst::Register(Bits8::L).load(Src::Register, Some(Bits8::L), registers, memory)
-            }
-            Load::HLB => {
-                Dst::Pointer(Bits16::HL).load(Src::Register, Some(Bits8::B), registers, memory)
-            }
-            Load::HLC => {
-                Dst::Pointer(Bits16::HL).load(Src::Register, Some(Bits8::C), registers, memory)
-            }
-            Load::HLD => {
-                Dst::Pointer(Bits16::HL).load(Src::Register, Some(Bits8::D), registers, memory)
-            }
-            Load::HLE => {
-                Dst::Pointer(Bits16::HL).load(Src::Register, Some(Bits8::E), registers, memory)
-            }
-            Load::HLH => {
-                Dst::Pointer(Bits16::HL).load(Src::Register, Some(Bits8::H), registers, memory)
-            }
-            Load::HLL => {
-                Dst::Pointer(Bits16::HL).load(Src::Register, Some(Bits8::L), registers, memory)
-            }
-            Load::HLA => {
-                Dst::Pointer(Bits16::HL).load(Src::Register, Some(Bits8::A), registers, memory)
-            }
-            Load::BCA => {
-                Dst::Pointer(Bits16::BC).load(Src::Register, Some(Bits8::A), registers, memory)
-            }
-            Load::DEA => {
-                Dst::Pointer(Bits16::DE).load(Src::Register, Some(Bits8::A), registers, memory)
-            }
-            Load::ABC => {
-                Dst::Register(Bits8::A).load(Src::Pointer, Some(Bits8::B), registers, memory)
-            }
-            Load::ADE => {
-                Dst::Register(Bits8::A).load(Src::Pointer, Some(Bits8::D), registers, memory)
-            }
+            Load::B => Dst::Register(Bits8::B).load(Src::Next, registers, memory),
+            Load::C => Dst::Register(Bits8::C).load(Src::Next, registers, memory),
+            Load::D => Dst::Register(Bits8::D).load(Src::Next, registers, memory),
+            Load::E => Dst::Register(Bits8::E).load(Src::Next, registers, memory),
+            Load::H => Dst::Register(Bits8::H).load(Src::Next, registers, memory),
+            Load::L => Dst::Register(Bits8::L).load(Src::Next, registers, memory),
+            Load::A => Dst::Register(Bits8::A).load(Src::Next, registers, memory),
+            Load::HL8b => Dst::Pointer(Bits16::HL).load(Src::Next, registers, memory),
+            Load::BHL => Dst::Register(Bits8::B).load(Src::Pointer(Bits16::HL), registers, memory),
+            Load::CHL => Dst::Register(Bits8::C).load(Src::Pointer(Bits16::HL), registers, memory),
+            Load::DHL => Dst::Register(Bits8::D).load(Src::Pointer(Bits16::HL), registers, memory),
+            Load::EHL => Dst::Register(Bits8::E).load(Src::Pointer(Bits16::HL), registers, memory),
+            Load::HHL => Dst::Register(Bits8::H).load(Src::Pointer(Bits16::HL), registers, memory),
+            Load::LHL => Dst::Register(Bits8::L).load(Src::Pointer(Bits16::HL), registers, memory),
+            Load::AHL => Dst::Register(Bits8::A).load(Src::Pointer(Bits16::HL), registers, memory),
+            Load::AA => Dst::Register(Bits8::A).load(Src::Register(Bits8::A), registers, memory),
+            Load::AB => Dst::Register(Bits8::B).load(Src::Register(Bits8::A), registers, memory),
+            Load::AC => Dst::Register(Bits8::C).load(Src::Register(Bits8::A), registers, memory),
+            Load::AD => Dst::Register(Bits8::D).load(Src::Register(Bits8::A), registers, memory),
+            Load::AE => Dst::Register(Bits8::E).load(Src::Register(Bits8::A), registers, memory),
+            Load::AH => Dst::Register(Bits8::H).load(Src::Register(Bits8::A), registers, memory),
+            Load::AL => Dst::Register(Bits8::L).load(Src::Register(Bits8::A), registers, memory),
+            Load::BB => Dst::Register(Bits8::B).load(Src::Register(Bits8::B), registers, memory),
+            Load::BC => Dst::Register(Bits8::C).load(Src::Register(Bits8::B), registers, memory),
+            Load::BD => Dst::Register(Bits8::D).load(Src::Register(Bits8::B), registers, memory),
+            Load::BE => Dst::Register(Bits8::E).load(Src::Register(Bits8::B), registers, memory),
+            Load::BH => Dst::Register(Bits8::H).load(Src::Register(Bits8::B), registers, memory),
+            Load::BL => Dst::Register(Bits8::L).load(Src::Register(Bits8::B), registers, memory),
+            Load::CB => Dst::Register(Bits8::B).load(Src::Register(Bits8::C), registers, memory),
+            Load::CC => Dst::Register(Bits8::C).load(Src::Register(Bits8::C), registers, memory),
+            Load::CD => Dst::Register(Bits8::D).load(Src::Register(Bits8::C), registers, memory),
+            Load::CE => Dst::Register(Bits8::E).load(Src::Register(Bits8::C), registers, memory),
+            Load::CH => Dst::Register(Bits8::H).load(Src::Register(Bits8::C), registers, memory),
+            Load::CL => Dst::Register(Bits8::L).load(Src::Register(Bits8::C), registers, memory),
+            Load::DB => Dst::Register(Bits8::B).load(Src::Register(Bits8::D), registers, memory),
+            Load::DC => Dst::Register(Bits8::C).load(Src::Register(Bits8::D), registers, memory),
+            Load::DD => Dst::Register(Bits8::D).load(Src::Register(Bits8::D), registers, memory),
+            Load::DE => Dst::Register(Bits8::E).load(Src::Register(Bits8::D), registers, memory),
+            Load::DH => Dst::Register(Bits8::H).load(Src::Register(Bits8::D), registers, memory),
+            Load::DL => Dst::Register(Bits8::L).load(Src::Register(Bits8::D), registers, memory),
+            Load::EB => Dst::Register(Bits8::B).load(Src::Register(Bits8::E), registers, memory),
+            Load::EC => Dst::Register(Bits8::C).load(Src::Register(Bits8::E), registers, memory),
+            Load::ED => Dst::Register(Bits8::D).load(Src::Register(Bits8::E), registers, memory),
+            Load::EE => Dst::Register(Bits8::E).load(Src::Register(Bits8::E), registers, memory),
+            Load::EH => Dst::Register(Bits8::H).load(Src::Register(Bits8::E), registers, memory),
+            Load::EL => Dst::Register(Bits8::L).load(Src::Register(Bits8::E), registers, memory),
+            Load::HB => Dst::Register(Bits8::B).load(Src::Register(Bits8::H), registers, memory),
+            Load::HC => Dst::Register(Bits8::C).load(Src::Register(Bits8::H), registers, memory),
+            Load::HD => Dst::Register(Bits8::D).load(Src::Register(Bits8::H), registers, memory),
+            Load::HE => Dst::Register(Bits8::E).load(Src::Register(Bits8::H), registers, memory),
+            Load::HH => Dst::Register(Bits8::H).load(Src::Register(Bits8::H), registers, memory),
+            Load::HL => Dst::Register(Bits8::L).load(Src::Register(Bits8::H), registers, memory),
+            Load::LB => Dst::Register(Bits8::B).load(Src::Register(Bits8::L), registers, memory),
+            Load::LC => Dst::Register(Bits8::C).load(Src::Register(Bits8::L), registers, memory),
+            Load::LD => Dst::Register(Bits8::D).load(Src::Register(Bits8::L), registers, memory),
+            Load::LE => Dst::Register(Bits8::E).load(Src::Register(Bits8::L), registers, memory),
+            Load::LH => Dst::Register(Bits8::H).load(Src::Register(Bits8::L), registers, memory),
+            Load::LL => Dst::Register(Bits8::L).load(Src::Register(Bits8::L), registers, memory),
+            Load::HLB => Dst::Pointer(Bits16::HL).load(Src::Register(Bits8::B), registers, memory),
+            Load::HLC => Dst::Pointer(Bits16::HL).load(Src::Register(Bits8::C), registers, memory),
+            Load::HLD => Dst::Pointer(Bits16::HL).load(Src::Register(Bits8::D), registers, memory),
+            Load::HLE => Dst::Pointer(Bits16::HL).load(Src::Register(Bits8::E), registers, memory),
+            Load::HLH => Dst::Pointer(Bits16::HL).load(Src::Register(Bits8::H), registers, memory),
+            Load::HLL => Dst::Pointer(Bits16::HL).load(Src::Register(Bits8::L), registers, memory),
+            Load::HLA => Dst::Pointer(Bits16::HL).load(Src::Register(Bits8::A), registers, memory),
+            Load::BCA => Dst::Pointer(Bits16::BC).load(Src::Register(Bits8::A), registers, memory),
+            Load::DEA => Dst::Pointer(Bits16::DE).load(Src::Register(Bits8::A), registers, memory),
+            Load::ABC => Dst::Register(Bits8::A).load(Src::Pointer(Bits16::BC), registers, memory),
+            Load::ADE => Dst::Register(Bits8::A).load(Src::Pointer(Bits16::DE), registers, memory),
             Load::HLPA => {
-                Dst::Increase(Bits16::HL).load(Src::Register, Some(Bits8::A), registers, memory)
+                Dst::Increase(Bits16::HL).load(Src::Register(Bits8::A), registers, memory)
             }
             Load::HLMA => {
-                Dst::Decrease(Bits16::HL).load(Src::Register, Some(Bits8::A), registers, memory)
+                Dst::Decrease(Bits16::HL).load(Src::Register(Bits8::A), registers, memory)
             }
-            Load::AHLP => Dst::Register(Bits8::A).load(Src::Increase, None, registers, memory),
-            Load::AHLM => Dst::Register(Bits8::A).load(Src::Decrease, None, registers, memory),
+            Load::AHLP => Dst::Register(Bits8::A).load(Src::Increase, registers, memory),
+            Load::AHLM => Dst::Register(Bits8::A).load(Src::Decrease, registers, memory),
         }
         .await;
     }

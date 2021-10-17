@@ -1,6 +1,10 @@
-use super::cb_operation::Rotation;
-use crate::area::Bits8;
-use crate::cpu::Registers;
+use super::consts::{BIT0, BIT7};
+use crate::bus::RegisterBus;
+use crate::opcodes::Src;
+use crate::{
+    area::{Bits8, Flag},
+    Registers,
+};
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
@@ -89,42 +93,88 @@ pub enum Rotate {
     RA = 0x1F,
 }
 
+pub enum Rotation {
+    Left,
+    LeftNoCarry,
+    Right,
+    RightNoCarry,
+}
+
+impl Rotation {
+    fn rotation(self, registers: &Registers, data: u8) -> u8 {
+        let carry = match self {
+            Rotation::Left | Rotation::LeftNoCarry => (data & BIT7) != 0,
+            Rotation::Right | Rotation::RightNoCarry => (data & BIT0) != 0,
+        };
+        let data = match self {
+            Rotation::Left => (data << 1) | registers.borrow().get(Flag::C) as u8,
+            Rotation::LeftNoCarry => (data << 1) | carry as u8,
+            Rotation::Right => (data >> 1) | ((registers.borrow().get(Flag::C) as u8) << 7),
+            Rotation::RightNoCarry => (data >> 1) | ((carry as u8) << 7),
+        };
+        registers.borrow_mut().set(Flag::C, carry);
+        registers.borrow_mut().set(Flag::Z, data == 0);
+        data
+    }
+
+    pub(crate) async fn rotate(self, src: Src, registers: Registers, memory: Memory) {
+        let data = src.get(registers.clone(), memory.clone()).await;
+        let data = self.rotation(&registers, data);
+        src.set(registers, memory, data).await;
+    }
+}
+
 impl Rotate {
     pub async fn exec(self, registers: Registers, memory: Memory) {
         match self {
-            Rotate::LA => Rotation::Left.rotate(registers, Bits8::A),
-            Rotate::LB => Rotation::Left.rotate(registers, Bits8::B),
-            Rotate::LC => Rotation::Left.rotate(registers, Bits8::C),
-            Rotate::LD => Rotation::Left.rotate(registers, Bits8::D),
-            Rotate::LE => Rotation::Left.rotate(registers, Bits8::E),
-            Rotate::LH => Rotation::Left.rotate(registers, Bits8::H),
-            Rotate::LL => Rotation::Left.rotate(registers, Bits8::L),
-            Rotate::LHL => Rotation::Left.rotate_hl(registers, memory).await,
-            Rotate::LCA => Rotation::LeftNoCarry.rotate(registers, Bits8::A),
-            Rotate::LCB => Rotation::LeftNoCarry.rotate(registers, Bits8::B),
-            Rotate::LCC => Rotation::LeftNoCarry.rotate(registers, Bits8::C),
-            Rotate::LCD => Rotation::LeftNoCarry.rotate(registers, Bits8::D),
-            Rotate::LCE => Rotation::LeftNoCarry.rotate(registers, Bits8::E),
-            Rotate::LCH => Rotation::LeftNoCarry.rotate(registers, Bits8::H),
-            Rotate::LCL => Rotation::LeftNoCarry.rotate(registers, Bits8::L),
-            Rotate::LCHL => Rotation::LeftNoCarry.rotate_hl(registers, memory).await,
-            Rotate::RA => Rotation::Right.rotate(registers, Bits8::A),
-            Rotate::RB => Rotation::Right.rotate(registers, Bits8::B),
-            Rotate::RC => Rotation::Right.rotate(registers, Bits8::C),
-            Rotate::RD => Rotation::Right.rotate(registers, Bits8::D),
-            Rotate::RE => Rotation::Right.rotate(registers, Bits8::E),
-            Rotate::RH => Rotation::Right.rotate(registers, Bits8::H),
-            Rotate::RL => Rotation::Right.rotate(registers, Bits8::L),
-            Rotate::RHL => Rotation::Right.rotate_hl(registers, memory).await,
-            Rotate::RCA => Rotation::RightNoCarry.rotate(registers, Bits8::A),
-            Rotate::RCB => Rotation::RightNoCarry.rotate(registers, Bits8::B),
-            Rotate::RCC => Rotation::RightNoCarry.rotate(registers, Bits8::C),
-            Rotate::RCD => Rotation::RightNoCarry.rotate(registers, Bits8::D),
-            Rotate::RCE => Rotation::RightNoCarry.rotate(registers, Bits8::E),
-            Rotate::RCH => Rotation::RightNoCarry.rotate(registers, Bits8::H),
-            Rotate::RCL => Rotation::RightNoCarry.rotate(registers, Bits8::L),
-            Rotate::RCHL => Rotation::RightNoCarry.rotate_hl(registers, memory).await,
-        };
+            Rotate::LA => Rotation::Left.rotate(Src::Register(Bits8::A), registers, memory),
+            Rotate::LB => Rotation::Left.rotate(Src::Register(Bits8::B), registers, memory),
+            Rotate::LC => Rotation::Left.rotate(Src::Register(Bits8::C), registers, memory),
+            Rotate::LD => Rotation::Left.rotate(Src::Register(Bits8::D), registers, memory),
+            Rotate::LE => Rotation::Left.rotate(Src::Register(Bits8::E), registers, memory),
+            Rotate::LH => Rotation::Left.rotate(Src::Register(Bits8::H), registers, memory),
+            Rotate::LL => Rotation::Left.rotate(Src::Register(Bits8::L), registers, memory),
+            Rotate::LHL => Rotation::Left.rotate(Src::Pointer, registers, memory),
+            Rotate::LCA => Rotation::LeftNoCarry.rotate(Src::Register(Bits8::A), registers, memory),
+            Rotate::LCB => Rotation::LeftNoCarry.rotate(Src::Register(Bits8::B), registers, memory),
+            Rotate::LCC => Rotation::LeftNoCarry.rotate(Src::Register(Bits8::C), registers, memory),
+            Rotate::LCD => Rotation::LeftNoCarry.rotate(Src::Register(Bits8::D), registers, memory),
+            Rotate::LCE => Rotation::LeftNoCarry.rotate(Src::Register(Bits8::E), registers, memory),
+            Rotate::LCH => Rotation::LeftNoCarry.rotate(Src::Register(Bits8::H), registers, memory),
+            Rotate::LCL => Rotation::LeftNoCarry.rotate(Src::Register(Bits8::L), registers, memory),
+            Rotate::LCHL => Rotation::LeftNoCarry.rotate(Src::Pointer, registers, memory),
+            Rotate::RA => Rotation::Right.rotate(Src::Register(Bits8::A), registers, memory),
+            Rotate::RB => Rotation::Right.rotate(Src::Register(Bits8::B), registers, memory),
+            Rotate::RC => Rotation::Right.rotate(Src::Register(Bits8::C), registers, memory),
+            Rotate::RD => Rotation::Right.rotate(Src::Register(Bits8::D), registers, memory),
+            Rotate::RE => Rotation::Right.rotate(Src::Register(Bits8::E), registers, memory),
+            Rotate::RH => Rotation::Right.rotate(Src::Register(Bits8::H), registers, memory),
+            Rotate::RL => Rotation::Right.rotate(Src::Register(Bits8::L), registers, memory),
+            Rotate::RHL => Rotation::Right.rotate(Src::Pointer, registers, memory),
+            Rotate::RCA => {
+                Rotation::RightNoCarry.rotate(Src::Register(Bits8::A), registers, memory)
+            }
+            Rotate::RCB => {
+                Rotation::RightNoCarry.rotate(Src::Register(Bits8::B), registers, memory)
+            }
+            Rotate::RCC => {
+                Rotation::RightNoCarry.rotate(Src::Register(Bits8::C), registers, memory)
+            }
+            Rotate::RCD => {
+                Rotation::RightNoCarry.rotate(Src::Register(Bits8::D), registers, memory)
+            }
+            Rotate::RCE => {
+                Rotation::RightNoCarry.rotate(Src::Register(Bits8::E), registers, memory)
+            }
+            Rotate::RCH => {
+                Rotation::RightNoCarry.rotate(Src::Register(Bits8::H), registers, memory)
+            }
+            Rotate::RCL => {
+                Rotation::RightNoCarry.rotate(Src::Register(Bits8::L), registers, memory)
+            }
+            Rotate::RCHL => Rotation::RightNoCarry.rotate(Src::Pointer, registers, memory),
+        }
+        .await;
     }
 }
 
