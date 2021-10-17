@@ -12,4 +12,4 @@ pub use load::Load;
 pub use load16b::Load16b;
 pub use logical::Logic;
 pub use rotate::Rotate;
-pub use shift_left::ShiftLeft;
+pub use shift_left::Shift;
