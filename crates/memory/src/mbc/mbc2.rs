@@ -106,7 +106,7 @@ mod mbc2_test {
     use super::Mbc2;
     use super::MbcBus;
     use super::MemoryBus;
-    const FILE: &[u8; 65536] = include_bytes!("../../../../roms/Ayakashi.gb");
+    const FILE: &[u8; 262144] = include_bytes!("../../../../roms/Mystic_Quest.gb");
 
     #[test]
     fn test_is_mbc2_rom() {
@@ -120,7 +120,7 @@ mod mbc2_test {
         let rom_file = FILE.to_vec();
         let mbc = Mbc2::new(rom_file);
         let data = mbc.get(0);
-        assert_eq!(data, 0xe1);
+        assert_eq!(data, 0xc3);
     }
 
     #[test]
@@ -217,7 +217,7 @@ mod mbc2_test {
         assert_eq!(mbc.ram_lock, true);
 
         let data = mbc.get(0x0000a630);
-        assert_eq!(data, 0x0f);
+        assert_eq!(data, 0x0E);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x00).unwrap();
         assert_eq!(mbc.ram_lock, false);

@@ -1,5 +1,4 @@
 use crate::processor::Processor;
-use pretty_hex::*;
 use std::convert::TryFrom;
 use std::fs;
 use std::task::Context;
@@ -30,10 +29,8 @@ impl TryFrom<&str> for SOC {
         assert_eq!(head.len(), HEAD_LEN);
         assert_eq!(raw_header.len(), HEADER_LEN);
 
-        println!("head - {:?}", head.hex_dump());
-        println!("header - {:?}", raw_header.hex_dump());
-
         let header = Header::try_from(raw_header).expect("Invalid data in raw_header");
+        println!("Header: {:#?}", header);
 
         let memory: memory::Memory = memory::memory::Memory::new(header.cartridge, rom);
         let processors = Processor::init(memory);

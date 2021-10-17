@@ -6,13 +6,7 @@ BIOS_PATH += $(RESSOURCES_PATH)/bios
 
 BIOS += "dmg_boot.bin"
 
-ROMS_URL1 := "https://projects.intra.42.fr/uploads/document/document/4986/roms.zip"
-ROMS_URL2 := "https://s3roms.download/romfiles/gameboy/a/ayakashi-no-shiro-japan.zip"
-
-ROM2_ZIP := "Ayakashi.zip"
-ROM2_NAME := "Ayakashi no Shiro (J) [!].gb"
-ROM3_ZIP := "Mary-Kate and Ashley - Pocket Planner (USA, Europe).zip"
-ROM3_NAME := "Mary-Kate and Ashley - Pocket Planner (USA, Europe).gbc"
+ROMS_URL := "https://projects.intra.42.fr/uploads/document/document/4986/roms.zip"
 
 # Fonts
 FONT_PATH := $(RESSOURCES_PATH)/fonts
@@ -62,12 +56,9 @@ $(BIOS_PATH):
 
 roms: roms.zip
 	unzip -o $< 'roms/*' -x '*/.DS_Store'
-	unzip -o $(ROM2_ZIP)
-	mv $(ROM2_NAME) roms/Ayakashi.gb
 
 roms.zip:
-	curl -L $(ROMS_URL1) > $@
-	curl -k $(ROMS_URL2) > $(ROM2_ZIP)
+	curl -L $(ROMS_URL) > $@
 
 ### utils ###
 
@@ -86,7 +77,7 @@ test:
 	cargo test
 
 clean:
-	rm -rf roms.zip  $(ROM2_ZIP) $(ROM3_ZIP) $(HASKLIG_ZIP)
+	rm -rf roms.zip  $(HASKLIG_ZIP)
 
 fclean: clean
 	cargo clean
