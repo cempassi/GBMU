@@ -6,7 +6,7 @@ use crate::opcodes::Logic;
 use crate::opcodes::Rotate;
 use crate::opcodes::Shift;
 
-use crate::nextpc::NextPc;
+use crate::futures::NextPc;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 

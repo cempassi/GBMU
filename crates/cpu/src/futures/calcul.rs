@@ -1,7 +1,6 @@
-use super::{GetAt, Reader};
+use super::{GetAt, NextPc, Reader};
 use crate::area::Bits16;
 use crate::logical::Logical;
-use crate::nextpc::NextPc;
 use crate::Registers;
 use memory::Memory;
 use shared::Error;

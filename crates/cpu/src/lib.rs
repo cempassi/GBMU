@@ -7,7 +7,6 @@ mod flags;
 pub mod futures;
 pub mod interface;
 pub(crate) mod logical;
-pub mod nextpc;
 mod opcodes;
 pub mod registers;
 pub(crate) mod shift;
