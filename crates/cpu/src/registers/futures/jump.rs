@@ -1,4 +1,4 @@
-use super::{NextPc, Reader};
+use super::{reader::Reader, NextPc};
 use crate::registers::{Absolute, Flag, Relative};
 use crate::Registers;
 use memory::Memory;
