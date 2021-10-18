@@ -1,5 +1,5 @@
-use super::{reader::Reader, NextPc, Async};
-use crate::registers::{Absolute, Flag, Relative, Bits16, Bus};
+use super::{reader::Reader, Async, NextPc};
+use crate::registers::{Absolute, Bits16, Bus, Flag, Relative};
 use crate::Registers;
 use memory::Memory;
 use shared::Error;
@@ -16,6 +16,8 @@ pub enum Jump {
     RelativeCheck(Flag),
     RelativeNot(Flag),
     Call,
+    CallCheck(Flag),
+    CallNot(Flag),
 }
 
 impl Jump {
@@ -35,8 +37,12 @@ impl Jump {
             Jump::RelativeNot(flag) => {
                 Box::pin(Reader::new(Box::pin(rel_not(register, memory, flag))))
             }
-            Jump::Call =>{
-                Box::pin(Reader::new(Box::pin(call(register, memory))))
+            Jump::Call => Box::pin(Reader::new(Box::pin(call(register, memory)))),
+            Jump::CallCheck(flag) => {
+                Box::pin(Reader::new(Box::pin(call_check(register, memory, flag))))
+            }
+            Jump::CallNot(flag) => {
+                Box::pin(Reader::new(Box::pin(call_not(register, memory, flag))))
             }
         }
     }
@@ -44,8 +50,32 @@ impl Jump {
 
 async fn call(registers: Registers, memory: Memory) -> Result<(), Error> {
     let address: u16 = registers.clone().next_pc(memory.clone()).await?;
-    Async::Push(Bits16::PC).run(registers.clone(), memory).await?;
+    Async::Push(Bits16::PC)
+        .run(registers.clone(), memory)
+        .await?;
     registers.borrow_mut().set(Bits16::PC, address);
+    Ok(())
+}
+
+async fn call_check(registers: Registers, memory: Memory, flag: Flag) -> Result<(), Error> {
+    let address: u16 = registers.clone().next_pc(memory.clone()).await?;
+    if registers.borrow().get(flag) {
+        Async::Push(Bits16::PC)
+            .run(registers.clone(), memory)
+            .await?;
+        registers.borrow_mut().set(Bits16::PC, address);
+    }
+    Ok(())
+}
+
+async fn call_not(registers: Registers, memory: Memory, flag: Flag) -> Result<(), Error> {
+    let address: u16 = registers.clone().next_pc(memory.clone()).await?;
+    if !registers.borrow().get(flag) {
+        Async::Push(Bits16::PC)
+            .run(registers.clone(), memory)
+            .await?;
+        registers.borrow_mut().set(Bits16::PC, address);
+    }
     Ok(())
 }
 

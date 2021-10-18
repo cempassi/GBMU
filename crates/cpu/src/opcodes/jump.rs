@@ -45,6 +45,10 @@ pub enum Jump {
     ZR8b = 0x28,
     CR8b = 0x38,
     Call = 0xCD,
+    CallZ = 0xCC,
+    CallC = 0xDC,
+    CallNZ = 0xC4,
+    CallNC = 0xD4,
 }
 
 impl Jump {
@@ -52,6 +56,10 @@ impl Jump {
         match self {
             Jump::HL => registers.borrow_mut().absolute(Bits16::HL),
             Jump::Call => Async::Call.jump(registers, memory).await?,
+            Jump::CallZ => Async::CallCheck(Flag::Z).jump(registers, memory).await?,
+            Jump::CallC => Async::CallCheck(Flag::C).jump(registers, memory).await?,
+            Jump::CallNZ => Async::CallNot(Flag::Z).jump(registers, memory).await?,
+            Jump::CallNC => Async::CallNot(Flag::C).jump(registers, memory).await?,
             Jump::R8b => Async::Relative.jump(registers, memory).await?,
             Jump::NN => Async::Absolute.jump(registers, memory).await?,
             Jump::NZNN => Async::AbsoluteNot(Flag::Z).jump(registers, memory).await?,
@@ -206,5 +214,82 @@ mod test_jumps {
         let result_stack = register.borrow().get(Bits16::SP);
         assert_eq!(result_pc, expected_pc);
         assert_eq!(result_stack, expected_stack);
+    }
+
+    #[test]
+    fn test_call_conditionnal_success_as_flag_c_is_true() {
+        let src: u16 = 0xc000;
+        let dst: u16 = 0xc100;
+        let stack = 0xc200;
+        let expected_pc: u16 = 0xc100;
+        let expected_stack: u16 = 0xc200 - 2;
+
+        let register = Registers::default();
+        let memory = Memory::default();
+
+        let instruction = Jump::CallC;
+
+        register.borrow_mut().set(Bits16::PC, src);
+        register.borrow_mut().set(Flag::C, true);
+        register.borrow_mut().set(Bits16::SP, stack);
+        memory.borrow_mut().set_u16(0xc000, dst).unwrap();
+
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+
+        let result_pc = register.borrow().get(Bits16::PC);
+        let result_stack = register.borrow().get(Bits16::SP);
+        assert_eq!(result_pc, expected_pc);
+        assert_eq!(result_stack, expected_stack);
+    }
+
+    #[test]
+    fn test_call_conditionnal_success_as_flag_z_is_false() {
+        let src: u16 = 0xc000;
+        let dst: u16 = 0xc100;
+        let stack = 0xc200;
+        let expected_pc: u16 = 0xc100;
+        let expected_stack: u16 = 0xc200 - 2;
+
+        let register = Registers::default();
+        let memory = Memory::default();
+
+        let instruction = Jump::CallNZ;
+
+        register.borrow_mut().set(Bits16::PC, src);
+        register.borrow_mut().set(Bits16::SP, stack);
+        memory.borrow_mut().set_u16(0xc000, dst).unwrap();
+
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+
+        let result_pc = register.borrow().get(Bits16::PC);
+        let result_stack = register.borrow().get(Bits16::SP);
+        assert_eq!(result_pc, expected_pc);
+        assert_eq!(result_stack, expected_stack);
+    }
+
+    #[test]
+    fn test_call_conditionnal_failure_as_flag_z_is_true() {
+        let src: u16 = 0xc000;
+        let dst: u16 = 0xc100;
+        let stack = 0xc200;
+        let expected_pc: u16 = 0xc100;
+        let expected_stack: u16 = 0xc200 - 2;
+
+        let register = Registers::default();
+        let memory = Memory::default();
+
+        let instruction = Jump::CallNZ;
+
+        register.borrow_mut().set(Bits16::PC, src);
+        register.borrow_mut().set(Flag::Z, true);
+        register.borrow_mut().set(Bits16::SP, stack);
+        memory.borrow_mut().set_u16(0xc000, dst).unwrap();
+
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+
+        let result_pc = register.borrow().get(Bits16::PC);
+        let result_stack = register.borrow().get(Bits16::SP);
+        assert_ne!(result_pc, expected_pc);
+        assert_ne!(result_stack, expected_stack);
     }
 }
