@@ -1,5 +1,5 @@
-use super::{reader::Reader, NextPc};
-use crate::registers::{Absolute, Flag, Relative};
+use super::{reader::Reader, NextPc, Async};
+use crate::registers::{Absolute, Flag, Relative, Bits16, Bus};
 use crate::Registers;
 use memory::Memory;
 use shared::Error;
@@ -15,10 +15,11 @@ pub enum Jump {
     Relative,
     RelativeCheck(Flag),
     RelativeNot(Flag),
+    Call,
 }
 
 impl Jump {
-    pub fn jump(self, memory: Memory, register: Registers) -> Jumper {
+    pub fn jump(self, register: Registers, memory: Memory) -> Jumper {
         match self {
             Jump::Absolute => Box::pin(Reader::new(Box::pin(absolute(register, memory)))),
             Jump::Relative => Box::pin(Reader::new(Box::pin(relative(register, memory)))),
@@ -34,8 +35,18 @@ impl Jump {
             Jump::RelativeNot(flag) => {
                 Box::pin(Reader::new(Box::pin(rel_not(register, memory, flag))))
             }
+            Jump::Call =>{
+                Box::pin(Reader::new(Box::pin(call(register, memory))))
+            }
         }
     }
+}
+
+async fn call(registers: Registers, memory: Memory) -> Result<(), Error> {
+    let address: u16 = registers.clone().next_pc(memory.clone()).await?;
+    Async::Push(Bits16::PC).run(registers.clone(), memory).await?;
+    registers.borrow_mut().set(Bits16::PC, address);
+    Ok(())
 }
 
 async fn absolute(registers: Registers, memory: Memory) -> Result<(), Error> {
