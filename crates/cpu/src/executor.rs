@@ -3,7 +3,7 @@ use std::pin::Pin;
 use std::task::{Context, Poll};
 
 #[allow(dead_code)]
-pub fn execute(mut future: Pin<Box<impl Future<Output = ()>>>) {
+pub fn execute<T>(mut future: Pin<Box<impl Future<Output = T>>>) {
     let waker = waker::create();
     let mut context = Context::from_waker(&waker);
     loop {
