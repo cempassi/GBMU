@@ -7,19 +7,19 @@ pub(crate) trait Absolute<T> {
 }
 
 pub trait Relative {
-    fn jump_relative(&mut self, offset: i8);
-    fn jump_relative_check(&mut self, offset: i8, flag: Flag);
-    fn jump_relative_not(&mut self, offset: i8, flag: Flag);
+    fn relative(&mut self, offset: i8);
+    fn relative_check(&mut self, offset: i8, flag: Flag);
+    fn relative_not(&mut self, offset: i8, flag: Flag);
 }
 
 impl Relative for Registers {
-    fn jump_relative(&mut self, offset: i8) {
+    fn relative(&mut self, offset: i8) {
         let mut address: i16 = self.get(Bits16::PC) as i16;
         address = address.wrapping_add(offset.into());
         self.set(Bits16::PC, address as u16);
     }
 
-    fn jump_relative_check(&mut self, offset: i8, flag: Flag) {
+    fn relative_check(&mut self, offset: i8, flag: Flag) {
         if self.get(flag) {
             let mut address: i16 = self.get(Bits16::PC) as i16;
             address = address.wrapping_add(offset.into());
@@ -27,7 +27,7 @@ impl Relative for Registers {
         }
     }
 
-    fn jump_relative_not(&mut self, offset: i8, flag: Flag) {
+    fn relative_not(&mut self, offset: i8, flag: Flag) {
         if !self.get(flag) {
             let mut address: i16 = self.get(Bits16::PC) as i16;
             address = address.wrapping_add(offset.into());

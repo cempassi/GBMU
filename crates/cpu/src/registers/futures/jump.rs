@@ -46,7 +46,7 @@ async fn absolute(registers: Registers, memory: Memory) -> Result<(), Error> {
 
 async fn relative(registers: Registers, memory: Memory) -> Result<(), Error> {
     let offset: u8 = registers.clone().next_pc(memory).await?;
-    registers.borrow_mut().jump_relative(offset as i8);
+    registers.borrow_mut().relative(offset as i8);
     Ok(())
 }
 
@@ -64,16 +64,12 @@ async fn abs_not(registers: Registers, memory: Memory, flag: Flag) -> Result<(),
 
 async fn rel_check(registers: Registers, memory: Memory, flag: Flag) -> Result<(), Error> {
     let offset: u8 = registers.clone().next_pc(memory).await?;
-    registers
-        .borrow_mut()
-        .jump_relative_check(offset as i8, flag);
+    registers.borrow_mut().relative_check(offset as i8, flag);
     Ok(())
 }
 
 async fn rel_not(registers: Registers, memory: Memory, flag: Flag) -> Result<(), Error> {
     let offset: u8 = registers.clone().next_pc(memory).await?;
-    registers
-        .borrow_mut()
-        .jump_relative_check(offset as i8, flag);
+    registers.borrow_mut().relative_check(offset as i8, flag);
     Ok(())
 }
