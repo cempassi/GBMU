@@ -51,35 +51,35 @@ impl Jump {
             Jump::R8b => Action::Relative.jump(memory, registers).await.unwrap(),
             Jump::NN => Action::Absolute.jump(memory, registers).await.unwrap(),
             Jump::HL => registers.borrow_mut().absolute(Bits16::HL),
-            Jump::ZNN => Action::AbsCheck(Flag::Z)
+            Jump::ZNN => Action::AbsoluteCheck(Flag::Z)
                 .jump(memory, registers)
                 .await
                 .unwrap(),
-            Jump::CNN => Action::AbsCheck(Flag::C)
+            Jump::CNN => Action::AbsoluteCheck(Flag::C)
                 .jump(memory, registers)
                 .await
                 .unwrap(),
-            Jump::NZNN => Action::AbsNot(Flag::Z)
+            Jump::NZNN => Action::AbsoluteNot(Flag::Z)
                 .jump(memory, registers)
                 .await
                 .unwrap(),
-            Jump::NCNN => Action::AbsNot(Flag::C)
+            Jump::NCNN => Action::AbsoluteNot(Flag::C)
                 .jump(memory, registers)
                 .await
                 .unwrap(),
-            Jump::NZR8b => Action::RelNot(Flag::Z)
+            Jump::NZR8b => Action::RelativeNot(Flag::Z)
                 .jump(memory, registers)
                 .await
                 .unwrap(),
-            Jump::NCR8b => Action::RelNot(Flag::C)
+            Jump::NCR8b => Action::RelativeNot(Flag::C)
                 .jump(memory, registers)
                 .await
                 .unwrap(),
-            Jump::ZR8b => Action::RelCheck(Flag::Z)
+            Jump::ZR8b => Action::RelativeCheck(Flag::Z)
                 .jump(memory, registers)
                 .await
                 .unwrap(),
-            Jump::CR8b => Action::RelCheck(Flag::Z)
+            Jump::CR8b => Action::RelativeCheck(Flag::Z)
                 .jump(memory, registers)
                 .await
                 .unwrap(),

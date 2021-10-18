@@ -10,11 +10,11 @@ type Jumper = Pin<Box<dyn Future<Output = Result<(), Error>>>>;
 
 pub enum Jump {
     Absolute,
-    AbsCheck(Flag),
-    AbsNot(Flag),
+    AbsoluteCheck(Flag),
+    AbsoluteNot(Flag),
     Relative,
-    RelCheck(Flag),
-    RelNot(Flag),
+    RelativeCheck(Flag),
+    RelativeNot(Flag),
 }
 
 impl Jump {
@@ -22,14 +22,18 @@ impl Jump {
         match self {
             Jump::Absolute => Box::pin(Reader::new(Box::pin(absolute(register, memory)))),
             Jump::Relative => Box::pin(Reader::new(Box::pin(relative(register, memory)))),
-            Jump::AbsCheck(flag) => {
+            Jump::AbsoluteCheck(flag) => {
                 Box::pin(Reader::new(Box::pin(abs_check(register, memory, flag))))
             }
-            Jump::AbsNot(flag) => Box::pin(Reader::new(Box::pin(abs_not(register, memory, flag)))),
-            Jump::RelCheck(flag) => {
+            Jump::AbsoluteNot(flag) => {
+                Box::pin(Reader::new(Box::pin(abs_not(register, memory, flag))))
+            }
+            Jump::RelativeCheck(flag) => {
                 Box::pin(Reader::new(Box::pin(rel_check(register, memory, flag))))
             }
-            Jump::RelNot(flag) => Box::pin(Reader::new(Box::pin(rel_not(register, memory, flag)))),
+            Jump::RelativeNot(flag) => {
+                Box::pin(Reader::new(Box::pin(rel_not(register, memory, flag))))
+            }
         }
     }
 }
