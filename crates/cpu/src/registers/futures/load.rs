@@ -56,13 +56,13 @@ pub async fn reg_from(
 pub async fn push(registers: Registers, memory: Memory, area: Bits16) -> Result<(), Error> {
     let data = registers.borrow().get(area);
     registers.clone().set_at(memory, Bits16::SP, data).await?;
-    registers.borrow_mut().increase(Bits16::SP, 2);
+    registers.borrow_mut().decrease(Bits16::SP, 2);
     Ok(())
 }
 
 pub async fn pop(registers: Registers, memory: Memory, area: Bits16) -> Result<(), Error> {
     let data = registers.clone().get_at(memory, Bits16::SP).await?;
     registers.borrow_mut().set(area, data);
-    registers.borrow_mut().decrease(Bits16::SP, 2);
+    registers.borrow_mut().increase(Bits16::SP, 2);
     Ok(())
 }

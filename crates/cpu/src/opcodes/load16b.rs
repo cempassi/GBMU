@@ -126,7 +126,7 @@ mod test_load_register_u16 {
         memory.borrow_mut().set_u16(0xc000, 0x4242).unwrap();
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
         assert_eq!(register.borrow().get(Bits16::HL), 0x4242);
-        assert_eq!(register.borrow().get(Bits16::SP), 0xc000 - 2);
+        assert_eq!(register.borrow().get(Bits16::SP), 0xc000 + 2);
     }
 
     #[test]
@@ -134,10 +134,10 @@ mod test_load_register_u16 {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Load16b::PushHL;
-        register.borrow_mut().set(Bits16::SP, 0xc000);
+        register.borrow_mut().set(Bits16::SP, 0xc002);
         register.borrow_mut().set(Bits16::HL, 0x4242);
         executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(memory.borrow().get_u16(0xc000).unwrap(), 0x4242);
-        assert_eq!(register.borrow().get(Bits16::SP), 0xc002);
+        assert_eq!(memory.borrow().get_u16(0xc002).unwrap(), 0x4242);
+        assert_eq!(register.borrow().get(Bits16::SP), 0xc000);
     }
 }
