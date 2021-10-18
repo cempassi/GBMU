@@ -1,11 +1,12 @@
 use cpu::cpu::Cpu;
 use memory::Memory;
 use ppu::{Ppu, Run};
+use shared::Error;
 use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
-pub type State = Option<Pin<Box<dyn Future<Output = u8>>>>;
+pub type State = Option<Pin<Box<dyn Future<Output = Result<u8, Error>>>>>;
 
 pub enum Processor {
     Ppu(Ppu, State),
