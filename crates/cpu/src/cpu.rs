@@ -1,5 +1,6 @@
 pub use crate::interface::{New, Registers};
 use crate::opcodes::Arithmetic;
+use crate::opcodes::Jump;
 use crate::opcodes::Load;
 use crate::opcodes::Load16b;
 use crate::opcodes::Logic;
@@ -64,6 +65,8 @@ impl Cpu {
         } else if let Ok(operation) = Load::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = Load16b::try_from_primitive(opcode.into()) {
+            operation.exec(self.registers, self.memory).await;
+        } else if let Ok(operation) = Jump::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = Arithmetic::try_from_primitive(opcode) {
             operation.exec(self.registers, self.memory).await;
