@@ -4,11 +4,7 @@ use crate::Registers;
 use memory::{Async, Memory};
 use shared::Error;
 
-pub async fn set_update(
-    registers: Registers,
-    memory: Memory,
-    is_increase: bool,
-) -> Result<(), Error> {
+pub async fn update(registers: Registers, memory: Memory, is_increase: bool) -> Result<(), Error> {
     let data = registers.borrow().get(Bits8::A);
     registers.clone().set_at(memory, Bits16::HL, data).await?;
     match is_increase {
@@ -18,13 +14,13 @@ pub async fn set_update(
     Ok(())
 }
 
-pub async fn set_data(registers: Registers, memory: Memory, area: Bits16) -> Result<(), Error> {
+pub async fn data(registers: Registers, memory: Memory, area: Bits16) -> Result<(), Error> {
     let data: u16 = registers.borrow().get(area);
     let dst: u16 = registers.next_pc(memory.clone()).await?;
     memory.set(dst, data).await
 }
 
-pub async fn set_reg_at(
+pub async fn reg_at(
     registers: Registers,
     memory: Memory,
     dst: Bits16,
@@ -35,7 +31,7 @@ pub async fn set_reg_at(
     memory.set(address, data).await
 }
 
-pub async fn set_hl(registers: Registers, memory: Memory, area: Bits8) -> Result<(), Error> {
+pub async fn hl(registers: Registers, memory: Memory, area: Bits8) -> Result<(), Error> {
     let data: u8 = registers.borrow().get(area);
     let dst: u16 = registers.borrow().get(Bits16::HL);
     memory.set(dst, data).await

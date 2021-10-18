@@ -22,7 +22,7 @@ fn calculate(registers: Registers, data: u8, operation: Logical) -> Result<(), E
     Ok(())
 }
 
-pub(crate) async fn get_hl(
+pub(crate) async fn hl(
     registers: Registers,
     memory: Memory,
     operation: Logical,
@@ -31,7 +31,7 @@ pub(crate) async fn get_hl(
     calculate(registers, data, operation)
 }
 
-pub(crate) async fn get_next(
+pub(crate) async fn next(
     registers: Registers,
     memory: Memory,
     operation: Logical,
