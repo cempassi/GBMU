@@ -22,6 +22,14 @@ use shared::Error;
 /// Conditional jump to the relative address specified by the next 8-bits, depending on the condition cc.
 /// Cycle: 12 / 8
 
+/// Call nn
+/// Unconditional function call to the absolute address specified by the 16-bit operand nn.
+/// Cycle: 24
+
+/// Call CC nn
+/// Conditional function call to the absolute address specified by the 16-bit operand nn.
+/// Cycle: 24 / 12
+
 /// Flags:
 ///
 /// Z - Unuzed
