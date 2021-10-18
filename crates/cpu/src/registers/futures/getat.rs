@@ -1,4 +1,4 @@
-use super::Reader;
+use super::reader::Reader;
 use crate::registers::{Bits16, Bus};
 use crate::Registers;
 use memory::{Async, Memory};

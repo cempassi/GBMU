@@ -1,4 +1,4 @@
-use crate::registers::futures::{LoadData, Pop, Push, SetData};
+use crate::registers::futures::Async;
 use crate::registers::Bits16;
 use crate::Registers;
 use memory::Memory;
@@ -64,19 +64,19 @@ pub enum Load16b {
 impl Load16b {
     pub async fn exec(self, registers: Registers, memory: Memory) {
         match self {
-            Load16b::PushAF => registers.push(memory, Bits16::AF),
-            Load16b::PushBC => registers.push(memory, Bits16::BC),
-            Load16b::PushDE => registers.push(memory, Bits16::DE),
-            Load16b::PushHL => registers.push(memory, Bits16::HL),
-            Load16b::PopAF => registers.pop(memory, Bits16::AF),
-            Load16b::PopBC => registers.pop(memory, Bits16::BC),
-            Load16b::PopDE => registers.pop(memory, Bits16::DE),
-            Load16b::PopHL => registers.pop(memory, Bits16::HL),
-            Load16b::BC => registers.load_data(memory, Bits16::BC),
-            Load16b::DE => registers.load_data(memory, Bits16::DE),
-            Load16b::HL => registers.load_data(memory, Bits16::HL),
-            Load16b::SP => registers.load_data(memory, Bits16::SP),
-            Load16b::A16SP => registers.set_data(memory, Bits16::SP),
+            Load16b::PushAF => Async::Push(Bits16::AF).run(registers, memory),
+            Load16b::PushBC => Async::Push(Bits16::BC).run(registers, memory),
+            Load16b::PushDE => Async::Push(Bits16::DE).run(registers, memory),
+            Load16b::PushHL => Async::Push(Bits16::HL).run(registers, memory),
+            Load16b::PopAF => Async::Pop(Bits16::AF).run(registers, memory),
+            Load16b::PopBC => Async::Pop(Bits16::BC).run(registers, memory),
+            Load16b::PopDE => Async::Pop(Bits16::DE).run(registers, memory),
+            Load16b::PopHL => Async::Pop(Bits16::HL).run(registers, memory),
+            Load16b::BC => Async::Load16b(Bits16::BC).run(registers, memory),
+            Load16b::DE => Async::Load16b(Bits16::DE).run(registers, memory),
+            Load16b::HL => Async::Load16b(Bits16::HL).run(registers, memory),
+            Load16b::SP => Async::Load16b(Bits16::SP).run(registers, memory),
+            Load16b::A16SP => Async::SetData(Bits16::SP).run(registers, memory),
         }
         .await
         .unwrap()

@@ -4,6 +4,7 @@ pub mod bus;
 pub(crate) mod flags;
 pub(crate) mod futures;
 pub(crate) mod jump;
+pub(crate) mod load;
 pub(crate) mod logical;
 pub(crate) mod shift;
 
@@ -12,6 +13,7 @@ pub(crate) use arithmetic::Arithmetic;
 pub use bus::Bus;
 pub(crate) use flags::Flags;
 pub(crate) use jump::{Absolute, Relative};
+pub(crate) use load::Load;
 pub(crate) use logical::Logical;
 pub(crate) use shift::Shift;
 

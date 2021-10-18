@@ -3,11 +3,12 @@ use crate::oam::Oam;
 use crate::registers::lcd::Register;
 use crate::transfert::Pixel;
 use crate::Ppu;
+use shared::Error;
 use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
-type Output = Pin<Box<dyn Future<Output = u8>>>;
+type Output = Pin<Box<dyn Future<Output = Result<u8, Error>>>>;
 
 pub struct Runner<T> {
     inner: Pin<Box<dyn Future<Output = T>>>,
@@ -38,7 +39,7 @@ impl Run for Ppu {
     }
 }
 
-async fn run(ppu: Ppu) -> u8 {
+async fn run(ppu: Ppu) -> Result<u8, Error> {
     println!("Running the ppu!");
     while ppu.borrow_mut().is_lower(Register::Ly, 144) {
         Oam::search(ppu.clone()).await;
@@ -48,5 +49,5 @@ async fn run(ppu: Ppu) -> u8 {
     }
     Blank::new(VBLANK).await;
     ppu.borrow_mut().clear(Register::Ly);
-    42
+    Ok(42)
 }

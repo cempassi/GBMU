@@ -1,5 +1,4 @@
 use enum_iterator::IntoEnumIterator;
-use std::convert::From;
 
 #[derive(Debug, IntoEnumIterator, PartialEq, Clone, Copy)]
 pub enum Bits8 {
@@ -21,21 +20,6 @@ pub enum Bits16 {
     BC,
     DE,
     HL,
-}
-
-impl From<Bits8> for Bits16 {
-    fn from(bit8: Bits8) -> Self {
-        match bit8 {
-            Bits8::A => Bits16::AF,
-            Bits8::F => Bits16::AF,
-            Bits8::B => Bits16::BC,
-            Bits8::C => Bits16::BC,
-            Bits8::D => Bits16::DE,
-            Bits8::E => Bits16::DE,
-            Bits8::H => Bits16::HL,
-            Bits8::L => Bits16::HL,
-        }
-    }
 }
 
 #[derive(Debug, Clone, Copy)]
