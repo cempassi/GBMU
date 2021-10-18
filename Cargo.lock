@@ -1740,6 +1740,7 @@ dependencies = [
  "num_enum",
  "ppu",
  "pretty-hex",
+ "shared",
 ]
 
 [[package]]
