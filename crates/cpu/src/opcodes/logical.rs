@@ -1,6 +1,6 @@
 use crate::cpu::Registers;
-use crate::registers::futures::{LogicalHL, LogicalNext, Operation};
-use crate::registers::{Bits8, Logical};
+use crate::registers::futures::{Async, Logical};
+use crate::registers::{Bits8, Logical as L};
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
@@ -133,8 +133,6 @@ impl Logic {
             Logic::AndAE => registers.borrow_mut().and(Bits8::E),
             Logic::AndAH => registers.borrow_mut().and(Bits8::H),
             Logic::AndAL => registers.borrow_mut().and(Bits8::L),
-            Logic::AndAHL => registers.do_hl(memory, Operation::And).await.unwrap(),
-            Logic::AndA8b => registers.do_next(memory, Operation::And).await.unwrap(),
             Logic::OrAB => registers.borrow_mut().or(Bits8::B),
             Logic::OrAC => registers.borrow_mut().or(Bits8::C),
             Logic::OrAD => registers.borrow_mut().or(Bits8::D),
@@ -142,8 +140,6 @@ impl Logic {
             Logic::OrAH => registers.borrow_mut().or(Bits8::H),
             Logic::OrAL => registers.borrow_mut().or(Bits8::L),
             Logic::OrAA => registers.borrow_mut().or(Bits8::A),
-            Logic::OrAHL => registers.do_hl(memory, Operation::Or).await.unwrap(),
-            Logic::OrA8b => registers.do_next(memory, Operation::Or).await.unwrap(),
             Logic::XorAA => registers.borrow_mut().xor(Bits8::A),
             Logic::XorAB => registers.borrow_mut().xor(Bits8::B),
             Logic::XorAC => registers.borrow_mut().xor(Bits8::C),
@@ -151,8 +147,6 @@ impl Logic {
             Logic::XorAE => registers.borrow_mut().xor(Bits8::E),
             Logic::XorAH => registers.borrow_mut().xor(Bits8::H),
             Logic::XorAL => registers.borrow_mut().xor(Bits8::L),
-            Logic::XorAHL => registers.do_hl(memory, Operation::Xor).await.unwrap(),
-            Logic::XorA8b => registers.do_next(memory, Operation::Xor).await.unwrap(),
             Logic::CmpAA => registers.borrow_mut().compare(Bits8::A),
             Logic::CmpAB => registers.borrow_mut().compare(Bits8::B),
             Logic::CmpAC => registers.borrow_mut().compare(Bits8::C),
@@ -160,8 +154,38 @@ impl Logic {
             Logic::CmpAE => registers.borrow_mut().compare(Bits8::E),
             Logic::CmpAH => registers.borrow_mut().compare(Bits8::H),
             Logic::CmpAL => registers.borrow_mut().compare(Bits8::L),
-            Logic::CmpAHL => registers.do_hl(memory, Operation::Comapre).await.unwrap(),
-            Logic::CmpA8b => registers.do_next(memory, Operation::Comapre).await.unwrap(),
+            Logic::AndAHL => Async::CalculHL(Logical::And)
+                .run(registers, memory)
+                .await
+                .unwrap(),
+            Logic::AndA8b => Async::CalculNext(Logical::And)
+                .run(registers, memory)
+                .await
+                .unwrap(),
+            Logic::OrAHL => Async::CalculHL(Logical::Or)
+                .run(registers, memory)
+                .await
+                .unwrap(),
+            Logic::OrA8b => Async::CalculNext(Logical::Or)
+                .run(registers, memory)
+                .await
+                .unwrap(),
+            Logic::XorAHL => Async::CalculHL(Logical::Xor)
+                .run(registers, memory)
+                .await
+                .unwrap(),
+            Logic::XorA8b => Async::CalculNext(Logical::Xor)
+                .run(registers, memory)
+                .await
+                .unwrap(),
+            Logic::CmpAHL => Async::CalculHL(Logical::Compare)
+                .run(registers, memory)
+                .await
+                .unwrap(),
+            Logic::CmpA8b => Async::CalculHL(Logical::Compare)
+                .run(registers, memory)
+                .await
+                .unwrap(),
         }
     }
 }
