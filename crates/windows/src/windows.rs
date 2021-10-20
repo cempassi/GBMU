@@ -5,7 +5,6 @@ use soc::SOC;
 use std::convert::TryFrom;
 
 use crate::debugger;
-//use crate::emulator;
 
 pub struct Windows {}
 
