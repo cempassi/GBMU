@@ -30,6 +30,14 @@ use shared::Error;
 /// Conditional function call to the absolute address specified by the 16-bit operand nn.
 /// Cycle: 24 / 12
 
+/// Return nn
+/// Unconditional function call to the absolute address specified by the 16-bit operand nn.
+/// Cycle: 16
+
+/// Return CC nn
+/// Conditional function call to the absolute address specified by the 16-bit operand nn.
+/// Cycle: 20 / 8
+
 /// Flags:
 ///
 /// Z - Unuzed
@@ -57,6 +65,11 @@ pub enum Jump {
     CallC = 0xDC,
     CallNZ = 0xC4,
     CallNC = 0xD4,
+    Return = 0xC9,
+    ReturnZ = 0xC8,
+    ReturnC = 0xD8,
+    ReturnNZ = 0xC0,
+    ReturnNC = 0xD0,
 }
 
 impl Jump {
@@ -74,6 +87,11 @@ impl Jump {
             Jump::NCNN => Async::AbsoluteNot(Flag::C).jump(registers, memory).await?,
             Jump::NZR8b => Async::RelativeNot(Flag::Z).jump(registers, memory).await?,
             Jump::NCR8b => Async::RelativeNot(Flag::C).jump(registers, memory).await?,
+            Jump::Return => Async::Return.jump(registers, memory).await?,
+            Jump::ReturnZ => Async::ReturnCheck(Flag::Z).jump(registers, memory).await?,
+            Jump::ReturnC => Async::ReturnCheck(Flag::C).jump(registers, memory).await?,
+            Jump::ReturnNZ => Async::ReturnNot(Flag::Z).jump(registers, memory).await?,
+            Jump::ReturnNC => Async::ReturnNot(Flag::C).jump(registers, memory).await?,
             Jump::ZNN => {
                 Async::AbsoluteCheck(Flag::Z)
                     .jump(registers, memory)

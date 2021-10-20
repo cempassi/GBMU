@@ -18,6 +18,9 @@ pub enum Jump {
     Call,
     CallCheck(Flag),
     CallNot(Flag),
+    Return,
+    ReturnCheck(Flag),
+    ReturnNot(Flag),
 }
 
 impl Jump {
@@ -32,8 +35,30 @@ impl Jump {
             Jump::Call => Box::pin(call(register, memory)),
             Jump::CallCheck(flag) => Box::pin(call_check(register, memory, flag)),
             Jump::CallNot(flag) => Box::pin(call_not(register, memory, flag)),
+            Jump::Return => Box::pin(ret(register, memory)),
+            Jump::ReturnCheck(flag) => Box::pin(ret_check(register, memory, flag)),
+            Jump::ReturnNot(flag) => Box::pin(ret_not(register, memory, flag)),
         }
     }
+}
+
+async fn ret(registers: Registers, memory: Memory) -> Result<(), Error> {
+    Async::Pop(Bits16::PC).run(registers, memory).await?;
+    Ok(())
+}
+
+async fn ret_check(registers: Registers, memory: Memory, flag: Flag) -> Result<(), Error> {
+    if registers.borrow().get(flag) {
+        Async::Pop(Bits16::PC).run(registers, memory).await?;
+    }
+    Ok(())
+}
+
+async fn ret_not(registers: Registers, memory: Memory, flag: Flag) -> Result<(), Error> {
+    if !registers.borrow().get(flag) {
+        Async::Pop(Bits16::PC).run(registers, memory).await?;
+    }
+    Ok(())
 }
 
 async fn call(registers: Registers, memory: Memory) -> Result<(), Error> {
