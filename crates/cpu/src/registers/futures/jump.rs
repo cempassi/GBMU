@@ -1,4 +1,4 @@
-use super::{reader::Reader, Async, NextPc};
+use super::{Async, NextPc};
 use crate::registers::{Absolute, Bits16, Bus, Flag, Relative};
 use crate::Registers;
 use memory::Memory;
@@ -23,27 +23,15 @@ pub enum Jump {
 impl Jump {
     pub fn jump(self, register: Registers, memory: Memory) -> Jumper {
         match self {
-            Jump::Absolute => Box::pin(Reader::new(Box::pin(absolute(register, memory)))),
-            Jump::Relative => Box::pin(Reader::new(Box::pin(relative(register, memory)))),
-            Jump::AbsoluteCheck(flag) => {
-                Box::pin(Reader::new(Box::pin(abs_check(register, memory, flag))))
-            }
-            Jump::AbsoluteNot(flag) => {
-                Box::pin(Reader::new(Box::pin(abs_not(register, memory, flag))))
-            }
-            Jump::RelativeCheck(flag) => {
-                Box::pin(Reader::new(Box::pin(rel_check(register, memory, flag))))
-            }
-            Jump::RelativeNot(flag) => {
-                Box::pin(Reader::new(Box::pin(rel_not(register, memory, flag))))
-            }
-            Jump::Call => Box::pin(Reader::new(Box::pin(call(register, memory)))),
-            Jump::CallCheck(flag) => {
-                Box::pin(Reader::new(Box::pin(call_check(register, memory, flag))))
-            }
-            Jump::CallNot(flag) => {
-                Box::pin(Reader::new(Box::pin(call_not(register, memory, flag))))
-            }
+            Jump::Absolute => Box::pin(absolute(register, memory)),
+            Jump::Relative => Box::pin(relative(register, memory)),
+            Jump::AbsoluteCheck(flag) => Box::pin(abs_check(register, memory, flag)),
+            Jump::AbsoluteNot(flag) => Box::pin(abs_not(register, memory, flag)),
+            Jump::RelativeCheck(flag) => Box::pin(rel_check(register, memory, flag)),
+            Jump::RelativeNot(flag) => Box::pin(rel_not(register, memory, flag)),
+            Jump::Call => Box::pin(call(register, memory)),
+            Jump::CallCheck(flag) => Box::pin(call_check(register, memory, flag)),
+            Jump::CallNot(flag) => Box::pin(call_not(register, memory, flag)),
         }
     }
 }
