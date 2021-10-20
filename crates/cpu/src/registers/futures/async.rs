@@ -1,6 +1,5 @@
 use super::calcul::{self, Logical};
 use super::load;
-use super::reader::Reader;
 use super::set;
 use crate::registers::{Bits16, Bits8};
 use crate::Registers;
@@ -34,51 +33,27 @@ pub(crate) enum Async {
 impl Async {
     pub fn run(self, registers: Registers, memory: Memory) -> Processing {
         match self {
-            Async::CalculHL(op) => {
-                Box::pin(Reader::new(Box::pin(calcul::hl(registers, memory, op))))
+            Async::CalculHL(op) => Box::pin(calcul::hl(registers, memory, op)),
+            Async::CalculNext(op) => Box::pin(calcul::next(registers, memory, op)),
+            Async::Load8b(area) => Box::pin(load::u8(registers, memory, area)),
+            Async::Load16b(area) => Box::pin(load::u16(registers, memory, area)),
+            Async::LoadHL(area) => Box::pin(load::hl(registers, memory, area)),
+            Async::LoadHL8b => Box::pin(load::hl8b(registers, memory)),
+            Async::SetHL(area) => Box::pin(set::hl(registers, memory, area)),
+            Async::SetRegisterAt(dst, src) => Box::pin(set::reg_at(registers, memory, dst, src)),
+            Async::SetData(area) => Box::pin(set::data(registers, memory, area)),
+            Async::Push(area) => Box::pin(load::push(registers, memory, area)),
+            Async::Pop(area) => Box::pin(load::pop(registers, memory, area)),
+            Async::SetIncrease => Box::pin(set::update(registers, memory, true)),
+            Async::SetDecrease => Box::pin(set::update(registers, memory, false)),
+            Async::LoadIncrease => Box::pin(load::update(registers, memory, true)),
+            Async::LoadDecrease => Box::pin(load::update(registers, memory, false)),
+            Async::LoadRegisterFrom(dst, src) => {
+                Box::pin(load::reg_from(registers, memory, dst, src))
             }
-            Async::CalculNext(op) => {
-                Box::pin(Reader::new(Box::pin(calcul::next(registers, memory, op))))
-            }
-            Async::Load8b(area) => {
-                Box::pin(Reader::new(Box::pin(load::u8(registers, memory, area))))
-            }
-            Async::Load16b(area) => {
-                Box::pin(Reader::new(Box::pin(load::u16(registers, memory, area))))
-            }
-            Async::LoadHL(area) => {
-                Box::pin(Reader::new(Box::pin(load::hl(registers, memory, area))))
-            }
-            Async::LoadHL8b => Box::pin(Reader::new(Box::pin(load::hl8b(registers, memory)))),
-            Async::SetHL(area) => Box::pin(Reader::new(Box::pin(set::hl(registers, memory, area)))),
-            Async::SetRegisterAt(dst, src) => Box::pin(Reader::new(Box::pin(set::reg_at(
-                registers, memory, dst, src,
-            )))),
-            Async::LoadRegisterFrom(dst, src) => Box::pin(Reader::new(Box::pin(load::reg_from(
-                registers, memory, dst, src,
-            )))),
-            Async::SetIncrease => {
-                Box::pin(Reader::new(Box::pin(set::update(registers, memory, true))))
-            }
-            Async::SetDecrease => {
-                Box::pin(Reader::new(Box::pin(set::update(registers, memory, false))))
-            }
-            Async::LoadIncrease => {
-                Box::pin(Reader::new(Box::pin(load::update(registers, memory, true))))
-            }
-            Async::LoadDecrease => Box::pin(Reader::new(Box::pin(load::update(
-                registers, memory, false,
-            )))),
             // Async::LoadSP(area) =>{
             //     Box::pin(Reader::new(Box::pin(load_sp(registers, memory, area))))
             // }
-            Async::SetData(area) => {
-                Box::pin(Reader::new(Box::pin(set::data(registers, memory, area))))
-            }
-            Async::Push(area) => {
-                Box::pin(Reader::new(Box::pin(load::push(registers, memory, area))))
-            }
-            Async::Pop(area) => Box::pin(Reader::new(Box::pin(load::pop(registers, memory, area)))),
         }
     }
 }
