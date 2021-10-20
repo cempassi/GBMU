@@ -50,10 +50,9 @@ impl Async {
             Async::LoadDecrease => Box::pin(load::update(registers, memory, false)),
             Async::LoadRegisterFrom(dst, src) => {
                 Box::pin(load::reg_from(registers, memory, dst, src))
-            }
-            // Async::LoadSP(area) =>{
-            //     Box::pin(Reader::new(Box::pin(load_sp(registers, memory, area))))
-            // }
+            } // Async::LoadSP(area) =>{
+              //     Box::pin(Reader::new(Box::pin(load_sp(registers, memory, area))))
+              // }
         }
     }
 }
