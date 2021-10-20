@@ -4,7 +4,6 @@ mod getat;
 mod jump;
 mod load;
 mod nextpc;
-mod reader;
 mod set;
 mod setat;
 

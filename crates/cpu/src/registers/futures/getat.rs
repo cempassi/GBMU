@@ -1,4 +1,3 @@
-use super::reader::Reader;
 use crate::registers::{Bits16, Bus};
 use crate::Registers;
 use memory::{Async, Memory};
@@ -15,15 +14,13 @@ pub(crate) trait GetAt<T> {
 impl GetAt<u8> for Registers {
     fn get_at(self, memory: Memory, area: Bits16) -> Getter<u8> {
         let address = self.borrow().get(area);
-        let inner = Box::pin(memory.get::<u8>(address));
-        Box::pin(Reader::new(inner))
+        Box::pin(memory.get::<u8>(address))
     }
 }
 
 impl GetAt<u16> for Registers {
     fn get_at(self, memory: Memory, area: Bits16) -> Getter<u16> {
         let address = self.borrow().get(area);
-        let inner = Box::pin(memory.get::<u16>(address));
-        Box::pin(Reader::new(inner))
+        Box::pin(memory.get::<u16>(address))
     }
 }

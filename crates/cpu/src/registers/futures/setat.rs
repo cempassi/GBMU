@@ -1,4 +1,3 @@
-use super::reader::Reader;
 use crate::registers::{Bits16, Bus};
 use crate::Registers;
 use memory::{Async, Memory};
@@ -15,15 +14,13 @@ pub(crate) trait SetAt<T> {
 impl SetAt<u8> for Registers {
     fn set_at(self, memory: Memory, area: Bits16, data: u8) -> Setter {
         let address = self.borrow().get(area);
-        let inner = Box::pin(memory.set::<u8>(address, data));
-        Box::pin(Reader::new(inner))
+        Box::pin(memory.set::<u8>(address, data))
     }
 }
 
 impl SetAt<u16> for Registers {
     fn set_at(self, memory: Memory, area: Bits16, data: u16) -> Setter {
         let address = self.borrow().get(area);
-        let inner = Box::pin(memory.set::<u16>(address, data));
-        Box::pin(Reader::new(inner))
+        Box::pin(memory.set::<u16>(address, data))
     }
 }

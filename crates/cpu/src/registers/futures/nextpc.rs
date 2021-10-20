@@ -1,4 +1,3 @@
-use super::reader::Reader;
 use crate::Registers;
 use memory::Async;
 use memory::Memory;
@@ -12,15 +11,13 @@ pub(crate) trait NextPc<T> {
 
 impl NextPc<u8> for Registers {
     fn next_pc(self, memory: Memory) -> Pin<Box<dyn Future<Output = Result<u8, Error>>>> {
-        let inner = Box::pin(next(self, memory));
-        Box::pin(Reader::new(inner))
+        Box::pin(next(self, memory))
     }
 }
 
 impl NextPc<u16> for Registers {
     fn next_pc(self, memory: Memory) -> Pin<Box<dyn Future<Output = Result<u16, Error>>>> {
-        let inner = Box::pin(next_16(self, memory));
-        Box::pin(Reader::new(inner))
+        Box::pin(next_16(self, memory))
     }
 }
 
