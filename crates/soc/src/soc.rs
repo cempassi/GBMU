@@ -1,4 +1,5 @@
 use crate::processor::Processor;
+use crate::runner::{New, Runner};
 use std::convert::TryFrom;
 use std::fs;
 use std::task::Context;
@@ -14,8 +15,8 @@ const HEAD_LEN: usize = 0x100;
 
 /// The SOC is the GBMU async executor
 pub struct SOC {
+    runner: Runner,
     processors: Vec<Processor>,
-    clock: u32,
 }
 
 impl TryFrom<&str> for SOC {
@@ -34,9 +35,9 @@ impl TryFrom<&str> for SOC {
 
         let memory: memory::Memory = memory::memory::Memory::new(header.cartridge, rom);
         let processors = Processor::init(memory);
-        let clock = 0;
+        let runner = <Runner as New>::new();
 
-        Ok(SOC { processors, clock })
+        Ok(SOC { processors, runner })
     }
 }
 
@@ -67,12 +68,19 @@ impl SOC {
             .unwrap()
     }
 
+    pub fn get_runner(&self) -> Runner {
+        self.runner.clone()
+    }
+
+    fn is_ready(&mut self) -> bool {
+        self.runner.borrow_mut().check()
+    }
+
     pub fn run(&mut self) {
         let waker = crate::waker::create();
         let mut context = Context::from_waker(&waker);
 
-        if self.clock < 20 {
-            self.clock += 1;
+        if self.is_ready() {
             for processor in &mut self.processors {
                 processor.run(&mut context);
             }
