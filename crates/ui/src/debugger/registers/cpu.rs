@@ -82,6 +82,14 @@ impl RegisterPair {
         }
     }
 
+    fn is_merged(&self) -> bool {
+        match self {
+            RegisterPair::Splited(_, _) => false,
+            RegisterPair::Merged(_) => true,
+            _ => false,
+        }
+    }
+
     pub fn view(&self, registers: Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
         let checkbox = Checkbox::new(self.is_merged(), "", |_| RegisterMsg::MergeToogle);
         let register = self.view_register(registers, theme);
@@ -92,13 +100,5 @@ impl RegisterPair {
             RegisterPair::NoSplit(_) => row.push(space),
         };
         row.push(register).into()
-    }
-
-    pub fn is_merged(&self) -> bool {
-        match self {
-            RegisterPair::Splited(_, _) => false,
-            RegisterPair::Merged(_) => true,
-            _ => false,
-        }
     }
 }

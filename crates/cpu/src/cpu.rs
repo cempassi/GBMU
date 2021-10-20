@@ -54,6 +54,7 @@ impl Cpu {
     /// 3 - Tryfrom to Instruction
     /// 4 - Exec Instructions -> Do the Maths put in Dest and set Flags
     pub async fn run(self) -> Result<u8, Error> {
+        println!("Next Cpu Execution, fetching Opcode...!");
         let opcode: u8 = self
             .registers
             .clone()
@@ -64,18 +65,24 @@ impl Cpu {
         if opcode == 0xCB {
             self.prefix_cb().await;
         } else if let Ok(operation) = Load::try_from_primitive(opcode) {
+            println!("Load 8 bits: {:#?}", operation);
             operation.exec(self.registers, self.memory).await?;
         } else if let Ok(operation) = Load16b::try_from_primitive(opcode.into()) {
+            println!("Load 16b: {:#?}", operation);
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = Jump::try_from_primitive(opcode) {
+            println!("Jump: {:#?}", operation);
             operation.exec(self.registers, self.memory).await?;
         } else if let Ok(operation) = Arithmetic::try_from_primitive(opcode) {
+            println!("Arithmetic: {:#?}", operation);
             operation.exec(self.registers, self.memory).await;
         } else if let Ok(operation) = Logic::try_from_primitive(opcode) {
+            println!("Logic: {:#?}", operation);
             operation.exec(self.registers, self.memory).await;
         } else {
             println!("Not implemented!");
         }
+        println!("Finished execution!");
         Ok(8)
     }
 }
