@@ -1,4 +1,5 @@
 mod memory_map;
+mod menu;
 mod registers;
 mod ui;
 mod widgets;
