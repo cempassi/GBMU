@@ -14,7 +14,6 @@ use flag::Sgb;
 use memory::Cartridge;
 use newlicense::NewLicense;
 use oldlicense::OldLicense;
-use std::convert::{TryFrom, TryInto};
 use title::Title;
 
 /// entry_point: After displaying the Nintendo Logo, the built-in boot procedure jumps to this address

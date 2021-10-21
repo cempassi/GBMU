@@ -1,6 +1,5 @@
 use crate::processor::Processor;
 use crate::runner::{New, Runner};
-use std::convert::TryFrom;
 use std::fs;
 use std::task::Context;
 
