@@ -1,7 +1,7 @@
 mod dark;
 mod light;
 
-use iced_wgpu::{checkbox, container};
+use iced_wgpu::{button, checkbox, container};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Theme {
@@ -29,6 +29,15 @@ impl From<Theme> for Box<dyn checkbox::StyleSheet> {
         match theme {
             Theme::Light => light::Checkbox.into(),
             Theme::Dark => dark::Checkbox.into(),
+        }
+    }
+}
+
+impl From<Theme> for Box<dyn button::StyleSheet> {
+    fn from(theme: Theme) -> Self {
+        match theme {
+            Theme::Light => light::Button.into(),
+            Theme::Dark => dark::Button.into(),
         }
     }
 }

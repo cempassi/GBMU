@@ -34,7 +34,7 @@ impl Future for Getter<u8> {
             Cycle::Finished => Poll::Ready(self.memory.borrow().get_u8(self.address)),
             Cycle::Cpu(ref mut ticks) => {
                 *ticks += 1;
-                if *ticks >= 4 {
+                if *ticks >= 3 {
                     self.cycle = Cycle::Finished;
                 }
                 Poll::Pending
@@ -51,7 +51,7 @@ impl Future for Getter<u16> {
             Cycle::Finished => Poll::Ready(self.memory.borrow().get_u16(self.address)),
             Cycle::Cpu(ref mut ticks) => {
                 *ticks += 1;
-                if *ticks >= 8 {
+                if *ticks >= 7 {
                     self.cycle = Cycle::Finished;
                 }
                 Poll::Pending

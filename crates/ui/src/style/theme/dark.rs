@@ -1,4 +1,11 @@
-use iced_wgpu::{checkbox, container, Color};
+use iced_wgpu::{button, checkbox, container, Color};
+use iced_winit::Vector;
+
+const BACKGROUND: Color = Color::from_rgb(
+    0xFF as f32 / 255.0,
+    0xFF as f32 / 255.0,
+    0xFF as f32 / 255.0,
+);
 
 const SURFACE: Color = Color::from_rgb(
     0x40 as f32 / 255.0,
@@ -32,6 +39,21 @@ impl container::StyleSheet for Container {
             background: Color::from_rgb8(0x36, 0x39, 0x3F).into(),
             text_color: Color::WHITE.into(),
             ..container::Style::default()
+        }
+    }
+}
+
+pub struct Button;
+
+impl button::StyleSheet for Button {
+    fn active(&self) -> button::Style {
+        button::Style {
+            background: BACKGROUND.into(),
+            border_radius: 10.0,
+            border_width: 5.0,
+            border_color: Color::BLACK,
+            shadow_offset: Vector::new(0.5, 0.5),
+            text_color: Color::BLACK,
         }
     }
 }
