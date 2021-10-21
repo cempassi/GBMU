@@ -1,4 +1,4 @@
-pub use crate::interface::{New, Registers};
+pub use crate::interface::Registers;
 use crate::opcodes::Arithmetic;
 use crate::opcodes::Jump;
 use crate::opcodes::Load;
@@ -22,7 +22,7 @@ impl Cpu {
     pub fn new(memory: Memory) -> Self {
         Self {
             memory,
-            registers: New::new(),
+            registers: Registers::default(),
         }
     }
 

@@ -18,7 +18,7 @@ impl Area {
         let result = match self {
             Area::Bios => address,
             Area::Rom => address,
-            Area::Vram => address - consts::ROM_MIN,
+            Area::Vram => address - consts::VRAM_MIN,
             Area::_ExtRam => address - consts::EXT_RAM_MIN,
             Area::Wram => address - consts::WRAM_MIN,
             Area::_EchoRam => address - consts::ECHO_RAM_MIN,

@@ -1,7 +1,7 @@
 use crate::registers::lcd::Register;
 use crate::registers::Registers;
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Ppu {
     vram: Vec<u8>,
     registers: Registers,
@@ -13,7 +13,18 @@ impl AsRef<Vec<u8>> for Ppu {
     }
 }
 
+impl Default for Ppu {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Ppu {
+    pub fn new() -> Self {
+        let vram = vec![0; 8192];
+        let registers = Registers::default();
+        Self { vram, registers }
+    }
     pub fn get_vram(&self, address: usize) -> u8 {
         self.vram[address]
     }
