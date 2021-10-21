@@ -76,14 +76,18 @@ impl SOC {
         self.runner.borrow_mut().check()
     }
 
-    pub fn run(&mut self) {
+    pub fn run(&mut self) -> bool {
         let waker = crate::waker::create();
         let mut context = Context::from_waker(&waker);
+        let mut result = false;
 
         if self.is_ready() {
             for processor in &mut self.processors {
-                processor.run(&mut context);
+                if processor.run(&mut context) {
+                    result = true;
+                }
             }
         }
+        result
     }
 }
