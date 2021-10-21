@@ -62,7 +62,7 @@ roms.zip:
 
 ### utils ###
 
-check: format lint test
+check: format.all format lint test
 
 lint:
 	cargo clippy --workspace --verbose -- -D warnings
