@@ -19,7 +19,9 @@ impl Windows {
         //let (emulator_id, mut emulator) = emulator::generate_emulator(&event_loop);
 
         event_loop.run(move |event, _, control_flow| {
-            debugger.soc.run();
+            if debugger.soc.run() {
+                debugger.request_redraw();
+            }
             match event {
                 Event::LoopDestroyed => (),
                 Event::WindowEvent { event, window_id } if window_id == debugger.id => {
@@ -31,11 +33,8 @@ impl Windows {
                 Event::MainEventsCleared => {
                     // If there are events pending
                     if !debugger.state.state.is_queue_empty() {
-                        // We update iced
-                        debugger.update();
-
-                        // and request a redraw
-                        debugger.window.request_redraw();
+                        // We update iced and request a redraw
+                        debugger.request_redraw();
                     }
                 }
                 Event::RedrawRequested(window_id) if window_id == debugger.id => {

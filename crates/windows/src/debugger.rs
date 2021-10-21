@@ -142,8 +142,9 @@ impl Debugger {
         }
     }
 
-    pub fn update(&mut self) {
+    pub fn request_redraw(&mut self) {
         self.state.update(self.window.scale_factor());
+        self.window.request_redraw();
     }
 
     fn resize(&mut self) {

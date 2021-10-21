@@ -21,36 +21,58 @@ impl Processor {
         vec![cpu, ppu]
     }
 
-    pub fn run(&mut self, context: &mut Context) {
+    pub fn run(&mut self, context: &mut Context) -> bool {
+        let mut result = false;
         match self {
             Processor::Ppu(ppu, ref mut state) => {
                 if let Some(mut task) = state.take() {
                     match task.as_mut().poll(context) {
-                        Poll::Ready(_) => state.replace(Box::pin(ppu.clone().run())),
-                        Poll::Pending => state.replace(task),
+                        Poll::Ready(_) => {
+                            state.replace(Box::pin(ppu.clone().run()));
+                            result = true;
+                        }
+                        Poll::Pending => {
+                            state.replace(task);
+                        }
                     };
                 } else {
                     let mut task = Box::pin(ppu.clone().run());
                     match task.as_mut().poll(context) {
-                        Poll::Pending => state.replace(task),
-                        Poll::Ready(_) => state.replace(task),
+                        Poll::Pending => {
+                            state.replace(task);
+                        }
+                        Poll::Ready(_) => {
+                            state.replace(Box::pin(ppu.clone().run()));
+                            result = true;
+                        }
                     };
                 }
             }
             Processor::Cpu(cpu, ref mut state) => {
                 if let Some(mut task) = state.take() {
                     match task.as_mut().poll(context) {
-                        Poll::Ready(_) => state.replace(Box::pin(cpu.clone().run())),
-                        Poll::Pending => state.replace(task),
+                        Poll::Ready(_) => {
+                            state.replace(Box::pin(cpu.clone().run()));
+                            result = true;
+                        }
+                        Poll::Pending => {
+                            state.replace(task);
+                        }
                     };
                 } else {
                     let mut task = Box::pin(cpu.clone().run());
                     match task.as_mut().poll(context) {
-                        Poll::Pending => state.replace(task),
-                        Poll::Ready(_) => state.replace(task),
+                        Poll::Pending => {
+                            state.replace(task);
+                        }
+                        Poll::Ready(_) => {
+                            state.replace(Box::pin(cpu.clone().run()));
+                            result = true;
+                        }
                     };
                 }
             }
-        }
+        };
+        result
     }
 }
