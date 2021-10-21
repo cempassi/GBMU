@@ -36,4 +36,3 @@ impl Line {
             .into()
     }
 }
-

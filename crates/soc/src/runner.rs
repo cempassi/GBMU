@@ -32,13 +32,10 @@ impl Cycle {
     }
 
     fn step(&mut self) {
-        match self.state {
-            State::Line(ref mut ticks) => {
-                println!("Processing line, currently at tick {} on 456", *ticks);
-                self.ticks += 1;
-                *ticks += 1;
-            }
-            _ => (),
+        if let State::Line(ref mut ticks) = self.state {
+            println!("Processing line, currently at tick {} on 456", *ticks);
+            self.ticks += 1;
+            *ticks += 1;
         }
     }
 

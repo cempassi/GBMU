@@ -1,17 +1,16 @@
-mod tick;
 mod line;
+mod tick;
 
 use crate::style::Theme;
 use iced_wgpu::{Renderer, Row};
 use iced_winit::{alignment::Alignment, Element, Length, Space};
-use soc::Runner;
 use line::Line;
+use soc::Runner;
 use tick::Tick;
 
 pub struct Menu {
     line: Line,
-    tick: Tick
-
+    tick: Tick,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -23,13 +22,13 @@ pub enum MenuMsg {
 impl Menu {
     pub fn new(runner: Runner) -> Self {
         let line = Line::new(runner.clone());
-        let tick = Tick::new(runner.clone());
+        let tick = Tick::new(runner);
         Self { tick, line }
     }
     pub fn update(&mut self, message: MenuMsg) {
         match message {
             MenuMsg::TickPressed => self.tick.update(),
-            MenuMsg::LinePressed => self.line.update()
+            MenuMsg::LinePressed => self.line.update(),
         }
     }
 

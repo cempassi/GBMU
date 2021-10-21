@@ -16,7 +16,7 @@ impl Tick {
         Self { runner, state }
     }
     pub fn update(&mut self) {
-         self.runner.borrow_mut().tick();
+        self.runner.borrow_mut().tick();
     }
 
     pub fn view(&mut self, theme: Theme) -> Element<MenuMsg, Renderer> {
