@@ -22,7 +22,7 @@ impl Future for Blank {
             Cycle::Finished => Poll::Ready(42),
             Cycle::Ppu(ref mut ticks) => {
                 *ticks += 1;
-                if *ticks as u32 == length {
+                if *ticks as u32 == length - 1 {
                     println!("Blank Period finished: {} cycles", ticks);
                     self.cycle = Cycle::Finished;
                 }

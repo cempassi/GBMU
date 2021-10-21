@@ -2,7 +2,6 @@ use iced_wgpu::wgpu::Instance;
 use iced_winit::winit::event::Event;
 use iced_winit::winit::event_loop::EventLoop;
 use soc::SOC;
-use std::convert::TryFrom;
 
 use crate::debugger;
 

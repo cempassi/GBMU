@@ -1,36 +1,65 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-pub type Runner = Rc<RefCell<Mode>>;
+pub type Runner = Rc<RefCell<Cycle>>;
 
-#[derive(Debug)]
-pub enum Mode {
-    Tick(bool),
+const LINE_LENGTH: u32 = 456;
+
+#[derive(Debug, Default)]
+pub struct Cycle {
+    state: State,
+    ticks: u32,
 }
 
-impl Mode {
+impl Cycle {
     pub fn check(&mut self) -> bool {
-        match self {
-            Mode::Tick(ref mut status) if *status => {
-                let current = *status;
-                *status = !*status;
-                current
+        self.step();
+        match self.state {
+            State::Tick => {
+                self.state = State::Idle;
+                true
+            }
+            State::Line(ticks) => {
+                if ticks < LINE_LENGTH {
+                    true
+                } else {
+                    self.state = State::Idle;
+                    false
+                }
             }
             _ => false,
         }
     }
 
+    fn step(&mut self) {
+        if let State::Line(ref mut ticks) = self.state {
+            println!("Processing line, currently at tick {} on 456", *ticks);
+            self.ticks += 1;
+            *ticks += 1;
+        }
+    }
+
     pub fn tick(&mut self) {
-        *self = Mode::Tick(true);
+        self.state = State::Tick;
+    }
+
+    pub fn line(&mut self) {
+        println!("Line processing mode!");
+        let current_line = self.ticks % LINE_LENGTH;
+        println!("Starting at: {}", current_line);
+        self.state = State::Line(current_line);
     }
 }
 
-pub trait New {
-    fn new() -> Self;
+#[derive(Debug)]
+pub enum State {
+    Tick,
+    Line(u32),
+    Idle,
 }
 
-impl New for Runner {
-    fn new() -> Self {
-        Rc::new(RefCell::new(Mode::Tick(false)))
+impl Default for State {
+    fn default() -> Self {
+        State::Idle
     }
 }

@@ -27,7 +27,7 @@ impl Future for Oam {
             Cycle::Ppu(ref mut ticks) => {
                 println!("Search OAM, currently at cycle {}", ticks);
                 *ticks += 1;
-                if *ticks == 40 {
+                if *ticks == 39 {
                     println!("OAM Search finished: {} cycles", 40);
                     self.cycle = Cycle::Finished;
                 }
