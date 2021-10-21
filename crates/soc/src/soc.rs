@@ -1,5 +1,5 @@
 use crate::processor::Processor;
-use crate::runner::{New, Runner};
+use crate::runner::Runner;
 use std::fs;
 use std::task::Context;
 
@@ -34,7 +34,7 @@ impl TryFrom<&str> for SOC {
 
         let memory: memory::Memory = memory::memory::Memory::new(header.cartridge, rom);
         let processors = Processor::init(memory);
-        let runner = <Runner as New>::new();
+        let runner = Runner::default();
 
         Ok(SOC { processors, runner })
     }
