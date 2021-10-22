@@ -7,7 +7,7 @@ pub type Runner = Rc<RefCell<Cycle>>;
 const LINE_LENGTH: u32 = 456;
 
 /// Number of Lines in a frame
-const FRAME_LENGTH: u32 = 120;
+const FRAME_LENGTH: u32 = 144;
 
 #[derive(Debug, Default)]
 pub struct Cycle {
@@ -60,6 +60,7 @@ impl Cycle {
                 self.ticks = 0;
             }
             if self.lines == FRAME_LENGTH {
+                self.lines = 0;
                 self.ticks = 0;
             }
         }
