@@ -1,48 +1,55 @@
-mod line;
-mod tick;
-
+use super::button::Button;
 use crate::style::Theme;
 use iced_wgpu::{Renderer, Row};
-use iced_winit::{alignment::Alignment, Element, Length, Space};
-use line::Line;
+use iced_winit::{Alignment, Element, Length, Space};
 use soc::Runner;
-use tick::Tick;
 
 pub struct Menu {
-    line: Line,
-    tick: Tick,
+    buttons: Vec<Button>,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MenuMsg {
-    TickPressed,
-    LinePressed,
+    Tick,
+    Line,
+    Frame,
 }
 
 impl Menu {
     pub fn new(runner: Runner) -> Self {
-        let line = Line::new(runner.clone());
-        let tick = Tick::new(runner);
-        Self { tick, line }
-    }
-    pub fn update(&mut self, message: MenuMsg) {
-        match message {
-            MenuMsg::TickPressed => self.tick.update(),
-            MenuMsg::LinePressed => self.line.update(),
+        let tick = Button::new(runner.clone(), MenuMsg::Tick);
+        let line = Button::new(runner.clone(), MenuMsg::Line);
+        let frame = Button::new(runner, MenuMsg::Frame);
+
+        Self {
+            buttons: vec![tick, line, frame],
         }
     }
 
+    pub fn update(&mut self, message: MenuMsg) {
+        if let Some(button) = self
+            .buttons
+            .iter()
+            .find(|&button| button.is_button(message))
+        {
+            button.update()
+        };
+    }
+
     pub fn view(&mut self, theme: Theme) -> Element<MenuMsg, Renderer> {
-        let line = self.line.view(theme);
-        let tick = self.tick.view(theme);
-        let space = Space::new(Length::Units(35), Length::Units(0));
-        Row::new()
-            .align_items(Alignment::End)
-            .width(Length::Fill)
-            .padding(5)
-            .push(tick)
-            .push(space)
-            .push(line)
+        self.buttons
+            .iter_mut()
+            .fold(
+                Row::new()
+                    .align_items(Alignment::End)
+                    .width(Length::Fill)
+                    .padding(5),
+                |row, button| {
+                    let space = Space::new(Length::Units(10), Length::Shrink);
+                    let element: Element<MenuMsg, Renderer> = button.view(theme);
+                    row.push(element).push(space)
+                },
+            )
             .into()
     }
 }

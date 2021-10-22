@@ -71,22 +71,26 @@ impl SOC {
         self.runner.clone()
     }
 
-    fn is_ready(&mut self) -> bool {
-        self.runner.borrow_mut().check()
+    fn check_tick(&mut self) -> bool {
+        self.runner.borrow_mut().check_tick()
+    }
+
+    fn check_redraw(&mut self, redraw: bool) -> bool {
+        self.runner.borrow_mut().check_redraw(redraw)
     }
 
     pub fn run(&mut self) -> bool {
         let waker = crate::waker::create();
         let mut context = Context::from_waker(&waker);
-        let mut result = false;
+        let mut redraw = false;
 
-        if self.is_ready() {
+        if self.check_tick() {
             for processor in &mut self.processors {
                 if processor.run(&mut context) {
-                    result = true;
+                    redraw = true;
                 }
             }
         }
-        result
+        self.check_redraw(redraw)
     }
 }

@@ -1,3 +1,4 @@
+mod button;
 mod memory_map;
 mod menu;
 mod registers;
