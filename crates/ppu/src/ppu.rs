@@ -25,6 +25,7 @@ impl Ppu {
         let registers = Registers::default();
         Self { vram, registers }
     }
+
     pub fn get_vram(&self, address: usize) -> u8 {
         self.vram[address]
     }
