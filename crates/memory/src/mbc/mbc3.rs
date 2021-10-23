@@ -286,7 +286,7 @@ mod mbc3_test {
         assert!(mbc.ram_lock);
 
         mbc.set(0x034b, 0x03);
-        assert!(mbc.ram_lock)
+        assert!(!mbc.ram_lock)
     }
 
     #[test]
@@ -351,7 +351,7 @@ mod mbc3_test {
         assert_eq!(data, 0xca);
 
         mbc.set(0x01ff, 0x00);
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -366,7 +366,7 @@ mod mbc3_test {
         assert_eq!(mbc.ram_bank, 1);
 
         mbc.set(0x01ff, 0x00);
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -386,7 +386,7 @@ mod mbc3_test {
         assert_eq!(data, 0xc9);
 
         mbc.set(0x01ff, 0x00);
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -406,7 +406,7 @@ mod mbc3_test {
         assert_eq!(data, 0xc9);
 
         mbc.set(0x01ff, 0x00);
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -426,7 +426,7 @@ mod mbc3_test {
         assert_eq!(data, 0xc9);
 
         mbc.set(0x01ff, 0x00);
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -446,7 +446,7 @@ mod mbc3_test {
         assert_eq!(data, 0x31);
 
         mbc.set(0x01ff, 0x00);
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -466,7 +466,7 @@ mod mbc3_test {
         assert_eq!(data, 0x0a);
 
         mbc.set(0x01ff, 0x00);
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -484,7 +484,7 @@ mod mbc3_test {
         assert_eq!(data, 0x00);
 
         mbc.set(0x01ff, 0x00);
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -502,7 +502,7 @@ mod mbc3_test {
         assert_eq!(data, 0xc9);
 
         mbc.set(0x01ff, 0x00);
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -520,7 +520,7 @@ mod mbc3_test {
         assert_eq!(data, 0x02);
 
         mbc.set(0x01ff, 0x00);
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -538,7 +538,7 @@ mod mbc3_test {
         assert_eq!(data, 0x01);
 
         mbc.set(0x01ff, 0x00);
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -556,7 +556,7 @@ mod mbc3_test {
         assert_eq!(data, 0);
 
         mbc.set(0x01ff, 0x00);
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -571,7 +571,7 @@ mod mbc3_test {
         assert!(mbc.latch);
 
         mbc.set(0x6000, 0x01);
-        assert!(mbc.latch);
+        assert!(!mbc.latch);
 
         mbc.set(0x4f4f, 0x08);
         assert_eq!(mbc.ram_bank, 8); //seconds

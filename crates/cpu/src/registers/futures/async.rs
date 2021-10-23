@@ -55,8 +55,8 @@ impl Async {
             }
             Async::CbHL(operation) => Box::pin(cb::hl(registers, memory, operation)),
             // Async::LoadSP(area) =>{
-              //     Box::pin(Reader::new(Box::pin(load_sp(registers, memory, area))))
-              // }
+            //     Box::pin(Reader::new(Box::pin(load_sp(registers, memory, area))))
+            // }
         }
     }
 }

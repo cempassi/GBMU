@@ -1,5 +1,8 @@
 use crate::cpu::Registers;
-use crate::registers::{Bits8, Shift as S, futures::{Async, CbOperation as Operation}};
+use crate::registers::{
+    futures::{Async, CbOperation as Operation},
+    Bits8, Shift as S,
+};
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 use shared::Error;
@@ -73,9 +76,8 @@ pub enum Shift {
     RLA = 0x3F,
 }
 
-
 impl Shift {
-    pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error>{
+    pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
         let result = match self {
             Shift::LB => registers.borrow_mut().shift_left(Bits8::B),
             Shift::LC => registers.borrow_mut().shift_left(Bits8::C),
@@ -84,7 +86,7 @@ impl Shift {
             Shift::LH => registers.borrow_mut().shift_left(Bits8::H),
             Shift::LL => registers.borrow_mut().shift_left(Bits8::L),
             Shift::LA => registers.borrow_mut().shift_left(Bits8::A),
-            Shift::LHL => Async::CbHL(Operation::SLeft).run( registers, memory).await?,
+            Shift::LHL => Async::CbHL(Operation::SLeft).run(registers, memory).await?,
             Shift::SB => registers.borrow_mut().swap(Bits8::B),
             Shift::SC => registers.borrow_mut().swap(Bits8::C),
             Shift::SD => registers.borrow_mut().swap(Bits8::D),
@@ -92,7 +94,7 @@ impl Shift {
             Shift::SH => registers.borrow_mut().swap(Bits8::H),
             Shift::SL => registers.borrow_mut().swap(Bits8::L),
             Shift::SA => registers.borrow_mut().swap(Bits8::A),
-            Shift::SHL => Async::CbHL(Operation::Swap).run( registers, memory).await?,
+            Shift::SHL => Async::CbHL(Operation::Swap).run(registers, memory).await?,
             Shift::RAB => registers.borrow_mut().shift_arithmetic(Bits8::B),
             Shift::RAC => registers.borrow_mut().shift_arithmetic(Bits8::C),
             Shift::RAD => registers.borrow_mut().shift_arithmetic(Bits8::D),
@@ -100,7 +102,11 @@ impl Shift {
             Shift::RAH => registers.borrow_mut().shift_arithmetic(Bits8::H),
             Shift::RAL => registers.borrow_mut().shift_arithmetic(Bits8::L),
             Shift::RAA => registers.borrow_mut().shift_arithmetic(Bits8::A),
-            Shift::RAHL => Async::CbHL(Operation::SRArithmetic).run( registers, memory).await?,
+            Shift::RAHL => {
+                Async::CbHL(Operation::SRArithmetic)
+                    .run(registers, memory)
+                    .await?
+            }
             Shift::RLB => registers.borrow_mut().shift_logic(Bits8::B),
             Shift::RLC => registers.borrow_mut().shift_logic(Bits8::C),
             Shift::RLD => registers.borrow_mut().shift_logic(Bits8::D),
@@ -108,7 +114,11 @@ impl Shift {
             Shift::RLH => registers.borrow_mut().shift_logic(Bits8::H),
             Shift::RLL => registers.borrow_mut().shift_logic(Bits8::L),
             Shift::RLA => registers.borrow_mut().shift_logic(Bits8::A),
-            Shift::RLHL => Async::CbHL(Operation::SRLogic).run( registers, memory).await?,
+            Shift::RLHL => {
+                Async::CbHL(Operation::SRLogic)
+                    .run(registers, memory)
+                    .await?
+            }
         };
         Ok(result)
     }

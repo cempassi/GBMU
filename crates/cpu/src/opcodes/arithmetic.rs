@@ -1,5 +1,8 @@
 use crate::cpu::Registers;
-use crate::registers::{Arithmetic as A, Bits8, futures::{Async, Operation}};
+use crate::registers::{
+    futures::{Async, Operation},
+    Arithmetic as A, Bits8,
+};
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 use shared::Error;
@@ -107,10 +110,26 @@ impl Arithmetic {
             Arithmetic::AAcE => registers.borrow_mut().add(Bits8::E, true),
             Arithmetic::AAcH => registers.borrow_mut().add(Bits8::H, true),
             Arithmetic::AAcL => registers.borrow_mut().add(Bits8::L, true),
-            Arithmetic::AAc8b => Async::CalculNext(Operation::AddCarry).run(registers, memory).await?,
-            Arithmetic::AA8b => Async::CalculNext(Operation::AddNoCarry).run(registers, memory).await?,
-            Arithmetic::AAHL => Async::CalculHL(Operation::AddNoCarry).run(registers, memory).await?,
-            Arithmetic::AAcHL => Async::CalculHL(Operation::AddCarry).run(registers, memory).await?,
+            Arithmetic::AAc8b => {
+                Async::CalculNext(Operation::AddCarry)
+                    .run(registers, memory)
+                    .await?
+            }
+            Arithmetic::AA8b => {
+                Async::CalculNext(Operation::AddNoCarry)
+                    .run(registers, memory)
+                    .await?
+            }
+            Arithmetic::AAHL => {
+                Async::CalculHL(Operation::AddNoCarry)
+                    .run(registers, memory)
+                    .await?
+            }
+            Arithmetic::AAcHL => {
+                Async::CalculHL(Operation::AddCarry)
+                    .run(registers, memory)
+                    .await?
+            }
             Arithmetic::SAB => registers.borrow_mut().sub(Bits8::B, false),
             Arithmetic::SAC => registers.borrow_mut().sub(Bits8::C, false),
             Arithmetic::SAD => registers.borrow_mut().sub(Bits8::D, false),
@@ -125,10 +144,26 @@ impl Arithmetic {
             Arithmetic::SAcH => registers.borrow_mut().sub(Bits8::H, true),
             Arithmetic::SAcL => registers.borrow_mut().sub(Bits8::L, true),
             Arithmetic::SAcA => registers.borrow_mut().sub(Bits8::A, true),
-            Arithmetic::SAHL => Async::CalculHL(Operation::SubNoCarry).run(registers, memory).await?,
-            Arithmetic::SAcHL => Async::CalculHL(Operation::SubCarry).run(registers, memory).await?,
-            Arithmetic::SA8b => Async::CalculNext(Operation::SubNoCarry).run(registers, memory).await?,
-            Arithmetic::SAc8b => Async::CalculNext(Operation::SubCarry).run(registers, memory).await?,
+            Arithmetic::SAHL => {
+                Async::CalculHL(Operation::SubNoCarry)
+                    .run(registers, memory)
+                    .await?
+            }
+            Arithmetic::SAcHL => {
+                Async::CalculHL(Operation::SubCarry)
+                    .run(registers, memory)
+                    .await?
+            }
+            Arithmetic::SA8b => {
+                Async::CalculNext(Operation::SubNoCarry)
+                    .run(registers, memory)
+                    .await?
+            }
+            Arithmetic::SAc8b => {
+                Async::CalculNext(Operation::SubCarry)
+                    .run(registers, memory)
+                    .await?
+            }
         };
         Ok(result)
     }

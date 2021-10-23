@@ -54,7 +54,7 @@ mod test_nombc {
 
     #[test]
     fn test_read_nombc() {
-        let mbc0 = Box::<Mbc0>::default();
+        let mbc0 = Mbc0::default();
 
         assert_eq!(mbc0.get(0x10), 0);
     }
@@ -63,6 +63,6 @@ mod test_nombc {
     fn test_write_read_nombc() {
         let mut mbc0 = Mbc0::default();
 
-        <Mbc0 as MbcBus>::set(&mut mbc0, 0x42, 42).unwrap();
+        assert!(<Mbc0 as MbcBus>::set(&mut mbc0, 0x42, 42).is_err());
     }
 }

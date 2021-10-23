@@ -189,7 +189,7 @@ mod test_rotate {
         let result = register.borrow_mut().get(Bits8::A);
         let carry = register.borrow_mut().get(Flag::C);
         assert_eq!(result, expected);
-        assert!(carry);
+        assert!(!carry);
     }
 
     #[test]
@@ -228,7 +228,7 @@ mod test_rotate {
         let result = memory.borrow_mut().get_u8(hl).unwrap();
         let carry = register.borrow_mut().get(Flag::C);
         assert_eq!(result, expected);
-        assert!(carry);
+        assert!(!carry);
     }
 
     #[test]

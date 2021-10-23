@@ -12,7 +12,7 @@ impl Load<Bits8> for Registers {
 }
 
 impl Load<Bits16> for Registers {
-    fn load(&mut self, dst: Bits16, src: Bits16) -> u8{
+    fn load(&mut self, dst: Bits16, src: Bits16) -> u8 {
         self.set(dst, self.get(src));
         0
     }

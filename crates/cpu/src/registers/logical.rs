@@ -2,10 +2,10 @@ use super::{Arithmetic, Bits8, Bus, Flag};
 use crate::registers::Registers;
 
 pub trait Logical<T> {
-    fn and(&mut self, area: T) -> u8 ;
-    fn or(&mut self, area: T) -> u8 ;
-    fn xor(&mut self, area: T) -> u8 ;
-    fn compare(&mut self, area: T) -> u8 ;
+    fn and(&mut self, area: T) -> u8;
+    fn or(&mut self, area: T) -> u8;
+    fn xor(&mut self, area: T) -> u8;
+    fn compare(&mut self, area: T) -> u8;
 }
 
 impl Logical<Bits8> for Registers {

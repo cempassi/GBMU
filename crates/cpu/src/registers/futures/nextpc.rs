@@ -5,20 +5,20 @@ use shared::Error;
 use std::future::Future;
 use std::pin::Pin;
 
-type Next<T> =  Pin<Box<dyn Future<Output = Result<(T, u8), Error>>>>;
+type Next<T> = Pin<Box<dyn Future<Output = Result<(T, u8), Error>>>>;
 
 pub(crate) trait NextPc<T> {
     fn next_pc(self, memory: Memory) -> Next<T>;
 }
 
 impl NextPc<u8> for Registers {
-    fn next_pc(self, memory: Memory) -> Next<u8>{
+    fn next_pc(self, memory: Memory) -> Next<u8> {
         Box::pin(next(self, memory))
     }
 }
 
 impl NextPc<u16> for Registers {
-    fn next_pc(self, memory: Memory) -> Next<u16>{
+    fn next_pc(self, memory: Memory) -> Next<u16> {
         Box::pin(next_16(self, memory))
     }
 }

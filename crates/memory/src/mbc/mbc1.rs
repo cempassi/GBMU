@@ -185,7 +185,7 @@ mod mbc1_test {
         assert!(mbc.ram_lock);
 
         mbc.set(0x034b, 0x03);
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -194,7 +194,7 @@ mod mbc1_test {
         let mut mbc = Mbc1::new(rom_file);
 
         mbc.set(0x6abc, 4);
-        assert!(mbc.bank_mode);
+        assert!(!mbc.bank_mode);
 
         mbc.set(0x7abc, 3);
         assert!(mbc.bank_mode);
@@ -293,7 +293,7 @@ mod mbc1_test {
         assert_eq!(data, 0xca);
 
         mbc.set(0x01ff, 0x00);
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -311,6 +311,6 @@ mod mbc1_test {
         assert_eq!(mbc.ram_bank, 1);
 
         mbc.set(0x01ff, 0x00);
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 }

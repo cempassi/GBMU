@@ -26,7 +26,7 @@ fn calculate(registers: Registers, data: u8, operation: Operation) -> u8 {
         Operation::RLNOCarry => registers.left_nocarry(data),
         Operation::RRCarry => registers.right_carry(data),
         Operation::RRNoCarry => registers.right_nocarry(data),
-        Operation::SLeft=> registers.shift_left(data),
+        Operation::SLeft => registers.shift_left(data),
         Operation::Swap => registers.swap(data),
         Operation::SRArithmetic => registers.shift_arithmetic(data),
         Operation::SRLogic => registers.shift_logic(data),

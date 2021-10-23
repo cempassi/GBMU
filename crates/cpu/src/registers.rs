@@ -6,8 +6,8 @@ pub(crate) mod futures;
 pub(crate) mod jump;
 pub(crate) mod load;
 pub(crate) mod logical;
-pub(crate) mod shift;
 pub(crate) mod rotation;
+pub(crate) mod shift;
 
 pub use area::{Bits16, Bits8, Flag};
 pub(crate) use arithmetic::Arithmetic;

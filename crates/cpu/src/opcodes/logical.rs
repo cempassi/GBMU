@@ -155,30 +155,46 @@ impl Logic {
             Logic::CmpAE => registers.borrow_mut().compare(Bits8::E),
             Logic::CmpAH => registers.borrow_mut().compare(Bits8::H),
             Logic::CmpAL => registers.borrow_mut().compare(Bits8::L),
-            Logic::AndAHL => Async::CalculHL(Operation::And)
-                .run(registers, memory)
-                .await?,
-            Logic::AndA8b => Async::CalculNext(Operation::And)
-                .run(registers, memory)
-                .await?,
-            Logic::OrAHL => Async::CalculHL(Operation::Or)
-                .run(registers, memory)
-                .await?,
-            Logic::OrA8b => Async::CalculNext(Operation::Or)
-                .run(registers, memory)
-                .await?,
-            Logic::XorAHL => Async::CalculHL(Operation::Xor)
-                .run(registers, memory)
-                .await?,
-            Logic::XorA8b => Async::CalculNext(Operation::Xor)
-                .run(registers, memory)
-                .await?,
-            Logic::CmpAHL => Async::CalculHL(Operation::Compare)
-                .run(registers, memory)
-                .await?,
-            Logic::CmpA8b => Async::CalculHL(Operation::Compare)
-                .run(registers, memory)
-                .await?,
+            Logic::AndAHL => {
+                Async::CalculHL(Operation::And)
+                    .run(registers, memory)
+                    .await?
+            }
+            Logic::AndA8b => {
+                Async::CalculNext(Operation::And)
+                    .run(registers, memory)
+                    .await?
+            }
+            Logic::OrAHL => {
+                Async::CalculHL(Operation::Or)
+                    .run(registers, memory)
+                    .await?
+            }
+            Logic::OrA8b => {
+                Async::CalculNext(Operation::Or)
+                    .run(registers, memory)
+                    .await?
+            }
+            Logic::XorAHL => {
+                Async::CalculHL(Operation::Xor)
+                    .run(registers, memory)
+                    .await?
+            }
+            Logic::XorA8b => {
+                Async::CalculNext(Operation::Xor)
+                    .run(registers, memory)
+                    .await?
+            }
+            Logic::CmpAHL => {
+                Async::CalculHL(Operation::Compare)
+                    .run(registers, memory)
+                    .await?
+            }
+            Logic::CmpA8b => {
+                Async::CalculHL(Operation::Compare)
+                    .run(registers, memory)
+                    .await?
+            }
         };
         Ok(result)
     }

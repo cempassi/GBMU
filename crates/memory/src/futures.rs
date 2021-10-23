@@ -31,12 +31,10 @@ impl Future for Getter<u8> {
 
     fn poll(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
         match self.cycle {
-            Cycle::Finished => {
-                match  self.memory.borrow().get_u8(self.address){
-                    Ok(data) => Poll::Ready(Ok((data, 4))),
-                    Err(err) => Poll::Ready(Err(err)),
-                }
-            }
+            Cycle::Finished => match self.memory.borrow().get_u8(self.address) {
+                Ok(data) => Poll::Ready(Ok((data, 4))),
+                Err(err) => Poll::Ready(Err(err)),
+            },
             Cycle::Cpu(ref mut ticks) => {
                 *ticks += 1;
                 if *ticks == 3 {
@@ -53,12 +51,10 @@ impl Future for Getter<u16> {
 
     fn poll(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
         match self.cycle {
-            Cycle::Finished => {
-                match  self.memory.borrow().get_u16(self.address){
-                    Ok(data) => Poll::Ready(Ok((data, 8))),
-                    Err(err) => Poll::Ready(Err(err)),
-                }
-            }
+            Cycle::Finished => match self.memory.borrow().get_u16(self.address) {
+                Ok(data) => Poll::Ready(Ok((data, 8))),
+                Err(err) => Poll::Ready(Err(err)),
+            },
             Cycle::Cpu(ref mut ticks) => {
                 *ticks += 1;
                 if *ticks == 7 {
@@ -97,7 +93,7 @@ impl Future for Setter<u8> {
             Cycle::Finished => {
                 let address = self.address;
                 let data = self.data;
-                match self.memory.borrow_mut().set_u8(address, data){
+                match self.memory.borrow_mut().set_u8(address, data) {
                     Ok(_) => Poll::Ready(Ok(4)),
                     Err(err) => Poll::Ready(Err(err)),
                 }
@@ -121,7 +117,7 @@ impl Future for Setter<u16> {
             Cycle::Finished => {
                 let address = self.address;
                 let data = self.data;
-                match self.memory.borrow_mut().set_u16(address, data){
+                match self.memory.borrow_mut().set_u16(address, data) {
                     Ok(_) => Poll::Ready(Ok(8)),
                     Err(err) => Poll::Ready(Err(err)),
                 }

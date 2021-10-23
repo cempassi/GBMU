@@ -57,8 +57,8 @@ async fn ret_check(registers: Registers, memory: Memory, flag: Flag) -> Result<u
 async fn ret_not(registers: Registers, memory: Memory, flag: Flag) -> Result<u8, Error> {
     if !registers.borrow().get(flag) {
         Async::Pop(Bits16::PC).run(registers, memory).await
-    }else {
-    Ok(0)
+    } else {
+        Ok(0)
     }
 }
 

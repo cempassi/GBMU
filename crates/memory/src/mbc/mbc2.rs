@@ -137,7 +137,7 @@ mod mbc2_test {
         assert_eq!(data, 0x0b);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x00).unwrap();
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -158,7 +158,7 @@ mod mbc2_test {
         assert!(mbc.ram_lock);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00fb, 0x03).unwrap();
-        assert!(mbc.ram_lock)
+        assert!(!mbc.ram_lock)
     }
 
     #[test]
@@ -202,7 +202,7 @@ mod mbc2_test {
         assert_eq!(data, 0x0a);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x00).unwrap();
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -217,7 +217,7 @@ mod mbc2_test {
         assert_eq!(data, 0x0E);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x00).unwrap();
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -232,6 +232,6 @@ mod mbc2_test {
         assert_eq!(mbc.rom_bank, 13);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x00).unwrap();
-        assert!(mbc.ram_lock);
+        assert!(!mbc.ram_lock);
     }
 }

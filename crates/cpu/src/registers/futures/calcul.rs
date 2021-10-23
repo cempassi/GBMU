@@ -1,5 +1,5 @@
 use super::{GetAt, NextPc};
-use crate::registers::{Bits16, Logical as L, Arithmetic};
+use crate::registers::{Arithmetic, Bits16, Logical as L};
 use crate::Registers;
 use memory::Memory;
 use shared::Error;
@@ -23,9 +23,9 @@ fn calculate(registers: Registers, data: u8, operation: Operation) -> u8 {
         Operation::Xor => registers.xor(data),
         Operation::Compare => registers.compare(data),
         Operation::AddCarry => registers.add(data, true),
-        Operation::SubCarry => registers.add(data, true),
+        Operation::SubCarry => registers.sub(data, true),
         Operation::AddNoCarry => registers.add(data, false),
-        Operation::SubNoCarry => registers.add(data, false),
+        Operation::SubNoCarry => registers.sub(data, false),
     }
 }
 
@@ -34,7 +34,7 @@ pub(crate) async fn hl(
     memory: Memory,
     operation: Operation,
 ) -> Result<u8, Error> {
-    let (data, cycles)  = registers.clone().get_at(memory, Bits16::HL).await?;
+    let (data, cycles) = registers.clone().get_at(memory, Bits16::HL).await?;
     Ok(calculate(registers, data, operation) + cycles)
 }
 
