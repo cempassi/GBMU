@@ -1,5 +1,5 @@
 use crate::cpu::Registers;
-use crate::registers::futures::Async;
+use crate::registers::futures::Set;
 use crate::registers::{Bits16, Bits8, Load as L};
 use memory::Memory;
 use num_enum::TryFromPrimitive;
@@ -231,49 +231,49 @@ impl Load {
             Load::LE => registers.borrow_mut().load(Bits8::L, Bits8::E),
             Load::LH => registers.borrow_mut().load(Bits8::L, Bits8::H),
             Load::LL => registers.borrow_mut().load(Bits8::L, Bits8::L),
-            Load::HLB => Async::SetHL(Bits8::B).run(registers, memory).await?,
-            Load::HLC => Async::SetHL(Bits8::C).run(registers, memory).await?,
-            Load::HLD => Async::SetHL(Bits8::D).run(registers, memory).await?,
-            Load::HLE => Async::SetHL(Bits8::E).run(registers, memory).await?,
-            Load::HLH => Async::SetHL(Bits8::H).run(registers, memory).await?,
-            Load::HLL => Async::SetHL(Bits8::L).run(registers, memory).await?,
-            Load::HLA => Async::SetHL(Bits8::A).run(registers, memory).await?,
-            Load::HLPA => Async::SetIncrease.run(registers, memory).await?,
-            Load::HLMA => Async::SetDecrease.run(registers, memory).await?,
-            Load::AHLP => Async::LoadIncrease.run(registers, memory).await?,
-            Load::AHLM => Async::LoadDecrease.run(registers, memory).await?,
-            Load::HL8b => Async::LoadHL8b.run(registers, memory).await?,
-            Load::B => Async::Load8b(Bits8::B).run(registers, memory).await?,
-            Load::C => Async::Load8b(Bits8::C).run(registers, memory).await?,
-            Load::D => Async::Load8b(Bits8::D).run(registers, memory).await?,
-            Load::E => Async::Load8b(Bits8::E).run(registers, memory).await?,
-            Load::H => Async::Load8b(Bits8::H).run(registers, memory).await?,
-            Load::L => Async::Load8b(Bits8::L).run(registers, memory).await?,
-            Load::A => Async::Load8b(Bits8::A).run(registers, memory).await?,
-            Load::BHL => Async::LoadHL(Bits8::B).run(registers, memory).await?,
-            Load::CHL => Async::LoadHL(Bits8::C).run(registers, memory).await?,
-            Load::DHL => Async::LoadHL(Bits8::D).run(registers, memory).await?,
-            Load::EHL => Async::LoadHL(Bits8::E).run(registers, memory).await?,
-            Load::HHL => Async::LoadHL(Bits8::H).run(registers, memory).await?,
-            Load::LHL => Async::LoadHL(Bits8::L).run(registers, memory).await?,
-            Load::AHL => Async::LoadHL(Bits8::A).run(registers, memory).await?,
+            Load::HLB => Set::HL(Bits8::B).run(registers, memory).await?,
+            Load::HLC => Set::HL(Bits8::C).run(registers, memory).await?,
+            Load::HLD => Set::HL(Bits8::D).run(registers, memory).await?,
+            Load::HLE => Set::HL(Bits8::E).run(registers, memory).await?,
+            Load::HLH => Set::HL(Bits8::H).run(registers, memory).await?,
+            Load::HLL => Set::HL(Bits8::L).run(registers, memory).await?,
+            Load::HLA => Set::HL(Bits8::A).run(registers, memory).await?,
+            Load::HLPA => Set::Increase.run(registers, memory).await?,
+            Load::HLMA => Set::Decrease.run(registers, memory).await?,
+            Load::AHLP => Set::LoadIncrease.run(registers, memory).await?,
+            Load::AHLM => Set::LoadDecrease.run(registers, memory).await?,
+            Load::HL8b => Set::LoadHL8b.run(registers, memory).await?,
+            Load::B => Set::Load8b(Bits8::B).run(registers, memory).await?,
+            Load::C => Set::Load8b(Bits8::C).run(registers, memory).await?,
+            Load::D => Set::Load8b(Bits8::D).run(registers, memory).await?,
+            Load::E => Set::Load8b(Bits8::E).run(registers, memory).await?,
+            Load::H => Set::Load8b(Bits8::H).run(registers, memory).await?,
+            Load::L => Set::Load8b(Bits8::L).run(registers, memory).await?,
+            Load::A => Set::Load8b(Bits8::A).run(registers, memory).await?,
+            Load::BHL => Set::LoadHL(Bits8::B).run(registers, memory).await?,
+            Load::CHL => Set::LoadHL(Bits8::C).run(registers, memory).await?,
+            Load::DHL => Set::LoadHL(Bits8::D).run(registers, memory).await?,
+            Load::EHL => Set::LoadHL(Bits8::E).run(registers, memory).await?,
+            Load::HHL => Set::LoadHL(Bits8::H).run(registers, memory).await?,
+            Load::LHL => Set::LoadHL(Bits8::L).run(registers, memory).await?,
+            Load::AHL => Set::LoadHL(Bits8::A).run(registers, memory).await?,
             Load::BCA => {
-                Async::SetRegisterAt(Bits16::BC, Bits8::A)
+                Set::RegisterAt(Bits16::BC, Bits8::A)
                     .run(registers, memory)
                     .await?
             }
             Load::DEA => {
-                Async::SetRegisterAt(Bits16::DE, Bits8::A)
+                Set::RegisterAt(Bits16::DE, Bits8::A)
                     .run(registers, memory)
                     .await?
             }
             Load::ABC => {
-                Async::LoadRegisterFrom(Bits8::A, Bits16::DE)
+                Set::LoadRegisterFrom(Bits8::A, Bits16::DE)
                     .run(registers, memory)
                     .await?
             }
             Load::ADE => {
-                Async::LoadRegisterFrom(Bits8::A, Bits16::DE)
+                Set::LoadRegisterFrom(Bits8::A, Bits16::DE)
                     .run(registers, memory)
                     .await?
             }

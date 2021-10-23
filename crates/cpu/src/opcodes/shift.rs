@@ -1,6 +1,6 @@
 use crate::cpu::Registers;
 use crate::registers::{
-    futures::{Async, CbOperation as Operation},
+    futures::{CbOperation as Operation, Set},
     Bits8, Shift as S,
 };
 use memory::Memory;
@@ -86,7 +86,7 @@ impl Shift {
             Shift::LH => registers.borrow_mut().shift_left(Bits8::H),
             Shift::LL => registers.borrow_mut().shift_left(Bits8::L),
             Shift::LA => registers.borrow_mut().shift_left(Bits8::A),
-            Shift::LHL => Async::CbHL(Operation::SLeft).run(registers, memory).await?,
+            Shift::LHL => Set::CbHL(Operation::SLeft).run(registers, memory).await?,
             Shift::SB => registers.borrow_mut().swap(Bits8::B),
             Shift::SC => registers.borrow_mut().swap(Bits8::C),
             Shift::SD => registers.borrow_mut().swap(Bits8::D),
@@ -94,7 +94,7 @@ impl Shift {
             Shift::SH => registers.borrow_mut().swap(Bits8::H),
             Shift::SL => registers.borrow_mut().swap(Bits8::L),
             Shift::SA => registers.borrow_mut().swap(Bits8::A),
-            Shift::SHL => Async::CbHL(Operation::Swap).run(registers, memory).await?,
+            Shift::SHL => Set::CbHL(Operation::Swap).run(registers, memory).await?,
             Shift::RAB => registers.borrow_mut().shift_arithmetic(Bits8::B),
             Shift::RAC => registers.borrow_mut().shift_arithmetic(Bits8::C),
             Shift::RAD => registers.borrow_mut().shift_arithmetic(Bits8::D),
@@ -103,7 +103,7 @@ impl Shift {
             Shift::RAL => registers.borrow_mut().shift_arithmetic(Bits8::L),
             Shift::RAA => registers.borrow_mut().shift_arithmetic(Bits8::A),
             Shift::RAHL => {
-                Async::CbHL(Operation::SRArithmetic)
+                Set::CbHL(Operation::SRArithmetic)
                     .run(registers, memory)
                     .await?
             }
@@ -114,11 +114,7 @@ impl Shift {
             Shift::RLH => registers.borrow_mut().shift_logic(Bits8::H),
             Shift::RLL => registers.borrow_mut().shift_logic(Bits8::L),
             Shift::RLA => registers.borrow_mut().shift_logic(Bits8::A),
-            Shift::RLHL => {
-                Async::CbHL(Operation::SRLogic)
-                    .run(registers, memory)
-                    .await?
-            }
+            Shift::RLHL => Set::CbHL(Operation::SRLogic).run(registers, memory).await?,
         };
         Ok(cycles)
     }

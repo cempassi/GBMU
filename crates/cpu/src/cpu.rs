@@ -8,7 +8,7 @@ use crate::opcodes::Rotate;
 use crate::opcodes::Shift;
 use shared::Error;
 
-use crate::registers::futures::NextPc;
+use crate::registers::futures::{AsyncGet, Get};
 use memory::Memory;
 use num_enum::TryFromPrimitive;
 
@@ -35,7 +35,9 @@ impl Cpu {
     }
 
     async fn prefix_cb(self) -> Result<u8, Error> {
-        let (opcode, cycles) = self.registers.clone().next_pc(self.memory.clone()).await?;
+        let (opcode, cycles) = Get::Next
+            .get(self.registers.clone(), self.memory.clone())
+            .await?;
 
         if let Ok(operation) = Rotate::try_from_primitive(opcode) {
             Ok(operation.exec(self.registers, self.memory).await? + cycles)
@@ -52,7 +54,9 @@ impl Cpu {
     /// 4 - Exec Instructions -> Do the Maths put in Dest and set Flags
     pub async fn run(self) -> Result<u8, Error> {
         println!("Next Cpu Execution, fetching Opcode...!");
-        let (opcode, cycles) = self.registers.clone().next_pc(self.memory.clone()).await?;
+        let (opcode, cycles) = Get::Next
+            .get(self.registers.clone(), self.memory.clone())
+            .await?;
 
         if opcode == 0xCB {
             Ok(self.prefix_cb().await? + cycles)

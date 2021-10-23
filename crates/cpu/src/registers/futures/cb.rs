@@ -1,4 +1,4 @@
-use super::{GetAt, SetAt};
+use super::{AsyncGet, Get, Set};
 use crate::registers::{Bits16, Rotation, Shift};
 use crate::Registers;
 use memory::Memory;
@@ -38,7 +38,12 @@ pub(crate) async fn hl(
     memory: Memory,
     operation: Operation,
 ) -> Result<u8, Error> {
-    let (data, cycles) = registers.clone().get_at(memory.clone(), Bits16::HL).await?;
+    let (data, cycles) = Get::BitsAt(Bits16::HL)
+        .get(registers.clone(), memory.clone())
+        .await?;
     let data = calculate(registers.clone(), data, operation);
-    Ok(registers.set_at(memory, Bits16::HL, data).await? + cycles)
+    Ok(Set::Bits8At(Bits16::HL, data)
+        .run(registers, memory)
+        .await?
+        + cycles)
 }

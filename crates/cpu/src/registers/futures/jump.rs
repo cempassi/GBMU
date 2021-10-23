@@ -1,4 +1,4 @@
-use super::{Async, NextPc};
+use super::{AsyncGet, Get, Set};
 use crate::registers::{Absolute, Bits16, Bus, Flag, Relative};
 use crate::Registers;
 use memory::Memory;
@@ -43,12 +43,12 @@ impl Jump {
 }
 
 async fn ret(registers: Registers, memory: Memory) -> Result<u8, Error> {
-    Async::Pop(Bits16::PC).run(registers, memory).await
+    Set::Pop(Bits16::PC).run(registers, memory).await
 }
 
 async fn ret_check(registers: Registers, memory: Memory, flag: Flag) -> Result<u8, Error> {
     if registers.borrow().get(flag) {
-        Async::Pop(Bits16::PC).run(registers, memory).await
+        Set::Pop(Bits16::PC).run(registers, memory).await
     } else {
         Ok(0)
     }
@@ -56,75 +56,69 @@ async fn ret_check(registers: Registers, memory: Memory, flag: Flag) -> Result<u
 
 async fn ret_not(registers: Registers, memory: Memory, flag: Flag) -> Result<u8, Error> {
     if !registers.borrow().get(flag) {
-        Async::Pop(Bits16::PC).run(registers, memory).await
+        Set::Pop(Bits16::PC).run(registers, memory).await
     } else {
         Ok(0)
     }
 }
 
 async fn call(registers: Registers, memory: Memory) -> Result<u8, Error> {
-    let (address, mut cycles): (u16, u8) = registers.clone().next_pc(memory.clone()).await?;
-    cycles += Async::Push(Bits16::PC)
-        .run(registers.clone(), memory)
-        .await?;
+    let (address, mut cycles): (u16, u8) = Get::Next.get(registers.clone(), memory.clone()).await?;
+    cycles += Set::Push(Bits16::PC).run(registers.clone(), memory).await?;
     registers.borrow_mut().set(Bits16::PC, address);
     Ok(cycles)
 }
 
 async fn call_check(registers: Registers, memory: Memory, flag: Flag) -> Result<u8, Error> {
-    let (address, mut cycles): (u16, u8) = registers.clone().next_pc(memory.clone()).await?;
+    let (address, mut cycles): (u16, u8) = Get::Next.get(registers.clone(), memory.clone()).await?;
     if registers.borrow().get(flag) {
-        cycles += Async::Push(Bits16::PC)
-            .run(registers.clone(), memory)
-            .await?;
+        cycles += Set::Push(Bits16::PC).run(registers.clone(), memory).await?;
         registers.borrow_mut().set(Bits16::PC, address);
     }
     Ok(cycles)
 }
 
 async fn call_not(registers: Registers, memory: Memory, flag: Flag) -> Result<u8, Error> {
-    let (address, mut cycles): (u16, u8) = registers.clone().next_pc(memory.clone()).await?;
+    let (address, mut cycles): (u16, u8) = Get::Next.get(registers.clone(), memory.clone()).await?;
     if !registers.borrow().get(flag) {
-        cycles += Async::Push(Bits16::PC)
-            .run(registers.clone(), memory)
-            .await?;
+        cycles += Set::Push(Bits16::PC).run(registers.clone(), memory).await?;
         registers.borrow_mut().set(Bits16::PC, address);
     }
     Ok(cycles)
 }
 
 async fn absolute(registers: Registers, memory: Memory) -> Result<u8, Error> {
-    let (address, cycles): (u16, u8) = registers.clone().next_pc(memory.clone()).await?;
+    let (address, cycles): (u16, u8) = Get::Next.get(registers.clone(), memory).await?;
     registers.borrow_mut().absolute(address);
     Ok(cycles)
 }
 
 async fn relative(registers: Registers, memory: Memory) -> Result<u8, Error> {
-    let (offset, cycles): (u8, u8) = registers.clone().next_pc(memory.clone()).await?;
+    let (offset, cycles): (u8, u8) = Get::Next.get(registers.clone(), memory).await?;
     registers.borrow_mut().relative(offset as i8);
     Ok(cycles)
 }
 
 async fn abs_check(registers: Registers, memory: Memory, flag: Flag) -> Result<u8, Error> {
-    let (address, cycles): (u16, u8) = registers.clone().next_pc(memory.clone()).await?;
+    let (address, cycles): (u16, u8) = Get::Next.get(registers.clone(), memory).await?;
     registers.borrow_mut().absolute_check(address, flag);
     Ok(cycles)
 }
 
 async fn abs_not(registers: Registers, memory: Memory, flag: Flag) -> Result<u8, Error> {
-    let (address, cycles): (u16, u8) = registers.clone().next_pc(memory.clone()).await?;
+    let (address, cycles): (u16, u8) = Get::Next.get(registers.clone(), memory).await?;
     registers.borrow_mut().absolute_check(address, flag);
     Ok(cycles)
 }
 
 async fn rel_check(registers: Registers, memory: Memory, flag: Flag) -> Result<u8, Error> {
-    let (offset, cycles): (u8, u8) = registers.clone().next_pc(memory.clone()).await?;
+    let (offset, cycles): (u8, u8) = Get::Next.get(registers.clone(), memory).await?;
     registers.borrow_mut().relative_check(offset as i8, flag);
     Ok(cycles)
 }
 
 async fn rel_not(registers: Registers, memory: Memory, flag: Flag) -> Result<u8, Error> {
-    let (offset, cycles): (u8, u8) = registers.clone().next_pc(memory.clone()).await?;
+    let (offset, cycles): (u8, u8) = Get::Next.get(registers.clone(), memory).await?;
     registers.borrow_mut().relative_check(offset as i8, flag);
     Ok(cycles)
 }

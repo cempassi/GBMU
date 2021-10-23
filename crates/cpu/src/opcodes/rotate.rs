@@ -1,6 +1,6 @@
 use crate::{
     registers::{
-        futures::{Async, CbOperation},
+        futures::{CbOperation, Set},
         Bits8, Rotation,
     },
     Registers,
@@ -126,22 +126,22 @@ impl Rotate {
             Rotate::RCH => registers.borrow_mut().right_nocarry(Bits8::H),
             Rotate::RCL => registers.borrow_mut().right_nocarry(Bits8::L),
             Rotate::LHL => {
-                Async::CbHL(CbOperation::RLCarry)
+                Set::CbHL(CbOperation::RLCarry)
                     .run(registers, memory)
                     .await?
             }
             Rotate::LCHL => {
-                Async::CbHL(CbOperation::RLNOCarry)
+                Set::CbHL(CbOperation::RLNOCarry)
                     .run(registers, memory)
                     .await?
             }
             Rotate::RHL => {
-                Async::CbHL(CbOperation::RRCarry)
+                Set::CbHL(CbOperation::RRCarry)
                     .run(registers, memory)
                     .await?
             }
             Rotate::RCHL => {
-                Async::CbHL(CbOperation::RRNoCarry)
+                Set::CbHL(CbOperation::RRNoCarry)
                     .run(registers, memory)
                     .await?
             }
