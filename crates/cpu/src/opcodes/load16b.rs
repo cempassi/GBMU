@@ -3,6 +3,7 @@ use crate::registers::Bits16;
 use crate::Registers;
 use memory::Memory;
 use num_enum::TryFromPrimitive;
+use shared::Error;
 
 ///1. LD n,nn
 /// Description:
@@ -62,7 +63,7 @@ pub enum Load16b {
 }
 
 impl Load16b {
-    pub async fn exec(self, registers: Registers, memory: Memory) {
+    pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
         match self {
             Load16b::PushAF => Async::Push(Bits16::AF).run(registers, memory),
             Load16b::PushBC => Async::Push(Bits16::BC).run(registers, memory),
@@ -79,7 +80,6 @@ impl Load16b {
             Load16b::A16SP => Async::SetData(Bits16::SP).run(registers, memory),
         }
         .await
-        .unwrap()
     }
 }
 
@@ -98,7 +98,7 @@ mod test_load_register_u16 {
         let instruction = Load16b::BC;
         register.borrow_mut().set(Bits16::PC, 0xc000);
         memory.borrow_mut().set_u16(0xc000, 0x4242).unwrap();
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
         assert_eq!(register.borrow().get(Bits16::BC), 0x4242);
     }
 
@@ -124,7 +124,7 @@ mod test_load_register_u16 {
         let instruction = Load16b::PopHL;
         register.borrow_mut().set(Bits16::SP, 0xc000);
         memory.borrow_mut().set_u16(0xc000, 0x4242).unwrap();
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
         assert_eq!(register.borrow().get(Bits16::HL), 0x4242);
         assert_eq!(register.borrow().get(Bits16::SP), 0xc000 + 2);
     }

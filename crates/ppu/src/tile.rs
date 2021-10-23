@@ -49,15 +49,15 @@ mod test_tiles {
             0x00, 0x00,
         ]);
         let map = Pixels::from(tile);
-        let mut dest = Vec::new();
-        dest.push(vec![0, 3, 3, 3, 3, 3, 0, 0]);
-        dest.push(vec![2, 2, 0, 0, 0, 2, 2, 0]);
-        dest.push(vec![1, 1, 0, 0, 0, 1, 1, 0]);
-        dest.push(vec![2, 2, 2, 2, 2, 2, 2, 0]);
-        dest.push(vec![3, 3, 0, 0, 0, 3, 3, 0]);
-        dest.push(vec![2, 2, 0, 0, 0, 2, 2, 0]);
-        dest.push(vec![1, 1, 0, 0, 0, 1, 1, 0]);
-        dest.push(vec![0, 0, 0, 0, 0, 0, 0, 0]);
+        let line1 = vec![0, 3, 3, 3, 3, 3, 0, 0];
+        let line2 = vec![2, 2, 0, 0, 0, 2, 2, 0];
+        let line3 = vec![1, 1, 0, 0, 0, 1, 1, 0];
+        let line4 = vec![2, 2, 2, 2, 2, 2, 2, 0];
+        let line5 = vec![3, 3, 0, 0, 0, 3, 3, 0];
+        let line6 = vec![2, 2, 0, 0, 0, 2, 2, 0];
+        let line7 = vec![1, 1, 0, 0, 0, 1, 1, 0];
+        let line8 = vec![0, 0, 0, 0, 0, 0, 0, 0];
+        let dest = vec![line1, line2, line3, line4, line5, line6, line7, line8];
         assert_eq!(map, dest);
     }
 }

@@ -1,8 +1,9 @@
 use crate::cpu::Registers;
-use crate::registers::futures::{Async, Logical};
+use crate::registers::futures::{Async, Operation};
 use crate::registers::{Bits8, Logical as L};
 use memory::Memory;
 use num_enum::TryFromPrimitive;
+use shared::Error;
 
 /// AND n
 /// Description:
@@ -124,8 +125,8 @@ pub enum Logic {
 }
 
 impl Logic {
-    pub async fn exec(self, registers: Registers, memory: Memory) {
-        match self {
+    pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
+        let cycles = match self {
             Logic::AndAA => registers.borrow_mut().and(Bits8::A),
             Logic::AndAB => registers.borrow_mut().and(Bits8::B),
             Logic::AndAC => registers.borrow_mut().and(Bits8::C),
@@ -154,39 +155,48 @@ impl Logic {
             Logic::CmpAE => registers.borrow_mut().compare(Bits8::E),
             Logic::CmpAH => registers.borrow_mut().compare(Bits8::H),
             Logic::CmpAL => registers.borrow_mut().compare(Bits8::L),
-            Logic::AndAHL => Async::CalculHL(Logical::And)
-                .run(registers, memory)
-                .await
-                .unwrap(),
-            Logic::AndA8b => Async::CalculNext(Logical::And)
-                .run(registers, memory)
-                .await
-                .unwrap(),
-            Logic::OrAHL => Async::CalculHL(Logical::Or)
-                .run(registers, memory)
-                .await
-                .unwrap(),
-            Logic::OrA8b => Async::CalculNext(Logical::Or)
-                .run(registers, memory)
-                .await
-                .unwrap(),
-            Logic::XorAHL => Async::CalculHL(Logical::Xor)
-                .run(registers, memory)
-                .await
-                .unwrap(),
-            Logic::XorA8b => Async::CalculNext(Logical::Xor)
-                .run(registers, memory)
-                .await
-                .unwrap(),
-            Logic::CmpAHL => Async::CalculHL(Logical::Compare)
-                .run(registers, memory)
-                .await
-                .unwrap(),
-            Logic::CmpA8b => Async::CalculHL(Logical::Compare)
-                .run(registers, memory)
-                .await
-                .unwrap(),
-        }
+            Logic::AndAHL => {
+                Async::CalculHL(Operation::And)
+                    .run(registers, memory)
+                    .await?
+            }
+            Logic::AndA8b => {
+                Async::CalculNext(Operation::And)
+                    .run(registers, memory)
+                    .await?
+            }
+            Logic::OrAHL => {
+                Async::CalculHL(Operation::Or)
+                    .run(registers, memory)
+                    .await?
+            }
+            Logic::OrA8b => {
+                Async::CalculNext(Operation::Or)
+                    .run(registers, memory)
+                    .await?
+            }
+            Logic::XorAHL => {
+                Async::CalculHL(Operation::Xor)
+                    .run(registers, memory)
+                    .await?
+            }
+            Logic::XorA8b => {
+                Async::CalculNext(Operation::Xor)
+                    .run(registers, memory)
+                    .await?
+            }
+            Logic::CmpAHL => {
+                Async::CalculHL(Operation::Compare)
+                    .run(registers, memory)
+                    .await?
+            }
+            Logic::CmpA8b => {
+                Async::CalculHL(Operation::Compare)
+                    .run(registers, memory)
+                    .await?
+            }
+        };
+        Ok(cycles)
     }
 }
 
@@ -205,10 +215,10 @@ mod test_logic_opcodes {
         register.borrow_mut().set(Bits8::A, 0x4f);
         register.borrow_mut().set(Bits8::E, 0x0f);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0x0f);
-        assert_eq!(register.borrow().get(Flag::H), true);
+        assert!(register.borrow().get(Flag::H));
     }
 
     #[test]
@@ -217,10 +227,10 @@ mod test_logic_opcodes {
         let memory = Memory::default();
         let instruction = Logic::AndA8b;
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0x00);
-        assert_eq!(register.borrow().get(Flag::H), true);
+        assert!(register.borrow().get(Flag::H));
     }
 
     #[test]
@@ -231,7 +241,7 @@ mod test_logic_opcodes {
         register.borrow_mut().set(Bits8::A, 0x4A);
         register.borrow_mut().set(Bits8::B, 0xF2);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0xFA);
     }
@@ -246,7 +256,7 @@ mod test_logic_opcodes {
         register.borrow_mut().set(Bits16::PC, 0xc000);
         memory.borrow_mut().set_u8(0xc000, 0xF2).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0xFA);
     }
@@ -259,7 +269,7 @@ mod test_logic_opcodes {
         register.borrow_mut().set(Bits8::A, 0x4A);
         register.borrow_mut().set(Bits8::D, 0xF2);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0xB8);
     }
@@ -274,7 +284,7 @@ mod test_logic_opcodes {
         register.borrow_mut().set(Bits16::HL, 0xc000);
         memory.borrow_mut().set_u8(0xc000, 0xF2).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0xB8);
     }
@@ -287,7 +297,7 @@ mod test_logic_opcodes {
         register.borrow_mut().set(Bits8::A, 0x4A);
         register.borrow_mut().set(Bits8::L, 0xF2);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0x4A);
     }
@@ -302,7 +312,7 @@ mod test_logic_opcodes {
         register.borrow_mut().set(Bits16::HL, 0xc000);
         memory.borrow_mut().set_u8(0xc000, 0xF2).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0x4A);
     }

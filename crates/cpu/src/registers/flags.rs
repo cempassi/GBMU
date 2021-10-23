@@ -48,6 +48,6 @@ mod test_flags {
 
         flags.set(Flag::Z, true);
         let value = flags.get(Flag::Z);
-        assert_eq!(value, true);
+        assert!(value);
     }
 }

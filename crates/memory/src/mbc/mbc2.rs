@@ -129,18 +129,15 @@ mod mbc2_test {
         let mut mbc = Mbc2::new(rom_file);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x0a).unwrap();
-        assert_eq!(mbc.ram_lock, true);
+        assert!(mbc.ram_lock);
 
-        assert_eq!(
-            <Mbc2 as MbcBus>::set(&mut mbc, 0x0000a0e0, 0xeb).unwrap(),
-            ()
-        );
+        <Mbc2 as MbcBus>::set(&mut mbc, 0x0000a0e0, 0xeb).unwrap();
 
         let data = mbc.get(0x0000a0e0);
         assert_eq!(data, 0x0b);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x00).unwrap();
-        assert_eq!(mbc.ram_lock, false);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -149,7 +146,7 @@ mod mbc2_test {
         let mut mbc = Mbc2::new(rom_file);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x0a).unwrap();
-        assert_eq!(mbc.ram_lock, true);
+        assert!(mbc.ram_lock);
     }
 
     #[test]
@@ -158,10 +155,10 @@ mod mbc2_test {
         let mut mbc = Mbc2::new(rom_file);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x0a).unwrap();
-        assert_eq!(mbc.ram_lock, true);
+        assert!(mbc.ram_lock);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00fb, 0x03).unwrap();
-        assert_eq!(mbc.ram_lock, false)
+        assert!(!mbc.ram_lock)
     }
 
     #[test]
@@ -197,7 +194,7 @@ mod mbc2_test {
         let mut mbc = Mbc2::new(rom_file);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00f5, 0x0a).unwrap();
-        assert_eq!(mbc.ram_lock, true);
+        assert!(mbc.ram_lock);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x0000a130, 0xca).unwrap();
 
@@ -205,7 +202,7 @@ mod mbc2_test {
         assert_eq!(data, 0x0a);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x00).unwrap();
-        assert_eq!(mbc.ram_lock, false);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -214,13 +211,13 @@ mod mbc2_test {
         let mut mbc = Mbc2::new(rom_file);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00f5, 0x0a).unwrap();
-        assert_eq!(mbc.ram_lock, true);
+        assert!(mbc.ram_lock);
 
         let data = mbc.get(0x0000a630);
         assert_eq!(data, 0x0E);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x00).unwrap();
-        assert_eq!(mbc.ram_lock, false);
+        assert!(!mbc.ram_lock);
     }
 
     #[test]
@@ -229,12 +226,12 @@ mod mbc2_test {
         let mut mbc = Mbc2::new(rom_file);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00f5, 0x0a).unwrap();
-        assert_eq!(mbc.ram_lock, true);
+        assert!(mbc.ram_lock);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x1f4b, 0x0d).unwrap();
         assert_eq!(mbc.rom_bank, 13);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x00).unwrap();
-        assert_eq!(mbc.ram_lock, false);
+        assert!(!mbc.ram_lock);
     }
 }

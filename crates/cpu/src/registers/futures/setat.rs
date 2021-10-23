@@ -5,7 +5,7 @@ use shared::Error;
 use std::future::Future;
 use std::pin::Pin;
 
-type Setter = Pin<Box<dyn Future<Output = Result<(), Error>>>>;
+type Setter = Pin<Box<dyn Future<Output = Result<u8, Error>>>>;
 
 pub(crate) trait SetAt<T> {
     fn set_at(self, memory: Memory, area: Bits16, data: T) -> Setter;

@@ -186,8 +186,8 @@ pub enum Load {
 }
 
 impl Load {
-    pub async fn exec(self, registers: Registers, memory: Memory) -> Result<(), Error> {
-        match self {
+    pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
+        let cycles = match self {
             Load::AA => registers.borrow_mut().load(Bits8::A, Bits8::A),
             Load::AB => registers.borrow_mut().load(Bits8::A, Bits8::B),
             Load::AC => registers.borrow_mut().load(Bits8::A, Bits8::C),
@@ -278,7 +278,7 @@ impl Load {
                     .await?
             }
         };
-        Ok(())
+        Ok(cycles)
     }
 }
 
@@ -295,7 +295,7 @@ mod test_instruction_load_reg_reg {
         let register = Registers::default();
         let memory = Memory::default();
         let instruction = Load::HL;
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
         assert_eq!(
             register.borrow().get(Bits8::H),
             register.borrow().get(Bits8::L)
@@ -324,7 +324,7 @@ mod test_instruction_load_reg_reg {
         let ldr8b = Load::B;
         let byte = memory.borrow().get_u8(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
-        let future = ldr8b.exec(register.clone(), memory.clone());
+        let future = ldr8b.exec(register.clone(), memory);
         executor::execute(Box::pin(future));
         assert_eq!(byte, register.borrow().get(Bits8::B));
     }
