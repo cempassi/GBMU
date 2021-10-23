@@ -1,4 +1,4 @@
-use crate::registers::futures::Async;
+use crate::registers::futures::Set;
 use crate::registers::Bits16;
 use crate::Registers;
 use memory::Memory;
@@ -65,19 +65,19 @@ pub enum Load16b {
 impl Load16b {
     pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
         match self {
-            Load16b::PushAF => Async::Push(Bits16::AF).run(registers, memory),
-            Load16b::PushBC => Async::Push(Bits16::BC).run(registers, memory),
-            Load16b::PushDE => Async::Push(Bits16::DE).run(registers, memory),
-            Load16b::PushHL => Async::Push(Bits16::HL).run(registers, memory),
-            Load16b::PopAF => Async::Pop(Bits16::AF).run(registers, memory),
-            Load16b::PopBC => Async::Pop(Bits16::BC).run(registers, memory),
-            Load16b::PopDE => Async::Pop(Bits16::DE).run(registers, memory),
-            Load16b::PopHL => Async::Pop(Bits16::HL).run(registers, memory),
-            Load16b::BC => Async::Load16b(Bits16::BC).run(registers, memory),
-            Load16b::DE => Async::Load16b(Bits16::DE).run(registers, memory),
-            Load16b::HL => Async::Load16b(Bits16::HL).run(registers, memory),
-            Load16b::SP => Async::Load16b(Bits16::SP).run(registers, memory),
-            Load16b::A16SP => Async::SetData(Bits16::SP).run(registers, memory),
+            Load16b::PushAF => Set::Push(Bits16::AF).run(registers, memory),
+            Load16b::PushBC => Set::Push(Bits16::BC).run(registers, memory),
+            Load16b::PushDE => Set::Push(Bits16::DE).run(registers, memory),
+            Load16b::PushHL => Set::Push(Bits16::HL).run(registers, memory),
+            Load16b::PopAF => Set::Pop(Bits16::AF).run(registers, memory),
+            Load16b::PopBC => Set::Pop(Bits16::BC).run(registers, memory),
+            Load16b::PopDE => Set::Pop(Bits16::DE).run(registers, memory),
+            Load16b::PopHL => Set::Pop(Bits16::HL).run(registers, memory),
+            Load16b::BC => Set::Load16b(Bits16::BC).run(registers, memory),
+            Load16b::DE => Set::Load16b(Bits16::DE).run(registers, memory),
+            Load16b::HL => Set::Load16b(Bits16::HL).run(registers, memory),
+            Load16b::SP => Set::Load16b(Bits16::SP).run(registers, memory),
+            Load16b::A16SP => Set::Data(Bits16::SP).run(registers, memory),
         }
         .await
     }

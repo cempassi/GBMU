@@ -1,4 +1,4 @@
-use super::{GetAt, NextPc};
+use super::{AsyncGet, Get};
 use crate::registers::{Arithmetic, Bits16, Logical as L};
 use crate::Registers;
 use memory::Memory;
@@ -34,7 +34,9 @@ pub(crate) async fn hl(
     memory: Memory,
     operation: Operation,
 ) -> Result<u8, Error> {
-    let (data, cycles) = registers.clone().get_at(memory, Bits16::HL).await?;
+    let (data, cycles) = Get::BitsAt(Bits16::HL)
+        .get(registers.clone(), memory)
+        .await?;
     Ok(calculate(registers, data, operation) + cycles)
 }
 
@@ -43,6 +45,6 @@ pub(crate) async fn next(
     memory: Memory,
     operation: Operation,
 ) -> Result<u8, Error> {
-    let (data, cycles) = registers.clone().next_pc(memory).await.unwrap();
+    let (data, cycles) = Get::Next.get(registers.clone(), memory).await?;
     Ok(calculate(registers, data, operation) + cycles)
 }

@@ -1,6 +1,6 @@
 use crate::cpu::Registers;
 use crate::registers::{
-    futures::{Async, Operation},
+    futures::{Operation, Set},
     Arithmetic as A, Bits8,
 };
 use memory::Memory;
@@ -111,22 +111,22 @@ impl Arithmetic {
             Arithmetic::AAcH => registers.borrow_mut().add(Bits8::H, true),
             Arithmetic::AAcL => registers.borrow_mut().add(Bits8::L, true),
             Arithmetic::AAc8b => {
-                Async::CalculNext(Operation::AddCarry)
+                Set::CalculNext(Operation::AddCarry)
                     .run(registers, memory)
                     .await?
             }
             Arithmetic::AA8b => {
-                Async::CalculNext(Operation::AddNoCarry)
+                Set::CalculNext(Operation::AddNoCarry)
                     .run(registers, memory)
                     .await?
             }
             Arithmetic::AAHL => {
-                Async::CalculHL(Operation::AddNoCarry)
+                Set::CalculHL(Operation::AddNoCarry)
                     .run(registers, memory)
                     .await?
             }
             Arithmetic::AAcHL => {
-                Async::CalculHL(Operation::AddCarry)
+                Set::CalculHL(Operation::AddCarry)
                     .run(registers, memory)
                     .await?
             }
@@ -145,22 +145,22 @@ impl Arithmetic {
             Arithmetic::SAcL => registers.borrow_mut().sub(Bits8::L, true),
             Arithmetic::SAcA => registers.borrow_mut().sub(Bits8::A, true),
             Arithmetic::SAHL => {
-                Async::CalculHL(Operation::SubNoCarry)
+                Set::CalculHL(Operation::SubNoCarry)
                     .run(registers, memory)
                     .await?
             }
             Arithmetic::SAcHL => {
-                Async::CalculHL(Operation::SubCarry)
+                Set::CalculHL(Operation::SubCarry)
                     .run(registers, memory)
                     .await?
             }
             Arithmetic::SA8b => {
-                Async::CalculNext(Operation::SubNoCarry)
+                Set::CalculNext(Operation::SubNoCarry)
                     .run(registers, memory)
                     .await?
             }
             Arithmetic::SAc8b => {
-                Async::CalculNext(Operation::SubCarry)
+                Set::CalculNext(Operation::SubCarry)
                     .run(registers, memory)
                     .await?
             }
