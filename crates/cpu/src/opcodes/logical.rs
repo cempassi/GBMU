@@ -126,7 +126,7 @@ pub enum Logic {
 
 impl Logic {
     pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
-        let result = match self {
+        let cycles = match self {
             Logic::AndAA => registers.borrow_mut().and(Bits8::A),
             Logic::AndAB => registers.borrow_mut().and(Bits8::B),
             Logic::AndAC => registers.borrow_mut().and(Bits8::C),
@@ -196,7 +196,7 @@ impl Logic {
                     .await?
             }
         };
-        Ok(result)
+        Ok(cycles)
     }
 }
 

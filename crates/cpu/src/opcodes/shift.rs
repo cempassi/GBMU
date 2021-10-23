@@ -78,7 +78,7 @@ pub enum Shift {
 
 impl Shift {
     pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
-        let result = match self {
+        let cycles = match self {
             Shift::LB => registers.borrow_mut().shift_left(Bits8::B),
             Shift::LC => registers.borrow_mut().shift_left(Bits8::C),
             Shift::LD => registers.borrow_mut().shift_left(Bits8::D),
@@ -120,7 +120,7 @@ impl Shift {
                     .await?
             }
         };
-        Ok(result)
+        Ok(cycles)
     }
 }
 

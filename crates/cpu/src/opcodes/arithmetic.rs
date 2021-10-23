@@ -95,7 +95,7 @@ pub enum Arithmetic {
 
 impl Arithmetic {
     pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
-        let result = match self {
+        let cycles = match self {
             Arithmetic::AAA => registers.borrow_mut().add(Bits8::A, false),
             Arithmetic::AAB => registers.borrow_mut().add(Bits8::B, false),
             Arithmetic::AAC => registers.borrow_mut().add(Bits8::C, false),
@@ -165,7 +165,7 @@ impl Arithmetic {
                     .await?
             }
         };
-        Ok(result)
+        Ok(cycles)
     }
 }
 

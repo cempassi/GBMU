@@ -96,7 +96,7 @@ pub enum Rotate {
 
 impl Rotate {
     pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
-        let result = match self {
+        let cycles = match self {
             Rotate::LA => registers.borrow_mut().left_carry(Bits8::A),
             Rotate::LB => registers.borrow_mut().left_carry(Bits8::B),
             Rotate::LC => registers.borrow_mut().left_carry(Bits8::C),
@@ -146,7 +146,7 @@ impl Rotate {
                     .await?
             }
         };
-        Ok(result)
+        Ok(cycles)
     }
 }
 

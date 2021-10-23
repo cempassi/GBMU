@@ -74,7 +74,7 @@ pub enum Jump {
 
 impl Jump {
     pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
-        let result = match self {
+        let cycles = match self {
             Jump::HL => registers.borrow_mut().absolute(Bits16::HL),
             Jump::Call => Async::Call.jump(registers, memory).await?,
             Jump::CallZ => Async::CallCheck(Flag::Z).jump(registers, memory).await?,
@@ -113,7 +113,7 @@ impl Jump {
                     .await?
             }
         };
-        Ok(result)
+        Ok(cycles)
     }
 }
 

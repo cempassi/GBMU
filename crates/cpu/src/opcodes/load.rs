@@ -187,7 +187,7 @@ pub enum Load {
 
 impl Load {
     pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
-        let result = match self {
+        let cycles = match self {
             Load::AA => registers.borrow_mut().load(Bits8::A, Bits8::A),
             Load::AB => registers.borrow_mut().load(Bits8::A, Bits8::B),
             Load::AC => registers.borrow_mut().load(Bits8::A, Bits8::C),
@@ -278,7 +278,7 @@ impl Load {
                     .await?
             }
         };
-        Ok(result)
+        Ok(cycles)
     }
 }
 
