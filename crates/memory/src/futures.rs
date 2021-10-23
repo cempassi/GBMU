@@ -27,14 +27,19 @@ impl<T> Getter<T> {
 }
 
 impl Future for Getter<u8> {
-    type Output = Result<u8, Error>;
+    type Output = Result<(u8, u8), Error>;
 
     fn poll(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
         match self.cycle {
-            Cycle::Finished => Poll::Ready(self.memory.borrow().get_u8(self.address)),
+            Cycle::Finished => {
+                match  self.memory.borrow().get_u8(self.address){
+                    Ok(data) => Poll::Ready(Ok((data, 4))),
+                    Err(err) => Poll::Ready(Err(err)),
+                }
+            }
             Cycle::Cpu(ref mut ticks) => {
                 *ticks += 1;
-                if *ticks >= 3 {
+                if *ticks == 3 {
                     self.cycle = Cycle::Finished;
                 }
                 Poll::Pending
@@ -44,14 +49,19 @@ impl Future for Getter<u8> {
 }
 
 impl Future for Getter<u16> {
-    type Output = Result<u16, Error>;
+    type Output = Result<(u16, u8), Error>;
 
     fn poll(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
         match self.cycle {
-            Cycle::Finished => Poll::Ready(self.memory.borrow().get_u16(self.address)),
+            Cycle::Finished => {
+                match  self.memory.borrow().get_u16(self.address){
+                    Ok(data) => Poll::Ready(Ok((data, 8))),
+                    Err(err) => Poll::Ready(Err(err)),
+                }
+            }
             Cycle::Cpu(ref mut ticks) => {
                 *ticks += 1;
-                if *ticks >= 7 {
+                if *ticks == 7 {
                     self.cycle = Cycle::Finished;
                 }
                 Poll::Pending
@@ -80,18 +90,21 @@ impl<T> Setter<T> {
 }
 
 impl Future for Setter<u8> {
-    type Output = Result<(), Error>;
+    type Output = Result<u8, Error>;
 
     fn poll(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
         match self.cycle {
             Cycle::Finished => {
                 let address = self.address;
                 let data = self.data;
-                Poll::Ready(self.memory.borrow_mut().set_u8(address, data))
+                match self.memory.borrow_mut().set_u8(address, data){
+                    Ok(_) => Poll::Ready(Ok(4)),
+                    Err(err) => Poll::Ready(Err(err)),
+                }
             }
             Cycle::Cpu(ref mut ticks) => {
                 *ticks += 1;
-                if *ticks >= 4 {
+                if *ticks == 3 {
                     self.cycle = Cycle::Finished;
                 }
                 Poll::Pending
@@ -101,18 +114,21 @@ impl Future for Setter<u8> {
 }
 
 impl Future for Setter<u16> {
-    type Output = Result<(), Error>;
+    type Output = Result<u8, Error>;
 
     fn poll(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
         match self.cycle {
             Cycle::Finished => {
                 let address = self.address;
                 let data = self.data;
-                Poll::Ready(self.memory.borrow_mut().set_u16(address, data))
+                match self.memory.borrow_mut().set_u16(address, data){
+                    Ok(_) => Poll::Ready(Ok(8)),
+                    Err(err) => Poll::Ready(Err(err)),
+                }
             }
             Cycle::Cpu(ref mut ticks) => {
                 *ticks += 1;
-                if *ticks >= 8 {
+                if *ticks == 7 {
                     self.cycle = Cycle::Finished;
                 }
                 Poll::Pending

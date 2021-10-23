@@ -7,6 +7,7 @@ pub(crate) mod jump;
 pub(crate) mod load;
 pub(crate) mod logical;
 pub(crate) mod shift;
+pub(crate) mod rotation;
 
 pub use area::{Bits16, Bits8, Flag};
 pub(crate) use arithmetic::Arithmetic;
@@ -15,6 +16,7 @@ pub(crate) use flags::Flags;
 pub(crate) use jump::{Absolute, Relative};
 pub(crate) use load::Load;
 pub(crate) use logical::Logical;
+pub(crate) use rotation::Rotation;
 pub(crate) use shift::Shift;
 
 #[derive(Debug, Default)]

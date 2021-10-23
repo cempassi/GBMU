@@ -182,10 +182,10 @@ mod mbc1_test {
         assert_eq!(mbc.data[0x147], 0x03);
 
         mbc.set(0x01f5, 0x0a);
-        assert_eq!(mbc.ram_lock, true);
+        assert!(mbc.ram_lock);
 
         mbc.set(0x034b, 0x03);
-        assert_eq!(mbc.ram_lock, false)
+        assert!(mbc.ram_lock);
     }
 
     #[test]
@@ -194,10 +194,10 @@ mod mbc1_test {
         let mut mbc = Mbc1::new(rom_file);
 
         mbc.set(0x6abc, 4);
-        assert_eq!(mbc.bank_mode, false);
+        assert!(mbc.bank_mode);
 
         mbc.set(0x7abc, 3);
-        assert_eq!(mbc.bank_mode, true);
+        assert!(mbc.bank_mode);
     }
 
     #[test]
@@ -279,10 +279,10 @@ mod mbc1_test {
         let mut mbc = Mbc1::new(rom_file);
 
         mbc.set(0x01f5, 0x0a);
-        assert_eq!(mbc.ram_lock, true);
+        assert!(mbc.ram_lock);
 
         mbc.set(0x7abc, 3); // enable bank_mode
-        assert_eq!(mbc.bank_mode, true);
+        assert!(mbc.bank_mode);
 
         mbc.set(0x4f4f, 0x00);
         assert_eq!(mbc.ram_bank, 0);
@@ -293,7 +293,7 @@ mod mbc1_test {
         assert_eq!(data, 0xca);
 
         mbc.set(0x01ff, 0x00);
-        assert_eq!(mbc.ram_lock, false);
+        assert!(mbc.ram_lock);
     }
 
     #[test]
@@ -302,15 +302,15 @@ mod mbc1_test {
         let mut mbc = Mbc1::new(rom_file);
 
         mbc.set(0x01f5, 0x0a);
-        assert_eq!(mbc.ram_lock, true);
+        assert!(mbc.ram_lock);
 
         mbc.set(0x7abc, 3);
-        assert_eq!(mbc.bank_mode, true);
+        assert!(mbc.bank_mode);
 
         mbc.set(0x4f4f, 0x01);
         assert_eq!(mbc.ram_bank, 1);
 
         mbc.set(0x01ff, 0x00);
-        assert_eq!(mbc.ram_lock, false);
+        assert!(mbc.ram_lock);
     }
 }

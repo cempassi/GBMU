@@ -1,8 +1,8 @@
 use crate::cpu::Registers;
-use crate::opcodes::Src;
-use crate::registers::{Bits8, Shift as S};
+use crate::registers::{Bits8, Shift as S, futures::{Async, CbOperation as Operation}};
 use memory::Memory;
 use num_enum::TryFromPrimitive;
+use shared::Error;
 
 /// SLA r8 | [HL]
 /// Shift Left Arithmetic register r8 | byte pointed to by HL.
@@ -73,63 +73,44 @@ pub enum Shift {
     RLA = 0x3F,
 }
 
-enum Type {
-    Left,
-    Swap,
-    Arithmetic,
-    Logic,
-}
-
-impl Type {
-    pub async fn shift(self, src: Src, registers: Registers, memory: Memory) {
-        let data = src.get(registers.clone(), memory.clone()).await;
-        let data = match self {
-            Type::Left => registers.borrow_mut().shift_left(data),
-            Type::Swap => registers.borrow_mut().swap(data),
-            Type::Arithmetic => registers.borrow_mut().shift_arithmetic(data),
-            Type::Logic => registers.borrow_mut().shift_logic(data),
-        };
-        src.set(registers, memory, data).await;
-    }
-}
 
 impl Shift {
-    pub async fn exec(self, registers: Registers, memory: Memory) {
-        match self {
-            Shift::LB => Type::Left.shift(Src::Register(Bits8::B), registers, memory),
-            Shift::LC => Type::Left.shift(Src::Register(Bits8::C), registers, memory),
-            Shift::LD => Type::Left.shift(Src::Register(Bits8::D), registers, memory),
-            Shift::LE => Type::Left.shift(Src::Register(Bits8::E), registers, memory),
-            Shift::LH => Type::Left.shift(Src::Register(Bits8::H), registers, memory),
-            Shift::LL => Type::Left.shift(Src::Register(Bits8::L), registers, memory),
-            Shift::LA => Type::Left.shift(Src::Register(Bits8::A), registers, memory),
-            Shift::LHL => Type::Left.shift(Src::Pointer, registers, memory),
-            Shift::SB => Type::Swap.shift(Src::Register(Bits8::B), registers, memory),
-            Shift::SC => Type::Swap.shift(Src::Register(Bits8::C), registers, memory),
-            Shift::SD => Type::Swap.shift(Src::Register(Bits8::D), registers, memory),
-            Shift::SE => Type::Swap.shift(Src::Register(Bits8::E), registers, memory),
-            Shift::SH => Type::Swap.shift(Src::Register(Bits8::H), registers, memory),
-            Shift::SL => Type::Swap.shift(Src::Register(Bits8::L), registers, memory),
-            Shift::SA => Type::Swap.shift(Src::Register(Bits8::A), registers, memory),
-            Shift::SHL => Type::Swap.shift(Src::Pointer, registers, memory),
-            Shift::RAB => Type::Arithmetic.shift(Src::Register(Bits8::B), registers, memory),
-            Shift::RAC => Type::Arithmetic.shift(Src::Register(Bits8::C), registers, memory),
-            Shift::RAD => Type::Arithmetic.shift(Src::Register(Bits8::D), registers, memory),
-            Shift::RAE => Type::Arithmetic.shift(Src::Register(Bits8::E), registers, memory),
-            Shift::RAH => Type::Arithmetic.shift(Src::Register(Bits8::H), registers, memory),
-            Shift::RAL => Type::Arithmetic.shift(Src::Register(Bits8::L), registers, memory),
-            Shift::RAA => Type::Arithmetic.shift(Src::Register(Bits8::A), registers, memory),
-            Shift::RAHL => Type::Arithmetic.shift(Src::Pointer, registers, memory),
-            Shift::RLB => Type::Logic.shift(Src::Register(Bits8::B), registers, memory),
-            Shift::RLC => Type::Logic.shift(Src::Register(Bits8::C), registers, memory),
-            Shift::RLD => Type::Logic.shift(Src::Register(Bits8::D), registers, memory),
-            Shift::RLE => Type::Logic.shift(Src::Register(Bits8::E), registers, memory),
-            Shift::RLH => Type::Logic.shift(Src::Register(Bits8::H), registers, memory),
-            Shift::RLL => Type::Logic.shift(Src::Register(Bits8::L), registers, memory),
-            Shift::RLA => Type::Logic.shift(Src::Register(Bits8::A), registers, memory),
-            Shift::RLHL => Type::Logic.shift(Src::Pointer, registers, memory),
-        }
-        .await;
+    pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error>{
+        let result = match self {
+            Shift::LB => registers.borrow_mut().shift_left(Bits8::B),
+            Shift::LC => registers.borrow_mut().shift_left(Bits8::C),
+            Shift::LD => registers.borrow_mut().shift_left(Bits8::D),
+            Shift::LE => registers.borrow_mut().shift_left(Bits8::E),
+            Shift::LH => registers.borrow_mut().shift_left(Bits8::H),
+            Shift::LL => registers.borrow_mut().shift_left(Bits8::L),
+            Shift::LA => registers.borrow_mut().shift_left(Bits8::A),
+            Shift::LHL => Async::CbHL(Operation::SLeft).run( registers, memory).await?,
+            Shift::SB => registers.borrow_mut().swap(Bits8::B),
+            Shift::SC => registers.borrow_mut().swap(Bits8::C),
+            Shift::SD => registers.borrow_mut().swap(Bits8::D),
+            Shift::SE => registers.borrow_mut().swap(Bits8::E),
+            Shift::SH => registers.borrow_mut().swap(Bits8::H),
+            Shift::SL => registers.borrow_mut().swap(Bits8::L),
+            Shift::SA => registers.borrow_mut().swap(Bits8::A),
+            Shift::SHL => Async::CbHL(Operation::Swap).run( registers, memory).await?,
+            Shift::RAB => registers.borrow_mut().shift_arithmetic(Bits8::B),
+            Shift::RAC => registers.borrow_mut().shift_arithmetic(Bits8::C),
+            Shift::RAD => registers.borrow_mut().shift_arithmetic(Bits8::D),
+            Shift::RAE => registers.borrow_mut().shift_arithmetic(Bits8::E),
+            Shift::RAH => registers.borrow_mut().shift_arithmetic(Bits8::H),
+            Shift::RAL => registers.borrow_mut().shift_arithmetic(Bits8::L),
+            Shift::RAA => registers.borrow_mut().shift_arithmetic(Bits8::A),
+            Shift::RAHL => Async::CbHL(Operation::SRArithmetic).run( registers, memory).await?,
+            Shift::RLB => registers.borrow_mut().shift_logic(Bits8::B),
+            Shift::RLC => registers.borrow_mut().shift_logic(Bits8::C),
+            Shift::RLD => registers.borrow_mut().shift_logic(Bits8::D),
+            Shift::RLE => registers.borrow_mut().shift_logic(Bits8::E),
+            Shift::RLH => registers.borrow_mut().shift_logic(Bits8::H),
+            Shift::RLL => registers.borrow_mut().shift_logic(Bits8::L),
+            Shift::RLA => registers.borrow_mut().shift_logic(Bits8::A),
+            Shift::RLHL => Async::CbHL(Operation::SRLogic).run( registers, memory).await?,
+        };
+        Ok(result)
     }
 }
 
@@ -154,7 +135,7 @@ mod test_shift_left {
         let result = register.borrow().get(Bits8::A);
         let carry = register.borrow_mut().get(Flag::C);
         assert_eq!(result, expected);
-        assert_eq!(carry, true);
+        assert!(carry);
     }
 
     #[test]
@@ -173,7 +154,7 @@ mod test_shift_left {
         let result = memory.borrow_mut().get_u8(hl).unwrap();
         let carry = register.borrow_mut().get(Flag::C);
         assert_eq!(result, expected);
-        assert_eq!(carry, true);
+        assert!(carry);
     }
 
     #[test]
@@ -190,7 +171,7 @@ mod test_shift_left {
         let result = register.borrow().get(Bits8::C);
         let carry = register.borrow_mut().get(Flag::C);
         assert_eq!(result, expected);
-        assert_eq!(carry, true);
+        assert!(carry);
     }
 
     #[test]
@@ -209,7 +190,7 @@ mod test_shift_left {
         let result = memory.borrow_mut().get_u8(hl).unwrap();
         let carry = register.borrow_mut().get(Flag::C);
         assert_eq!(result, expected);
-        assert_eq!(carry, true);
+        assert!(carry);
     }
 
     #[test]

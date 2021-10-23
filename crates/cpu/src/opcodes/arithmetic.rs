@@ -1,8 +1,8 @@
 use crate::cpu::Registers;
-use crate::registers::futures::{GetAt, NextPc};
-use crate::registers::{Arithmetic as A, Bits16, Bits8, Bus};
+use crate::registers::{Arithmetic as A, Bits8, futures::{Async, Operation}};
 use memory::Memory;
 use num_enum::TryFromPrimitive;
+use shared::Error;
 
 /// [ADD | ADC] A,n
 /// Description:
@@ -90,226 +90,47 @@ pub enum Arithmetic {
     SAc8b = 0xDE,
 }
 
-enum Src {
-    Register(Bits8),
-    Pointer,
-    Next,
-}
-
-impl Src {
-    pub async fn data(self, registers: Registers, memory: Memory) -> u8 {
-        match self {
-            Src::Register(src) => registers.borrow().get(src),
-            Src::Pointer => registers.clone().get_at(memory, Bits16::HL).await.unwrap(),
-            Src::Next => registers.clone().next_pc(memory.clone()).await.unwrap(),
-        }
-    }
-}
-
 impl Arithmetic {
-    pub async fn exec(self, registers: Registers, memory: Memory) {
-        match self {
-            Arithmetic::AAA => {
-                let data = Src::Register(Bits8::A)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().add(data, false);
-            }
-            Arithmetic::AAB => {
-                let data = Src::Register(Bits8::B)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().add(data, false);
-            }
-            Arithmetic::AAC => {
-                let data = Src::Register(Bits8::C)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().add(data, false);
-            }
-            Arithmetic::AAD => {
-                let data = Src::Register(Bits8::D)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().add(data, false);
-            }
-            Arithmetic::AAE => {
-                let data = Src::Register(Bits8::E)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().add(data, false);
-            }
-            Arithmetic::AAH => {
-                let data = Src::Register(Bits8::H)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().add(data, false);
-            }
-            Arithmetic::AAL => {
-                let data = Src::Register(Bits8::L)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().add(data, false);
-            }
-            Arithmetic::AAcA => {
-                let data = Src::Register(Bits8::A)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().add(data, true);
-            }
-            Arithmetic::AAcB => {
-                let data = Src::Register(Bits8::B)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().add(data, true);
-            }
-            Arithmetic::AAcC => {
-                let data = Src::Register(Bits8::C)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().add(data, true);
-            }
-            Arithmetic::AAcD => {
-                let data = Src::Register(Bits8::D)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().add(data, true);
-            }
-            Arithmetic::AAcE => {
-                let data = Src::Register(Bits8::E)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().add(data, true);
-            }
-            Arithmetic::AAcH => {
-                let data = Src::Register(Bits8::H)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().add(data, true);
-            }
-            Arithmetic::AAcL => {
-                let data = Src::Register(Bits8::L)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().add(data, true);
-            }
-            Arithmetic::AAc8b => {
-                let data = Src::Next.data(registers.clone(), memory).await;
-                registers.borrow_mut().add(data, true);
-            }
-            Arithmetic::AA8b => {
-                let data = Src::Next.data(registers.clone(), memory).await;
-                registers.borrow_mut().add(data, false);
-            }
-            Arithmetic::AAHL => {
-                let data = Src::Pointer.data(registers.clone(), memory).await;
-                registers.borrow_mut().add(data, false);
-            }
-            Arithmetic::AAcHL => {
-                let data = Src::Pointer.data(registers.clone(), memory).await;
-                registers.borrow_mut().add(data, true);
-            }
-            Arithmetic::SAB => {
-                let data = Src::Register(Bits8::B)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().sub(data, false);
-            }
-            Arithmetic::SAC => {
-                let data = Src::Register(Bits8::C)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().sub(data, false);
-            }
-            Arithmetic::SAD => {
-                let data = Src::Register(Bits8::D)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().sub(data, false);
-            }
-            Arithmetic::SAE => {
-                let data = Src::Register(Bits8::E)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().sub(data, false);
-            }
-            Arithmetic::SAH => {
-                let data = Src::Register(Bits8::H)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().sub(data, false);
-            }
-            Arithmetic::SAL => {
-                let data = Src::Register(Bits8::L)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().sub(data, false);
-            }
-            Arithmetic::SAA => {
-                let data = Src::Register(Bits8::A)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().sub(data, false);
-            }
-            Arithmetic::SAcB => {
-                let data = Src::Register(Bits8::B)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().sub(data, true);
-            }
-            Arithmetic::SAcC => {
-                let data = Src::Register(Bits8::C)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().sub(data, true);
-            }
-            Arithmetic::SAcD => {
-                let data = Src::Register(Bits8::D)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().sub(data, true);
-            }
-            Arithmetic::SAcE => {
-                let data = Src::Register(Bits8::E)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().sub(data, true);
-            }
-            Arithmetic::SAcH => {
-                let data = Src::Register(Bits8::H)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().sub(data, true);
-            }
-            Arithmetic::SAcL => {
-                let data = Src::Register(Bits8::L)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().sub(data, true);
-            }
-            Arithmetic::SAcA => {
-                let data = Src::Register(Bits8::A)
-                    .data(registers.clone(), memory)
-                    .await;
-                registers.borrow_mut().sub(data, true);
-            }
-            Arithmetic::SAHL => {
-                let data = Src::Pointer.data(registers.clone(), memory).await;
-                registers.borrow_mut().sub(data, false);
-            }
-            Arithmetic::SAcHL => {
-                let data = Src::Pointer.data(registers.clone(), memory).await;
-                registers.borrow_mut().sub(data, true);
-            }
-            Arithmetic::SA8b => {
-                let data = Src::Next.data(registers.clone(), memory).await;
-                registers.borrow_mut().sub(data, false);
-            }
-            Arithmetic::SAc8b => {
-                let data = Src::Next.data(registers.clone(), memory).await;
-                registers.borrow_mut().sub(data, true);
-            }
-        }
+    pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
+        let result = match self {
+            Arithmetic::AAA => registers.borrow_mut().add(Bits8::A, false),
+            Arithmetic::AAB => registers.borrow_mut().add(Bits8::B, false),
+            Arithmetic::AAC => registers.borrow_mut().add(Bits8::C, false),
+            Arithmetic::AAD => registers.borrow_mut().add(Bits8::D, false),
+            Arithmetic::AAE => registers.borrow_mut().add(Bits8::E, false),
+            Arithmetic::AAH => registers.borrow_mut().add(Bits8::H, false),
+            Arithmetic::AAL => registers.borrow_mut().add(Bits8::L, false),
+            Arithmetic::AAcA => registers.borrow_mut().add(Bits8::A, true),
+            Arithmetic::AAcB => registers.borrow_mut().add(Bits8::B, true),
+            Arithmetic::AAcC => registers.borrow_mut().add(Bits8::C, true),
+            Arithmetic::AAcD => registers.borrow_mut().add(Bits8::D, true),
+            Arithmetic::AAcE => registers.borrow_mut().add(Bits8::E, true),
+            Arithmetic::AAcH => registers.borrow_mut().add(Bits8::H, true),
+            Arithmetic::AAcL => registers.borrow_mut().add(Bits8::L, true),
+            Arithmetic::AAc8b => Async::CalculNext(Operation::AddCarry).run(registers, memory).await?,
+            Arithmetic::AA8b => Async::CalculNext(Operation::AddNoCarry).run(registers, memory).await?,
+            Arithmetic::AAHL => Async::CalculHL(Operation::AddNoCarry).run(registers, memory).await?,
+            Arithmetic::AAcHL => Async::CalculHL(Operation::AddCarry).run(registers, memory).await?,
+            Arithmetic::SAB => registers.borrow_mut().sub(Bits8::B, false),
+            Arithmetic::SAC => registers.borrow_mut().sub(Bits8::C, false),
+            Arithmetic::SAD => registers.borrow_mut().sub(Bits8::D, false),
+            Arithmetic::SAE => registers.borrow_mut().sub(Bits8::E, false),
+            Arithmetic::SAH => registers.borrow_mut().sub(Bits8::H, false),
+            Arithmetic::SAL => registers.borrow_mut().sub(Bits8::L, false),
+            Arithmetic::SAA => registers.borrow_mut().sub(Bits8::A, false),
+            Arithmetic::SAcB => registers.borrow_mut().sub(Bits8::B, true),
+            Arithmetic::SAcC => registers.borrow_mut().sub(Bits8::C, true),
+            Arithmetic::SAcD => registers.borrow_mut().sub(Bits8::D, true),
+            Arithmetic::SAcE => registers.borrow_mut().sub(Bits8::E, true),
+            Arithmetic::SAcH => registers.borrow_mut().sub(Bits8::H, true),
+            Arithmetic::SAcL => registers.borrow_mut().sub(Bits8::L, true),
+            Arithmetic::SAcA => registers.borrow_mut().sub(Bits8::A, true),
+            Arithmetic::SAHL => Async::CalculHL(Operation::SubNoCarry).run(registers, memory).await?,
+            Arithmetic::SAcHL => Async::CalculHL(Operation::SubCarry).run(registers, memory).await?,
+            Arithmetic::SA8b => Async::CalculNext(Operation::SubNoCarry).run(registers, memory).await?,
+            Arithmetic::SAc8b => Async::CalculNext(Operation::SubCarry).run(registers, memory).await?,
+        };
+        Ok(result)
     }
 }
 
@@ -329,10 +150,10 @@ mod test_arithmetic {
         register.borrow_mut().set(Bits8::A, 0x4f);
         register.borrow_mut().set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0x80);
-        assert_eq!(register.borrow().get(Flag::H), true);
+        assert!(register.borrow().get(Flag::H));
     }
 
     #[test]
@@ -345,7 +166,7 @@ mod test_arithmetic {
         register.borrow_mut().set(Bits16::HL, 0xc008);
         register.borrow_mut().set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
         assert_eq!(register.borrow().get(Bits8::A), 0xf8);
     }
 
@@ -357,10 +178,10 @@ mod test_arithmetic {
 
         register.borrow_mut().set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0x00);
-        assert_eq!(register.borrow().get(Flag::Z), true);
+        assert!(register.borrow().get(Flag::Z));
     }
 
     #[test]
@@ -374,7 +195,7 @@ mod test_arithmetic {
         register.borrow_mut().set(Flag::C, true);
         memory.borrow_mut().set_u8(0xc000, 0x2F).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0x7F);
     }
@@ -390,7 +211,7 @@ mod test_arithmetic {
         register.borrow_mut().set(Flag::C, true);
         memory.borrow_mut().set_u8(0xc008, 0x2d).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0x58);
     }
@@ -405,7 +226,7 @@ mod test_arithmetic {
         register.borrow_mut().set(Bits8::C, 0xAA);
         register.borrow_mut().set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0xD6);
     }
@@ -421,7 +242,7 @@ mod test_arithmetic {
         register.borrow_mut().set(Flag::C, true);
         memory.borrow_mut().set_u8(0xc000, 0x2F).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0x20);
     }
@@ -437,7 +258,7 @@ mod test_arithmetic {
         register.borrow_mut().set(Bits16::HL, 0xc008);
         memory.borrow_mut().set_u8(0xc008, 0xaa).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0x4e);
     }
@@ -450,9 +271,9 @@ mod test_arithmetic {
 
         register.borrow_mut().set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
         assert_eq!(register.borrow().get(Bits8::A), 0x00);
-        assert_eq!(register.borrow().get(Flag::Z), true);
+        assert!(register.borrow().get(Flag::Z));
     }
 
     #[test]
@@ -466,7 +287,7 @@ mod test_arithmetic {
         register.borrow_mut().set(Bits16::HL, 0xc008);
         memory.borrow_mut().set_u8(0xc008, 0xaa).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0x4d);
     }
@@ -481,7 +302,7 @@ mod test_arithmetic {
         register.borrow_mut().set(Bits8::L, 0xAB);
         register.borrow_mut().set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
 
         assert_eq!(register.borrow().get(Bits8::A), 0x4C);
     }

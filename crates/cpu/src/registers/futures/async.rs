@@ -1,4 +1,5 @@
-use super::calcul::{self, Logical};
+use super::calcul::{self, Operation};
+use super::cb::{self, Operation as CbOperation};
 use super::load;
 use super::set;
 use crate::registers::{Bits16, Bits8};
@@ -8,11 +9,12 @@ use shared::Error;
 use std::future::Future;
 use std::pin::Pin;
 
-type Processing = Pin<Box<dyn Future<Output = Result<(), Error>>>>;
+type Processing = Pin<Box<dyn Future<Output = Result<u8, Error>>>>;
 
 pub(crate) enum Async {
-    CalculHL(Logical),
-    CalculNext(Logical),
+    CalculHL(Operation),
+    CalculNext(Operation),
+    CbHL(CbOperation),
     Load8b(Bits8),
     Load16b(Bits16),
     LoadHL(Bits8),
@@ -50,7 +52,9 @@ impl Async {
             Async::LoadDecrease => Box::pin(load::update(registers, memory, false)),
             Async::LoadRegisterFrom(dst, src) => {
                 Box::pin(load::reg_from(registers, memory, dst, src))
-            } // Async::LoadSP(area) =>{
+            }
+            Async::CbHL(operation) => Box::pin(cb::hl(registers, memory, operation)),
+            // Async::LoadSP(area) =>{
               //     Box::pin(Reader::new(Box::pin(load_sp(registers, memory, area))))
               // }
         }

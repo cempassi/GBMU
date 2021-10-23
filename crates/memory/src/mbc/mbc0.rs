@@ -63,9 +63,6 @@ mod test_nombc {
     fn test_write_read_nombc() {
         let mut mbc0 = Mbc0::default();
 
-        match <Mbc0 as MbcBus>::set(&mut mbc0, 0x42, 42) {
-            Ok(_) => panic!(),
-            Err(_) => (),
-        }
+        <Mbc0 as MbcBus>::set(&mut mbc0, 0x42, 42).unwrap();
     }
 }

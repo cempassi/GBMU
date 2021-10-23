@@ -5,7 +5,7 @@ use shared::Error;
 use std::future::Future;
 use std::pin::Pin;
 
-type Getter<T> = Pin<Box<dyn Future<Output = Result<T, Error>>>>;
+type Getter<T> = Pin<Box<dyn Future<Output = Result<(T, u8), Error>>>>;
 
 pub(crate) trait GetAt<T> {
     fn get_at(self, memory: Memory, area: Bits16) -> Getter<T>;
