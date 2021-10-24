@@ -1,7 +1,7 @@
 use crate::registers::{futures::Jump as Async, Absolute as J, Bits16, Flag};
 use crate::Registers;
 use memory::Memory;
-use num_enum::TryFromPrimitive;
+use num_enum::{TryFromPrimitive, IntoPrimitive};
 use shared::Error;
 
 /// JP nn
@@ -45,7 +45,7 @@ use shared::Error;
 /// H - Unused
 /// C - Unused
 
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
+#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Jump {
