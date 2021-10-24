@@ -5,6 +5,8 @@ use memory::Memory;
 use num_enum::TryFromPrimitive;
 use shared::Error;
 
+use super::decode::{Decode, Decoder};
+
 /// 2. LD r1,r2
 /// Description:
 ///  Put value r2 into r1.
@@ -183,6 +185,12 @@ pub enum Load {
     HLMA = 0x32,
     AHLP = 0x2A,
     AHLM = 0x3A,
+}
+
+impl Decoder for Load {
+    fn decode(self,registers: Registers, memory: Memory) -> Decode {
+        Box::pin(self.exec(registers, memory))
+    }
 }
 
 impl Load {

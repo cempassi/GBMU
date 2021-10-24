@@ -4,6 +4,8 @@ use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 
+use super::decode::{Decode, Decoder};
+
 /// JP nn
 /// Unconditional jump to the absolute address specified in the next 16-bits.
 /// Cycle: 16
@@ -70,6 +72,12 @@ pub enum Jump {
     ReturnC = 0xD8,
     ReturnNZ = 0xC0,
     ReturnNC = 0xD0,
+}
+
+impl Decoder for Jump {
+    fn decode(self,registers: Registers, memory: Memory) -> Decode {
+        Box::pin(self.exec(registers, memory))
+    }
 }
 
 impl Jump {

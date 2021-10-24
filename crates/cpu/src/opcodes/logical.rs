@@ -5,6 +5,8 @@ use memory::Memory;
 use num_enum::TryFromPrimitive;
 use shared::Error;
 
+use super::decode::{Decode, Decoder};
+
 /// AND n
 /// Description:
 ///  Logically AND n with A, result in A.
@@ -122,6 +124,13 @@ pub enum Logic {
     CmpAHL = 0xbe,
     CmpA8b = 0xfe,
 }
+
+impl Decoder for Logic {
+    fn decode(self,registers: Registers, memory: Memory) -> Decode {
+        Box::pin(self.exec(registers, memory))
+    }
+}
+
 
 impl Logic {
     pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {

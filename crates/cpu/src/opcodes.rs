@@ -5,6 +5,7 @@ mod load16b;
 mod logical;
 mod rotate;
 mod shift;
+pub(super) mod decode;
 
 pub use arithmetic::Arithmetic;
 pub use jump::Jump;

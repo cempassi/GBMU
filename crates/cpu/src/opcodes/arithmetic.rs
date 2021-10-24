@@ -1,3 +1,4 @@
+use super::decode::{Decode, Decoder};
 use crate::cpu::Registers;
 use crate::registers::{
     futures::{Operation, Set},
@@ -91,6 +92,12 @@ pub enum Arithmetic {
     SAcA = 0x9F,
     SA8b = 0xD6,
     SAc8b = 0xDE,
+}
+
+impl Decoder for Arithmetic {
+    fn decode(self, registers: Registers, memory: Memory) -> Decode {
+        Box::pin(self.exec(registers, memory))
+    }
 }
 
 impl Arithmetic {
