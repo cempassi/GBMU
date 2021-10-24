@@ -10,6 +10,7 @@ authors = [
 
 [dependencies]
 enum-iterator = "0.7.0"
+num_enum = "0.5.3"
 itertools = "0.10.1"
 iced_wgpu = {git = "https://github.com/hecrj/iced"}
 iced_winit = {git = "https://github.com/hecrj/iced"}

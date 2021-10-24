@@ -1,8 +1,9 @@
+use super::disassembler::{DisassMsg, Disassembler};
 use super::memory_map::{Memory, MemoryMsg};
 use super::menu::{Menu, MenuMsg};
 use super::registers::{CpuMsg, CpuRegisters};
 use crate::style::Theme;
-use iced_wgpu::{Column, Renderer};
+use iced_wgpu::{Column, Renderer, Row};
 use iced_winit::{Command, Element, Program};
 use soc::SOC;
 use std::convert::From;
@@ -12,15 +13,19 @@ pub struct UserInterface {
     cpu_registers: CpuRegisters,
     memory: Memory,
     menu: Menu,
+    disassembler: Disassembler,
 }
 
 impl From<&SOC> for UserInterface {
     fn from(soc: &SOC) -> UserInterface {
+        let cpu_registers = soc.get_cpu_registers();
+        let memory = soc.get_memory();
         Self {
             theme: Theme::default(),
-            cpu_registers: CpuRegisters::new(soc.get_cpu_registers()),
-            memory: <Memory as From<memory::Memory>>::from(soc.get_memory()),
+            cpu_registers: CpuRegisters::new(cpu_registers.clone()),
+            memory: <Memory as From<memory::Memory>>::from(memory.clone()),
             menu: Menu::new(soc.get_runner()),
+            disassembler: Disassembler::new(cpu_registers, memory),
         }
     }
 }
@@ -30,6 +35,7 @@ pub enum Message {
     Registers(CpuMsg),
     Memory(MemoryMsg),
     Menu(MenuMsg),
+    Disassembler(DisassMsg),
 }
 
 impl From<CpuMsg> for Message {
@@ -67,6 +73,10 @@ impl Program for UserInterface {
                 self.menu.update(message);
                 Command::none()
             }
+            Message::Disassembler(message) => {
+                self.disassembler.update(message);
+                Command::none()
+            }
         }
     }
 
@@ -76,18 +86,19 @@ impl Program for UserInterface {
             .menu
             .view(self.theme)
             .map(|message| Message::Menu(message));
+        let disassembler = self
+            .disassembler
+            .view()
+            .map(|message| Message::Disassembler(message));
         let cpu_registers = self
             .cpu_registers
             .view(self.theme)
             .map(|message| Message::Registers(message));
+        let row = Row::new().push(cpu_registers).push(disassembler);
         let memory = self
             .memory
             .view(self.theme)
             .map(|message| Message::Memory(message));
-        Column::new()
-            .push(menu)
-            .push(cpu_registers)
-            .push(memory)
-            .into()
+        Column::new().push(menu).push(row).push(memory).into()
     }
 }
