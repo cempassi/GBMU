@@ -1,6 +1,6 @@
-use iced_wgpu::{Column, Text, Renderer};
-use iced_winit::Element;
 use crate::style::fonts;
+use iced_wgpu::{Column, Renderer, Text};
+use iced_winit::Element;
 
 use cpu::Registers;
 use memory::Memory;
@@ -18,7 +18,7 @@ pub struct Disassembler {
 
 #[derive(Debug, Clone)]
 pub enum DisassMsg {
-    Step
+    Step,
 }
 
 impl Disassembler {

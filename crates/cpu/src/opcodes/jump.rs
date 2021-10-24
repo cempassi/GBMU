@@ -1,7 +1,7 @@
 use crate::registers::{futures::Jump as Async, Absolute as J, Bits16, Flag};
 use crate::Registers;
 use memory::Memory;
-use num_enum::{TryFromPrimitive, IntoPrimitive};
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 
 /// JP nn

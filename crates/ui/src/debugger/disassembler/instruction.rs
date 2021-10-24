@@ -11,11 +11,11 @@ use shared::Error;
 pub struct Instruction {
     address: u16,
     disass: Disass,
-    is_next: bool,
+    //is_next: bool,
 }
 
 impl Instruction {
-    pub fn try_new(address: u16, memory: &Memory, is_next: bool) -> Result<Self, Error> {
+    pub fn try_new(address: u16, memory: &Memory, _is_next: bool) -> Result<Self, Error> {
         let opcode = memory.borrow().get_u8(address)?;
 
         let mut disass: Disass = {
@@ -29,7 +29,7 @@ impl Instruction {
         Ok(Self {
             address,
             disass,
-            is_next,
+            // is_next,
         })
     }
 
@@ -42,7 +42,7 @@ impl Instruction {
 }
 
 pub enum Data {
-    None,
+    //None,
     Bits8(u8),
     Bits16(u16),
 }
@@ -50,7 +50,7 @@ pub enum Data {
 impl Data {
     pub fn set(&mut self, memory: &Memory, address: u16) -> Result<(), Error> {
         match self {
-            Data::None => (),
+            //Data::None => (),
             Data::Bits8(ref mut data) => *data = memory.borrow().get_u8(address)?,
             Data::Bits16(ref mut data) => *data = memory.borrow().get_u16(address)?,
         };
@@ -61,7 +61,7 @@ impl Data {
 impl ToString for Data {
     fn to_string(&self) -> String {
         match self {
-            Data::None => "None".to_owned(),
+            //Data::None => "None".to_owned(),
             Data::Bits8(data) => format!("{:#X}", data),
             Data::Bits16(data) => format!("{:#X}", data),
         }

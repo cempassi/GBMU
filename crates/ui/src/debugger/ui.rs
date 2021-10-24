@@ -1,4 +1,4 @@
-use super::disassembler::{Disassembler, DisassMsg};
+use super::disassembler::{DisassMsg, Disassembler};
 use super::memory_map::{Memory, MemoryMsg};
 use super::menu::{Menu, MenuMsg};
 use super::registers::{CpuMsg, CpuRegisters};

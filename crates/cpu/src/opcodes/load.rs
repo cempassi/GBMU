@@ -185,7 +185,6 @@ pub enum Load {
     AHLM = 0x3A,
 }
 
-
 impl Load {
     pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
         let cycles = match self {
