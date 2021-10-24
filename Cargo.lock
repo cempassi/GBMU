@@ -1861,6 +1861,7 @@ dependencies = [
  "iced_winit",
  "itertools",
  "memory",
+ "num_enum",
  "shared",
  "soc",
 ]
