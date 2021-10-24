@@ -7,6 +7,8 @@ use memory::Memory;
 use num_enum::TryFromPrimitive;
 use shared::Error;
 
+use super::decode::{Decode, Decoder};
+
 /// SLA r8 | [HL]
 /// Shift Left Arithmetic register r8 | byte pointed to by HL.
 ///
@@ -74,6 +76,12 @@ pub enum Shift {
     RLL = 0x3D,
     RLHL = 0x3E,
     RLA = 0x3F,
+}
+
+impl Decoder for Shift {
+    fn decode(self, registers: Registers, memory: Memory) -> Decode {
+        Box::pin(self.exec(registers, memory))
+    }
 }
 
 impl Shift {

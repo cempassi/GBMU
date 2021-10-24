@@ -9,6 +9,8 @@ use memory::Memory;
 use num_enum::TryFromPrimitive;
 use shared::Error;
 
+use super::decode::{Decode, Decoder};
+
 /// RR r8
 /// Rotate bits in register r8 right through carry.
 /// RR [HL]
@@ -92,6 +94,12 @@ pub enum Rotate {
     RL = 0x1D,
     RHL = 0x1E,
     RA = 0x1F,
+}
+
+impl Decoder for Rotate {
+    fn decode(self, registers: Registers, memory: Memory) -> Decode {
+        Box::pin(self.exec(registers, memory))
+    }
 }
 
 impl Rotate {

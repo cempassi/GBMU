@@ -1,4 +1,5 @@
 mod arithmetic;
+pub(super) mod decode;
 mod jump;
 mod load;
 mod load16b;

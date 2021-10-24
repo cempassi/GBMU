@@ -2,8 +2,10 @@ use crate::cpu::Registers;
 use crate::registers::futures::Set;
 use crate::registers::{Bits16, Bits8, Load as L};
 use memory::Memory;
-use num_enum::TryFromPrimitive;
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
+
+use super::decode::{Decode, Decoder};
 
 /// 2. LD r1,r2
 /// Description:
@@ -106,7 +108,7 @@ use shared::Error;
 /// Instruction Parameters Opcode Cycles
 /// LD          A, (HL+)      0x2A     8
 /// LD          A, (HL-)      0x3A     8
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
+#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Load {
@@ -183,6 +185,12 @@ pub enum Load {
     HLMA = 0x32,
     AHLP = 0x2A,
     AHLM = 0x3A,
+}
+
+impl Decoder for Load {
+    fn decode(self, registers: Registers, memory: Memory) -> Decode {
+        Box::pin(self.exec(registers, memory))
+    }
 }
 
 impl Load {

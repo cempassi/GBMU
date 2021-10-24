@@ -1,4 +1,5 @@
 pub use crate::interface::Registers;
+use crate::opcodes::decode::{Decode, Decoder};
 use crate::opcodes::Arithmetic;
 use crate::opcodes::Jump;
 use crate::opcodes::Load;
@@ -34,49 +35,46 @@ impl Cpu {
         self.registers.clone()
     }
 
-    async fn prefix_cb(self) -> Result<u8, Error> {
-        let (opcode, cycles) = Get::Next
-            .get(self.registers.clone(), self.memory.clone())
-            .await?;
-
+    fn prefix_cb(self, opcode: u8) -> Result<Decode, Error> {
         if let Ok(operation) = Rotate::try_from_primitive(opcode) {
-            Ok(operation.exec(self.registers, self.memory).await? + cycles)
+            Ok(operation.decode(self.registers.clone(), self.memory))
         } else if let Ok(operation) = Shift::try_from_primitive(opcode) {
-            Ok(operation.exec(self.registers, self.memory).await? + cycles)
+            Ok(operation.decode(self.registers.clone(), self.memory))
         } else {
             Err(Error::Unimplemented)
         }
     }
 
-    /// 1 - Get OpCode from PC
-    /// 2 - Convert Opcode With Tryfrom
-    /// 3 - Tryfrom to Instruction
-    /// 4 - Exec Instructions -> Do the Maths put in Dest and set Flags
-    pub async fn run(self) -> Result<u8, Error> {
-        println!("Next Cpu Execution, fetching Opcode...!");
-        let (opcode, cycles) = Get::Next
-            .get(self.registers.clone(), self.memory.clone())
-            .await?;
-
+    async fn decode(self, opcode: u8, cycles: &mut u8) -> Result<Decode, Error> {
         if opcode == 0xCB {
-            Ok(self.prefix_cb().await? + cycles)
+            let (opcode, cb_cycles) = Get::Next
+                .get(self.registers.clone(), self.memory.clone())
+                .await?;
+
+            *cycles += cb_cycles;
+            self.prefix_cb(opcode)
         } else if let Ok(operation) = Load::try_from_primitive(opcode) {
-            println!("Load 8 bits: {:#?}", operation);
-            Ok(operation.exec(self.registers, self.memory).await? + cycles)
-        } else if let Ok(operation) = Load16b::try_from_primitive(opcode.into()) {
-            println!("Load 16b: {:#?}", operation);
-            Ok(operation.exec(self.registers, self.memory).await? + cycles)
+            Ok(operation.decode(self.registers.clone(), self.memory.clone()))
+        } else if let Ok(operation) = Load16b::try_from_primitive(opcode) {
+            Ok(operation.decode(self.registers.clone(), self.memory.clone()))
         } else if let Ok(operation) = Jump::try_from_primitive(opcode) {
-            println!("Jump: {:#?}", operation);
-            Ok(operation.exec(self.registers, self.memory).await? + cycles)
+            Ok(operation.decode(self.registers.clone(), self.memory.clone()))
         } else if let Ok(operation) = Arithmetic::try_from_primitive(opcode) {
-            println!("Arithmetic: {:#?}", operation);
-            Ok(operation.exec(self.registers, self.memory).await? + cycles)
+            Ok(operation.decode(self.registers.clone(), self.memory.clone()))
         } else if let Ok(operation) = Logic::try_from_primitive(opcode) {
-            println!("Logic: {:#?}", operation);
-            Ok(operation.exec(self.registers, self.memory).await? + cycles)
+            Ok(operation.decode(self.registers.clone(), self.memory.clone()))
         } else {
             Err(Error::Unimplemented)
         }
+    }
+
+    pub async fn run(self) -> Result<u8, Error> {
+        println!("Next Cpu Execution, fetching Opcode...!");
+        let (opcode, mut cycles) = Get::Next
+            .get(self.registers.clone(), self.memory.clone())
+            .await?;
+
+        let execute = self.decode(opcode, &mut cycles).await?;
+        Ok(execute.await? + cycles)
     }
 }
