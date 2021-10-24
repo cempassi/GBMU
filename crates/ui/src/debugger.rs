@@ -1,4 +1,5 @@
 mod button;
+mod disassembler;
 mod memory_map;
 mod menu;
 mod registers;
