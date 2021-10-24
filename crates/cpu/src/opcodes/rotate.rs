@@ -97,7 +97,7 @@ pub enum Rotate {
 }
 
 impl Decoder for Rotate {
-    fn decode(self,registers: Registers, memory: Memory) -> Decode {
+    fn decode(self, registers: Registers, memory: Memory) -> Decode {
         Box::pin(self.exec(registers, memory))
     }
 }

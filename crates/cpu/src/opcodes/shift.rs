@@ -79,7 +79,7 @@ pub enum Shift {
 }
 
 impl Decoder for Shift {
-    fn decode(self,registers: Registers, memory: Memory) -> Decode {
+    fn decode(self, registers: Registers, memory: Memory) -> Decode {
         Box::pin(self.exec(registers, memory))
     }
 }

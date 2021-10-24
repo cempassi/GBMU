@@ -55,7 +55,7 @@ impl Cpu {
             self.prefix_cb(opcode)
         } else if let Ok(operation) = Load::try_from_primitive(opcode) {
             Ok(operation.decode(self.registers.clone(), self.memory.clone()))
-        } else if let Ok(operation) = Load16b::try_from_primitive(opcode.into()) {
+        } else if let Ok(operation) = Load16b::try_from_primitive(opcode) {
             Ok(operation.decode(self.registers.clone(), self.memory.clone()))
         } else if let Ok(operation) = Jump::try_from_primitive(opcode) {
             Ok(operation.decode(self.registers.clone(), self.memory.clone()))

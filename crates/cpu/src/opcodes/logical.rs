@@ -126,11 +126,10 @@ pub enum Logic {
 }
 
 impl Decoder for Logic {
-    fn decode(self,registers: Registers, memory: Memory) -> Decode {
+    fn decode(self, registers: Registers, memory: Memory) -> Decode {
         Box::pin(self.exec(registers, memory))
     }
 }
-
 
 impl Logic {
     pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {

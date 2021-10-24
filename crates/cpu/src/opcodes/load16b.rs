@@ -2,7 +2,7 @@ use crate::registers::futures::Set;
 use crate::registers::Bits16;
 use crate::Registers;
 use memory::Memory;
-use num_enum::TryFromPrimitive;
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 
 use super::decode::{Decode, Decoder};
@@ -46,8 +46,8 @@ use super::decode::{Decode, Decoder};
 /// POP         DE         0xD1   12
 /// POP         HL         0xE1   12
 
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
-#[repr(u16)]
+#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
+#[repr(u8)]
 pub enum Load16b {
     PushAF = 0xf5,
     PushBC = 0xc5,
@@ -65,7 +65,7 @@ pub enum Load16b {
 }
 
 impl Decoder for Load16b {
-    fn decode(self,registers: Registers, memory: Memory) -> Decode {
+    fn decode(self, registers: Registers, memory: Memory) -> Decode {
         Box::pin(self.exec(registers, memory))
     }
 }

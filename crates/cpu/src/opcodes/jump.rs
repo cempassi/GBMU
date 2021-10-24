@@ -47,7 +47,7 @@ use super::decode::{Decode, Decoder};
 /// H - Unused
 /// C - Unused
 
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
+#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Jump {
@@ -75,7 +75,7 @@ pub enum Jump {
 }
 
 impl Decoder for Jump {
-    fn decode(self,registers: Registers, memory: Memory) -> Decode {
+    fn decode(self, registers: Registers, memory: Memory) -> Decode {
         Box::pin(self.exec(registers, memory))
     }
 }
