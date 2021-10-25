@@ -2,7 +2,7 @@ use crate::cpu::Registers;
 use crate::registers::futures::{Operation, Set};
 use crate::registers::{Bits8, Logical as L};
 use memory::Memory;
-use num_enum::TryFromPrimitive;
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 
 use super::decode::{Decode, Decoder};
@@ -83,7 +83,7 @@ use super::decode::{Decode, Decoder};
 /// CP          C          0xb9   4        CP          L          0xbd   4
 /// CP          D          0xba   4        CP          (HL)       0xbe   8
 /// CP          8b         0xfe   8
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
+#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Logic {

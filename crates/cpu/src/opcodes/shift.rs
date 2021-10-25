@@ -4,7 +4,7 @@ use crate::registers::{
     Bits8, Shift as S,
 };
 use memory::Memory;
-use num_enum::TryFromPrimitive;
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 
 use super::decode::{Decode, Decoder};
@@ -40,7 +40,7 @@ use super::decode::{Decode, Decoder};
 /// H - Unused
 /// C - Set according to result.
 
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
+#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Shift {
