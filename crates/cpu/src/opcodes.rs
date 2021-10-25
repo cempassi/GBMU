@@ -1,16 +1,23 @@
 mod arithmetic;
+mod bitset;
+mod consts;
 pub(super) mod decode;
 mod jump;
 mod load;
 mod load16b;
 mod logic;
+mod reset;
 mod rotate;
 mod shift;
+mod test;
 
 pub use arithmetic::Arithmetic;
+pub use bitset::Bitset;
 pub use jump::Jump;
 pub use load::Load;
 pub use load16b::Load16b;
 pub use logic::Logic;
+pub use reset::Reset;
 pub use rotate::Rotate;
 pub use shift::Shift;
+pub use test::Test;
