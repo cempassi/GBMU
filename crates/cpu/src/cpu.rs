@@ -1,12 +1,15 @@
 pub use crate::interface::Registers;
 use crate::opcodes::decode::{Decode, Decoder};
 use crate::opcodes::Arithmetic;
+use crate::opcodes::Bitset;
 use crate::opcodes::Jump;
 use crate::opcodes::Load;
 use crate::opcodes::Load16b;
 use crate::opcodes::Logic;
+use crate::opcodes::Reset;
 use crate::opcodes::Rotate;
 use crate::opcodes::Shift;
+use crate::opcodes::Test;
 use shared::Error;
 
 use crate::registers::futures::{AsyncGet, Get};
@@ -39,6 +42,12 @@ impl Cpu {
         if let Ok(operation) = Rotate::try_from_primitive(opcode) {
             Ok(operation.decode(self.registers.clone(), self.memory))
         } else if let Ok(operation) = Shift::try_from_primitive(opcode) {
+            Ok(operation.decode(self.registers.clone(), self.memory))
+        } else if let Ok(operation) = Test::try_from_primitive(opcode) {
+            Ok(operation.decode(self.registers.clone(), self.memory))
+        } else if let Ok(operation) = Reset::try_from_primitive(opcode) {
+            Ok(operation.decode(self.registers.clone(), self.memory))
+        } else if let Ok(operation) = Bitset::try_from_primitive(opcode) {
             Ok(operation.decode(self.registers.clone(), self.memory))
         } else {
             Err(Error::Unimplemented)
