@@ -1,12 +1,90 @@
 use super::instruction::{Data, Disass};
 use cpu::opcodes::Arithmetic;
+use cpu::opcodes::Bitset;
 use cpu::opcodes::Jump;
 use cpu::opcodes::Load;
 use cpu::opcodes::Load16b;
 use cpu::opcodes::Logic;
+use cpu::opcodes::Reset;
 use cpu::opcodes::Rotate;
 use cpu::opcodes::Shift;
+use cpu::opcodes::Test;
 use shared::Error;
+
+impl From<Bitset> for Disass<u8> {
+    fn from(opcode: Bitset) -> Self {
+        let name = format!("{:<12}", format!("Test {:?}", opcode));
+        let (cycles, data): (u8, Data) = match opcode {
+            Bitset::HLBit0 => (12, Data::None),
+            Bitset::HLBit1 => (12, Data::None),
+            Bitset::HLBit2 => (12, Data::None),
+            Bitset::HLBit3 => (12, Data::None),
+            Bitset::HLBit4 => (12, Data::None),
+            Bitset::HLBit5 => (12, Data::None),
+            Bitset::HLBit6 => (12, Data::None),
+            Bitset::HLBit7 => (12, Data::None),
+            _ => (8, Data::None),
+        };
+
+        let code: u8 = opcode.into();
+        Self {
+            name,
+            code,
+            cycles,
+            data,
+        }
+    }
+}
+
+impl From<Reset> for Disass<u8> {
+    fn from(opcode: Reset) -> Self {
+        let name = format!("{:<12}", format!("Test {:?}", opcode));
+        let (cycles, data): (u8, Data) = match opcode {
+            Reset::HLBit0 => (12, Data::None),
+            Reset::HLBit1 => (12, Data::None),
+            Reset::HLBit2 => (12, Data::None),
+            Reset::HLBit3 => (12, Data::None),
+            Reset::HLBit4 => (12, Data::None),
+            Reset::HLBit5 => (12, Data::None),
+            Reset::HLBit6 => (12, Data::None),
+            Reset::HLBit7 => (12, Data::None),
+            _ => (8, Data::None),
+        };
+
+        let code: u8 = opcode.into();
+        Self {
+            name,
+            code,
+            cycles,
+            data,
+        }
+    }
+}
+
+impl From<Test> for Disass<u8> {
+    fn from(opcode: Test) -> Self {
+        let name = format!("{:<12}", format!("Test {:?}", opcode));
+        let (cycles, data): (u8, Data) = match opcode {
+            Test::HLBit0 => (12, Data::None),
+            Test::HLBit1 => (12, Data::None),
+            Test::HLBit2 => (12, Data::None),
+            Test::HLBit3 => (12, Data::None),
+            Test::HLBit4 => (12, Data::None),
+            Test::HLBit5 => (12, Data::None),
+            Test::HLBit6 => (12, Data::None),
+            Test::HLBit7 => (12, Data::None),
+            _ => (8, Data::None),
+        };
+
+        let code: u8 = opcode.into();
+        Self {
+            name,
+            code,
+            cycles,
+            data,
+        }
+    }
+}
 
 impl TryFrom<Jump> for Disass<(u8, u8)> {
     type Error = shared::Error;
