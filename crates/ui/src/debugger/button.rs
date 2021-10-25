@@ -1,8 +1,9 @@
-use crate::style::{fonts, Theme};
-use iced_wgpu::{button, Renderer, Text};
-use iced_winit::{Element, Length};
+use crate::style::Theme;
+use iced_wgpu::{button, Renderer};
+use iced_winit::Element;
 
 use super::menu::MenuMsg;
+use super::widgets::Text;
 use soc::Runner;
 
 pub struct Button {
@@ -32,6 +33,7 @@ impl Button {
             MenuMsg::Frame => {
                 self.runner.borrow_mut().frame();
             }
+            _ => (),
         }
     }
 
@@ -40,12 +42,10 @@ impl Button {
     }
 
     pub fn view(&mut self, theme: Theme) -> Element<MenuMsg, Renderer> {
-        let text = Text::new(format!("{:?}", self.message))
-            .font(fonts::HASKLIG_LIGHT)
-            .size(20);
+        let text = format!("{:?}", self.message);
+        let text = Text::new(format!("{:^10}", text)).bold(20);
         button::Button::new(&mut self.state, text)
             .on_press(self.message)
-            .width(Length::Fill)
             .style(theme)
             .into()
     }

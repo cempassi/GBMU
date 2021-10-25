@@ -21,7 +21,11 @@ impl CpuRegisters {
     pub fn new(registers: Registers) -> Self {
         let mut ui = Vec::new();
         for (left, right) in Bits8::into_enum_iter().tuples() {
-            ui.push(RegisterPair::Splited(left, right));
+            if left == Bits8::H {
+                ui.push(RegisterPair::Merged(Bits16::HL));
+            } else {
+                ui.push(RegisterPair::Splited(left, right));
+            }
         }
         ui.push(RegisterPair::NoSplit(Bits16::SP));
         ui.push(RegisterPair::NoSplit(Bits16::PC));
