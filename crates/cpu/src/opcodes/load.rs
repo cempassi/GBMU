@@ -112,13 +112,13 @@ use super::decode::{Decode, Decoder};
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Load {
-    B = 0x06,
-    C = 0x0e,
-    D = 0x16,
-    E = 0x1e,
-    H = 0x26,
-    L = 0x2e,
-    A = 0x3e,
+    B8b = 0x06,
+    C8b = 0x0e,
+    D8b = 0x16,
+    E8b = 0x1e,
+    H8b = 0x26,
+    L8b = 0x2e,
+    A8b = 0x3e,
     AA = 0x7f,
     AB = 0x78,
     AC = 0x79,
@@ -251,13 +251,13 @@ impl Load {
             Load::AHLP => Set::LoadIncrease.run(registers, memory).await?,
             Load::AHLM => Set::LoadDecrease.run(registers, memory).await?,
             Load::HL8b => Set::LoadHL8b.run(registers, memory).await?,
-            Load::B => Set::Load8b(Bits8::B).run(registers, memory).await?,
-            Load::C => Set::Load8b(Bits8::C).run(registers, memory).await?,
-            Load::D => Set::Load8b(Bits8::D).run(registers, memory).await?,
-            Load::E => Set::Load8b(Bits8::E).run(registers, memory).await?,
-            Load::H => Set::Load8b(Bits8::H).run(registers, memory).await?,
-            Load::L => Set::Load8b(Bits8::L).run(registers, memory).await?,
-            Load::A => Set::Load8b(Bits8::A).run(registers, memory).await?,
+            Load::B8b => Set::Load8b(Bits8::B).run(registers, memory).await?,
+            Load::C8b => Set::Load8b(Bits8::C).run(registers, memory).await?,
+            Load::D8b => Set::Load8b(Bits8::D).run(registers, memory).await?,
+            Load::E8b => Set::Load8b(Bits8::E).run(registers, memory).await?,
+            Load::H8b => Set::Load8b(Bits8::H).run(registers, memory).await?,
+            Load::L8b => Set::Load8b(Bits8::L).run(registers, memory).await?,
+            Load::A8b => Set::Load8b(Bits8::A).run(registers, memory).await?,
             Load::BHL => Set::LoadHL(Bits8::B).run(registers, memory).await?,
             Load::CHL => Set::LoadHL(Bits8::C).run(registers, memory).await?,
             Load::DHL => Set::LoadHL(Bits8::D).run(registers, memory).await?,
@@ -329,7 +329,7 @@ mod test_instruction_load_reg_reg {
     fn test_load_reg_b_from_next_byte() {
         let register = Registers::default();
         let memory = Memory::default();
-        let ldr8b = Load::B;
+        let ldr8b = Load::B8b;
         let byte = memory.borrow().get_u8(register.borrow().pc).unwrap();
         assert_eq!(byte, 0x31);
         let future = ldr8b.exec(register.clone(), memory);

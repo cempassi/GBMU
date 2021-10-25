@@ -5,7 +5,7 @@ use crate::registers::{
     Arithmetic as A, Bits8,
 };
 use memory::Memory;
-use num_enum::TryFromPrimitive;
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 
 /// [ADD | ADC] A,n
@@ -52,7 +52,7 @@ use shared::Error;
 ///  SUB        A,L          0x95   4        SBC         A,L        0x9D   4
 ///  SUB        A,(HL)       0x96   8        SBC         A,(HL)     0x9E   8
 ///  SUB        A,8b         0xd6   8        SBC         A,8b       0xDE     ?
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
+#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Arithmetic {
@@ -117,6 +117,20 @@ impl Arithmetic {
             Arithmetic::AAcE => registers.borrow_mut().add(Bits8::E, true),
             Arithmetic::AAcH => registers.borrow_mut().add(Bits8::H, true),
             Arithmetic::AAcL => registers.borrow_mut().add(Bits8::L, true),
+            Arithmetic::SAB => registers.borrow_mut().sub(Bits8::B, false),
+            Arithmetic::SAC => registers.borrow_mut().sub(Bits8::C, false),
+            Arithmetic::SAD => registers.borrow_mut().sub(Bits8::D, false),
+            Arithmetic::SAE => registers.borrow_mut().sub(Bits8::E, false),
+            Arithmetic::SAH => registers.borrow_mut().sub(Bits8::H, false),
+            Arithmetic::SAL => registers.borrow_mut().sub(Bits8::L, false),
+            Arithmetic::SAA => registers.borrow_mut().sub(Bits8::A, false),
+            Arithmetic::SAcB => registers.borrow_mut().sub(Bits8::B, true),
+            Arithmetic::SAcC => registers.borrow_mut().sub(Bits8::C, true),
+            Arithmetic::SAcD => registers.borrow_mut().sub(Bits8::D, true),
+            Arithmetic::SAcE => registers.borrow_mut().sub(Bits8::E, true),
+            Arithmetic::SAcH => registers.borrow_mut().sub(Bits8::H, true),
+            Arithmetic::SAcL => registers.borrow_mut().sub(Bits8::L, true),
+            Arithmetic::SAcA => registers.borrow_mut().sub(Bits8::A, true),
             Arithmetic::AAc8b => {
                 Set::CalculNext(Operation::AddCarry)
                     .run(registers, memory)
@@ -137,20 +151,6 @@ impl Arithmetic {
                     .run(registers, memory)
                     .await?
             }
-            Arithmetic::SAB => registers.borrow_mut().sub(Bits8::B, false),
-            Arithmetic::SAC => registers.borrow_mut().sub(Bits8::C, false),
-            Arithmetic::SAD => registers.borrow_mut().sub(Bits8::D, false),
-            Arithmetic::SAE => registers.borrow_mut().sub(Bits8::E, false),
-            Arithmetic::SAH => registers.borrow_mut().sub(Bits8::H, false),
-            Arithmetic::SAL => registers.borrow_mut().sub(Bits8::L, false),
-            Arithmetic::SAA => registers.borrow_mut().sub(Bits8::A, false),
-            Arithmetic::SAcB => registers.borrow_mut().sub(Bits8::B, true),
-            Arithmetic::SAcC => registers.borrow_mut().sub(Bits8::C, true),
-            Arithmetic::SAcD => registers.borrow_mut().sub(Bits8::D, true),
-            Arithmetic::SAcE => registers.borrow_mut().sub(Bits8::E, true),
-            Arithmetic::SAcH => registers.borrow_mut().sub(Bits8::H, true),
-            Arithmetic::SAcL => registers.borrow_mut().sub(Bits8::L, true),
-            Arithmetic::SAcA => registers.borrow_mut().sub(Bits8::A, true),
             Arithmetic::SAHL => {
                 Set::CalculHL(Operation::SubNoCarry)
                     .run(registers, memory)

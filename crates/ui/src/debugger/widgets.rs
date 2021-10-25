@@ -1,3 +1,6 @@
+pub(crate) mod cell;
 pub mod hexdump;
+pub(crate) mod text;
 
-pub use hexdump::Hexdump;
+pub(crate) use cell::Cell;
+pub(crate) use text::Text;

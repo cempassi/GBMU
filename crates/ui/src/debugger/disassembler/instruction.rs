@@ -1,12 +1,16 @@
-use iced_wgpu::{Renderer, Row, Text};
+use cpu::opcodes::Rotate;
+use iced_wgpu::{Renderer, Row};
 use iced_winit::Element;
 use num_enum::TryFromPrimitive;
 
 use super::DisassMsg;
-use crate::style::fonts;
+use crate::debugger::widgets::Cell;
+use cpu::opcodes::Arithmetic;
 use cpu::opcodes::Jump;
 use cpu::opcodes::Load;
 use cpu::opcodes::Load16b;
+use cpu::opcodes::Logic;
+use cpu::opcodes::Shift;
 use memory::Memory;
 use shared::Error;
 
@@ -31,6 +35,14 @@ impl Instruction {
                 Ok(Cycles::Absolute(Disass::<u8>::from(opcode)))
             } else if let Ok(opcode) = Load16b::try_from_primitive(opcode) {
                 Ok(Cycles::Absolute(Disass::<u8>::from(opcode)))
+            } else if let Ok(opcode) = Arithmetic::try_from_primitive(opcode) {
+                Ok(Cycles::Absolute(Disass::<u8>::from(opcode)))
+            } else if let Ok(opcode) = Logic::try_from_primitive(opcode) {
+                Ok(Cycles::Absolute(Disass::<u8>::from(opcode)))
+            } else if let Ok(opcode) = Rotate::try_from_primitive(opcode) {
+                Ok(Cycles::Absolute(Disass::<u8>::from(opcode)))
+            } else if let Ok(opcode) = Shift::try_from_primitive(opcode) {
+                Ok(Cycles::Absolute(Disass::<u8>::from(opcode)))
             } else {
                 Err(Error::Unimplemented)
             }
@@ -44,10 +56,15 @@ impl Instruction {
     }
 
     pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
-        let address = Text::new(format!("{:#X}", self.address))
-            .font(fonts::HASKLIG_LIGHT)
-            .size(20);
+        let address = Cell::light(format!("{:^12}", format!("{:#04X}", self.address)), 20);
         Row::new().push(address).push(self.disass.view()).into()
+    }
+
+    pub fn fetched(&self) -> u16 {
+        match &self.disass {
+            Cycles::Absolute(disass) => disass.fetched(),
+            Cycles::Conditionnal(disass) => disass.fetched(),
+        }
     }
 }
 
@@ -81,18 +98,10 @@ pub(super) struct Disass<T> {
 
 impl Disass<u8> {
     pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
-        let name = Text::new(self.name.to_string())
-            .font(fonts::HASKLIG_LIGHT)
-            .size(20);
-        let code = Text::new(format!("{:#X}", self.code))
-            .font(fonts::HASKLIG_LIGHT)
-            .size(20);
-        let cycles = Text::new(format!("{}", self.cycles))
-            .font(fonts::HASKLIG_LIGHT)
-            .size(20);
-        let data = Text::new(self.data.to_string())
-            .font(fonts::HASKLIG_LIGHT)
-            .size(20);
+        let name = Cell::light(self.name.clone(), 20);
+        let code = Cell::light(format!("{:^12}", format!("{:#04X}", self.code)), 20);
+        let cycles = Cell::light(format!("{:^12}", format!("{:>2}", self.cycles)), 20);
+        let data = Cell::light(self.data.to_string(), 20);
 
         Row::new()
             .push(name)
@@ -105,18 +114,11 @@ impl Disass<u8> {
 
 impl Disass<(u8, u8)> {
     pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
-        let name = Text::new(self.name.to_string())
-            .font(fonts::HASKLIG_LIGHT)
-            .size(20);
-        let code = Text::new(format!("{:#X}", self.code))
-            .font(fonts::HASKLIG_LIGHT)
-            .size(20);
-        let cycles = Text::new(format!("{}/{}", self.cycles.0, self.cycles.1))
-            .font(fonts::HASKLIG_LIGHT)
-            .size(20);
-        let data = Text::new(self.data.to_string())
-            .font(fonts::HASKLIG_LIGHT)
-            .size(20);
+        let name = Cell::light(self.name.to_string(), 20);
+        let code = Cell::light(format!("{:#X}", self.code), 20);
+        let cycles = format!("{:^12}", format!("{}/{}", self.cycles.0, self.cycles.1));
+        let cycles = Cell::light(cycles, 20);
+        let data = Cell::light(self.data.to_string(), 20);
 
         Row::new()
             .push(name)
@@ -128,17 +130,27 @@ impl Disass<(u8, u8)> {
 }
 
 pub enum Data {
-    //None,
+    None,
     Bits8(u8),
     Bits16(u16),
+}
+
+impl<T> Disass<T> {
+    pub fn fetched(&self) -> u16 {
+        match self.data {
+            Data::None => 1,
+            Data::Bits8(_) => 2,
+            Data::Bits16(_) => 3,
+        }
+    }
 }
 
 impl Data {
     pub fn set(&mut self, memory: &Memory, address: u16) -> Result<(), Error> {
         match self {
-            //Data::None => (),
-            Data::Bits8(ref mut data) => *data = memory.borrow().get_u8(address)?,
-            Data::Bits16(ref mut data) => *data = memory.borrow().get_u16(address)?,
+            Data::None => (),
+            Data::Bits8(ref mut data) => *data = memory.borrow().get_u8(address + 1)?,
+            Data::Bits16(ref mut data) => *data = memory.borrow().get_u16(address + 1)?,
         };
         Ok(())
     }
@@ -147,9 +159,13 @@ impl Data {
 impl ToString for Data {
     fn to_string(&self) -> String {
         match self {
-            //Data::None => "None".to_owned(),
-            Data::Bits8(data) => format!("{:#X}", data),
-            Data::Bits16(data) => format!("{:#X}", data),
+            Data::None => format!("{:^12}", "None"),
+            Data::Bits8(data) => {
+                format!("{:^12}", format!("{:#X}", *data))
+            }
+            Data::Bits16(data) => {
+                format!("{:^12}", format!("{:#X}", *data))
+            }
         }
     }
 }

@@ -6,7 +6,7 @@ use crate::{
     Registers,
 };
 use memory::Memory;
-use num_enum::TryFromPrimitive;
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 
 use super::decode::{Decode, Decoder};
@@ -47,7 +47,7 @@ use super::decode::{Decode, Decoder};
 ///
 /// C <- [7 <- 0] <- [7]
 
-/// Cycles: 2 | 4 for [HL]
+/// Cycles: 8 | 16 for [HL]
 ///
 /// Bytes: 2 | 4 for [HL]
 ///
@@ -58,7 +58,7 @@ use super::decode::{Decode, Decoder};
 /// H - Unused
 /// C - Set according to result.
 
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
+#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Rotate {

@@ -57,11 +57,11 @@ pub enum Load16b {
     PopBC = 0xc1,
     PopDE = 0xd1,
     PopHL = 0xe1,
-    BC = 0x01,
-    DE = 0x11,
-    HL = 0x21,
-    SP = 0x31,
-    A16SP = 0x08,
+    LoadBC = 0x01,
+    LoadDE = 0x11,
+    LoadHL = 0x21,
+    LoadSP = 0x31,
+    LoadA16SP = 0x08,
 }
 
 impl Decoder for Load16b {
@@ -81,11 +81,11 @@ impl Load16b {
             Load16b::PopBC => Set::Pop(Bits16::BC).run(registers, memory),
             Load16b::PopDE => Set::Pop(Bits16::DE).run(registers, memory),
             Load16b::PopHL => Set::Pop(Bits16::HL).run(registers, memory),
-            Load16b::BC => Set::Load16b(Bits16::BC).run(registers, memory),
-            Load16b::DE => Set::Load16b(Bits16::DE).run(registers, memory),
-            Load16b::HL => Set::Load16b(Bits16::HL).run(registers, memory),
-            Load16b::SP => Set::Load16b(Bits16::SP).run(registers, memory),
-            Load16b::A16SP => Set::Data(Bits16::SP).run(registers, memory),
+            Load16b::LoadBC => Set::Load16b(Bits16::BC).run(registers, memory),
+            Load16b::LoadDE => Set::Load16b(Bits16::DE).run(registers, memory),
+            Load16b::LoadHL => Set::Load16b(Bits16::HL).run(registers, memory),
+            Load16b::LoadSP => Set::Load16b(Bits16::SP).run(registers, memory),
+            Load16b::LoadA16SP => Set::Data(Bits16::SP).run(registers, memory),
         }
         .await
     }
@@ -103,7 +103,7 @@ mod test_load_register_u16 {
     fn test_load_register_bc() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = Load16b::BC;
+        let instruction = Load16b::LoadBC;
         register.borrow_mut().set(Bits16::PC, 0xc000);
         memory.borrow_mut().set_u16(0xc000, 0x4242).unwrap();
         executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
@@ -114,7 +114,7 @@ mod test_load_register_u16 {
     fn test_load_to_address_at_next_u16() {
         let register = Registers::default();
         let memory = Memory::default();
-        let instruction = Load16b::A16SP;
+        let instruction = Load16b::LoadA16SP;
         register.borrow_mut().set(Bits16::PC, 0xc000);
         memory.borrow_mut().set_u16(0xc000, 0xc002).unwrap();
         register.borrow_mut().set(Bits16::SP, 0x4242);
