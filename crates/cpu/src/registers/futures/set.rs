@@ -15,6 +15,7 @@ pub(crate) enum Set {
     CalculHL(Operation),
     CalculNext(Operation),
     CbHL(CbOperation),
+    TestHL(u8),
     Load8b(Bits8),
     Load16b(Bits16),
     LoadHL(Bits8),
@@ -57,6 +58,7 @@ impl Set {
                 Box::pin(load::reg_from(registers, memory, dst, src))
             }
             Set::CbHL(operation) => Box::pin(cb::hl(registers, memory, operation)),
+            Set::TestHL(bit) => Box::pin(cb::test(registers, memory, bit)),
         }
     }
 }

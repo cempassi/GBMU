@@ -1,5 +1,6 @@
 pub(crate) mod area;
 pub(crate) mod arithmetic;
+pub(crate) mod bitwise;
 pub mod bus;
 pub(crate) mod flags;
 pub(crate) mod futures;
@@ -11,6 +12,7 @@ pub(crate) mod shift;
 
 pub use area::{Bits16, Bits8, Flag};
 pub(crate) use arithmetic::Arithmetic;
+pub(crate) use bitwise::Bitwise;
 pub use bus::Bus;
 pub(crate) use flags::Flags;
 pub(crate) use jump::{Absolute, Relative};

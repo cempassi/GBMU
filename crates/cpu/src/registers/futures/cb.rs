@@ -1,5 +1,5 @@
 use super::{AsyncGet, Get, Set};
-use crate::registers::{Bits16, Rotation, Shift};
+use crate::registers::{Bits16, Bitwise, Rotation, Shift};
 use crate::Registers;
 use memory::Memory;
 use shared::Error;
@@ -17,6 +17,8 @@ pub enum Operation {
     Swap,
     SRArithmetic,
     SRLogic,
+    Reset(u8),
+    Bitset(u8),
 }
 
 fn calculate(registers: Registers, data: u8, operation: Operation) -> u8 {
@@ -30,6 +32,8 @@ fn calculate(registers: Registers, data: u8, operation: Operation) -> u8 {
         Operation::Swap => registers.swap(data),
         Operation::SRArithmetic => registers.shift_arithmetic(data),
         Operation::SRLogic => registers.shift_logic(data),
+        Operation::Reset(bit) => registers.reset(data, bit),
+        Operation::Bitset(bit) => registers.bitset(data, bit),
     }
 }
 
@@ -46,4 +50,12 @@ pub(crate) async fn hl(
         .run(registers, memory)
         .await?
         + cycles)
+}
+
+pub(crate) async fn test(registers: Registers, memory: Memory, bit: u8) -> Result<u8, Error> {
+    let (data, cycles): (u8, u8) = Get::BitsAt(Bits16::HL)
+        .get(registers.clone(), memory.clone())
+        .await?;
+    registers.borrow_mut().test(data, bit);
+    Ok(cycles)
 }
