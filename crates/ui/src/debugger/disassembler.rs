@@ -4,10 +4,8 @@ use iced_winit::Element;
 
 use cpu::Registers;
 use memory::Memory;
+mod conversion;
 mod instruction;
-mod jump;
-mod load;
-mod load16b;
 
 use instruction::Instruction;
 use shared::Error;

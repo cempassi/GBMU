@@ -1,12 +1,16 @@
+use cpu::opcodes::Rotate;
 use iced_wgpu::{Renderer, Row, Text};
 use iced_winit::Element;
 use num_enum::TryFromPrimitive;
 
 use super::DisassMsg;
 use crate::style::fonts;
+use cpu::opcodes::Arithmetic;
 use cpu::opcodes::Jump;
 use cpu::opcodes::Load;
 use cpu::opcodes::Load16b;
+use cpu::opcodes::Logic;
+use cpu::opcodes::Shift;
 use memory::Memory;
 use shared::Error;
 
@@ -30,6 +34,14 @@ impl Instruction {
             } else if let Ok(opcode) = Load::try_from_primitive(opcode) {
                 Ok(Cycles::Absolute(Disass::<u8>::from(opcode)))
             } else if let Ok(opcode) = Load16b::try_from_primitive(opcode) {
+                Ok(Cycles::Absolute(Disass::<u8>::from(opcode)))
+            } else if let Ok(opcode) = Arithmetic::try_from_primitive(opcode) {
+                Ok(Cycles::Absolute(Disass::<u8>::from(opcode)))
+            } else if let Ok(opcode) = Logic::try_from_primitive(opcode) {
+                Ok(Cycles::Absolute(Disass::<u8>::from(opcode)))
+            } else if let Ok(opcode) = Rotate::try_from_primitive(opcode) {
+                Ok(Cycles::Absolute(Disass::<u8>::from(opcode)))
+            } else if let Ok(opcode) = Shift::try_from_primitive(opcode) {
                 Ok(Cycles::Absolute(Disass::<u8>::from(opcode)))
             } else {
                 Err(Error::Unimplemented)
@@ -128,7 +140,7 @@ impl Disass<(u8, u8)> {
 }
 
 pub enum Data {
-    //None,
+    None,
     Bits8(u8),
     Bits16(u16),
 }
@@ -136,7 +148,7 @@ pub enum Data {
 impl Data {
     pub fn set(&mut self, memory: &Memory, address: u16) -> Result<(), Error> {
         match self {
-            //Data::None => (),
+            Data::None => (),
             Data::Bits8(ref mut data) => *data = memory.borrow().get_u8(address)?,
             Data::Bits16(ref mut data) => *data = memory.borrow().get_u16(address)?,
         };
@@ -147,7 +159,7 @@ impl Data {
 impl ToString for Data {
     fn to_string(&self) -> String {
         match self {
-            //Data::None => "None".to_owned(),
+            Data::None => "None".to_owned(),
             Data::Bits8(data) => format!("{:#X}", data),
             Data::Bits16(data) => format!("{:#X}", data),
         }
