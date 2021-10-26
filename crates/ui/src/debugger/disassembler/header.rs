@@ -13,7 +13,7 @@ impl Header {
 
     pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
         let address = Cell::bold(format!("{:^12}", "Address"), 20);
-        let instruction = Cell::bold(format!("{:^12}", "Instruction"), 20);
+        let instruction = Cell::bold(format!("{:^14}", "Instruction"), 20);
         let cycles = Cell::bold(format!("{:^12}", "Cycles"), 20);
         let opcode = Cell::bold(format!("{:^12}", "Opcode"), 20);
         let data = Cell::bold(format!("{:^12}", "Data"), 20);

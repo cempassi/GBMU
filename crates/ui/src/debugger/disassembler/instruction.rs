@@ -99,7 +99,8 @@ pub(super) struct Disass<T> {
 impl Disass<u8> {
     pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
         let name = Cell::light(self.name.clone(), 20);
-        let code = Cell::light(format!("{:^12}", format!("{:#04X}", self.code)), 20);
+        let code = format!("{:#04X}", self.code);
+        let code = Cell::light(format!("{:^14}", code), 20);
         let cycles = Cell::light(format!("{:^12}", format!("{:>2}", self.cycles)), 20);
         let data = Cell::light(self.data.to_string(), 20);
 
@@ -115,7 +116,8 @@ impl Disass<u8> {
 impl Disass<(u8, u8)> {
     pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
         let name = Cell::light(self.name.to_string(), 20);
-        let code = Cell::light(format!("{:#X}", self.code), 20);
+        let code = format!("{:#X}", self.code);
+        let code = Cell::light(format!("{:^12}", code), 20);
         let cycles = format!("{:^12}", format!("{}/{}", self.cycles.0, self.cycles.1));
         let cycles = Cell::light(cycles, 20);
         let data = Cell::light(self.data.to_string(), 20);
@@ -126,6 +128,12 @@ impl Disass<(u8, u8)> {
             .push(cycles)
             .push(data)
             .into()
+    }
+}
+
+impl<T> Disass<T> {
+    pub fn name(name: String) -> String {
+        format!("{:^16}", name)
     }
 }
 
@@ -159,12 +167,12 @@ impl Data {
 impl ToString for Data {
     fn to_string(&self) -> String {
         match self {
-            Data::None => format!("{:^12}", "None"),
+            Data::None => format!("{:^16}", "None"),
             Data::Bits8(data) => {
-                format!("{:^12}", format!("{:#X}", *data))
+                format!("{:^16}", format!("{:#X}", *data))
             }
             Data::Bits16(data) => {
-                format!("{:^12}", format!("{:#X}", *data))
+                format!("{:^16}", format!("{:#X}", *data))
             }
         }
     }

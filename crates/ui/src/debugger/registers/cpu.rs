@@ -1,4 +1,5 @@
 use super::register::{Merge, RegisterMsg, Split, View};
+use crate::debugger::widgets::Text;
 use crate::style::Theme;
 use cpu::registers::{Bits16, Bits8};
 use cpu::Registers;
@@ -42,6 +43,8 @@ impl CpuRegisters {
     }
 
     pub fn view(&mut self, theme: Theme) -> Element<CpuMsg, Renderer> {
+        let title = Text::new("Cpu Registers").medium_it(20);
+        let cpu_registers = Column::new().push(title).align_items(Alignment::Center);
         let column =
             self.ui
                 .iter()
@@ -50,7 +53,7 @@ impl CpuRegisters {
                     let element = register_ui.view(self.registers.clone(), theme);
                     column.push(element.map(move |_message| CpuMsg::Merge(index)))
                 });
-        column.padding(15).spacing(5).into()
+        cpu_registers.push(column.padding(15).spacing(5)).into()
     }
 }
 

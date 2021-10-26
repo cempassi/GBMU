@@ -43,7 +43,8 @@ impl Button {
 
     pub fn view(&mut self, theme: Theme) -> Element<MenuMsg, Renderer> {
         let text = format!("{:?}", self.message);
-        let text = Text::new(format!("{:^10}", text)).bold(20);
+        let text = format!("{:^10}", text);
+        let text = Text::new(&text).bold(20);
         button::Button::new(&mut self.state, text)
             .on_press(self.message)
             .style(theme)
