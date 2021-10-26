@@ -1862,6 +1862,7 @@ dependencies = [
  "itertools",
  "memory",
  "num_enum",
+ "ppu",
  "shared",
  "soc",
 ]

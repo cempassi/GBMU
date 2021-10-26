@@ -29,7 +29,7 @@ impl From<Bitset> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }
@@ -54,7 +54,7 @@ impl From<Reset> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }
@@ -79,7 +79,7 @@ impl From<Test> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }
@@ -112,7 +112,7 @@ impl TryFrom<Jump> for Disass<(u8, u8)> {
         let code: u8 = opcode.into();
         Ok(Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         })
@@ -134,7 +134,7 @@ impl TryFrom<Jump> for Disass<u8> {
         let code: u8 = opcode.into();
         Ok(Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         })
@@ -159,7 +159,7 @@ impl From<Logic> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }
@@ -180,7 +180,7 @@ impl From<Rotate> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }
@@ -227,7 +227,7 @@ impl From<Load> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }
@@ -253,7 +253,7 @@ impl From<Load16b> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }
@@ -274,7 +274,7 @@ impl From<Shift> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }
@@ -299,7 +299,7 @@ impl From<Arithmetic> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }

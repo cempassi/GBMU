@@ -19,4 +19,5 @@ iced_graphics = {git = "https://github.com/hecrj/iced"}
 shared = { path = "../shared" }
 soc = { path = "../soc" }
 cpu = { path = "../cpu" }
+ppu = { path = "../ppu" }
 memory = { path = "../memory" }
