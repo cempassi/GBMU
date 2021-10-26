@@ -10,6 +10,7 @@ type Getter<T> = Pin<Box<dyn Future<Output = Result<(T, u8), Error>>>>;
 pub(crate) enum Get {
     Next,
     BitsAt(Bits16),
+    Nop,
 }
 
 pub trait AsyncGet<T> {
@@ -21,6 +22,7 @@ impl AsyncGet<u8> for Get {
         match self {
             Get::Next => Box::pin(bits8(registers, memory)),
             Get::BitsAt(area) => Box::pin(u8_at(registers, memory, area)),
+            Get::Nop => Box::pin(nop_u8(memory)),
         }
     }
 }
@@ -30,8 +32,19 @@ impl AsyncGet<u16> for Get {
         match self {
             Get::Next => Box::pin(bits16(registers, memory)),
             Get::BitsAt(area) => Box::pin(u16_at(registers, memory, area)),
+            Get::Nop => Box::pin(nop_u16(memory)),
         }
     }
+}
+
+pub async fn nop_u8(memory: Memory) -> Result<(u8, u8), Error> {
+    let (_, cycles) = memory.get::<u8>(0xc000).await?;
+    Ok((0, cycles))
+}
+
+pub async fn nop_u16(memory: Memory) -> Result<(u16, u8), Error> {
+    let (_, cycles) = memory.get::<u16>(0xc000).await?;
+    Ok((0, cycles))
 }
 
 pub async fn bits8(registers: Registers, memory: Memory) -> Result<(u8, u8), Error> {

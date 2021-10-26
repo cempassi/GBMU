@@ -1,134 +1,65 @@
-use super::{Bits16, Bits8, Bus, Flag, Registers};
+use super::{Bits16, Bits8, Bus, Carry, Flag, Registers};
 
-const HALF_U8: u8 = 0xF;
-const HALF_U16: u16 = 0xFF;
+pub trait Arithmetic<T> {
+    fn add(&mut self, lhs: T, use_carry: bool) -> u8;
 
-pub trait Arithmetic<T, U> {
-    fn increase(&mut self, _: T, n: U) -> u8;
-
-    fn decrease(&mut self, _: T, n: U) -> u8;
-
-    fn add(&mut self, lhs: U, use_carry: bool) -> u8;
-
-    fn sub(&mut self, lhs: U, use_carry: bool) -> u8;
+    fn sub(&mut self, lhs: T, use_carry: bool) -> u8;
 }
 
-impl Arithmetic<Bits8, u8> for Registers {
-    fn increase(&mut self, area: Bits8, n: u8) -> u8 {
-        let data = self.get(area).wrapping_add(n);
-        self.set(area, data);
-        self.set(Flag::N, false);
-        self.set(Flag::Z, data == 0);
-        0
-    }
-
-    fn decrease(&mut self, area: Bits8, n: u8) -> u8 {
-        let data = self.get(area).wrapping_sub(n);
-        self.set(area, data);
-        self.set(Flag::N, true);
-        self.set(Flag::Z, data == 0);
-        0
-    }
-
+impl Arithmetic<u8> for Registers {
     fn add(&mut self, data: u8, use_carry: bool) -> u8 {
-        let carry: u8 = if use_carry && self.get(Flag::C) { 1 } else { 0 };
+        let carry: u8 = self.f.is_carried(use_carry);
         let a = self.get(Bits8::A);
-        let (result, check_carry) = a.overflowing_add(data + carry);
-        let check_half = (a & HALF_U8) + (data & HALF_U8) + carry > HALF_U8;
+        let result = self.f.checked_add(a, data + carry);
+        self.set(Flag::N, false);
         self.set(Bits8::A, result);
-        self.set(Flag::H, check_half);
-        self.set(Flag::C, check_carry);
-        self.set(Flag::Z, result == 0);
         0
     }
 
     fn sub(&mut self, data: u8, use_carry: bool) -> u8 {
-        let carry: u8 = if use_carry && self.get(Flag::C) { 1 } else { 0 };
+        let carry: u8 = self.f.is_carried(use_carry);
         let a = self.get(Bits8::A);
-        let (result, check_carry) = a.overflowing_sub(data + carry);
-        let check_half = (a & HALF_U8) < (data & HALF_U8) + carry;
-        self.set(Bits8::A, result);
-        self.set(Flag::C, check_carry);
-        self.set(Flag::H, check_half);
+        let result = self.f.checked_sub(a, data + carry);
         self.set(Flag::N, true);
-        self.set(Flag::Z, result == 0);
+        self.set(Bits8::A, result);
         0
     }
 }
 
-impl Arithmetic<Bits8, Bits8> for Registers {
-    fn increase(&mut self, area: Bits8, n: Bits8) -> u8 {
-        let n = self.get(n);
-        let data = self.get(area).wrapping_add(n);
-        self.set(area, data);
-        self.set(Flag::N, false);
-        self.set(Flag::Z, data == 0);
-        0
-    }
-
-    fn decrease(&mut self, area: Bits8, n: Bits8) -> u8 {
-        let n = self.get(n);
-        let data = self.get(area).wrapping_sub(n);
-        self.set(area, data);
-        self.set(Flag::N, true);
-        self.set(Flag::Z, data == 0);
-        0
-    }
-
+impl Arithmetic<Bits8> for Registers {
     fn add(&mut self, data: Bits8, use_carry: bool) -> u8 {
-        let data = self.get(data);
-        let carry: u8 = if use_carry && self.get(Flag::C) { 1 } else { 0 };
+        let data: u8 = self.get(data);
+        let carry: u8 = self.f.is_carried(use_carry);
         let a = self.get(Bits8::A);
-        let (result, check_carry) = a.overflowing_add(data + carry);
-        let check_half = (a & HALF_U8) + (data & HALF_U8) + carry > HALF_U8;
+        let result = self.f.checked_add(a, data + carry);
+        self.set(Flag::N, false);
         self.set(Bits8::A, result);
-        self.set(Flag::H, check_half);
-        self.set(Flag::C, check_carry);
-        self.set(Flag::Z, result == 0);
         0
     }
 
     fn sub(&mut self, data: Bits8, use_carry: bool) -> u8 {
-        let data = self.get(data);
-        let carry: u8 = if use_carry && self.get(Flag::C) { 1 } else { 0 };
+        let data: u8 = self.get(data);
+        let carry: u8 = self.f.is_carried(use_carry);
         let a = self.get(Bits8::A);
-        let (result, check_carry) = a.overflowing_sub(data + carry);
-        let check_half = (a & HALF_U8) < (data & HALF_U8) + carry;
-        self.set(Bits8::A, result);
-        self.set(Flag::C, check_carry);
-        self.set(Flag::H, check_half);
+        let result = self.f.checked_sub(a, data + carry);
         self.set(Flag::N, true);
-        self.set(Flag::Z, result == 0);
+        self.set(Bits8::A, result);
         0
     }
 }
 
-impl Arithmetic<Bits16, u16> for Registers {
-    fn increase(&mut self, area: Bits16, n: u16) -> u8 {
-        let data = self.get(area).wrapping_add(n);
-        self.set(area, data);
-        0
-    }
-
-    fn decrease(&mut self, area: Bits16, n: u16) -> u8 {
-        let data = self.get(area).wrapping_sub(n);
-        self.set(area, data);
-        0
-    }
-
-    fn add(&mut self, data: u16, use_carry: bool) -> u8 {
-        let carry: u16 = if use_carry && self.get(Flag::C) { 1 } else { 0 };
-        let hl = self.get(Bits16::HL);
-        let (result, check_carry) = hl.overflowing_add(data + carry);
-        let check_half = (hl & HALF_U16) + (data & HALF_U16) + carry > HALF_U16;
+impl Arithmetic<Bits16> for Registers {
+    fn add(&mut self, data: Bits16, use_carry: bool) -> u8 {
+        let data = self.get(data);
+        let carry: u16 = self.f.is_carried(use_carry).into();
+        let dst = self.get(Bits16::HL);
+        let result = self.f.checked_add(dst, data + carry);
+        self.set(Flag::N, false);
         self.set(Bits16::HL, result);
-        self.set(Flag::H, check_half);
-        self.set(Flag::C, check_carry);
-        self.set(Flag::Z, result == 0);
         0
     }
 
-    fn sub(&mut self, _data: u16, _use_carry: bool) -> u8 {
+    fn sub(&mut self, _data: Bits16, _use_carry: bool) -> u8 {
         unreachable!()
     }
 }

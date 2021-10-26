@@ -2,7 +2,7 @@ use super::decode::{Decode, Decoder};
 use crate::cpu::Registers;
 use crate::registers::{
     futures::{Operation, Set},
-    Arithmetic as A, Bits8,
+    Arithmetic as A, Bits8, Complement, IncDec,
 };
 use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
@@ -92,6 +92,26 @@ pub enum Arithmetic {
     SAcA = 0x9F,
     SA8b = 0xD6,
     SAc8b = 0xDE,
+    IncB = 0x04,
+    IncD = 0x14,
+    IncH = 0x24,
+    IncHL = 0x34,
+    DecB = 0x05,
+    DecD = 0x15,
+    DecH = 0x25,
+    DecHL = 0x35,
+    IncC = 0x0C,
+    IncE = 0x1C,
+    IncL = 0x2C,
+    IncA = 0x3C,
+    DecC = 0x0D,
+    DecE = 0x1D,
+    DecL = 0x2D,
+    DecA = 0x3D,
+    DAA = 0x26,
+    SCF = 0x37,
+    CPL = 0x2F,
+    CCF = 0x3F,
 }
 
 impl Decoder for Arithmetic {
@@ -171,6 +191,34 @@ impl Arithmetic {
                     .run(registers, memory)
                     .await?
             }
+            Arithmetic::IncB => registers.borrow_mut().increase(Bits8::B, 1),
+            Arithmetic::IncD => registers.borrow_mut().increase(Bits8::D, 1),
+            Arithmetic::IncH => registers.borrow_mut().increase(Bits8::H, 1),
+            Arithmetic::IncHL => {
+                Set::CalculHL(Operation::Increase)
+                    .run(registers, memory)
+                    .await?
+            }
+            Arithmetic::DecB => registers.borrow_mut().decrease(Bits8::B, 1),
+            Arithmetic::DecD => registers.borrow_mut().decrease(Bits8::D, 1),
+            Arithmetic::DecH => registers.borrow_mut().decrease(Bits8::H, 1),
+            Arithmetic::DecHL => {
+                Set::CalculHL(Operation::Decrease)
+                    .run(registers, memory)
+                    .await?
+            }
+            Arithmetic::IncC => registers.borrow_mut().increase(Bits8::C, 1),
+            Arithmetic::IncE => registers.borrow_mut().increase(Bits8::E, 1),
+            Arithmetic::IncL => registers.borrow_mut().increase(Bits8::L, 1),
+            Arithmetic::IncA => registers.borrow_mut().increase(Bits8::A, 1),
+            Arithmetic::DecC => registers.borrow_mut().decrease(Bits8::C, 1),
+            Arithmetic::DecE => registers.borrow_mut().decrease(Bits8::E, 1),
+            Arithmetic::DecL => registers.borrow_mut().decrease(Bits8::L, 1),
+            Arithmetic::DecA => registers.borrow_mut().decrease(Bits8::A, 1),
+            Arithmetic::DAA => registers.borrow_mut().daa(),
+            Arithmetic::SCF => registers.borrow_mut().set_carry(),
+            Arithmetic::CPL => registers.borrow_mut().complement_a(),
+            Arithmetic::CCF => registers.borrow_mut().complement_carry(),
         };
         Ok(cycles)
     }

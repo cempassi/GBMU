@@ -1,5 +1,5 @@
 use super::{AsyncGet, Get, Set};
-use crate::registers::{Arithmetic, Bits16, Bits8, Bus};
+use crate::registers::{Bits16, Bits8, Bus, IncDec};
 use crate::Registers;
 use memory::{Async as A, Memory};
 use shared::Error;

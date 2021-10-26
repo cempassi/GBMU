@@ -1,5 +1,5 @@
 use super::{AsyncGet, Get};
-use crate::registers::{Arithmetic, Bits16, Logical as L};
+use crate::registers::{Arithmetic, Bits16, IncDec, Logical as L};
 use crate::Registers;
 use memory::Memory;
 use shared::Error;
@@ -9,6 +9,8 @@ pub enum Operation {
     SubCarry,
     AddNoCarry,
     SubNoCarry,
+    Increase,
+    Decrease,
     And,
     Or,
     Xor,
@@ -26,6 +28,8 @@ fn calculate(registers: Registers, data: u8, operation: Operation) -> u8 {
         Operation::SubCarry => registers.sub(data, true),
         Operation::AddNoCarry => registers.add(data, false),
         Operation::SubNoCarry => registers.sub(data, false),
+        Operation::Increase => registers.increase(data, 1),
+        Operation::Decrease => registers.decrease(data, 1),
     }
 }
 
