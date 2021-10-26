@@ -9,4 +9,5 @@ pub(crate) mod tile;
 pub(crate) mod transfert;
 
 pub use crate::interface::Ppu;
+pub use crate::registers::{Lcd, Registers};
 pub use crate::runner::Run;
