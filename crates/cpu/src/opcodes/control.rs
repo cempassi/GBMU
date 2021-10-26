@@ -49,7 +49,6 @@ use super::decode::{Decode, Decoder};
 ///     the HALT when that returns.
 /// IME not set
 ///     The behavior depends on whether an interrupt is pending (i.e. Ô[IE] & [IF]Õ is non-zero).
-///
 ///     None pending:
 ///         As soon as an interrupt becomes pending, the CPU resumes execution.
 ///         This is like the above, except that the handler is not called.

@@ -1,6 +1,6 @@
 use crate::cpu::Registers;
 use crate::registers::futures::{Operation, Set};
-use crate::registers::{Bits8, Rotation,  Logical as L};
+use crate::registers::{Bits8, Logical as L, Rotation};
 use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;

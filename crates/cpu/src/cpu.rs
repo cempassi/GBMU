@@ -2,11 +2,11 @@ pub use crate::interface::Registers;
 use crate::opcodes::decode::{Decode, Decoder};
 use crate::opcodes::Arithmetic;
 use crate::opcodes::Arithmetic16b;
+use crate::opcodes::Control;
 use crate::opcodes::Jump;
 use crate::opcodes::Load;
 use crate::opcodes::Load16b;
 use crate::opcodes::Logic;
-use crate::opcodes::Control;
 use shared::Error;
 
 use crate::registers::futures::{AsyncGet, Get};
@@ -36,7 +36,6 @@ impl Cpu {
     }
 
     async fn decode(self, opcode: u8) -> Result<Decode, Error> {
-
         if let Ok(operation) = Control::try_from_primitive(opcode) {
             Ok(operation.decode(self.registers.clone(), self.memory))
         } else if let Ok(operation) = Load::try_from_primitive(opcode) {
