@@ -13,6 +13,28 @@ pub enum Processor {
     Cpu(Cpu, State),
 }
 
+pub enum Finished {
+    Cpu(u8),
+    Ppu(u8),
+    Error(Error),
+    Nope,
+}
+
+impl Finished {
+    pub fn ppu(result: Result<u8, Error>) -> Self {
+        match result {
+            Ok(cycles) => Self::Ppu(cycles),
+            Err(error) => Self::Error(error),
+        }
+    }
+    pub fn cpu(result: Result<u8, Error>) -> Self {
+        match result {
+            Ok(cycles) => Self::Cpu(cycles),
+            Err(error) => Self::Error(error),
+        }
+    }
+}
+
 impl Processor {
     pub fn init(memory: Memory) -> Vec<Self> {
         let ppu = memory.borrow().get_ppu();
@@ -21,58 +43,60 @@ impl Processor {
         vec![cpu, ppu]
     }
 
-    pub fn run(&mut self, context: &mut Context) -> bool {
-        let mut result = false;
+    pub fn run(&mut self, context: &mut Context) -> Finished {
         match self {
             Processor::Ppu(ppu, ref mut state) => {
                 if let Some(mut task) = state.take() {
                     match task.as_mut().poll(context) {
-                        Poll::Ready(_) => {
+                        Poll::Ready(status) => {
                             state.replace(Box::pin(ppu.clone().run()));
-                            result = true;
+                            Finished::ppu(status)
                         }
                         Poll::Pending => {
                             state.replace(task);
+                            Finished::Nope
                         }
-                    };
+                    }
                 } else {
                     let mut task = Box::pin(ppu.clone().run());
                     match task.as_mut().poll(context) {
                         Poll::Pending => {
                             state.replace(task);
+                            Finished::Nope
                         }
-                        Poll::Ready(_) => {
+                        Poll::Ready(status) => {
                             state.replace(Box::pin(ppu.clone().run()));
-                            result = true;
+                            Finished::ppu(status)
                         }
-                    };
+                    }
                 }
             }
             Processor::Cpu(cpu, ref mut state) => {
                 if let Some(mut task) = state.take() {
                     match task.as_mut().poll(context) {
-                        Poll::Ready(_) => {
+                        Poll::Ready(status) => {
                             state.replace(Box::pin(cpu.clone().run()));
-                            result = true;
+                            Finished::cpu(status)
                         }
                         Poll::Pending => {
                             state.replace(task);
+                            Finished::Nope
                         }
-                    };
+                    }
                 } else {
                     let mut task = Box::pin(cpu.clone().run());
                     match task.as_mut().poll(context) {
                         Poll::Pending => {
                             state.replace(task);
+                            Finished::Nope
                         }
-                        Poll::Ready(_) => {
+                        Poll::Ready(status) => {
                             state.replace(Box::pin(cpu.clone().run()));
-                            result = true;
+                            Finished::cpu(status)
                         }
-                    };
+                    }
                 }
             }
-        };
-        result
+        }
     }
 }

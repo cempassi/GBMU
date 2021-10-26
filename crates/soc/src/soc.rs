@@ -1,3 +1,4 @@
+use super::processor::Finished;
 use crate::processor::Processor;
 use crate::runner::Runner;
 use std::fs;
@@ -54,6 +55,19 @@ impl SOC {
             .unwrap()
     }
 
+    pub fn get_ppu(&self) -> ppu::Ppu {
+        self.processors
+            .iter()
+            .find_map(|x| {
+                if let Processor::Ppu(ppu, _) = x {
+                    Some(ppu.clone())
+                } else {
+                    None
+                }
+            })
+            .unwrap()
+    }
+
     pub fn get_memory(&self) -> memory::Memory {
         self.processors
             .iter()
@@ -75,22 +89,20 @@ impl SOC {
         self.runner.borrow_mut().check_tick()
     }
 
-    fn check_redraw(&mut self, redraw: bool) -> bool {
-        self.runner.borrow_mut().check_redraw(redraw)
+    fn check_redraw(&mut self, status: Vec<Finished>) -> bool {
+        self.runner.borrow_mut().check_redraw(status)
     }
 
     pub fn run(&mut self) -> bool {
         let waker = crate::waker::create();
         let mut context = Context::from_waker(&waker);
-        let mut redraw = false;
+        let mut status = Vec::new();
 
         if self.check_tick() {
             for processor in &mut self.processors {
-                if processor.run(&mut context) {
-                    redraw = true;
-                }
+                status.push(processor.run(&mut context));
             }
         }
-        self.check_redraw(redraw)
+        self.check_redraw(status)
     }
 }
