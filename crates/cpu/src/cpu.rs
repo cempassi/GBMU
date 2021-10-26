@@ -1,6 +1,7 @@
 pub use crate::interface::Registers;
 use crate::opcodes::decode::{Decode, Decoder};
 use crate::opcodes::Arithmetic;
+use crate::opcodes::Arithmetic16b;
 use crate::opcodes::Bitset;
 use crate::opcodes::Jump;
 use crate::opcodes::Load;
@@ -69,6 +70,8 @@ impl Cpu {
         } else if let Ok(operation) = Jump::try_from_primitive(opcode) {
             Ok(operation.decode(self.registers.clone(), self.memory.clone()))
         } else if let Ok(operation) = Arithmetic::try_from_primitive(opcode) {
+            Ok(operation.decode(self.registers.clone(), self.memory.clone()))
+        } else if let Ok(operation) = Arithmetic16b::try_from_primitive(opcode) {
             Ok(operation.decode(self.registers.clone(), self.memory.clone()))
         } else if let Ok(operation) = Logic::try_from_primitive(opcode) {
             Ok(operation.decode(self.registers.clone(), self.memory.clone()))
