@@ -11,6 +11,7 @@ mod reset;
 mod rotate;
 mod shift;
 mod test;
+mod control;
 
 pub use arithmetic::Arithmetic;
 pub use arithmetic16b::Arithmetic16b;
@@ -23,3 +24,4 @@ pub use reset::Reset;
 pub use rotate::Rotate;
 pub use shift::Shift;
 pub use test::Test;
+pub use control::Control;
