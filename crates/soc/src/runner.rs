@@ -8,7 +8,7 @@ pub type Runner = Rc<RefCell<Cycle>>;
 #[derive(Debug, Default)]
 pub struct Cycle {
     mode: Mode,
-    redraw: bool,
+    pub(crate) redraw: bool,
     lines: u32,
     ticks: u32,
     last_cpu: u8,
@@ -16,32 +16,28 @@ pub struct Cycle {
 }
 
 impl Cycle {
-    pub fn check_tick(&mut self) -> bool {
-        self.step();
-        !matches!(self.mode, Mode::Idle)
-    }
-
-    pub fn check_redraw(&mut self, status: Vec<Finished>) -> bool {
+    pub fn check_redraw(&mut self, status: &mut Vec<Finished>) {
         for status in status {
             match status {
                 Finished::Cpu(cycles) => {
                     self.mode.update_processing();
-                    self.last_cpu = cycles;
+                    self.last_cpu = *cycles;
                     self.redraw = true;
                 }
                 Finished::Ppu(cycles) => {
                     self.mode.update_processing();
-                    self.last_ppu = cycles;
+                    self.last_ppu = *cycles;
                     self.redraw = true;
                 }
                 Finished::Error(_) => self.redraw = true,
-                Finished::Nope => self.redraw = self.mode.check_redraw(),
+                Finished::Nope if self.mode.is_processing() => (),
+                Finished::Nope if !self.redraw => self.redraw = self.mode.check_redraw(),
+                _ => (),
             }
         }
-        self.redraw
     }
 
-    fn step(&mut self) {
+    pub fn step(&mut self) {
         if let Mode::Line(ticks) = self.mode {
             println!("Processing line, currently at tick {} on 456", ticks);
             if self.mode.increase() {
