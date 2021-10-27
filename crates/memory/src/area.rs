@@ -9,7 +9,7 @@ pub enum Area {
     Wram,
     _EchoRam,
     _Oam,
-    _IOReg,
+    IOReg,
     _HighRam,
 }
 
@@ -23,7 +23,7 @@ impl Area {
             Area::Wram => address - consts::WRAM_MIN,
             Area::_EchoRam => address - consts::ECHO_RAM_MIN,
             Area::_Oam => address - consts::OAM_MIN,
-            Area::_IOReg => address - consts::IOREG_MIN,
+            Area::IOReg => address - consts::IOREG_MIN,
             Area::_HighRam => address - consts::HIGH_MIN,
         };
         result as usize

@@ -12,6 +12,7 @@ use crate::state;
 use crate::wram::Wram;
 use ppu::Ppu;
 use shared::Error;
+use crate::io::IO;
 
 #[derive(Debug)]
 pub struct Memory {
@@ -20,6 +21,7 @@ pub struct Memory {
     pub(crate) rom: Rom,
     pub(crate) wram: Bus,
     pub(crate) ppu: Ppu,
+    pub(crate) io: IO,
 }
 
 impl Default for Memory {
@@ -30,6 +32,7 @@ impl Default for Memory {
             wram: Rc::new(RefCell::new(Box::new(Wram::default()))),
             ppu: Ppu::default(),
             rom: Rom::default(),
+            io: IO::default(),
         }
     }
 }
@@ -47,6 +50,7 @@ impl Memory {
             consts::WRAM_MIN..=consts::WRAM_MAX => {
                 Ok(self.wram.borrow().get(Area::Wram.relative(address)))
             }
+            consts::IOREG_MIN..=consts::IOREM_MAX => Ok(self.io.get(address)),
             _ => Err(Error::InvalidGet(address)),
         }
     }
@@ -67,6 +71,10 @@ impl Memory {
             }
             consts::VRAM_MIN..=consts::VRAM_MAX => {
                 self.ppu.borrow_mut().set(address.into(), data);
+                Ok(())
+            }
+            consts::IOREG_MIN..=consts::IOREM_MAX => {
+                self.io.set(address, data);
                 Ok(())
             }
             _ => Err(Error::InvalidSet(address, data)),
@@ -101,7 +109,7 @@ impl Memory {
             Area::Wram => self.wram.clone(),
             Area::_EchoRam => todo!(),
             Area::_Oam => todo!(),
-            Area::_IOReg => todo!(),
+            Area::IOReg => todo!(),
             Area::_HighRam => todo!(),
         }
     }
@@ -127,12 +135,14 @@ impl Memory {
         let wram: Box<dyn MemoryBus> = Box::new(Wram::default());
         let wram = Rc::new(RefCell::new(wram));
         let ppu = Ppu::default();
+        let io = IO::default();
         Rc::new(RefCell::new(Self {
             state,
             bios,
             rom,
             wram,
             ppu,
+            io
         }))
     }
 }
