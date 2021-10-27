@@ -2,15 +2,13 @@
 
 #[derive(Debug)]
 pub struct Apu {
-    data: Vec<u8>
+    data: Vec<u8>,
 }
 
 impl Apu {
     pub fn new() -> Self {
         let data = vec![0; 0x30];
-        Self {
-            data
-        }
+        Self { data }
     }
 }
 

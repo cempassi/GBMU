@@ -7,12 +7,12 @@ use crate::bios::Bios;
 use crate::bus::MemoryBus;
 use crate::consts;
 use crate::interface::{Bus, Rom};
+use crate::io::IO;
 use crate::mbc::default::RomDefault;
-use crate::state;
 use crate::ram::Ram;
+use crate::state;
 use ppu::Ppu;
 use shared::Error;
-use crate::io::IO;
 
 #[derive(Debug)]
 pub struct Memory {
@@ -23,7 +23,7 @@ pub struct Memory {
     pub(crate) ppu: Ppu,
     pub(crate) hram: Bus,
     pub(crate) io: IO,
-    pub(crate) ie: u8
+    pub(crate) ie: u8,
 }
 
 impl Default for Memory {
@@ -36,7 +36,7 @@ impl Default for Memory {
             rom: Rom::default(),
             io: IO::default(),
             hram: Rc::new(RefCell::new(Box::new(Ram::new(127)))),
-            ie: 0
+            ie: 0,
         }
     }
 }
@@ -58,9 +58,7 @@ impl Memory {
             consts::HRAM_MIN..=consts::HRAM_MAX => {
                 Ok(self.hram.borrow().get(Area::Hram.relative(address)))
             }
-            consts::INTERUPT_ENABLE => {
-                Ok(self.ie)
-            }
+            consts::INTERUPT_ENABLE => Ok(self.ie),
             _ => Err(Error::InvalidGet(address)),
         }
     }
@@ -166,7 +164,7 @@ impl Memory {
             ppu,
             io,
             hram,
-            ie: 0
+            ie: 0,
         }))
     }
 }
