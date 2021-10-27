@@ -9,7 +9,7 @@ use crate::consts;
 use crate::interface::{Bus, Rom};
 use crate::mbc::default::RomDefault;
 use crate::state;
-use crate::wram::Wram;
+use crate::ram::Ram;
 use ppu::Ppu;
 use shared::Error;
 use crate::io::IO;
@@ -21,7 +21,9 @@ pub struct Memory {
     pub(crate) rom: Rom,
     pub(crate) wram: Bus,
     pub(crate) ppu: Ppu,
+    pub(crate) hram: Bus,
     pub(crate) io: IO,
+    pub(crate) ie: u8
 }
 
 impl Default for Memory {
@@ -29,10 +31,12 @@ impl Default for Memory {
         Memory {
             state: state::Rom::Bios,
             bios: Rc::new(RefCell::new(Box::new(Bios::new()))),
-            wram: Rc::new(RefCell::new(Box::new(Wram::default()))),
+            wram: Rc::new(RefCell::new(Box::new(Ram::default()))),
             ppu: Ppu::default(),
             rom: Rom::default(),
             io: IO::default(),
+            hram: Rc::new(RefCell::new(Box::new(Ram::new(127)))),
+            ie: 0
         }
     }
 }
@@ -51,6 +55,12 @@ impl Memory {
                 Ok(self.wram.borrow().get(Area::Wram.relative(address)))
             }
             consts::IOREG_MIN..=consts::IOREM_MAX => Ok(self.io.get(address)),
+            consts::HRAM_MIN..=consts::HRAM_MAX => {
+                Ok(self.hram.borrow().get(Area::Hram.relative(address)))
+            }
+            consts::INTERUPT_ENABLE => {
+                Ok(self.ie)
+            }
             _ => Err(Error::InvalidGet(address)),
         }
     }
@@ -75,6 +85,16 @@ impl Memory {
             }
             consts::IOREG_MIN..=consts::IOREM_MAX => {
                 self.io.set(address, data);
+                Ok(())
+            }
+            consts::HRAM_MIN..=consts::HRAM_MAX => {
+                self.hram
+                    .borrow_mut()
+                    .set(Area::Hram.relative(address), data);
+                Ok(())
+            }
+            consts::INTERUPT_ENABLE => {
+                self.ie = data;
                 Ok(())
             }
             _ => Err(Error::InvalidSet(address, data)),
@@ -110,7 +130,7 @@ impl Memory {
             Area::_EchoRam => todo!(),
             Area::_Oam => todo!(),
             Area::IOReg => todo!(),
-            Area::_HighRam => todo!(),
+            Area::Hram => todo!(),
         }
     }
 
@@ -132,17 +152,21 @@ impl Memory {
         let state = state::Rom::Bios;
         let bios: Box<dyn MemoryBus> = Box::new(Bios::new());
         let bios = Rc::new(RefCell::new(bios));
-        let wram: Box<dyn MemoryBus> = Box::new(Wram::default());
+        let wram: Box<dyn MemoryBus> = Box::new(Ram::default());
         let wram = Rc::new(RefCell::new(wram));
         let ppu = Ppu::default();
         let io = IO::default();
+        let hram: Box<dyn MemoryBus> = Box::new(Ram::new(consts::HIGH_RAM_SIZE));
+        let hram = Rc::new(RefCell::new(hram));
         Rc::new(RefCell::new(Self {
             state,
             bios,
             rom,
             wram,
             ppu,
-            io
+            io,
+            hram,
+            ie: 0
         }))
     }
 }
