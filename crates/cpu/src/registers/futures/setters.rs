@@ -6,14 +6,21 @@ use shared::Error;
 
 const IO_REG: u16 = 0xFF00;
 
-pub async fn update(registers: Registers, memory: Memory, is_increase: bool) -> Result<u8, Error> {
-    let cycles = Set::RegisterAt(Bits16::HL, Bits8::A)
+pub async fn hl_sub(registers: Registers, memory: Memory) -> Result<u8, Error> {
+    let data = registers.borrow_mut().get(Bits8::A);
+    let cycles = Set::Bits8At(Bits16::HL, data)
         .run(registers.clone(), memory)
         .await?;
-    match is_increase {
-        true => registers.borrow_mut().increase(Bits16::HL, 1),
-        false => registers.borrow_mut().decrease(Bits16::HL, 1),
-    };
+    registers.borrow_mut().decrease(Bits16::HL, 1);
+    Ok(cycles)
+}
+
+pub async fn hl_add(registers: Registers, memory: Memory) -> Result<u8, Error> {
+    let data = registers.borrow_mut().get(Bits8::A);
+    let cycles = Set::Bits8At(Bits16::HL, data)
+        .run(registers.clone(), memory)
+        .await?;
+    registers.borrow_mut().increase(Bits16::HL, 1);
     Ok(cycles)
 }
 

@@ -32,15 +32,21 @@ pub async fn hl(registers: Registers, memory: Memory, area: Bits8) -> Result<u8,
     Ok(cycles)
 }
 
-pub async fn update(registers: Registers, memory: Memory, is_increase: bool) -> Result<u8, Error> {
+pub async fn hl_sub(registers: Registers, memory: Memory) -> Result<u8, Error> {
     let (data, cycles) = Get::BitsAt(Bits16::HL)
         .get(registers.clone(), memory)
         .await?;
     registers.borrow_mut().set(Bits8::A, data);
-    match is_increase {
-        true => registers.borrow_mut().increase(Bits16::HL, 1),
-        false => registers.borrow_mut().decrease(Bits16::HL, 1),
-    };
+    registers.borrow_mut().decrease(Bits16::HL, 1);
+    Ok(cycles)
+}
+
+pub async fn hl_add(registers: Registers, memory: Memory) -> Result<u8, Error> {
+    let (data, cycles) = Get::BitsAt(Bits16::HL)
+        .get(registers.clone(), memory)
+        .await?;
+    registers.borrow_mut().set(Bits8::A, data);
+    registers.borrow_mut().increase(Bits16::HL, 1);
     Ok(cycles)
 }
 
@@ -86,3 +92,19 @@ pub async fn io_next(registers: Registers, memory: Memory) -> Result<u8, Error> 
     registers.borrow_mut().set(Bits8::A, data);
     Ok(next + get)
 }
+
+pub async fn hl_sp(registers: Registers, memory: Memory) -> Result<u8, Error> {
+    let (mut data, cycles) = Get::Next.get(registers.clone(), memory).await?;
+    data += registers.borrow().get(Bits16::SP);
+    registers.borrow_mut().set(Bits16::HL, data);
+    Ok(cycles)
+}
+
+pub async fn sp_hl(registers: Registers, memory: Memory) -> Result<u8, Error> {
+    let data = registers.borrow().get(Bits16::HL);
+    let (_, cycles) = memory.get::<u8>(0xc000).await?;
+    registers.borrow_mut().set(Bits16::SP, data);
+    Ok(cycles)
+}
+
+
