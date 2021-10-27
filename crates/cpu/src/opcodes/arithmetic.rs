@@ -1,4 +1,3 @@
-use std::fmt;
 use super::decode::{Decode, Decoder};
 use crate::cpu::Registers;
 use crate::registers::{
@@ -8,6 +7,7 @@ use crate::registers::{
 use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
+use std::fmt;
 
 /// [ADD | ADC] A,n
 /// Description:

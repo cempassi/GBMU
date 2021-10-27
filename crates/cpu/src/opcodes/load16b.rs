@@ -64,7 +64,7 @@ pub enum Load16b {
     LoadSP = 0x31,
     LoadA16SP = 0x08,
     LoadHLSPr8 = 0xF8,
-    LoadSPHL = 0xF9
+    LoadSPHL = 0xF9,
 }
 
 impl Decoder for Load16b {
@@ -112,7 +112,7 @@ impl fmt::Display for Load16b {
             Load16b::LoadSP => write!(f, "Load SP (b16)"),
             Load16b::LoadA16SP => write!(f, "Load (b16) SP"),
             Load16b::LoadHLSPr8 => write!(f, "Load HL (SP + b8)"),
-            Load16b::LoadSPHL =>  write!(f, "Load SP HL"),
+            Load16b::LoadSPHL => write!(f, "Load SP HL"),
         }
     }
 }

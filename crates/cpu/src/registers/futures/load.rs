@@ -106,5 +106,3 @@ pub async fn sp_hl(registers: Registers, memory: Memory) -> Result<u8, Error> {
     registers.borrow_mut().set(Bits16::SP, data);
     Ok(cycles)
 }
-
-

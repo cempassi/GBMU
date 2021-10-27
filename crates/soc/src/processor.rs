@@ -35,7 +35,7 @@ impl Finished {
             Ok(cycles) => {
                 println!("CPU finished, cycles: {}", cycles);
                 Self::Cpu(cycles)
-            },
+            }
             Err(error) => {
                 println!("CPU ERROR, error: {}", error);
                 Self::Error(error)

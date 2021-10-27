@@ -38,7 +38,7 @@ pub(crate) enum Set {
     IOC,
     IONext,
     LoadHLSP,
-    LoadSPHL
+    LoadSPHL,
 }
 
 impl Set {
