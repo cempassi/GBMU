@@ -8,6 +8,7 @@ use crate::{
 use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
+use std::fmt;
 
 use super::decode::{Decode, Decoder};
 
@@ -58,7 +59,7 @@ use super::decode::{Decode, Decoder};
 /// H - Unused
 /// C - Set according to result.
 
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
+#[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Rotate {
@@ -155,6 +156,46 @@ impl Rotate {
             }
         };
         Ok(cycles)
+    }
+}
+
+
+impl fmt::Display for Rotate {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Rotate::LCB => write!(f, "Rotate L B"),
+            Rotate::LCC => write!(f, "Rotate L C"),
+            Rotate::LCD => write!(f, "Rotate L D"),
+            Rotate::LCE => write!(f, "Rotate L E"),
+            Rotate::LCH => write!(f, "Rotate L H"),
+            Rotate::LCL => write!(f, "Rotate L L"),
+            Rotate::LCHL => write!(f, "Rotate L L"),
+            Rotate::LCA => write!(f, "Rotate L A"),
+            Rotate::LB => write!(f, "Rotate L (Carry) B"),
+            Rotate::LC => write!(f, "Rotate L (Carry) C"),
+            Rotate::LD => write!(f, "Rotate L (Carry) D"),
+            Rotate::LE => write!(f, "Rotate L (Carry) E"),
+            Rotate::LH => write!(f, "Rotate L (Carry) H"),
+            Rotate::LL => write!(f, "Rotate L (Carry) L"),
+            Rotate::LHL => write!(f, "Rotate L (Carry) [HL]"),
+            Rotate::LA => write!(f, "Rotate L (Carry) A"),
+            Rotate::RCB => write!(f, "Rotate R (Carry) B"),
+            Rotate::RCC => write!(f, "Rotate R (Carry) C"),
+            Rotate::RCD => write!(f, "Rotate R (Carry) D"),
+            Rotate::RCE => write!(f, "Rotate R (Carry) E"),
+            Rotate::RCH => write!(f, "Rotate R (Carry) H"),
+            Rotate::RCL => write!(f, "Rotate R (Carry) L"),
+            Rotate::RCHL => write!(f, "Rotate R (Carry) [HL]"),
+            Rotate::RCA => write!(f, "Rotate R (Carry) A"),
+            Rotate::RB => write!(f, "Rotate R B"),
+            Rotate::RC => write!(f, "Rotate R C"),
+            Rotate::RD => write!(f, "Rotate R D"),
+            Rotate::RE => write!(f, "Rotate R E"),
+            Rotate::RH => write!(f, "Rotate R H"),
+            Rotate::RL => write!(f, "Rotate R L"),
+            Rotate::RHL => write!(f, "Rotate R [HL]"),
+            Rotate::RA => write!(f, "Rotate R A"),
+        }
     }
 }
 

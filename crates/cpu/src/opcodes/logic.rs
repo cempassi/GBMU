@@ -4,6 +4,7 @@ use crate::registers::{Bits8, Logical as L, Rotation};
 use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
+use std::fmt;
 
 use super::decode::{Decode, Decoder};
 
@@ -104,7 +105,7 @@ use super::decode::{Decode, Decoder};
 /// CP          C          0xb9   4        CP          L          0xbd   4
 /// CP          D          0xba   4        CP          (HL)       0xbe   8
 /// CP          8b         0xfe   8
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
+#[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Logic {
@@ -221,6 +222,53 @@ impl Logic {
             }
         };
         Ok(cycles)
+    }
+}
+
+impl fmt::Display for Logic {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Logic::AndAA => write!(f, "And A A"),
+            Logic::AndAB => write!(f, "And A B"),
+            Logic::AndAC => write!(f, "And A C"),
+            Logic::AndAD => write!(f, "And A D"),
+            Logic::AndAE => write!(f, "And A E"),
+            Logic::AndAH => write!(f, "And A H"),
+            Logic::AndAL => write!(f, "And A L"),
+            Logic::AndAHL => write!(f, "And A HL"),
+            Logic::AndA8b => write!(f, "And A 8b"),
+            Logic::OrAB => write!(f, "Or A B"),
+            Logic::OrAC => write!(f, "Or A C"),
+            Logic::OrAD => write!(f, "Or A D"),
+            Logic::OrAE => write!(f, "Or A E"),
+            Logic::OrAH => write!(f, "Or A H"),
+            Logic::OrAL => write!(f, "Or A L"),
+            Logic::OrAHL => write!(f, "Or A HL"),
+            Logic::OrAA => write!(f, "Or A A"),
+            Logic::OrA8b => write!(f, "Or A 8b"),
+            Logic::XorAA => write!(f, "Xor A A"),
+            Logic::XorAB => write!(f, "Xor A B"),
+            Logic::XorAC => write!(f, "Xor A C"),
+            Logic::XorAD => write!(f, "Xor A D"),
+            Logic::XorAE => write!(f, "Xor A E"),
+            Logic::XorAH => write!(f, "Xor A H"),
+            Logic::XorAL => write!(f, "Xor A L"),
+            Logic::XorAHL => write!(f, "Xor A HL"),
+            Logic::XorA8b => write!(f, "Xor A 8b"),
+            Logic::CmpAA => write!(f, "Cmp A A"),
+            Logic::CmpAB => write!(f, "Cmp A B"),
+            Logic::CmpAC => write!(f, "Cmp A C"),
+            Logic::CmpAD => write!(f, "Cmp A D"),
+            Logic::CmpAE => write!(f, "Cmp A E"),
+            Logic::CmpAH => write!(f, "Cmp A H"),
+            Logic::CmpAL => write!(f, "Cmp A L"),
+            Logic::CmpAHL => write!(f, "Cmp A HL"),
+            Logic::CmpA8b => write!(f, "Cmp A 8b"),
+            Logic::RLCA => write!(f, "Rotate Left A"),
+            Logic::RLA => write!(f, "Rotate Left Carry A"),
+            Logic::RRCA => write!(f, "Rotate Right A"),
+            Logic::RRA => write!(f, "Rotate Right Carry A"),
+        }
     }
 }
 

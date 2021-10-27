@@ -7,6 +7,7 @@ use crate::registers::{
 use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
+use std::fmt;
 
 /// ADD HL,r16
 /// Add the value in r16 to HL.
@@ -36,7 +37,7 @@ use shared::Error;
 /// Bytes: 1
 /// Flags: None affected.
 
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
+#[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Arithmetic16b {
@@ -78,5 +79,24 @@ impl Arithmetic16b {
         };
         let (_, cycles): (u8, u8) = Get::Nop.get(registers, memory).await?;
         Ok(cycles)
+    }
+}
+
+impl fmt::Display for Arithmetic16b {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Arithmetic16b::IncBC => write!(f, "Increase BC"),
+            Arithmetic16b::IncDE => write!(f, "Increase DE"),
+            Arithmetic16b::IncHL => write!(f, "Increase HL"),
+            Arithmetic16b::IncSP => write!(f, "Increase SP"),
+            Arithmetic16b::DecBC =>  write!(f, "Decrease BC"),
+            Arithmetic16b::DecDE =>  write!(f, "Decrease DE"),
+            Arithmetic16b::DecHL =>  write!(f, "Decrease HL"),
+            Arithmetic16b::DecSP =>  write!(f, "Decrease SP"),
+            Arithmetic16b::AddBC => write!(f, "Add HL BC"),
+            Arithmetic16b::AddDE => write!(f, "Add HL DE"),
+            Arithmetic16b::AddHL => write!(f, "Add HL HL"),
+            Arithmetic16b::AddSP => write!(f, "Add HL SP"),
+        }
     }
 }

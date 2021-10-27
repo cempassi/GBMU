@@ -6,6 +6,7 @@ use crate::registers::{
 use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
+use std::fmt;
 
 use super::decode::{Decode, Decoder};
 
@@ -40,7 +41,7 @@ use super::decode::{Decode, Decoder};
 /// H - Unused
 /// C - Set according to result.
 
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
+#[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Shift {
@@ -125,6 +126,44 @@ impl Shift {
             Shift::RLHL => Set::CbHL(Operation::SRLogic).run(registers, memory).await?,
         };
         Ok(cycles)
+    }
+}
+impl fmt::Display for Shift {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Shift::LB => write!(f, "Shift L B"),
+            Shift::LC => write!(f, "Shift L C"),
+            Shift::LD => write!(f, "Shift L D"),
+            Shift::LE => write!(f, "Shift L E"),
+            Shift::LH => write!(f, "Shift L H"),
+            Shift::LL => write!(f, "Shift L L"),
+            Shift::LHL => write!(f, "Shift L [HL]"),
+            Shift::LA => write!(f, "Shift L A"),
+            Shift::RAB => write!(f, "Shift R B (Arithmetic)"),
+            Shift::RAC => write!(f, "Shift R C (Arithmetic)"),
+            Shift::RAD => write!(f, "Shift R D (Arithmetic)"),
+            Shift::RAE => write!(f, "Shift R E (Arithmetic)"),
+            Shift::RAH => write!(f, "Shift R H (Arithmetic)"),
+            Shift::RAL => write!(f, "Shift R L (Arithmetic)"),
+            Shift::RAHL => write!(f, "Shift R [HL] (Arithmetic)"),
+            Shift::RAA => write!(f, "Shift R A (Arithmetic)"),
+            Shift::SB => write!(f, "Swap B"),
+            Shift::SC => write!(f, "Swap C"),
+            Shift::SD => write!(f, "Swap D"),
+            Shift::SE => write!(f, "Swap E"),
+            Shift::SH => write!(f, "Swap H"),
+            Shift::SL => write!(f, "Swap L"),
+            Shift::SHL => write!(f, "Swap [HL]"),
+            Shift::SA => write!(f, "Swap A"),
+            Shift::RLB => write!(f, "Shift R B (Logical)"),
+            Shift::RLC => write!(f, "Shift R C (Logical)"),
+            Shift::RLD => write!(f, "Shift R D (Logical)"),
+            Shift::RLE => write!(f, "Shift R E (Logical)"),
+            Shift::RLH => write!(f, "Shift R H (Logical)"),
+            Shift::RLL => write!(f, "Shift R L (Logical)"),
+            Shift::RLHL => write!(f, "Shift R [ HL] (Logical)"),
+            Shift::RLA => write!(f, "Shift R A (Logical)"),
+        }
     }
 }
 

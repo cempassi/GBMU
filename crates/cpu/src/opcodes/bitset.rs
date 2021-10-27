@@ -7,6 +7,7 @@ use crate::registers::{
 use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
+use std::fmt;
 
 use super::decode::{Decode, Decoder};
 
@@ -19,7 +20,7 @@ use super::decode::{Decode, Decoder};
 ///
 /// Flags: None affected.
 
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
+#[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Bitset {
@@ -196,6 +197,77 @@ impl Bitset {
             }
         };
         Ok(cycles)
+    }
+}
+
+impl fmt::Display for Bitset {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Bitset::BBit0 => write!(f, "SET B, Bit 0"),
+            Bitset::BBit1 => write!(f, "SET B, Bit 1"),
+            Bitset::BBit2 => write!(f, "SET B, Bit 2"),
+            Bitset::BBit3 => write!(f, "SET B, Bit 3"),
+            Bitset::BBit4 => write!(f, "SET B, Bit 4"),
+            Bitset::BBit5 => write!(f, "SET B, Bit 5"),
+            Bitset::BBit6 => write!(f, "SET B, Bit 6"),
+            Bitset::BBit7 => write!(f, "SET B, Bit 7"),
+            Bitset::CBit0 => write!(f, "SET C, Bit 0"),
+            Bitset::CBit1 => write!(f, "SET C, Bit 1"),
+            Bitset::CBit2 => write!(f, "SET C, Bit 2"),
+            Bitset::CBit3 => write!(f, "SET C, Bit 3"),
+            Bitset::CBit4 => write!(f, "SET C, Bit 4"),
+            Bitset::CBit5 => write!(f, "SET C, Bit 5"),
+            Bitset::CBit6 => write!(f, "SET C, Bit 6"),
+            Bitset::CBit7 => write!(f, "SET C, Bit 7"),
+            Bitset::DBit0 => write!(f, "SET D, Bit 0"),
+            Bitset::DBit1 => write!(f, "SET D, Bit 1"),
+            Bitset::DBit2 => write!(f, "SET D, Bit 2"),
+            Bitset::DBit3 => write!(f, "SET D, Bit 3"),
+            Bitset::DBit4 => write!(f, "SET D, Bit 4"),
+            Bitset::DBit5 => write!(f, "SET D, Bit 5"),
+            Bitset::DBit6 => write!(f, "SET D, Bit 6"),
+            Bitset::DBit7 => write!(f, "SET D, Bit 7"),
+            Bitset::EBit0 => write!(f, "SET E, Bit 0"),
+            Bitset::EBit1 => write!(f, "SET E, Bit 1"),
+            Bitset::EBit2 => write!(f, "SET E, Bit 2"),
+            Bitset::EBit3 => write!(f, "SET E, Bit 3"),
+            Bitset::EBit4 => write!(f, "SET E, Bit 4"),
+            Bitset::EBit5 => write!(f, "SET E, Bit 5"),
+            Bitset::EBit6 => write!(f, "SET E, Bit 6"),
+            Bitset::EBit7 => write!(f, "SET E, Bit 7"),
+            Bitset::HBit0 => write!(f, "SET H, Bit 0"),
+            Bitset::HBit1 => write!(f, "SET H, Bit 1"),
+            Bitset::HBit2 => write!(f, "SET H, Bit 2"),
+            Bitset::HBit3 => write!(f, "SET H, Bit 3"),
+            Bitset::HBit4 => write!(f, "SET H, Bit 4"),
+            Bitset::HBit5 => write!(f, "SET H, Bit 5"),
+            Bitset::HBit6 => write!(f, "SET H, Bit 6"),
+            Bitset::HBit7 => write!(f, "SET H, Bit 7"),
+            Bitset::LBit0 => write!(f, "SET L, Bit 0"),
+            Bitset::LBit1 => write!(f, "SET L, Bit 1"),
+            Bitset::LBit2 => write!(f, "SET L, Bit 2"),
+            Bitset::LBit3 => write!(f, "SET L, Bit 3"),
+            Bitset::LBit4 => write!(f, "SET L, Bit 4"),
+            Bitset::LBit5 => write!(f, "SET L, Bit 5"),
+            Bitset::LBit6 => write!(f, "SET L, Bit 6"),
+            Bitset::LBit7 => write!(f, "SET L, Bit 7"),
+            Bitset::HLBit0 => write!(f, "SET [HL], Bit 0"),
+            Bitset::HLBit1 => write!(f, "SET [HL], Bit 1"),
+            Bitset::HLBit2 => write!(f, "SET [HL], Bit 2"),
+            Bitset::HLBit3 => write!(f, "SET [HL], Bit 3"),
+            Bitset::HLBit4 => write!(f, "SET [HL], Bit 4"),
+            Bitset::HLBit5 => write!(f, "SET [HL], Bit 5"),
+            Bitset::HLBit6 => write!(f, "SET [HL], Bit 6"),
+            Bitset::HLBit7 => write!(f, "SET [HL], Bit 7"),
+            Bitset::ABit0 => write!(f, "SET A, Bit 0"),
+            Bitset::ABit1 => write!(f, "SET A, Bit 1"),
+            Bitset::ABit2 => write!(f, "SET A, Bit 2"),
+            Bitset::ABit3 => write!(f, "SET A, Bit 3"),
+            Bitset::ABit4 => write!(f, "SET A, Bit 4"),
+            Bitset::ABit5 => write!(f, "SET A, Bit 5"),
+            Bitset::ABit6 => write!(f, "SET A, Bit 6"),
+            Bitset::ABit7 => write!(f, "SET A, Bit 7"),
+        }
     }
 }
 
