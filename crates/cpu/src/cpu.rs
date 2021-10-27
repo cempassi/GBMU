@@ -51,15 +51,16 @@ impl Cpu {
         } else if let Ok(operation) = Logic::try_from_primitive(opcode) {
             Ok(operation.decode(self.registers.clone(), self.memory))
         } else {
+            println!("Something went wrong?, opcode: {}", opcode);
             Err(Error::Unimplemented)
         }
     }
 
     pub async fn run(self) -> Result<u8, Error> {
-        println!("Next Cpu Execution, fetching Opcode...!");
         let (opcode, cycles) = Get::Next
             .get(self.registers.clone(), self.memory.clone())
             .await?;
+        println!("New Cpu Execution, Opcode: {:#X}", opcode);
 
         let execute = self.decode(opcode).await?;
         Ok(execute.await? + cycles)

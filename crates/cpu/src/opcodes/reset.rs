@@ -7,6 +7,7 @@ use crate::registers::{
 use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
+use std::fmt;
 
 use super::decode::{Decode, Decoder};
 
@@ -19,7 +20,7 @@ use super::decode::{Decode, Decoder};
 ///
 /// Flags: None affected.
 
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
+#[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Reset {
@@ -196,6 +197,77 @@ impl Reset {
             }
         };
         Ok(cycles)
+    }
+}
+
+impl fmt::Display for Reset {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Reset::BBit0 => write!(f, "RESET B, Bit 0"),
+            Reset::BBit1 => write!(f, "RESET B, Bit 1"),
+            Reset::BBit2 => write!(f, "RESET B, Bit 2"),
+            Reset::BBit3 => write!(f, "RESET B, Bit 3"),
+            Reset::BBit4 => write!(f, "RESET B, Bit 4"),
+            Reset::BBit5 => write!(f, "RESET B, Bit 5"),
+            Reset::BBit6 => write!(f, "RESET B, Bit 6"),
+            Reset::BBit7 => write!(f, "RESET B, Bit 7"),
+            Reset::CBit0 => write!(f, "RESET C, Bit 0"),
+            Reset::CBit1 => write!(f, "RESET C, Bit 1"),
+            Reset::CBit2 => write!(f, "RESET C, Bit 2"),
+            Reset::CBit3 => write!(f, "RESET C, Bit 3"),
+            Reset::CBit4 => write!(f, "RESET C, Bit 4"),
+            Reset::CBit5 => write!(f, "RESET C, Bit 5"),
+            Reset::CBit6 => write!(f, "RESET C, Bit 6"),
+            Reset::CBit7 => write!(f, "RESET C, Bit 7"),
+            Reset::DBit0 => write!(f, "RESET D, Bit 0"),
+            Reset::DBit1 => write!(f, "RESET D, Bit 1"),
+            Reset::DBit2 => write!(f, "RESET D, Bit 2"),
+            Reset::DBit3 => write!(f, "RESET D, Bit 3"),
+            Reset::DBit4 => write!(f, "RESET D, Bit 4"),
+            Reset::DBit5 => write!(f, "RESET D, Bit 5"),
+            Reset::DBit6 => write!(f, "RESET D, Bit 6"),
+            Reset::DBit7 => write!(f, "RESET D, Bit 7"),
+            Reset::EBit0 => write!(f, "RESET E, Bit 0"),
+            Reset::EBit1 => write!(f, "RESET E, Bit 1"),
+            Reset::EBit2 => write!(f, "RESET E, Bit 2"),
+            Reset::EBit3 => write!(f, "RESET E, Bit 3"),
+            Reset::EBit4 => write!(f, "RESET E, Bit 4"),
+            Reset::EBit5 => write!(f, "RESET E, Bit 5"),
+            Reset::EBit6 => write!(f, "RESET E, Bit 6"),
+            Reset::EBit7 => write!(f, "RESET E, Bit 7"),
+            Reset::HBit0 => write!(f, "RESET H, Bit 0"),
+            Reset::HBit1 => write!(f, "RESET H, Bit 1"),
+            Reset::HBit2 => write!(f, "RESET H, Bit 2"),
+            Reset::HBit3 => write!(f, "RESET H, Bit 3"),
+            Reset::HBit4 => write!(f, "RESET H, Bit 4"),
+            Reset::HBit5 => write!(f, "RESET H, Bit 5"),
+            Reset::HBit6 => write!(f, "RESET H, Bit 6"),
+            Reset::HBit7 => write!(f, "RESET H, Bit 7"),
+            Reset::LBit0 => write!(f, "RESET L, Bit 0"),
+            Reset::LBit1 => write!(f, "RESET L, Bit 1"),
+            Reset::LBit2 => write!(f, "RESET L, Bit 2"),
+            Reset::LBit3 => write!(f, "RESET L, Bit 3"),
+            Reset::LBit4 => write!(f, "RESET L, Bit 4"),
+            Reset::LBit5 => write!(f, "RESET L, Bit 5"),
+            Reset::LBit6 => write!(f, "RESET L, Bit 6"),
+            Reset::LBit7 => write!(f, "RESET L, Bit 7"),
+            Reset::HLBit0 => write!(f, "RESET [HL], Bit 0"),
+            Reset::HLBit1 => write!(f, "RESET [HL], Bit 1"),
+            Reset::HLBit2 => write!(f, "RESET [HL], Bit 2"),
+            Reset::HLBit3 => write!(f, "RESET [HL], Bit 3"),
+            Reset::HLBit4 => write!(f, "RESET [HL], Bit 4"),
+            Reset::HLBit5 => write!(f, "RESET [HL], Bit 5"),
+            Reset::HLBit6 => write!(f, "RESET [HL], Bit 6"),
+            Reset::HLBit7 => write!(f, "RESET [HL], Bit 7"),
+            Reset::ABit0 => write!(f, "RESET A, Bit 0"),
+            Reset::ABit1 => write!(f, "RESET A, Bit 1"),
+            Reset::ABit2 => write!(f, "RESET A, Bit 2"),
+            Reset::ABit3 => write!(f, "RESET A, Bit 3"),
+            Reset::ABit4 => write!(f, "RESET A, Bit 4"),
+            Reset::ABit5 => write!(f, "RESET A, Bit 5"),
+            Reset::ABit6 => write!(f, "RESET A, Bit 6"),
+            Reset::ABit7 => write!(f, "RESET A, Bit 7"),
+        }
     }
 }
 

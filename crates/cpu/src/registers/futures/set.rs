@@ -11,6 +11,7 @@ use std::pin::Pin;
 
 type Processing = Pin<Box<dyn Future<Output = Result<u8, Error>>>>;
 
+#[allow(clippy::upper_case_acronyms)]
 pub(crate) enum Set {
     CalculHL(Operation),
     CalculNext(Operation),
@@ -32,6 +33,12 @@ pub(crate) enum Set {
     Data(Bits16),
     Pop(Bits16),
     Push(Bits16),
+    LoadIOC,
+    LoadIONext,
+    IOC,
+    IONext,
+    LoadHLSP,
+    LoadSPHL,
 }
 
 impl Set {
@@ -50,15 +57,21 @@ impl Set {
             Set::Data(area) => Box::pin(set::data(registers, memory, area)),
             Set::Push(area) => Box::pin(load::push(registers, memory, area)),
             Set::Pop(area) => Box::pin(load::pop(registers, memory, area)),
-            Set::Increase => Box::pin(set::update(registers, memory, true)),
-            Set::Decrease => Box::pin(set::update(registers, memory, false)),
-            Set::LoadIncrease => Box::pin(load::update(registers, memory, true)),
-            Set::LoadDecrease => Box::pin(load::update(registers, memory, false)),
+            Set::Increase => Box::pin(set::hl_add(registers, memory)),
+            Set::Decrease => Box::pin(set::hl_sub(registers, memory)),
+            Set::LoadIncrease => Box::pin(load::hl_add(registers, memory)),
+            Set::LoadDecrease => Box::pin(load::hl_sub(registers, memory)),
             Set::LoadRegisterFrom(dst, src) => {
                 Box::pin(load::reg_from(registers, memory, dst, src))
             }
             Set::CbHL(operation) => Box::pin(cb::hl(registers, memory, operation)),
             Set::TestHL(bit) => Box::pin(cb::test(registers, memory, bit)),
+            Set::LoadIOC => Box::pin(load::io_c(registers, memory)),
+            Set::LoadIONext => Box::pin(load::io_next(registers, memory)),
+            Set::IOC => Box::pin(set::io_c(registers, memory)),
+            Set::IONext => Box::pin(set::io_next(registers, memory)),
+            Set::LoadHLSP => Box::pin(load::hl_sp(registers, memory)),
+            Set::LoadSPHL => Box::pin(load::sp_hl(registers, memory)),
         }
     }
 }

@@ -7,6 +7,7 @@ use crate::registers::{
 use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
+use std::fmt;
 
 /// [ADD | ADC] A,n
 /// Description:
@@ -52,7 +53,7 @@ use shared::Error;
 ///  SUB        A,L          0x95   4        SBC         A,L        0x9D   4
 ///  SUB        A,(HL)       0x96   8        SBC         A,(HL)     0x9E   8
 ///  SUB        A,8b         0xd6   8        SBC         A,8b       0xDE     ?
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
+#[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Arithmetic {
@@ -221,6 +222,69 @@ impl Arithmetic {
             Arithmetic::CCF => registers.borrow_mut().complement_carry(),
         };
         Ok(cycles)
+    }
+}
+
+impl fmt::Display for Arithmetic {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Arithmetic::AAA => write!(f, "Add A A(No Carry)"),
+            Arithmetic::AAB => write!(f, "Add A B(No Carry)"),
+            Arithmetic::AAC => write!(f, "Add A C(No Carry)"),
+            Arithmetic::AAD => write!(f, "Add A D(No Carry)"),
+            Arithmetic::AAE => write!(f, "Add A E(No Carry)"),
+            Arithmetic::AAH => write!(f, "Add A H(No Carry)"),
+            Arithmetic::AAL => write!(f, "Add A L(No Carry)"),
+            Arithmetic::AAHL => write!(f, "Add A [HL](No Carry)"),
+            Arithmetic::AA8b => write!(f, "Add A 8b(No Carry)"),
+            Arithmetic::AAcA => write!(f, "Add A A(Carry)"),
+            Arithmetic::AAcB => write!(f, "Add A B(Carry)"),
+            Arithmetic::AAcC => write!(f, "Add A C(Carry)"),
+            Arithmetic::AAcD => write!(f, "Add A D(Carry)"),
+            Arithmetic::AAcE => write!(f, "Add A E(Carry)"),
+            Arithmetic::AAcH => write!(f, "Add A H(Carry)"),
+            Arithmetic::AAcL => write!(f, "Add A L(Carry)"),
+            Arithmetic::AAcHL => write!(f, "Add A [HL](Carry)"),
+            Arithmetic::AAc8b => write!(f, "Add A 8b(Carry)"),
+            Arithmetic::SAB => write!(f, "Sub A B(No Carry)"),
+            Arithmetic::SAC => write!(f, "Sub A C(No Carry)"),
+            Arithmetic::SAD => write!(f, "Sub A D(No Carry)"),
+            Arithmetic::SAE => write!(f, "Sub A E(No Carry)"),
+            Arithmetic::SAH => write!(f, "Sub A H(No Carry)"),
+            Arithmetic::SAL => write!(f, "Sub A L(No Carry)"),
+            Arithmetic::SAHL => write!(f, "Sub A [HL](No Carry)"),
+            Arithmetic::SAA => write!(f, "Sub A A(No Carry)"),
+            Arithmetic::SAcB => write!(f, "Sub A B(Carry)"),
+            Arithmetic::SAcC => write!(f, "Sub A C(Carry)"),
+            Arithmetic::SAcD => write!(f, "Sub A D(Carry)"),
+            Arithmetic::SAcE => write!(f, "Sub A E(Carry)"),
+            Arithmetic::SAcH => write!(f, "Sub A H(Carry)"),
+            Arithmetic::SAcL => write!(f, "Sub A L(Carry)"),
+            Arithmetic::SAcHL => write!(f, "Sub A [HL](Carry)"),
+            Arithmetic::SAcA => write!(f, "Sub A A (Carry)"),
+            Arithmetic::SA8b => write!(f, "Sub A 8b (No Carry)"),
+            Arithmetic::SAc8b => write!(f, "Sub A 8b(Carry)"),
+            Arithmetic::IncB => write!(f, "Increase B"),
+            Arithmetic::IncD => write!(f, "Increase D"),
+            Arithmetic::IncH => write!(f, "Increase H"),
+            Arithmetic::IncHL => write!(f, "Increase [HL]"),
+            Arithmetic::DecB => write!(f, "Decrease B"),
+            Arithmetic::DecD => write!(f, "Decrease D"),
+            Arithmetic::DecH => write!(f, "Decrease H"),
+            Arithmetic::DecHL => write!(f, "Decrease [HL]"),
+            Arithmetic::IncC => write!(f, "Increase C"),
+            Arithmetic::IncE => write!(f, "Increase E"),
+            Arithmetic::IncL => write!(f, "Increase L"),
+            Arithmetic::IncA => write!(f, "Increase A"),
+            Arithmetic::DecC => write!(f, "Decrease C"),
+            Arithmetic::DecE => write!(f, "Decrease E"),
+            Arithmetic::DecL => write!(f, "Decrease L"),
+            Arithmetic::DecA => write!(f, "Decrease A"),
+            Arithmetic::DAA => write!(f, "Decimal Adjust (DAA)"),
+            Arithmetic::SCF => write!(f, "Set Carry Flag"),
+            Arithmetic::CPL => write!(f, "Complement Carry Flag"),
+            Arithmetic::CCF => write!(f, "Clear Carry Flag"),
+        }
     }
 }
 

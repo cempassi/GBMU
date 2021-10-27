@@ -62,7 +62,11 @@ pub trait View {
 
 impl View for Bits8 {
     fn get_data(&self, registers: Registers) -> String {
-        format!("{:#x}", registers.borrow().get(*self))
+        if *self == Bits8::F {
+            format!("{:04b}", registers.borrow().get(*self))
+        } else {
+            format!("{:#x}", registers.borrow().get(*self))
+        }
     }
 
     fn get_name(&self) -> String {

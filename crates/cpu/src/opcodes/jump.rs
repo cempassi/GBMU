@@ -3,6 +3,7 @@ use crate::Registers;
 use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
+use std::fmt;
 
 use super::decode::{Decode, Decoder};
 
@@ -47,7 +48,7 @@ use super::decode::{Decode, Decoder};
 /// H - Unused
 /// C - Unused
 
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
+#[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Jump {
@@ -122,6 +123,33 @@ impl Jump {
             }
         };
         Ok(cycles)
+    }
+}
+impl fmt::Display for Jump {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Jump::NN => write!(f, "Jump NN(16b)"),
+            Jump::HL => write!(f, "Jump HL"),
+            Jump::NZNN => write!(f, "Jump NN(16b) if (!Z)"),
+            Jump::NCNN => write!(f, "Jump NN(16b) if (!C)"),
+            Jump::ZNN => write!(f, "Jump NN(16b) if (Z)"),
+            Jump::CNN => write!(f, "Jump NN(16b) if (C)"),
+            Jump::R8b => write!(f, "Jump R(8b)"),
+            Jump::NZR8b => write!(f, "Jump R(8b) if (!Z)"),
+            Jump::NCR8b => write!(f, "Jump R(8b) if (!C)"),
+            Jump::ZR8b => write!(f, "Jump R(8b) if (Z)"),
+            Jump::CR8b => write!(f, "Jump R(8b) if (C)"),
+            Jump::Call => write!(f, "Call"),
+            Jump::CallZ => write!(f, "Call if (Z)"),
+            Jump::CallC => write!(f, "Call if (C)"),
+            Jump::CallNZ => write!(f, "Call if (!Z)"),
+            Jump::CallNC => write!(f, "Call if (!C)"),
+            Jump::Return => write!(f, "Return"),
+            Jump::ReturnZ => write!(f, "Return if (Z)"),
+            Jump::ReturnC => write!(f, "Return if (C)"),
+            Jump::ReturnNZ => write!(f, "Return if (!Z)"),
+            Jump::ReturnNC => write!(f, "Return if (!C)"),
+        }
     }
 }
 

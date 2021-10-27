@@ -35,6 +35,10 @@ impl Mode {
         }
     }
 
+    pub fn is_processing(&self) -> bool {
+        matches!(self, Self::Cpu | Self::Ppu)
+    }
+
     pub fn check_redraw(&mut self) -> bool {
         match self {
             Self::Tick => {

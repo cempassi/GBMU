@@ -8,6 +8,7 @@ use crate::Registers;
 use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
+use std::fmt;
 
 use super::decode::{Decode, Decoder};
 
@@ -80,7 +81,7 @@ use super::decode::{Decode, Decoder};
 ///
 /// Flags: None affected.
 
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
+#[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Control {
@@ -129,5 +130,18 @@ impl Control {
             Control::EI => todo!(),
         };
         Ok(cycles)
+    }
+}
+
+impl fmt::Display for Control {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Control::NOP => write!(f, "NOP"),
+            Control::CB => write!(f, "CB"),
+            Control::STOP => write!(f, "STOP"),
+            Control::HALT => write!(f, "HALT"),
+            Control::DI => write!(f, "Dissable Interrupt"),
+            Control::EI => write!(f, "Enable Interrupt"),
+        }
     }
 }

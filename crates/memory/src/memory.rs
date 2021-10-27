@@ -47,7 +47,7 @@ impl Memory {
             consts::WRAM_MIN..=consts::WRAM_MAX => {
                 Ok(self.wram.borrow().get(Area::Wram.relative(address)))
             }
-            _ => Err(Error::SegmentationFault(address)),
+            _ => Err(Error::InvalidGet(address)),
         }
     }
 
@@ -69,7 +69,7 @@ impl Memory {
                 self.ppu.borrow_mut().set(address.into(), data);
                 Ok(())
             }
-            _ => Err(Error::SegmentationFault(address)),
+            _ => Err(Error::InvalidSet(address, data)),
         }
     }
 

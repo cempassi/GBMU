@@ -4,6 +4,7 @@ use crate::Registers;
 use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
+use std::fmt;
 
 use super::decode::{Decode, Decoder};
 
@@ -46,7 +47,7 @@ use super::decode::{Decode, Decoder};
 /// POP         DE         0xD1   12
 /// POP         HL         0xE1   12
 
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
+#[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 pub enum Load16b {
     PushAF = 0xf5,
@@ -62,6 +63,8 @@ pub enum Load16b {
     LoadHL = 0x21,
     LoadSP = 0x31,
     LoadA16SP = 0x08,
+    LoadHLSPr8 = 0xF8,
+    LoadSPHL = 0xF9,
 }
 
 impl Decoder for Load16b {
@@ -86,8 +89,31 @@ impl Load16b {
             Load16b::LoadHL => Set::Load16b(Bits16::HL).run(registers, memory),
             Load16b::LoadSP => Set::Load16b(Bits16::SP).run(registers, memory),
             Load16b::LoadA16SP => Set::Data(Bits16::SP).run(registers, memory),
+            Load16b::LoadHLSPr8 => Set::LoadHLSP.run(registers, memory),
+            Load16b::LoadSPHL => Set::LoadSPHL.run(registers, memory),
         }
         .await
+    }
+}
+impl fmt::Display for Load16b {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Load16b::PushAF => write!(f, "Push AF"),
+            Load16b::PushBC => write!(f, "Push BC"),
+            Load16b::PushDE => write!(f, "Push DE"),
+            Load16b::PushHL => write!(f, "Push HL"),
+            Load16b::PopAF => write!(f, "Pop AF"),
+            Load16b::PopBC => write!(f, "Pop BC"),
+            Load16b::PopDE => write!(f, "Pop DE"),
+            Load16b::PopHL => write!(f, "Pop HL"),
+            Load16b::LoadBC => write!(f, "Load BC (b16"),
+            Load16b::LoadDE => write!(f, "Load DE (b16)"),
+            Load16b::LoadHL => write!(f, "Load HL (b16)"),
+            Load16b::LoadSP => write!(f, "Load SP (b16)"),
+            Load16b::LoadA16SP => write!(f, "Load (b16) SP"),
+            Load16b::LoadHLSPr8 => write!(f, "Load HL (SP + b8)"),
+            Load16b::LoadSPHL => write!(f, "Load SP HL"),
+        }
     }
 }
 

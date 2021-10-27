@@ -4,6 +4,7 @@ use crate::registers::{Bits16, Bits8, Load as L};
 use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
+use std::fmt;
 
 use super::decode::{Decode, Decoder};
 
@@ -108,7 +109,7 @@ use super::decode::{Decode, Decoder};
 /// Instruction Parameters Opcode Cycles
 /// LD          A, (HL+)      0x2A     8
 /// LD          A, (HL-)      0x3A     8
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
+#[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Load {
@@ -185,6 +186,10 @@ pub enum Load {
     HLMA = 0x32,
     AHLP = 0x2A,
     AHLM = 0x3A,
+    ToIOC = 0xE2,
+    IOC = 0xF2,
+    ToIONext = 0xE0,
+    IONext = 0xF0,
 }
 
 impl Decoder for Load {
@@ -285,8 +290,95 @@ impl Load {
                     .run(registers, memory)
                     .await?
             }
+            Load::ToIOC => Set::IOC.run(registers, memory).await?,
+            Load::IOC => Set::LoadIOC.run(registers, memory).await?,
+            Load::ToIONext => Set::IONext.run(registers, memory).await?,
+            Load::IONext => Set::LoadIONext.run(registers, memory).await?,
         };
         Ok(cycles)
+    }
+}
+impl fmt::Display for Load {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Load::B8b => write!(f, "Load B (8b)"),
+            Load::C8b => write!(f, "Load C (8b)"),
+            Load::D8b => write!(f, "Load D (8b)"),
+            Load::E8b => write!(f, "Load E (8b)"),
+            Load::H8b => write!(f, "Load H (8b)"),
+            Load::L8b => write!(f, "Load L (8b)"),
+            Load::A8b => write!(f, "Load A (8b)"),
+            Load::AA => write!(f, "Load A A"),
+            Load::AB => write!(f, "Load A B"),
+            Load::AC => write!(f, "Load A C"),
+            Load::AD => write!(f, "Load A D"),
+            Load::AE => write!(f, "Load A E"),
+            Load::AH => write!(f, "Load A H"),
+            Load::AL => write!(f, "Load A L"),
+            Load::BB => write!(f, "Load B B"),
+            Load::BC => write!(f, "Load B C"),
+            Load::BD => write!(f, "Load B D"),
+            Load::BE => write!(f, "Load B E"),
+            Load::BH => write!(f, "Load B H"),
+            Load::BL => write!(f, "Load B L"),
+            Load::CB => write!(f, "Load C B"),
+            Load::CC => write!(f, "Load C C"),
+            Load::CD => write!(f, "Load C D"),
+            Load::CE => write!(f, "Load C E"),
+            Load::CH => write!(f, "Load C H"),
+            Load::CL => write!(f, "Load C L"),
+            Load::DB => write!(f, "Load D B"),
+            Load::DC => write!(f, "Load D C"),
+            Load::DD => write!(f, "Load D D"),
+            Load::DE => write!(f, "Load D E"),
+            Load::DH => write!(f, "Load D H"),
+            Load::DL => write!(f, "Load D L"),
+            Load::EB => write!(f, "Load E B"),
+            Load::EC => write!(f, "Load E C"),
+            Load::ED => write!(f, "Load E D"),
+            Load::EE => write!(f, "Load E E"),
+            Load::EH => write!(f, "Load E H"),
+            Load::EL => write!(f, "Load E L"),
+            Load::HB => write!(f, "Load H B"),
+            Load::HC => write!(f, "Load H C"),
+            Load::HD => write!(f, "Load H D"),
+            Load::HE => write!(f, "Load H E"),
+            Load::HH => write!(f, "Load H H"),
+            Load::HL => write!(f, "Load H L"),
+            Load::LB => write!(f, "Load L B"),
+            Load::LC => write!(f, "Load L C"),
+            Load::LD => write!(f, "Load L D"),
+            Load::LE => write!(f, "Load L E"),
+            Load::LH => write!(f, "Load L H"),
+            Load::LL => write!(f, "Load L L"),
+            Load::BHL => write!(f, "Load B [HL]"),
+            Load::CHL => write!(f, "Load C [HL]"),
+            Load::DHL => write!(f, "Load D [HL]"),
+            Load::EHL => write!(f, "Load E [HL]"),
+            Load::HHL => write!(f, "Load H [HL]"),
+            Load::LHL => write!(f, "Load L [HL]"),
+            Load::AHL => write!(f, "Load A [HL]"),
+            Load::HLB => write!(f, "Load [HL] B"),
+            Load::HLC => write!(f, "Load [HL] C"),
+            Load::HLD => write!(f, "Load [HL] D"),
+            Load::HLE => write!(f, "Load [HL] E"),
+            Load::HLH => write!(f, "Load [HL] H"),
+            Load::HLL => write!(f, "Load [HL] L"),
+            Load::HLA => write!(f, "Load [HL] A"),
+            Load::HL8b => write!(f, "Load [HL] (8b)"),
+            Load::BCA => write!(f, "Load [BC] A"),
+            Load::DEA => write!(f, "Load [DE] A"),
+            Load::ABC => write!(f, "Load A [BC]"),
+            Load::ADE => write!(f, "Load A [DE]"),
+            Load::HLPA => write!(f, "Load [HL+] A"),
+            Load::HLMA => write!(f, "Load [HL-] A"),
+            Load::AHLP => write!(f, "Load A [HL+]"),
+            Load::AHLM => write!(f, "Load A [HL-]"),
+            Load::ToIOC => write!(f, "Load (C + $FF00) A"),
+            Load::IOC => write!(f, "Load A (C + $FF00)"),
+            Load::ToIONext => write!(f, "Load (8b + $FF00) A"),
+            Load::IONext => write!(f, "Load A (8b + $FF00)"),
+        }
     }
 }
 

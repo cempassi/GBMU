@@ -4,6 +4,7 @@ use crate::registers::{futures::Set, Bits8, Bitwise};
 use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
+use std::fmt;
 
 use super::decode::{Decode, Decoder};
 
@@ -21,7 +22,7 @@ use super::decode::{Decode, Decoder};
 /// H - Set
 /// C - Unused
 
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
+#[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Test {
@@ -166,6 +167,77 @@ impl Test {
             Test::HLBit7 => Set::TestHL(consts::BIT7).run(registers, memory).await?,
         };
         Ok(cycles)
+    }
+}
+
+impl fmt::Display for Test {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Test::BBit0 => write!(f, "TEST B, Bit 0"),
+            Test::BBit1 => write!(f, "TEST B, Bit 1"),
+            Test::BBit2 => write!(f, "TEST B, Bit 2"),
+            Test::BBit3 => write!(f, "TEST B, Bit 3"),
+            Test::BBit4 => write!(f, "TEST B, Bit 4"),
+            Test::BBit5 => write!(f, "TEST B, Bit 5"),
+            Test::BBit6 => write!(f, "TEST B, Bit 6"),
+            Test::BBit7 => write!(f, "TEST B, Bit 7"),
+            Test::CBit0 => write!(f, "TEST C, Bit 0"),
+            Test::CBit1 => write!(f, "TEST C, Bit 1"),
+            Test::CBit2 => write!(f, "TEST C, Bit 2"),
+            Test::CBit3 => write!(f, "TEST C, Bit 3"),
+            Test::CBit4 => write!(f, "TEST C, Bit 4"),
+            Test::CBit5 => write!(f, "TEST C, Bit 5"),
+            Test::CBit6 => write!(f, "TEST C, Bit 6"),
+            Test::CBit7 => write!(f, "TEST C, Bit 7"),
+            Test::DBit0 => write!(f, "TEST D, Bit 0"),
+            Test::DBit1 => write!(f, "TEST D, Bit 1"),
+            Test::DBit2 => write!(f, "TEST D, Bit 2"),
+            Test::DBit3 => write!(f, "TEST D, Bit 3"),
+            Test::DBit4 => write!(f, "TEST D, Bit 4"),
+            Test::DBit5 => write!(f, "TEST D, Bit 5"),
+            Test::DBit6 => write!(f, "TEST D, Bit 6"),
+            Test::DBit7 => write!(f, "TEST D, Bit 7"),
+            Test::EBit0 => write!(f, "TEST E, Bit 0"),
+            Test::EBit1 => write!(f, "TEST E, Bit 1"),
+            Test::EBit2 => write!(f, "TEST E, Bit 2"),
+            Test::EBit3 => write!(f, "TEST E, Bit 3"),
+            Test::EBit4 => write!(f, "TEST E, Bit 4"),
+            Test::EBit5 => write!(f, "TEST E, Bit 5"),
+            Test::EBit6 => write!(f, "TEST E, Bit 6"),
+            Test::EBit7 => write!(f, "TEST E, Bit 7"),
+            Test::HBit0 => write!(f, "TEST H, Bit 0"),
+            Test::HBit1 => write!(f, "TEST H, Bit 1"),
+            Test::HBit2 => write!(f, "TEST H, Bit 2"),
+            Test::HBit3 => write!(f, "TEST H, Bit 3"),
+            Test::HBit4 => write!(f, "TEST H, Bit 4"),
+            Test::HBit5 => write!(f, "TEST H, Bit 5"),
+            Test::HBit6 => write!(f, "TEST H, Bit 6"),
+            Test::HBit7 => write!(f, "TEST H, Bit 7"),
+            Test::LBit0 => write!(f, "TEST L, Bit 0"),
+            Test::LBit1 => write!(f, "TEST L, Bit 1"),
+            Test::LBit2 => write!(f, "TEST L, Bit 2"),
+            Test::LBit3 => write!(f, "TEST L, Bit 3"),
+            Test::LBit4 => write!(f, "TEST L, Bit 4"),
+            Test::LBit5 => write!(f, "TEST L, Bit 5"),
+            Test::LBit6 => write!(f, "TEST L, Bit 6"),
+            Test::LBit7 => write!(f, "TEST L, Bit 7"),
+            Test::HLBit0 => write!(f, "TEST [HL], Bit 0"),
+            Test::HLBit1 => write!(f, "TEST [HL], Bit 1"),
+            Test::HLBit2 => write!(f, "TEST [HL], Bit 2"),
+            Test::HLBit3 => write!(f, "TEST [HL], Bit 3"),
+            Test::HLBit4 => write!(f, "TEST [HL], Bit 4"),
+            Test::HLBit5 => write!(f, "TEST [HL], Bit 5"),
+            Test::HLBit6 => write!(f, "TEST [HL], Bit 6"),
+            Test::HLBit7 => write!(f, "TEST [HL], Bit 7"),
+            Test::ABit0 => write!(f, "TEST A, Bit 0"),
+            Test::ABit1 => write!(f, "TEST A, Bit 1"),
+            Test::ABit2 => write!(f, "TEST A, Bit 2"),
+            Test::ABit3 => write!(f, "TEST A, Bit 3"),
+            Test::ABit4 => write!(f, "TEST A, Bit 4"),
+            Test::ABit5 => write!(f, "TEST A, Bit 5"),
+            Test::ABit6 => write!(f, "TEST A, Bit 6"),
+            Test::ABit7 => write!(f, "TEST A, Bit 7"),
+        }
     }
 }
 

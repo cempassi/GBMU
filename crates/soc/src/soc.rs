@@ -85,24 +85,34 @@ impl SOC {
         self.runner.clone()
     }
 
-    fn check_tick(&mut self) -> bool {
-        self.runner.borrow_mut().check_tick()
+    fn step(&mut self) {
+        self.runner.borrow_mut().step()
     }
 
-    fn check_redraw(&mut self, status: Vec<Finished>) -> bool {
+    fn check_redraw(&mut self, status: &mut Vec<Finished>) {
         self.runner.borrow_mut().check_redraw(status)
     }
 
-    pub fn run(&mut self) -> bool {
+    fn redraw_ready(&self) -> bool {
+        self.runner.borrow().redraw
+    }
+
+    fn redraw_init(&self) {
+        self.runner.borrow_mut().redraw = false;
+    }
+
+    pub fn run(&mut self) {
         let waker = crate::waker::create();
         let mut context = Context::from_waker(&waker);
         let mut status = Vec::new();
 
-        if self.check_tick() {
+        self.redraw_init();
+        while !self.redraw_ready() {
+            self.step();
             for processor in &mut self.processors {
                 status.push(processor.run(&mut context));
             }
+            self.check_redraw(&mut status);
         }
-        self.check_redraw(status)
     }
 }

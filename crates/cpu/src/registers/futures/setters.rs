@@ -4,14 +4,23 @@ use crate::Registers;
 use memory::{Async as A, Memory};
 use shared::Error;
 
-pub async fn update(registers: Registers, memory: Memory, is_increase: bool) -> Result<u8, Error> {
-    let cycles = Set::RegisterAt(Bits16::HL, Bits8::A)
+const IO_REG: u16 = 0xFF00;
+
+pub async fn hl_sub(registers: Registers, memory: Memory) -> Result<u8, Error> {
+    let data = registers.borrow_mut().get(Bits8::A);
+    let cycles = Set::Bits8At(Bits16::HL, data)
         .run(registers.clone(), memory)
         .await?;
-    match is_increase {
-        true => registers.borrow_mut().increase(Bits16::HL, 1),
-        false => registers.borrow_mut().decrease(Bits16::HL, 1),
-    };
+    registers.borrow_mut().decrease(Bits16::HL, 1);
+    Ok(cycles)
+}
+
+pub async fn hl_add(registers: Registers, memory: Memory) -> Result<u8, Error> {
+    let data = registers.borrow_mut().get(Bits8::A);
+    let cycles = Set::Bits8At(Bits16::HL, data)
+        .run(registers.clone(), memory)
+        .await?;
+    registers.borrow_mut().increase(Bits16::HL, 1);
     Ok(cycles)
 }
 
@@ -57,4 +66,18 @@ pub async fn hl(registers: Registers, memory: Memory, area: Bits8) -> Result<u8,
     let data: u8 = registers.borrow().get(area);
     let dst: u16 = registers.borrow().get(Bits16::HL);
     memory.set(dst, data).await
+}
+
+pub async fn io_c(registers: Registers, memory: Memory) -> Result<u8, Error> {
+    let a = registers.borrow_mut().get(Bits8::A);
+    let c: u16 = registers.borrow().get(Bits8::C).into();
+    let cycles = memory.set::<u8>(c + IO_REG, a).await?;
+    Ok(cycles)
+}
+
+pub async fn io_next(registers: Registers, memory: Memory) -> Result<u8, Error> {
+    let a = registers.borrow_mut().get(Bits8::A);
+    let (data, mut cycles): (u8, u8) = Get::Next.get(registers.clone(), memory.clone()).await?;
+    cycles += memory.set::<u8>(u16::from(data) + IO_REG, a).await?;
+    Ok(cycles)
 }
