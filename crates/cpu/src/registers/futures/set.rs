@@ -11,6 +11,7 @@ use std::pin::Pin;
 
 type Processing = Pin<Box<dyn Future<Output = Result<u8, Error>>>>;
 
+#[allow(clippy::upper_case_acronyms)]
 pub(crate) enum Set {
     CalculHL(Operation),
     CalculNext(Operation),
@@ -32,6 +33,10 @@ pub(crate) enum Set {
     Data(Bits16),
     Pop(Bits16),
     Push(Bits16),
+    LoadIOC,
+    LoadIONext,
+    IOC,
+    IONext
 }
 
 impl Set {
@@ -59,6 +64,10 @@ impl Set {
             }
             Set::CbHL(operation) => Box::pin(cb::hl(registers, memory, operation)),
             Set::TestHL(bit) => Box::pin(cb::test(registers, memory, bit)),
+            Set::LoadIOC => Box::pin(load::io_c(registers, memory)),
+            Set::LoadIONext => Box::pin(load::io_next(registers, memory)),
+            Set::IOC => Box::pin(set::io_c(registers, memory)),
+            Set::IONext => Box::pin(set::io_next(registers, memory)),
         }
     }
 }

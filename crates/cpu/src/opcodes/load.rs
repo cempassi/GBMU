@@ -185,6 +185,11 @@ pub enum Load {
     HLMA = 0x32,
     AHLP = 0x2A,
     AHLM = 0x3A,
+    ToIOC = 0xE2,
+    IOC = 0xF2,
+    ToIONext = 0xE0,
+    IONext = 0xF0,
+
 }
 
 impl Decoder for Load {
@@ -285,6 +290,10 @@ impl Load {
                     .run(registers, memory)
                     .await?
             }
+            Load::ToIOC => Set::IOC.run(registers, memory).await?,
+            Load::IOC => Set::LoadIOC.run(registers, memory).await?,
+            Load::ToIONext => Set::IONext.run(registers, memory).await?,
+            Load::IONext => Set::LoadIONext.run(registers, memory).await?,
         };
         Ok(cycles)
     }

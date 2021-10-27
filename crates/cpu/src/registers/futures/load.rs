@@ -1,8 +1,10 @@
 use super::{AsyncGet, Get, Set};
 use crate::registers::{Bits16, Bits8, Bus, IncDec};
 use crate::Registers;
-use memory::Memory;
+use memory::{Async, Memory};
 use shared::Error;
+
+const IO_REG: u16 = 0xFF00;
 
 pub async fn u8(registers: Registers, memory: Memory, area: Bits8) -> Result<u8, Error> {
     let (data, cycles) = Get::Next.get(registers.clone(), memory).await?;
@@ -69,4 +71,18 @@ pub async fn pop(registers: Registers, memory: Memory, area: Bits16) -> Result<u
     registers.borrow_mut().set(area, data);
     registers.borrow_mut().increase(Bits16::SP, 2);
     Ok(cycles)
+}
+
+pub async fn io_c(registers: Registers, memory: Memory) -> Result<u8, Error> {
+    let c: u16 = registers.borrow().get(Bits8::C).into();
+    let (data, cycles) = memory.get::<u8>(c + IO_REG).await?;
+    registers.borrow_mut().set(Bits8::A, data);
+    Ok(cycles)
+}
+
+pub async fn io_next(registers: Registers, memory: Memory) -> Result<u8, Error> {
+    let (src, next): (u8, u8) = Get::Next.get(registers.clone(), memory.clone()).await?;
+    let (data, get) = memory.get::<u8>(u16::from(src) + IO_REG).await?;
+    registers.borrow_mut().set(Bits8::A, data);
+    Ok(next + get)
 }
