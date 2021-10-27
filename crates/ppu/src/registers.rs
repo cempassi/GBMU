@@ -1,7 +1,7 @@
 pub(crate) mod lcd;
 mod palette;
 
-pub use lcd::Register;
+pub use lcd::Lcd;
 
 // /// 1 LCD Control Register
 // ///
@@ -40,108 +40,22 @@ pub use lcd::Register;
 // ///         8.5.1 Bit7=0 - General Purpose DMA
 // ///         8.5.2 Bit7=1 - H-Blank DMA
 
-#[allow(dead_code)]
-#[derive(Debug, Default, Copy, Clone, PartialEq)]
+#[derive(Debug, Default)]
 pub struct Registers {
-    // //control: lcd::Control,
+    pub lcd: Lcd, // // bgp: palette::Monochrome,
+                  // // objp0: palette::Monochrome,
+                  // // objp1: palette::Monochrome,
 
-    // status: lcd::Status,
-    yscroll: u8,
-    xscroll: u8,
-    ly: u8,
-    lycompare: u8,
-    ywindow: u8,
-    xwindow: u8,
-    // // bgp: palette::Monochrome,
-    // // objp0: palette::Monochrome,
-    // // objp1: palette::Monochrome,
+                  // // bcps: palette::Index,
+                  // // bcpd: palette::Data,
+                  // // ocps: palette::Index,
+                  // // ocpd: palette::Data,
 
-    // // bcps: palette::Index,
-    // // bcpd: palette::Data,
-    // // ocps: palette::Index,
-    // // ocpd: palette::Data,
+                  //dma_transfer: u8,
 
-    //dma_transfer: u8,
-
-    // // hdma1: u8,
-    // hdma2: u8,
-    // hdma3: u8,
-    // hdma4: u8,
-    // hdma5: u8,
-}
-
-impl Registers {
-    fn ly_cmp(&mut self) {
-        if self.ly == self.lycompare {
-            //self.status.set_lyc_ly(true);
-        }
-    }
-
-    pub fn increase(&mut self, operation: Register) {
-        match operation {
-            Register::Xscroll => self.xscroll += 1,
-            Register::Yscroll => self.yscroll += 1,
-            Register::Ly => {
-                self.ly += 1;
-                self.ly_cmp();
-            }
-            Register::LyCmp => {
-                self.lycompare += 1;
-                self.ly_cmp();
-            }
-            Register::Ywindow => self.ywindow += 1,
-            Register::Xwindow => self.xwindow += 1,
-        }
-    }
-
-    pub fn is_equal(&mut self, operation: Register, value: u8) -> bool {
-        match operation {
-            Register::Xscroll => self.xscroll == value,
-            Register::Yscroll => self.yscroll == value,
-            Register::Ly => {
-                self.ly_cmp();
-                self.ly == value
-            }
-            Register::LyCmp => {
-                self.ly_cmp();
-                self.lycompare == value
-            }
-            Register::Ywindow => self.ywindow == value,
-            Register::Xwindow => self.xwindow == value,
-        }
-    }
-
-    pub fn is_lower(&mut self, operation: Register, value: u8) -> bool {
-        match operation {
-            Register::Xscroll => self.xscroll < value,
-            Register::Yscroll => self.yscroll < value,
-            Register::Ly => {
-                self.ly_cmp();
-                self.ly < value
-            }
-            Register::LyCmp => {
-                self.ly_cmp();
-                self.lycompare < value
-            }
-            Register::Ywindow => self.ywindow < value,
-            Register::Xwindow => self.xwindow < value,
-        }
-    }
-
-    pub fn clear(&mut self, operation: Register) {
-        match operation {
-            Register::Xscroll => self.xscroll = 0,
-            Register::Yscroll => self.yscroll = 0,
-            Register::Ly => {
-                self.ly = 0;
-                self.ly_cmp();
-            }
-            Register::LyCmp => {
-                self.lycompare = 0;
-                self.ly_cmp();
-            }
-            Register::Ywindow => self.ywindow = 0,
-            Register::Xwindow => self.xwindow = 0,
-        }
-    }
+                  // // hdma1: u8,
+                  // hdma2: u8,
+                  // hdma3: u8,
+                  // hdma4: u8,
+                  // hdma5: u8
 }

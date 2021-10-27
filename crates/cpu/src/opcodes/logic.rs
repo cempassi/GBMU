@@ -1,11 +1,31 @@
 use crate::cpu::Registers;
 use crate::registers::futures::{Operation, Set};
-use crate::registers::{Bits8, Logical as L};
+use crate::registers::{Bits8, Logical as L, Rotation};
 use memory::Memory;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 
 use super::decode::{Decode, Decoder};
+
+/// RRA
+/// Rotate register A right through carry.
+///
+/// C -> [7 -> 0] -> C
+
+/// RRCA
+/// Rotate register A right.
+///
+/// C -> [7 -> 0] -> [7]
+
+/// LRA
+/// Rotate register A left through carry.
+///
+/// C <- [7 <- 0] <- C
+
+/// LRCA
+/// Rotate register A left.
+///
+/// C <- [7 <- 0] <- [7]
 
 /// AND n
 /// Description:
@@ -24,6 +44,7 @@ use super::decode::{Decode, Decoder};
 ///  AND        C          0xa1   4         AND        L          0xa5   4
 ///  AND        D          0xa2   4         AND        (HL)       0xa6   8
 ///  AND        8b         0xe6   8
+
 /// OR n
 /// Description:
 ///  Logical OR n with register A, result in A.
@@ -123,6 +144,10 @@ pub enum Logic {
     CmpAL = 0xbd,
     CmpAHL = 0xbe,
     CmpA8b = 0xfe,
+    RLCA = 0x07,
+    RLA = 0x17,
+    RRCA = 0x0F,
+    RRA = 0x1F,
 }
 
 impl Decoder for Logic {
@@ -134,6 +159,10 @@ impl Decoder for Logic {
 impl Logic {
     pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
         let cycles = match self {
+            Logic::RLA => registers.borrow_mut().left_carry(Bits8::A),
+            Logic::RLCA => registers.borrow_mut().left_nocarry(Bits8::A),
+            Logic::RRA => registers.borrow_mut().right_carry(Bits8::A),
+            Logic::RRCA => registers.borrow_mut().right_nocarry(Bits8::A),
             Logic::AndAA => registers.borrow_mut().and(Bits8::A),
             Logic::AndAB => registers.borrow_mut().and(Bits8::B),
             Logic::AndAC => registers.borrow_mut().and(Bits8::C),

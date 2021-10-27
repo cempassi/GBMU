@@ -33,7 +33,12 @@ impl Button {
             MenuMsg::Frame => {
                 self.runner.borrow_mut().frame();
             }
-            _ => (),
+            MenuMsg::Ppu => {
+                self.runner.borrow_mut().ppu();
+            }
+            MenuMsg::Cpu => {
+                self.runner.borrow_mut().cpu();
+            }
         }
     }
 
@@ -43,7 +48,8 @@ impl Button {
 
     pub fn view(&mut self, theme: Theme) -> Element<MenuMsg, Renderer> {
         let text = format!("{:?}", self.message);
-        let text = Text::new(format!("{:^10}", text)).bold(20);
+        let text = format!("{:^10}", text);
+        let text = Text::new(&text).medium(20);
         button::Button::new(&mut self.state, text)
             .on_press(self.message)
             .style(theme)

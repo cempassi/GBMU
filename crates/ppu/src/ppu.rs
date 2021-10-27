@@ -1,4 +1,4 @@
-use crate::registers::lcd::Register;
+use crate::registers::lcd;
 use crate::registers::Registers;
 
 #[derive(Debug)]
@@ -10,6 +10,12 @@ pub struct Ppu {
 impl AsRef<Vec<u8>> for Ppu {
     fn as_ref(&self) -> &Vec<u8> {
         self.vram.as_ref()
+    }
+}
+
+impl AsRef<Registers> for Ppu {
+    fn as_ref(&self) -> &Registers {
+        &self.registers
     }
 }
 
@@ -30,19 +36,23 @@ impl Ppu {
         self.vram[address]
     }
 
+    pub fn get_lcd(&self) -> &lcd::Lcd {
+        &self.registers.lcd
+    }
+
     pub fn set_vram(&mut self, address: usize, data: u8) {
         self.vram[address] = data;
     }
 
-    pub fn is_lower(&mut self, register: Register, nbr: u8) -> bool {
-        self.registers.is_lower(register, nbr)
+    pub fn is_lower(&mut self, register: lcd::Field, nbr: u8) -> bool {
+        self.registers.lcd.is_lower(register, nbr)
     }
 
-    pub fn increase(&mut self, register: Register) {
-        self.registers.increase(register);
+    pub fn increase(&mut self, register: lcd::Field) {
+        self.registers.lcd.increase(register);
     }
 
-    pub fn clear(&mut self, register: Register) {
-        self.registers.clear(register);
+    pub fn clear(&mut self, register: lcd::Field) {
+        self.registers.lcd.clear(register);
     }
 }

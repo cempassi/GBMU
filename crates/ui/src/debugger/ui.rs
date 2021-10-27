@@ -1,7 +1,7 @@
 use super::disassembler::{DisassMsg, Disassembler};
 use super::memory_map::{Memory, MemoryMsg};
 use super::menu::{Menu, MenuMsg};
-use super::registers::{CpuMsg, CpuRegisters};
+use super::registers::{Cpu, CpuMsg, Ppu, PpuMsg};
 use crate::style::Theme;
 use iced_wgpu::{Column, Renderer, Row};
 use iced_winit::{Command, Element, Program};
@@ -10,7 +10,8 @@ use std::convert::From;
 
 pub struct UserInterface {
     theme: Theme,
-    cpu_registers: CpuRegisters,
+    cpu_registers: Cpu,
+    ppu: Ppu,
     memory: Memory,
     menu: Menu,
     disassembler: Disassembler,
@@ -22,10 +23,11 @@ impl From<&SOC> for UserInterface {
         let memory = soc.get_memory();
         Self {
             theme: Theme::default(),
-            cpu_registers: CpuRegisters::new(cpu_registers.clone()),
+            cpu_registers: Cpu::new(cpu_registers.clone()),
             memory: <Memory as From<memory::Memory>>::from(memory.clone()),
             menu: Menu::new(soc.get_runner()),
             disassembler: Disassembler::new(cpu_registers, memory),
+            ppu: Ppu::new(soc.get_ppu()),
         }
     }
 }
@@ -36,6 +38,7 @@ pub enum Message {
     Memory(MemoryMsg),
     Menu(MenuMsg),
     Disassembler(DisassMsg),
+    Ppu(PpuMsg),
 }
 
 impl From<CpuMsg> for Message {
@@ -55,6 +58,10 @@ impl From<MenuMsg> for Message {
     }
 }
 
+impl UserInterface {
+    pub fn refresh(&self) {}
+}
+
 impl Program for UserInterface {
     type Message = Message;
     type Renderer = Renderer;
@@ -71,10 +78,17 @@ impl Program for UserInterface {
             }
             Message::Menu(message) => {
                 self.menu.update(message);
+                if message == MenuMsg::Cpu {
+                    self.disassembler.reload();
+                }
                 Command::none()
             }
             Message::Disassembler(message) => {
                 self.disassembler.update(message);
+                Command::none()
+            }
+            Message::Ppu(message) => {
+                self.ppu.update(message);
                 Command::none()
             }
         }

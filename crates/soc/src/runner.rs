@@ -1,65 +1,65 @@
+use super::mode::Mode;
+use super::processor::Finished;
 use std::cell::RefCell;
 use std::rc::Rc;
 
 pub type Runner = Rc<RefCell<Cycle>>;
 
-/// Number of ticks in a line
-const LINE_LENGTH: u32 = 456;
-
-/// Number of Lines in a frame
-const FRAME_LENGTH: u32 = 144;
-
 #[derive(Debug, Default)]
 pub struct Cycle {
-    state: State,
+    mode: Mode,
     redraw: bool,
     lines: u32,
     ticks: u32,
+    last_cpu: u8,
+    last_ppu: u8,
 }
 
 impl Cycle {
     pub fn check_tick(&mut self) -> bool {
         self.step();
-        !matches!(self.state, State::Idle)
+        !matches!(self.mode, Mode::Idle)
     }
 
-    pub fn check_redraw(&mut self, status: bool) -> bool {
-        match self.state {
-            State::Tick => {
-                self.state = State::Idle;
-                status
+    pub fn check_redraw(&mut self, status: Vec<Finished>) -> bool {
+        for status in status {
+            match status {
+                Finished::Cpu(cycles) => {
+                    self.mode.update_processing();
+                    self.last_cpu = cycles;
+                    self.redraw = true;
+                }
+                Finished::Ppu(cycles) => {
+                    self.mode.update_processing();
+                    self.last_ppu = cycles;
+                    self.redraw = true;
+                }
+                Finished::Error(_) => self.redraw = true,
+                Finished::Nope => self.redraw = self.mode.check_redraw(),
             }
-            State::Line(ticks) if ticks == LINE_LENGTH => {
-                self.state = State::Idle;
-                true
-            }
-            State::Frame(lines) if lines == FRAME_LENGTH => {
-                self.state = State::Idle;
-                true
-            }
-            _ => false,
         }
+        self.redraw
     }
 
     fn step(&mut self) {
-        if let State::Line(ticks) = self.state {
+        if let Mode::Line(ticks) = self.mode {
             println!("Processing line, currently at tick {} on 456", ticks);
-            if self.state.increase() {
+            if self.mode.increase() {
                 self.lines += 1;
                 self.ticks = 0;
             }
-        } else if let State::Frame(lines) = self.state {
+        } else if let Mode::Frame(lines) = self.mode {
             println!("Processing frame, currently at line {} on 120", lines);
-            if self.state.increase() {
+            if self.mode.increase() {
                 self.lines = 0;
             }
         } else {
             self.ticks += 1;
-            if self.ticks == LINE_LENGTH {
+            if Mode::is_eol(self.ticks) {
                 self.lines += 1;
                 self.ticks = 0;
             }
-            if self.lines == FRAME_LENGTH {
+            if Mode::is_eof(self.ticks) {
                 self.lines = 0;
                 self.ticks = 0;
             }
@@ -67,48 +67,29 @@ impl Cycle {
     }
 
     pub fn tick(&mut self) {
-        self.state = State::Tick;
+        println!("Tick processing mode!");
+        self.mode = Mode::Tick;
     }
 
     pub fn line(&mut self) {
         println!("Line processing mode!");
-        self.state = State::Line(self.ticks);
+        self.mode = Mode::Line(self.ticks);
         self.ticks = 0;
     }
 
     pub fn frame(&mut self) {
-        println!("Line processing mode!");
-        self.state = State::Line(self.lines);
+        println!("Frame processing mode!");
+        self.mode = Mode::Line(self.lines);
         self.lines = 0;
     }
-}
 
-#[derive(Debug, Clone, Copy)]
-pub enum State {
-    Tick,
-    Line(u32),
-    Frame(u32),
-    Idle,
-}
-
-impl State {
-    pub fn increase(&mut self) -> bool {
-        match self {
-            State::Line(ref mut ticks) => {
-                *ticks += 1;
-                *ticks == LINE_LENGTH
-            }
-            State::Frame(ref mut lines) => {
-                *lines += 1;
-                *lines == FRAME_LENGTH
-            }
-            _ => false,
-        }
+    pub fn ppu(&mut self) {
+        println!("Ppu cycle processing mode!");
+        self.mode = Mode::Ppu;
     }
-}
 
-impl Default for State {
-    fn default() -> Self {
-        State::Idle
+    pub fn cpu(&mut self) {
+        println!("Cpu cycle processing mode!");
+        self.mode = Mode::Cpu;
     }
 }

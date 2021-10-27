@@ -13,7 +13,7 @@ use shared::Error;
 
 impl From<Bitset> for Disass<u8> {
     fn from(opcode: Bitset) -> Self {
-        let name = format!("{:<12}", format!("Test {:?}", opcode));
+        let name = Self::name(format!("Bitset {:?}", opcode));
         let (cycles, data): (u8, Data) = match opcode {
             Bitset::HLBit0 => (12, Data::None),
             Bitset::HLBit1 => (12, Data::None),
@@ -29,7 +29,7 @@ impl From<Bitset> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }
@@ -38,7 +38,7 @@ impl From<Bitset> for Disass<u8> {
 
 impl From<Reset> for Disass<u8> {
     fn from(opcode: Reset) -> Self {
-        let name = format!("{:<12}", format!("Test {:?}", opcode));
+        let name = Self::name(format!("Reset {:?}", opcode));
         let (cycles, data): (u8, Data) = match opcode {
             Reset::HLBit0 => (12, Data::None),
             Reset::HLBit1 => (12, Data::None),
@@ -54,7 +54,7 @@ impl From<Reset> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }
@@ -63,7 +63,7 @@ impl From<Reset> for Disass<u8> {
 
 impl From<Test> for Disass<u8> {
     fn from(opcode: Test) -> Self {
-        let name = format!("{:<12}", format!("Test {:?}", opcode));
+        let name = Self::name(format!("Test {:?}", opcode));
         let (cycles, data): (u8, Data) = match opcode {
             Test::HLBit0 => (12, Data::None),
             Test::HLBit1 => (12, Data::None),
@@ -79,7 +79,7 @@ impl From<Test> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }
@@ -89,7 +89,7 @@ impl From<Test> for Disass<u8> {
 impl TryFrom<Jump> for Disass<(u8, u8)> {
     type Error = shared::Error;
     fn try_from(opcode: Jump) -> Result<Self, Self::Error> {
-        let name = format!("{:<12}", format!("{:?}", opcode));
+        let name = Self::name(format!("{:?}", opcode));
         let (cycles, data): ((u8, u8), Data) = match opcode {
             Jump::NZNN => Ok(((16, 12), Data::Bits16(0))),
             Jump::NCNN => Ok(((16, 12), Data::Bits16(0))),
@@ -112,7 +112,7 @@ impl TryFrom<Jump> for Disass<(u8, u8)> {
         let code: u8 = opcode.into();
         Ok(Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         })
@@ -122,7 +122,7 @@ impl TryFrom<Jump> for Disass<(u8, u8)> {
 impl TryFrom<Jump> for Disass<u8> {
     type Error = shared::Error;
     fn try_from(opcode: Jump) -> Result<Self, Self::Error> {
-        let name = format!("{:<12}", format!("{:?}", opcode));
+        let name = Self::name(format!("{:?}", opcode));
         let (cycles, data): (u8, Data) = match opcode {
             Jump::NN => Ok((16, Data::Bits16(0))),
             Jump::HL => Ok((16, Data::Bits16(0))),
@@ -134,7 +134,7 @@ impl TryFrom<Jump> for Disass<u8> {
         let code: u8 = opcode.into();
         Ok(Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         })
@@ -143,7 +143,7 @@ impl TryFrom<Jump> for Disass<u8> {
 
 impl From<Logic> for Disass<u8> {
     fn from(opcode: Logic) -> Self {
-        let name = format!("{:<12}", format!("{:?}", opcode));
+        let name = Self::name(format!("{:?}", opcode));
         let (cycles, data): (u8, Data) = match opcode {
             Logic::AndAHL => (8, Data::Bits8(0)),
             Logic::AndA8b => (8, Data::Bits8(0)),
@@ -159,7 +159,7 @@ impl From<Logic> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }
@@ -168,7 +168,7 @@ impl From<Logic> for Disass<u8> {
 
 impl From<Rotate> for Disass<u8> {
     fn from(opcode: Rotate) -> Self {
-        let name = format!("{:<12}", format!("Rotate {:?}", opcode));
+        let name = Self::name(format!("Rotate {:?}", opcode));
         let (cycles, data): (u8, Data) = match opcode {
             Rotate::LCHL => (8, Data::Bits8(0)),
             Rotate::LHL => (8, Data::Bits8(0)),
@@ -180,7 +180,7 @@ impl From<Rotate> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }
@@ -189,7 +189,7 @@ impl From<Rotate> for Disass<u8> {
 
 impl From<Load> for Disass<u8> {
     fn from(opcode: Load) -> Self {
-        let name = format!("{:<12}", format!("Load {:?}", opcode));
+        let name = Self::name(format!("Load {:?}", opcode));
         let (cycles, data): (u8, Data) = match opcode {
             Load::HL8b => (12, Data::Bits8(0)),
             Load::B8b => (8, Data::Bits8(0)),
@@ -227,7 +227,7 @@ impl From<Load> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }
@@ -236,7 +236,7 @@ impl From<Load> for Disass<u8> {
 
 impl From<Load16b> for Disass<u8> {
     fn from(opcode: Load16b) -> Self {
-        let name = format!("{:<12}", format!("{:?}", opcode));
+        let name = Self::name(format!("{:?}", opcode));
         let (cycles, data): (u8, Data) = match opcode {
             Load16b::PushAF => (16, Data::None),
             Load16b::PushBC => (16, Data::None),
@@ -253,7 +253,7 @@ impl From<Load16b> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }
@@ -262,7 +262,7 @@ impl From<Load16b> for Disass<u8> {
 
 impl From<Shift> for Disass<u8> {
     fn from(opcode: Shift) -> Self {
-        let name = format!("{:<12}", format!("{:?}", opcode));
+        let name = Self::name(format!("{:?}", opcode));
         let (cycles, data): (u8, Data) = match opcode {
             Shift::LHL => (8, Data::Bits8(0)),
             Shift::RAHL => (8, Data::Bits8(0)),
@@ -274,7 +274,7 @@ impl From<Shift> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }
@@ -283,7 +283,7 @@ impl From<Shift> for Disass<u8> {
 
 impl From<Arithmetic> for Disass<u8> {
     fn from(opcode: Arithmetic) -> Self {
-        let name = format!("{:<12}", format!("{:?}", opcode));
+        let name = Self::name(format!("{:?}", opcode));
         let (cycles, data): (u8, Data) = match opcode {
             Arithmetic::AAHL => (8, Data::Bits8(0)),
             Arithmetic::AA8b => (8, Data::Bits8(0)),
@@ -299,7 +299,7 @@ impl From<Arithmetic> for Disass<u8> {
         let code: u8 = opcode.into();
         Self {
             name,
-            code,
+            opcode: code,
             cycles,
             data,
         }

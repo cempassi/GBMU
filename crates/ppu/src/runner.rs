@@ -1,6 +1,6 @@
 use crate::blanks::{Blank, HBLANK, VBLANK};
 use crate::oam::Oam;
-use crate::registers::lcd::Register;
+use crate::registers::lcd;
 use crate::transfert::Pixel;
 use crate::Ppu;
 use shared::Error;
@@ -41,13 +41,13 @@ impl Run for Ppu {
 
 async fn run(ppu: Ppu) -> Result<u8, Error> {
     println!("Running the ppu!");
-    while ppu.borrow_mut().is_lower(Register::Ly, 144) {
+    while ppu.borrow_mut().is_lower(lcd::Field::Ly, 144) {
         Oam::search(ppu.clone()).await;
         Pixel::transfert(ppu.clone()).await;
         Blank::new(HBLANK).await;
-        ppu.borrow_mut().increase(Register::Ly)
+        ppu.borrow_mut().increase(lcd::Field::Ly)
     }
     Blank::new(VBLANK).await;
-    ppu.borrow_mut().clear(Register::Ly);
+    ppu.borrow_mut().clear(lcd::Field::Ly);
     Ok(42)
 }

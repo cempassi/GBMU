@@ -1,4 +1,5 @@
 mod header;
+pub mod mode;
 pub(crate) mod processor;
 pub mod runner;
 pub mod soc;

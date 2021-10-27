@@ -44,7 +44,7 @@ impl Instruction {
             } else if let Ok(opcode) = Shift::try_from_primitive(opcode) {
                 Ok(Cycles::Absolute(Disass::<u8>::from(opcode)))
             } else {
-                Err(Error::Unimplemented)
+                Ok(Cycles::unimplemented(opcode))
             }
         }?;
         disass.set(memory, address)?;
@@ -74,6 +74,9 @@ enum Cycles {
 }
 
 impl Cycles {
+    pub fn unimplemented(opcode: u8) -> Self {
+        Self::Absolute(Disass::unimplemented(opcode))
+    }
     pub fn set(&mut self, memory: &Memory, address: u16) -> Result<(), Error> {
         match self {
             Cycles::Absolute(ref mut disass) => disass.data.set(memory, address),
@@ -91,7 +94,7 @@ impl Cycles {
 
 pub(super) struct Disass<T> {
     pub(super) name: String,
-    pub(super) code: u8,
+    pub(super) opcode: u8,
     pub(super) cycles: T,
     pub(super) data: Data, //description: String,
 }
@@ -99,8 +102,39 @@ pub(super) struct Disass<T> {
 impl Disass<u8> {
     pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
         let name = Cell::light(self.name.clone(), 20);
-        let code = Cell::light(format!("{:^12}", format!("{:#04X}", self.code)), 20);
+        let code = format!("{:#04X}", self.opcode);
+        let code = Cell::light(format!("{:^14}", code), 20);
         let cycles = Cell::light(format!("{:^12}", format!("{:>2}", self.cycles)), 20);
+        let data = Cell::light(self.data.to_string(), 20);
+
+        Row::new()
+            .push(name)
+            .push(code)
+            .push(cycles)
+            .push(data)
+            .into()
+    }
+
+    pub fn unimplemented(opcode: u8) -> Self {
+        let name = "Unimplemented".to_string();
+        let cycles = 4;
+        let data = Data::None;
+        Self {
+            name,
+            opcode,
+            cycles,
+            data,
+        }
+    }
+}
+
+impl Disass<(u8, u8)> {
+    pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
+        let name = Cell::light(self.name.to_string(), 20);
+        let code = format!("{:#X}", self.opcode);
+        let code = Cell::light(format!("{:^12}", code), 20);
+        let cycles = format!("{:^12}", format!("{}/{}", self.cycles.0, self.cycles.1));
+        let cycles = Cell::light(cycles, 20);
         let data = Cell::light(self.data.to_string(), 20);
 
         Row::new()
@@ -112,20 +146,9 @@ impl Disass<u8> {
     }
 }
 
-impl Disass<(u8, u8)> {
-    pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
-        let name = Cell::light(self.name.to_string(), 20);
-        let code = Cell::light(format!("{:#X}", self.code), 20);
-        let cycles = format!("{:^12}", format!("{}/{}", self.cycles.0, self.cycles.1));
-        let cycles = Cell::light(cycles, 20);
-        let data = Cell::light(self.data.to_string(), 20);
-
-        Row::new()
-            .push(name)
-            .push(code)
-            .push(cycles)
-            .push(data)
-            .into()
+impl<T> Disass<T> {
+    pub fn name(name: String) -> String {
+        format!("{:^16}", name)
     }
 }
 
@@ -159,12 +182,12 @@ impl Data {
 impl ToString for Data {
     fn to_string(&self) -> String {
         match self {
-            Data::None => format!("{:^12}", "None"),
+            Data::None => format!("{:^16}", "None"),
             Data::Bits8(data) => {
-                format!("{:^12}", format!("{:#X}", *data))
+                format!("{:^16}", format!("{:#X}", *data))
             }
             Data::Bits16(data) => {
-                format!("{:^12}", format!("{:#X}", *data))
+                format!("{:^16}", format!("{:#X}", *data))
             }
         }
     }

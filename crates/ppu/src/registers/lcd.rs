@@ -1,3 +1,5 @@
+mod position;
+pub use position::{Field, Position};
 // use modular_bitfield::{bitfield, specifiers::B2};
 
 // /// LCDC is the main LCD Control register. Its bits toggle what elements are displayed on the screen, and how.
@@ -38,24 +40,55 @@
 // ///             3: Transferring Data to LCD Controller
 //
 // #[bitfield]
-// #[derive(Debug, Default, Copy, Clone, PartialEq)]
 // #[allow(dead_code)]
-// pub struct Status {
-//     mode: B2,
-//     pub lyc_ly: bool,
-//     hblank_interupt: bool,
-//     vblank_interupt: bool,
-//     oam_interupt: bool,
-//     lyc_ly_interupt: bool,
-//     #[skip]
-//     unused: bool,
-// }
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
+pub struct Status {
+    //     mode: B2,
+    pub lyc_ly: bool,
+    //     hblank_interupt: bool,
+    //     vblank_interupt: bool,
+    //     oam_interupt: bool,
+    //     lyc_ly_interupt: bool,
+    //     #[skip]
+    //     unused: bool,
+}
 
-pub enum Register {
-    Xscroll,
-    Yscroll,
-    Ly,
-    LyCmp,
-    Ywindow,
-    Xwindow,
+#[derive(Debug, Default, Clone, Copy)]
+pub struct Lcd {
+    // //control: Control,
+    status: Status,
+    position: Position,
+}
+
+impl Lcd {
+    fn check_ly(&mut self, field: Field) {
+        if matches!(field, Field::Ly | Field::LyCmp) {
+            self.status.lyc_ly = self.position.ly_cmp();
+        }
+    }
+
+    pub fn set(&self, dst: &mut Self) {
+        dst.status = self.status;
+        dst.position = self.position;
+    }
+
+    pub fn increase(&mut self, field: Field) {
+        self.position.increase(field);
+        self.check_ly(field);
+    }
+
+    pub fn clear(&mut self, field: Field) {
+        self.position.clear(field);
+        self.check_ly(field);
+    }
+
+    pub fn is_equal(&mut self, field: Field, data: u8) -> bool {
+        self.check_ly(field);
+        self.position.is_equal(field, data)
+    }
+
+    pub fn is_lower(&mut self, field: Field, data: u8) -> bool {
+        self.check_ly(field);
+        self.position.is_lower(field, data)
+    }
 }
