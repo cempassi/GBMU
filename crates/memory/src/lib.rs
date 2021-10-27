@@ -5,11 +5,12 @@ mod bus;
 pub(crate) mod consts;
 pub mod futures;
 pub mod interface;
+pub(crate) mod io;
 pub(crate) mod mbc;
 pub mod memory;
 pub(crate) mod ppu;
+pub(crate) mod ram;
 pub(crate) mod state;
-pub(crate) mod wram;
 
 pub use area::Area;
 pub use bus::MemoryBus;

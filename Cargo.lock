@@ -47,6 +47,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "apu"
+version = "0.1.0"
+
+[[package]]
 name = "arrayvec"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1088,6 +1092,7 @@ dependencies = [
 name = "memory"
 version = "0.1.0"
 dependencies = [
+ "apu",
  "num_enum",
  "ppu",
  "shared",
