@@ -9,6 +9,7 @@ use soc::SOC;
 use std::convert::From;
 
 pub struct UserInterface {
+    soc: SOC,
     theme: Theme,
     cpu_registers: Cpu,
     ppu: Ppu,
@@ -17,17 +18,20 @@ pub struct UserInterface {
     disassembler: Disassembler,
 }
 
-impl From<&SOC> for UserInterface {
-    fn from(soc: &SOC) -> UserInterface {
+impl From<SOC> for UserInterface {
+    fn from(soc: SOC) -> UserInterface {
         let cpu_registers = soc.get_cpu_registers();
         let memory = soc.get_memory();
+        let runner = soc.get_runner();
+        let ppu = soc.get_ppu();
         Self {
+            soc,
             theme: Theme::default(),
             cpu_registers: Cpu::new(cpu_registers.clone()),
             memory: <Memory as From<memory::Memory>>::from(memory.clone()),
-            menu: Menu::new(soc.get_runner()),
+            menu: Menu::new(runner),
             disassembler: Disassembler::new(cpu_registers, memory),
-            ppu: Ppu::new(soc.get_ppu()),
+            ppu: Ppu::new(ppu),
         }
     }
 }
@@ -70,28 +74,26 @@ impl Program for UserInterface {
         match message {
             Message::Registers(message) => {
                 self.cpu_registers.update(message);
-                Command::none()
             }
             Message::Memory(message) => {
                 self.memory.update(message);
-                Command::none()
             }
             Message::Menu(message) => {
                 self.menu.update(message);
                 if message == MenuMsg::Cpu {
                     self.disassembler.reload();
                 }
-                Command::none()
             }
             Message::Disassembler(message) => {
                 self.disassembler.update(message);
-                Command::none()
             }
             Message::Ppu(message) => {
                 self.ppu.update(message);
-                Command::none()
             }
-        }
+        };
+        self.soc.run();
+        self.disassembler.update(DisassMsg::Refresh);
+        Command::none()
     }
 
     #[allow(clippy::redundant_closure)]

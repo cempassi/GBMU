@@ -29,7 +29,7 @@ pub struct Debugger {
 }
 
 impl Debugger {
-    pub fn new(window: &Window, device: &Device, format: TextureFormat, soc: &SOC) -> Self {
+    pub fn new(window: &Window, device: &Device, format: TextureFormat, soc: SOC) -> Self {
         let user_interface = UserInterface::from(soc);
         let mut debug = Debug::new();
         let clipboard = Clipboard::connect(window);
