@@ -36,7 +36,7 @@ pub(crate) enum Set {
     LoadIOC,
     LoadIONext,
     IOC,
-    IONext
+    IONext,
 }
 
 impl Set {
