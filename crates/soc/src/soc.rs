@@ -109,7 +109,6 @@ impl SOC {
         self.redraw_init();
         while !self.redraw_ready() {
             self.step();
-            println!("I'm processing!");
             for processor in &mut self.processors {
                 status.push(processor.run(&mut context));
             }

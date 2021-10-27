@@ -63,29 +63,24 @@ impl Cycle {
     }
 
     pub fn tick(&mut self) {
-        println!("Tick processing mode!");
         self.mode = Mode::Tick;
     }
 
     pub fn line(&mut self) {
-        println!("Line processing mode!");
         self.mode = Mode::Line(self.ticks);
         self.ticks = 0;
     }
 
     pub fn frame(&mut self) {
-        println!("Frame processing mode!");
         self.mode = Mode::Line(self.lines);
         self.lines = 0;
     }
 
     pub fn ppu(&mut self) {
-        println!("Ppu cycle processing mode!");
         self.mode = Mode::Ppu;
     }
 
     pub fn cpu(&mut self) {
-        println!("Cpu cycle processing mode!");
         self.mode = Mode::Cpu;
     }
 }

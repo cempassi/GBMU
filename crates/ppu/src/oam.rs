@@ -25,10 +25,8 @@ impl Future for Oam {
         match self.cycle {
             Cycle::Finished => Poll::Ready(42),
             Cycle::Ppu(ref mut ticks) => {
-                println!("Search OAM, currently at cycle {}", ticks);
                 *ticks += 1;
                 if *ticks == 39 {
-                    println!("OAM Search finished: {} cycles", 40);
                     self.cycle = Cycle::Finished;
                 }
                 Poll::Pending

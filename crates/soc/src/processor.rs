@@ -23,14 +23,23 @@ pub enum Finished {
 impl Finished {
     pub fn ppu(result: Result<u8, Error>) -> Self {
         match result {
-            Ok(cycles) => Self::Ppu(cycles),
+            Ok(cycles) => {
+                println!("PPU finised, cycles: {}", cycles);
+                Self::Ppu(cycles)
+            }
             Err(error) => Self::Error(error),
         }
     }
     pub fn cpu(result: Result<u8, Error>) -> Self {
         match result {
-            Ok(cycles) => Self::Cpu(cycles),
-            Err(error) => Self::Error(error),
+            Ok(cycles) => {
+                println!("CPU finished, cycles: {}", cycles);
+                Self::Cpu(cycles)
+            },
+            Err(error) => {
+                println!("CPU ERROR, error: {}", error);
+                Self::Error(error)
+            }
         }
     }
 }
