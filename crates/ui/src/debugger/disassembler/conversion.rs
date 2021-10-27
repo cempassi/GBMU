@@ -177,10 +177,10 @@ impl TryFrom<Jump> for Disass<u8> {
         let name = Self::name(format!("{}", opcode));
         let (cycles, data): (u8, Data) = match opcode {
             Jump::NN => Ok((16, Data::Bits16(0))),
-            Jump::HL => Ok((16, Data::None)),
+            Jump::HL => Ok((4, Data::None)),
             Jump::R8b => Ok((12, Data::Bits8(0))),
             Jump::Call => Ok((24, Data::Bits16(0))),
-            Jump::Return => Ok((24, Data::Bits16(0))),
+            Jump::Return => Ok((16, Data::None)),
             _ => Err(Error::Unimplemented),
         }?;
         let code: u8 = opcode.into();

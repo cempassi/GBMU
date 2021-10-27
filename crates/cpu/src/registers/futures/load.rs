@@ -61,22 +61,26 @@ pub async fn reg_from(
     Ok(cycles)
 }
 
+/// SP instructions take an extra 4 clocks to execute
 pub async fn push(registers: Registers, memory: Memory, area: Bits16) -> Result<u8, Error> {
     let data = registers.borrow().get(area);
+    let (_, delay) = memory.clone().get::<u8>(0xc00).await?;
     let cycles = Set::Bits16At(Bits16::SP, data)
         .run(registers.clone(), memory)
         .await?;
     registers.borrow_mut().decrease(Bits16::SP, 2);
-    Ok(cycles)
+    Ok(cycles + delay)
 }
 
+/// SP instructions take an extra 4 clocks to execute
 pub async fn pop(registers: Registers, memory: Memory, area: Bits16) -> Result<u8, Error> {
+    let (_, delay) = memory.clone().get::<u8>(0xc00).await?;
     let (data, cycles): (u16, u8) = Get::BitsAt(Bits16::SP)
         .get(registers.clone(), memory)
         .await?;
     registers.borrow_mut().set(area, data);
     registers.borrow_mut().increase(Bits16::SP, 2);
-    Ok(cycles)
+    Ok(cycles + delay)
 }
 
 pub async fn io_c(registers: Registers, memory: Memory) -> Result<u8, Error> {
