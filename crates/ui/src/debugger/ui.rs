@@ -80,19 +80,16 @@ impl Program for UserInterface {
             }
             Message::Menu(message) => {
                 self.menu.update(message);
-                if message == MenuMsg::Cpu {
-                    self.disassembler.reload();
-                }
             }
             Message::Disassembler(message) => {
-                self.disassembler.update(message);
+                let _ = self.disassembler.update(message);
             }
             Message::Ppu(message) => {
                 self.ppu.update(message);
             }
         };
         self.soc.run();
-        self.disassembler.update(DisassMsg::Refresh);
+        let _ = self.disassembler.update(DisassMsg::Refresh);
         Command::none()
     }
 
