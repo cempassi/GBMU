@@ -3,8 +3,7 @@ use super::cb::{self, Operation as CbOperation};
 use super::load;
 use super::setters as set;
 use crate::registers::{Bits16, Bits8};
-use crate::Registers;
-use memory::Memory;
+use crate::Cpu;
 use shared::Error;
 use std::future::Future;
 use std::pin::Pin;
@@ -42,36 +41,34 @@ pub(crate) enum Set {
 }
 
 impl Set {
-    pub fn run(self, registers: Registers, memory: Memory) -> Processing {
+    pub fn run(self, cpu: Cpu) -> Processing {
         match self {
-            Set::CalculHL(op) => Box::pin(calcul::hl(registers, memory, op)),
-            Set::CalculNext(op) => Box::pin(calcul::next(registers, memory, op)),
-            Set::Load8b(area) => Box::pin(load::u8(registers, memory, area)),
-            Set::Load16b(area) => Box::pin(load::u16(registers, memory, area)),
-            Set::LoadHL(area) => Box::pin(load::hl(registers, memory, area)),
-            Set::LoadHL8b => Box::pin(load::hl8b(registers, memory)),
-            Set::HL(area) => Box::pin(set::hl(registers, memory, area)),
-            Set::RegisterAt(dst, src) => Box::pin(set::reg_at(registers, memory, dst, src)),
-            Set::Bits8At(dst, src) => Box::pin(set::u8_at(registers, memory, dst, src)),
-            Set::Bits16At(dst, src) => Box::pin(set::u16_at(registers, memory, dst, src)),
-            Set::Data(area) => Box::pin(set::data(registers, memory, area)),
-            Set::Push(area) => Box::pin(load::push(registers, memory, area)),
-            Set::Pop(area) => Box::pin(load::pop(registers, memory, area)),
-            Set::Increase => Box::pin(set::hl_add(registers, memory)),
-            Set::Decrease => Box::pin(set::hl_sub(registers, memory)),
-            Set::LoadIncrease => Box::pin(load::hl_add(registers, memory)),
-            Set::LoadDecrease => Box::pin(load::hl_sub(registers, memory)),
-            Set::LoadRegisterFrom(dst, src) => {
-                Box::pin(load::reg_from(registers, memory, dst, src))
-            }
-            Set::CbHL(operation) => Box::pin(cb::hl(registers, memory, operation)),
-            Set::TestHL(bit) => Box::pin(cb::test(registers, memory, bit)),
-            Set::LoadIOC => Box::pin(load::io_c(registers, memory)),
-            Set::LoadIONext => Box::pin(load::io_next(registers, memory)),
-            Set::IOC => Box::pin(set::io_c(registers, memory)),
-            Set::IONext => Box::pin(set::io_next(registers, memory)),
-            Set::LoadHLSP => Box::pin(load::hl_sp(registers, memory)),
-            Set::LoadSPHL => Box::pin(load::sp_hl(registers, memory)),
+            Set::CalculHL(op) => Box::pin(calcul::hl(cpu, op)),
+            Set::CalculNext(op) => Box::pin(calcul::next(cpu, op)),
+            Set::Load8b(area) => Box::pin(load::u8(cpu, area)),
+            Set::Load16b(area) => Box::pin(load::u16(cpu, area)),
+            Set::LoadHL(area) => Box::pin(load::hl(cpu, area)),
+            Set::LoadHL8b => Box::pin(load::hl8b(cpu)),
+            Set::HL(area) => Box::pin(set::hl(cpu, area)),
+            Set::RegisterAt(dst, src) => Box::pin(set::reg_at(cpu, dst, src)),
+            Set::Bits8At(dst, src) => Box::pin(set::u8_at(cpu, dst, src)),
+            Set::Bits16At(dst, src) => Box::pin(set::u16_at(cpu, dst, src)),
+            Set::Data(area) => Box::pin(set::data(cpu, area)),
+            Set::Push(area) => Box::pin(load::push(cpu, area)),
+            Set::Pop(area) => Box::pin(load::pop(cpu, area)),
+            Set::Increase => Box::pin(set::hl_add(cpu)),
+            Set::Decrease => Box::pin(set::hl_sub(cpu)),
+            Set::LoadIncrease => Box::pin(load::hl_add(cpu)),
+            Set::LoadDecrease => Box::pin(load::hl_sub(cpu)),
+            Set::LoadRegisterFrom(dst, src) => Box::pin(load::reg_from(cpu, dst, src)),
+            Set::CbHL(operation) => Box::pin(cb::hl(cpu, operation)),
+            Set::TestHL(bit) => Box::pin(cb::test(cpu, bit)),
+            Set::LoadIOC => Box::pin(load::io_c(cpu)),
+            Set::LoadIONext => Box::pin(load::io_next(cpu)),
+            Set::IOC => Box::pin(set::io_c(cpu)),
+            Set::IONext => Box::pin(set::io_next(cpu)),
+            Set::LoadHLSP => Box::pin(load::hl_sp(cpu)),
+            Set::LoadSPHL => Box::pin(load::sp_hl(cpu)),
         }
     }
 }

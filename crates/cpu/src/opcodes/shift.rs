@@ -1,9 +1,8 @@
-use crate::cpu::Registers;
 use crate::registers::{
     futures::{CbOperation as Operation, Set},
     Bits8, Shift as S,
 };
-use memory::Memory;
+use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 use std::fmt;
@@ -80,50 +79,46 @@ pub enum Shift {
 }
 
 impl Decoder for Shift {
-    fn decode(self, registers: Registers, memory: Memory) -> Decode {
-        Box::pin(self.exec(registers, memory))
+    fn decode(self, cpu: Cpu) -> Decode {
+        Box::pin(self.exec(cpu))
     }
 }
 
 impl Shift {
-    pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
+    pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         let cycles = match self {
-            Shift::LB => registers.borrow_mut().shift_left(Bits8::B),
-            Shift::LC => registers.borrow_mut().shift_left(Bits8::C),
-            Shift::LD => registers.borrow_mut().shift_left(Bits8::D),
-            Shift::LE => registers.borrow_mut().shift_left(Bits8::E),
-            Shift::LH => registers.borrow_mut().shift_left(Bits8::H),
-            Shift::LL => registers.borrow_mut().shift_left(Bits8::L),
-            Shift::LA => registers.borrow_mut().shift_left(Bits8::A),
-            Shift::LHL => Set::CbHL(Operation::SLeft).run(registers, memory).await?,
-            Shift::SB => registers.borrow_mut().swap(Bits8::B),
-            Shift::SC => registers.borrow_mut().swap(Bits8::C),
-            Shift::SD => registers.borrow_mut().swap(Bits8::D),
-            Shift::SE => registers.borrow_mut().swap(Bits8::E),
-            Shift::SH => registers.borrow_mut().swap(Bits8::H),
-            Shift::SL => registers.borrow_mut().swap(Bits8::L),
-            Shift::SA => registers.borrow_mut().swap(Bits8::A),
-            Shift::SHL => Set::CbHL(Operation::Swap).run(registers, memory).await?,
-            Shift::RAB => registers.borrow_mut().shift_arithmetic(Bits8::B),
-            Shift::RAC => registers.borrow_mut().shift_arithmetic(Bits8::C),
-            Shift::RAD => registers.borrow_mut().shift_arithmetic(Bits8::D),
-            Shift::RAE => registers.borrow_mut().shift_arithmetic(Bits8::E),
-            Shift::RAH => registers.borrow_mut().shift_arithmetic(Bits8::H),
-            Shift::RAL => registers.borrow_mut().shift_arithmetic(Bits8::L),
-            Shift::RAA => registers.borrow_mut().shift_arithmetic(Bits8::A),
-            Shift::RAHL => {
-                Set::CbHL(Operation::SRArithmetic)
-                    .run(registers, memory)
-                    .await?
-            }
-            Shift::RLB => registers.borrow_mut().shift_logic(Bits8::B),
-            Shift::RLC => registers.borrow_mut().shift_logic(Bits8::C),
-            Shift::RLD => registers.borrow_mut().shift_logic(Bits8::D),
-            Shift::RLE => registers.borrow_mut().shift_logic(Bits8::E),
-            Shift::RLH => registers.borrow_mut().shift_logic(Bits8::H),
-            Shift::RLL => registers.borrow_mut().shift_logic(Bits8::L),
-            Shift::RLA => registers.borrow_mut().shift_logic(Bits8::A),
-            Shift::RLHL => Set::CbHL(Operation::SRLogic).run(registers, memory).await?,
+            Shift::LB => cpu.registers().borrow_mut().shift_left(Bits8::B),
+            Shift::LC => cpu.registers().borrow_mut().shift_left(Bits8::C),
+            Shift::LD => cpu.registers().borrow_mut().shift_left(Bits8::D),
+            Shift::LE => cpu.registers().borrow_mut().shift_left(Bits8::E),
+            Shift::LH => cpu.registers().borrow_mut().shift_left(Bits8::H),
+            Shift::LL => cpu.registers().borrow_mut().shift_left(Bits8::L),
+            Shift::LA => cpu.registers().borrow_mut().shift_left(Bits8::A),
+            Shift::LHL => Set::CbHL(Operation::SLeft).run(cpu).await?,
+            Shift::SB => cpu.registers().borrow_mut().swap(Bits8::B),
+            Shift::SC => cpu.registers().borrow_mut().swap(Bits8::C),
+            Shift::SD => cpu.registers().borrow_mut().swap(Bits8::D),
+            Shift::SE => cpu.registers().borrow_mut().swap(Bits8::E),
+            Shift::SH => cpu.registers().borrow_mut().swap(Bits8::H),
+            Shift::SL => cpu.registers().borrow_mut().swap(Bits8::L),
+            Shift::SA => cpu.registers().borrow_mut().swap(Bits8::A),
+            Shift::SHL => Set::CbHL(Operation::Swap).run(cpu).await?,
+            Shift::RAB => cpu.registers().borrow_mut().shift_arithmetic(Bits8::B),
+            Shift::RAC => cpu.registers().borrow_mut().shift_arithmetic(Bits8::C),
+            Shift::RAD => cpu.registers().borrow_mut().shift_arithmetic(Bits8::D),
+            Shift::RAE => cpu.registers().borrow_mut().shift_arithmetic(Bits8::E),
+            Shift::RAH => cpu.registers().borrow_mut().shift_arithmetic(Bits8::H),
+            Shift::RAL => cpu.registers().borrow_mut().shift_arithmetic(Bits8::L),
+            Shift::RAA => cpu.registers().borrow_mut().shift_arithmetic(Bits8::A),
+            Shift::RAHL => Set::CbHL(Operation::SRArithmetic).run(cpu).await?,
+            Shift::RLB => cpu.registers().borrow_mut().shift_logic(Bits8::B),
+            Shift::RLC => cpu.registers().borrow_mut().shift_logic(Bits8::C),
+            Shift::RLD => cpu.registers().borrow_mut().shift_logic(Bits8::D),
+            Shift::RLE => cpu.registers().borrow_mut().shift_logic(Bits8::E),
+            Shift::RLH => cpu.registers().borrow_mut().shift_logic(Bits8::H),
+            Shift::RLL => cpu.registers().borrow_mut().shift_logic(Bits8::L),
+            Shift::RLA => cpu.registers().borrow_mut().shift_logic(Bits8::A),
+            Shift::RLHL => Set::CbHL(Operation::SRLogic).run(cpu).await?,
         };
         Ok(cycles)
     }
@@ -171,22 +166,20 @@ impl fmt::Display for Shift {
 mod test_shift_left {
     use super::Shift;
     use crate::registers::{Bits16, Bits8, Bus, Flag};
-    use crate::{executor, Registers};
-    use memory::Memory;
+    use crate::{executor, Access, Cpu};
 
     #[test]
     fn test_shift_left_register_a() {
         let src = 0b10001000;
         let expected = 0b00010000;
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Shift::LA;
-        register.borrow_mut().set(Bits8::A, src);
+        cpu.registers().borrow_mut().set(Bits8::A, src);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        let result = register.borrow().get(Bits8::A);
-        let carry = register.borrow_mut().get(Flag::C);
+        let result = cpu.registers().borrow().get(Bits8::A);
+        let carry = cpu.registers().borrow_mut().get(Flag::C);
         assert_eq!(result, expected);
         assert!(carry);
     }
@@ -196,16 +189,15 @@ mod test_shift_left {
         let hl = 0xc008;
         let src = 0b10001000;
         let expected = 0b00010000;
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Shift::LHL;
-        register.borrow_mut().set(Bits16::HL, hl);
-        memory.borrow_mut().set_u8(hl, src).unwrap();
+        cpu.registers().borrow_mut().set(Bits16::HL, hl);
+        cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        let result = memory.borrow_mut().get_u8(hl).unwrap();
-        let carry = register.borrow_mut().get(Flag::C);
+        let result = cpu.memory().borrow_mut().get_u8(hl).unwrap();
+        let carry = cpu.registers().borrow_mut().get(Flag::C);
         assert_eq!(result, expected);
         assert!(carry);
     }
@@ -214,15 +206,14 @@ mod test_shift_left {
     fn test_shift_right_arithmetic_register_c() {
         let src = 0b1000_1001;
         let expected = 0b1000_0100;
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Shift::RAC;
-        register.borrow_mut().set(Bits8::C, src);
+        cpu.registers().borrow_mut().set(Bits8::C, src);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        let result = register.borrow().get(Bits8::C);
-        let carry = register.borrow_mut().get(Flag::C);
+        let result = cpu.registers().borrow().get(Bits8::C);
+        let carry = cpu.registers().borrow_mut().get(Flag::C);
         assert_eq!(result, expected);
         assert!(carry);
     }
@@ -232,16 +223,15 @@ mod test_shift_left {
         let hl = 0xc008;
         let src = 0b1000_1001;
         let expected = 0b0100_0100;
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Shift::RLHL;
-        register.borrow_mut().set(Bits16::HL, hl);
-        memory.borrow_mut().set_u8(hl, src).unwrap();
+        cpu.registers().borrow_mut().set(Bits16::HL, hl);
+        cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        let result = memory.borrow_mut().get_u8(hl).unwrap();
-        let carry = register.borrow_mut().get(Flag::C);
+        let result = cpu.memory().borrow_mut().get_u8(hl).unwrap();
+        let carry = cpu.registers().borrow_mut().get(Flag::C);
         assert_eq!(result, expected);
         assert!(carry);
     }
@@ -250,14 +240,13 @@ mod test_shift_left {
     fn test_swap_register_l() {
         let src = 0b1010_0110;
         let expected = 0b0110_1010;
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Shift::SL;
-        register.borrow_mut().set(Bits8::L, src);
+        cpu.registers().borrow_mut().set(Bits8::L, src);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        let result = register.borrow().get(Bits8::L);
+        let result = cpu.registers().borrow().get(Bits8::L);
 
         println!("Src     : {:08b}", src);
         println!("result  : {:08b}", result);

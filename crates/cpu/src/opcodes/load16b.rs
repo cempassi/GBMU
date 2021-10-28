@@ -1,7 +1,6 @@
 use crate::registers::futures::Set;
 use crate::registers::Bits16;
-use crate::Registers;
-use memory::Memory;
+use crate::Cpu;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 use std::fmt;
@@ -68,29 +67,29 @@ pub enum Load16b {
 }
 
 impl Decoder for Load16b {
-    fn decode(self, registers: Registers, memory: Memory) -> Decode {
-        Box::pin(self.exec(registers, memory))
+    fn decode(self, cpu: Cpu) -> Decode {
+        Box::pin(self.exec(cpu))
     }
 }
 
 impl Load16b {
-    pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
+    pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         match self {
-            Load16b::PushAF => Set::Push(Bits16::AF).run(registers, memory),
-            Load16b::PushBC => Set::Push(Bits16::BC).run(registers, memory),
-            Load16b::PushDE => Set::Push(Bits16::DE).run(registers, memory),
-            Load16b::PushHL => Set::Push(Bits16::HL).run(registers, memory),
-            Load16b::PopAF => Set::Pop(Bits16::AF).run(registers, memory),
-            Load16b::PopBC => Set::Pop(Bits16::BC).run(registers, memory),
-            Load16b::PopDE => Set::Pop(Bits16::DE).run(registers, memory),
-            Load16b::PopHL => Set::Pop(Bits16::HL).run(registers, memory),
-            Load16b::LoadBC => Set::Load16b(Bits16::BC).run(registers, memory),
-            Load16b::LoadDE => Set::Load16b(Bits16::DE).run(registers, memory),
-            Load16b::LoadHL => Set::Load16b(Bits16::HL).run(registers, memory),
-            Load16b::LoadSP => Set::Load16b(Bits16::SP).run(registers, memory),
-            Load16b::LoadA16SP => Set::Data(Bits16::SP).run(registers, memory),
-            Load16b::LoadHLSPr8 => Set::LoadHLSP.run(registers, memory),
-            Load16b::LoadSPHL => Set::LoadSPHL.run(registers, memory),
+            Load16b::PushAF => Set::Push(Bits16::AF).run(cpu),
+            Load16b::PushBC => Set::Push(Bits16::BC).run(cpu),
+            Load16b::PushDE => Set::Push(Bits16::DE).run(cpu),
+            Load16b::PushHL => Set::Push(Bits16::HL).run(cpu),
+            Load16b::PopAF => Set::Pop(Bits16::AF).run(cpu),
+            Load16b::PopBC => Set::Pop(Bits16::BC).run(cpu),
+            Load16b::PopDE => Set::Pop(Bits16::DE).run(cpu),
+            Load16b::PopHL => Set::Pop(Bits16::HL).run(cpu),
+            Load16b::LoadBC => Set::Load16b(Bits16::BC).run(cpu),
+            Load16b::LoadDE => Set::Load16b(Bits16::DE).run(cpu),
+            Load16b::LoadHL => Set::Load16b(Bits16::HL).run(cpu),
+            Load16b::LoadSP => Set::Load16b(Bits16::SP).run(cpu),
+            Load16b::LoadA16SP => Set::Data(Bits16::SP).run(cpu),
+            Load16b::LoadHLSPr8 => Set::LoadHLSP.run(cpu),
+            Load16b::LoadSPHL => Set::LoadSPHL.run(cpu),
         }
         .await
     }
@@ -120,58 +119,52 @@ impl fmt::Display for Load16b {
 #[cfg(test)]
 mod test_load_register_u16 {
     use super::Load16b;
-    use crate::executor;
     use crate::registers::{Bits16, Bus};
-    use crate::Registers;
-    use memory::Memory;
+    use crate::{executor, Access, Cpu};
 
     #[test]
     fn test_load_register_bc() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Load16b::LoadBC;
-        register.borrow_mut().set(Bits16::PC, 0xc000);
-        memory.borrow_mut().set_u16(0xc000, 0x4242).unwrap();
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
-        assert_eq!(register.borrow().get(Bits16::BC), 0x4242);
+        cpu.registers().borrow_mut().set(Bits16::PC, 0xc000);
+        cpu.memory().borrow_mut().set_u16(0xc000, 0x4242).unwrap();
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        assert_eq!(cpu.registers().borrow().get(Bits16::BC), 0x4242);
     }
 
     #[test]
     fn test_load_to_address_at_next_u16() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Load16b::LoadA16SP;
-        register.borrow_mut().set(Bits16::PC, 0xc000);
-        memory.borrow_mut().set_u16(0xc000, 0xc002).unwrap();
-        register.borrow_mut().set(Bits16::SP, 0x4242);
+        cpu.registers().borrow_mut().set(Bits16::PC, 0xc000);
+        cpu.memory().borrow_mut().set_u16(0xc000, 0xc002).unwrap();
+        cpu.registers().borrow_mut().set(Bits16::SP, 0x4242);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        let result = memory.borrow_mut().get_u16(0xc002).unwrap();
-        assert_eq!(register.borrow().get(Bits16::SP), result);
+        let result = cpu.memory().borrow_mut().get_u16(0xc002).unwrap();
+        assert_eq!(cpu.registers().borrow().get(Bits16::SP), result);
     }
 
     #[test]
     fn test_pop_hl() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Load16b::PopHL;
-        register.borrow_mut().set(Bits16::SP, 0xc000);
-        memory.borrow_mut().set_u16(0xc000, 0x4242).unwrap();
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
-        assert_eq!(register.borrow().get(Bits16::HL), 0x4242);
-        assert_eq!(register.borrow().get(Bits16::SP), 0xc000 + 2);
+        cpu.registers().borrow_mut().set(Bits16::SP, 0xc000);
+        cpu.memory().borrow_mut().set_u16(0xc000, 0x4242).unwrap();
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        assert_eq!(cpu.registers().borrow().get(Bits16::HL), 0x4242);
+        assert_eq!(cpu.registers().borrow().get(Bits16::SP), 0xc000 + 2);
     }
 
     #[test]
     fn test_push_hl() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Load16b::PushHL;
-        register.borrow_mut().set(Bits16::SP, 0xc002);
-        register.borrow_mut().set(Bits16::HL, 0x4242);
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory.clone())));
-        assert_eq!(memory.borrow().get_u16(0xc000).unwrap(), 0x4242);
-        assert_eq!(register.borrow().get(Bits16::SP), 0xc000);
+        cpu.registers().borrow_mut().set(Bits16::SP, 0xc002);
+        cpu.registers().borrow_mut().set(Bits16::HL, 0x4242);
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        assert_eq!(cpu.memory().borrow().get_u16(0xc000).unwrap(), 0x4242);
+        assert_eq!(cpu.registers().borrow().get(Bits16::SP), 0xc000);
     }
 }
