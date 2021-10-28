@@ -65,10 +65,10 @@ pub async fn reg_from(
 pub async fn push(registers: Registers, memory: Memory, area: Bits16) -> Result<u8, Error> {
     let data = registers.borrow().get(area);
     let (_, delay) = memory.clone().get::<u8>(0xc00).await?;
+    registers.borrow_mut().decrease(Bits16::SP, 2);
     let cycles = Set::Bits16At(Bits16::SP, data)
         .run(registers.clone(), memory)
         .await?;
-    registers.borrow_mut().decrease(Bits16::SP, 2);
     Ok(cycles + delay)
 }
 
