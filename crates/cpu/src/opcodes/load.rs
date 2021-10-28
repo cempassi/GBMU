@@ -1,4 +1,4 @@
-use crate::registers::futures::Set;
+use crate::futures::Set;
 use crate::registers::{Bits16, Bits8, Load as L};
 use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
@@ -176,6 +176,12 @@ pub enum Load {
     HLH = 0x74,
     HLL = 0x75,
     HLA = 0x77,
+    BA = 0x47,
+    DA = 0x57,
+    HA = 0x67,
+    CA = 0x4F,
+    EA = 0x5F,
+    LA = 0x6F,
     HL8b = 0x36,
     BCA = 0x02,
     DEA = 0x12,
@@ -189,6 +195,8 @@ pub enum Load {
     IOC = 0xF2,
     ToIONext = 0xE0,
     IONext = 0xF0,
+    AtNextA = 0xEA,
+    AAtNext = 0xFA,
 }
 
 impl Decoder for Load {
@@ -243,6 +251,12 @@ impl Load {
             Load::LE => cpu.registers().borrow_mut().load(Bits8::L, Bits8::E),
             Load::LH => cpu.registers().borrow_mut().load(Bits8::L, Bits8::H),
             Load::LL => cpu.registers().borrow_mut().load(Bits8::L, Bits8::L),
+            Load::BA => cpu.registers().borrow_mut().load(Bits8::B, Bits8::A),
+            Load::DA => cpu.registers().borrow_mut().load(Bits8::D, Bits8::A),
+            Load::HA => cpu.registers().borrow_mut().load(Bits8::H, Bits8::A),
+            Load::CA => cpu.registers().borrow_mut().load(Bits8::C, Bits8::A),
+            Load::EA => cpu.registers().borrow_mut().load(Bits8::E, Bits8::A),
+            Load::LA => cpu.registers().borrow_mut().load(Bits8::L, Bits8::A),
             Load::HLB => Set::HL(Bits8::B).run(cpu).await?,
             Load::HLC => Set::HL(Bits8::C).run(cpu).await?,
             Load::HLD => Set::HL(Bits8::D).run(cpu).await?,
@@ -277,6 +291,8 @@ impl Load {
             Load::IOC => Set::LoadIOC.run(cpu).await?,
             Load::ToIONext => Set::IONext.run(cpu).await?,
             Load::IONext => Set::LoadIONext.run(cpu).await?,
+            Load::AtNextA => Set::AtNextA.run(cpu).await?,
+            Load::AAtNext => Set::AAtNext.run(cpu).await?,
         };
         Ok(cycles)
     }
@@ -334,6 +350,12 @@ impl fmt::Display for Load {
             Load::LE => write!(f, "Load L E"),
             Load::LH => write!(f, "Load L H"),
             Load::LL => write!(f, "Load L L"),
+            Load::BA => write!(f, "Load B A"),
+            Load::DA => write!(f, "Load D A"),
+            Load::HA => write!(f, "Load H A"),
+            Load::CA => write!(f, "Load C A"),
+            Load::EA => write!(f, "Load E A"),
+            Load::LA => write!(f, "Load L A"),
             Load::BHL => write!(f, "Load B [HL]"),
             Load::CHL => write!(f, "Load C [HL]"),
             Load::DHL => write!(f, "Load D [HL]"),
@@ -357,10 +379,12 @@ impl fmt::Display for Load {
             Load::HLMA => write!(f, "Load [HL-] A"),
             Load::AHLP => write!(f, "Load A [HL+]"),
             Load::AHLM => write!(f, "Load A [HL-]"),
-            Load::ToIOC => write!(f, "Load (C + $FF00) A"),
-            Load::IOC => write!(f, "Load A (C + $FF00)"),
-            Load::ToIONext => write!(f, "Load (8b + $FF00) A"),
-            Load::IONext => write!(f, "Load A (8b + $FF00)"),
+            Load::ToIOC => write!(f, "Load [C + $FF00] A"),
+            Load::IOC => write!(f, "Load A [C + $FF00]"),
+            Load::ToIONext => write!(f, "Load [8b + $FF00] A"),
+            Load::IONext => write!(f, "Load A [8b + $FF00]"),
+            Load::AtNextA => write!(f, "Load [16b] A"),
+            Load::AAtNext => write!(f, "Load A [16b]"),
         }
     }
 }

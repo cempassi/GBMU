@@ -1,5 +1,6 @@
 pub mod cpu;
 pub(crate) mod executor;
+pub(crate) mod futures;
 pub mod interface;
 pub mod opcodes;
 pub mod registers;

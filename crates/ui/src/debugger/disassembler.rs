@@ -1,4 +1,5 @@
 use crate::debugger::widgets::Text;
+use crate::error::Error;
 use iced_graphics::Alignment;
 use iced_wgpu::{Column, Renderer};
 use iced_winit::Element;
@@ -6,6 +7,7 @@ use iced_winit::Element;
 use cpu::Registers;
 use memory::Memory;
 mod conversion;
+mod disass;
 mod header;
 mod instruction;
 
@@ -18,11 +20,13 @@ pub struct Disassembler {
     memory: Memory,
     instructions: Vec<Option<Instruction>>,
     next: u16,
+    is_jump: bool,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DisassMsg {
     Refresh,
+    Reload,
 }
 
 impl Disassembler {
@@ -30,6 +34,7 @@ impl Disassembler {
         let instructions = Vec::new();
         let header = Header::new();
         let next = 0;
+        let is_jump = false;
 
         let mut disassembler = Self {
             header,
@@ -37,21 +42,36 @@ impl Disassembler {
             memory,
             instructions,
             next,
+            is_jump,
         };
-        disassembler.update(DisassMsg::Refresh);
+        let _ = disassembler.update(DisassMsg::Reload);
         disassembler
     }
 
-    fn update_instructions(&mut self) {
-        let mut pc = self.registers.borrow().pc;
-        if pc != self.next {
-            return;
+    fn check_pc(&mut self, message: DisassMsg) -> Result<u16, Error> {
+        let pc = self.registers.borrow().pc;
+        if self.is_jump {
+            self.is_jump = false;
+            Ok(pc)
+        } else if message == DisassMsg::Reload {
+            Ok(pc)
+        } else if pc != self.next {
+            Err(Error::NoUpdate)
+        } else {
+            Ok(self.next)
         }
+    }
+
+    pub fn update(&mut self, message: DisassMsg) -> Result<(), Error> {
+        let mut pc = self.check_pc(message)?;
         self.instructions.clear();
         for id in 0..5 {
             if let Ok(instruction) = Instruction::try_new(pc, &self.memory, false) {
                 pc += instruction.fetched();
                 if id == 0 {
+                    if instruction.is_jump {
+                        self.is_jump = true
+                    };
                     self.next = pc;
                 }
                 self.instructions.push(Some(instruction));
@@ -59,26 +79,7 @@ impl Disassembler {
                 self.instructions.push(None);
             };
         }
-    }
-
-    pub fn update(&mut self, _message: DisassMsg) {
-        self.update_instructions();
-    }
-
-    pub fn reload(&mut self) {
-        let mut pc = self.next;
-        self.instructions.clear();
-        for id in 0..5 {
-            if let Ok(instruction) = Instruction::try_new(pc, &self.memory, false) {
-                pc += instruction.fetched();
-                if id == 0 {
-                    self.next = pc;
-                }
-                self.instructions.push(Some(instruction));
-            } else {
-                self.instructions.push(None);
-            };
-        }
+        Ok(())
     }
 
     pub fn view(&mut self) -> Element<DisassMsg, Renderer> {

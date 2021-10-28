@@ -1670,6 +1670,7 @@ name = "shared"
 version = "0.1.0"
 dependencies = [
  "modular-bitfield",
+ "num_enum",
 ]
 
 [[package]]

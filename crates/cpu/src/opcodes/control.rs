@@ -1,9 +1,9 @@
+use crate::futures::{AsyncGet, Get};
 use crate::opcodes::Bitset;
 use crate::opcodes::Reset;
 use crate::opcodes::Rotate;
 use crate::opcodes::Shift;
 use crate::opcodes::Test;
-use crate::registers::futures::{AsyncGet, Get};
 use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
@@ -124,7 +124,7 @@ impl Control {
             Control::NOP => 0,
             Control::CB => Control::prefix_cb(cpu).await?,
             Control::STOP => todo!(),
-            Control::HALT => todo!(),
+            Control::HALT => cpu.borrow_mut().set_halt(),
             Control::EI => cpu.memory().borrow_mut().enable_interrupts(),
             Control::DI => cpu.memory().borrow_mut().disable_interrupts(),
         };

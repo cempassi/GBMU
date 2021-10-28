@@ -1,4 +1,4 @@
-use crate::registers::futures::{Operation, Set};
+use crate::futures::{Operation, Set};
 use crate::registers::{Bits8, Logical as L, Rotation};
 use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};

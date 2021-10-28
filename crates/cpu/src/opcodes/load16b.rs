@@ -1,4 +1,4 @@
-use crate::registers::futures::Set;
+use crate::futures::Set;
 use crate::registers::Bits16;
 use crate::Cpu;
 use num_enum::{IntoPrimitive, TryFromPrimitive};

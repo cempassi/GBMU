@@ -6,6 +6,8 @@ pub enum Error {
     IllegalSet(usize, u8),
     InvalidGet(u16),
     InvalidSet(u16, u8),
+    InvalidInterupt(u32),
+    DisabledInterrupts,
     RamLock(usize),
     Unimplemented,
 }
@@ -27,6 +29,10 @@ impl fmt::Display for Error {
             ),
             Error::RamLock(data) => write!(f, "Ram Lock: data: {:#x}", data),
             Error::Unimplemented => write!(f, "Unimplemented"),
+            Error::InvalidInterupt(interrupt) => {
+                write!(f, "Invalid Interrupt. value: {}", interrupt)
+            }
+            Error::DisabledInterrupts => write!(f, "Disabled interrupts"),
         }
     }
 }

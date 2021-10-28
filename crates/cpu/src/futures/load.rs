@@ -11,6 +11,21 @@ pub async fn u8(cpu: Cpu, area: Bits8) -> Result<u8, Error> {
     cpu.registers().borrow_mut().set(area, data);
     Ok(cycles)
 }
+
+pub async fn at_next_a(cpu: Cpu) -> Result<u8, Error> {
+    let (address, mut cycles): (u16, u8) = Get::Next.get(cpu.clone()).await?;
+    let a = cpu.registers().borrow().get(Bits8::A);
+    cycles += cpu.memory().set(address, a).await?;
+    Ok(cycles)
+}
+
+pub async fn a_at_next(cpu: Cpu) -> Result<u8, Error> {
+    let (address, cycles): (u16, u8) = Get::Next.get(cpu.clone()).await?;
+    let (data, fetch): (u8, u8) = cpu.memory().get::<u8>(address).await?;
+    cpu.registers().borrow_mut().set(Bits8::A, data);
+    Ok(cycles + fetch)
+}
+
 pub async fn u16(cpu: Cpu, area: Bits16) -> Result<u8, Error> {
     let (data, cycles) = Get::Next.get(cpu.clone()).await?;
     cpu.registers().borrow_mut().set(area, data);

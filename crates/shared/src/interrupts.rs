@@ -1,4 +1,6 @@
-//use modular_bitfield::{bitfield, specifiers::B3};
+#![allow(dead_code, unused_attributes, unused_imports)]
+use modular_bitfield::{bitfield, specifiers::B3};
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 pub mod interface {
     use std::cell::RefCell;
@@ -6,46 +8,58 @@ pub mod interface {
     pub type Interrupts = Rc<RefCell<super::Interrupts>>;
 }
 
-//#[bitfield]
-#[derive(Debug, Default)]
+#[bitfield]
+#[derive(Debug, Default, Clone, Copy)]
 pub struct Interrupts {
-    //pub(crate) vblank: bool,
-    //pub(crate) lcd: bool,
-    //pub(crate) timer: bool,
-    //pub(crate) serial: bool,
-    //pub(crate) joypad: bool,
-    //#[skip]
-    _unused: bool,
+    vblank: bool,
+    lcd: bool,
+    timer: bool,
+    serial: bool,
+    joypad: bool,
+    #[skip]
+    _unused: B3,
 }
 
-// impl Interrupts {
-//     pub fn processed(&mut self, interrupt: Interrupt) {
-//         match interrupt {
-//             Interrupt::Vblank => self.set_vblank(false),
-//             Interrupt::Lcd => self.set_lcd(false),
-//             Interrupt::Timer => self.set_timer(false),
-//             Interrupt::Serial => self.set_serial(false),
-//             Interrupt::Joypad =>self.set_joypad(false)
-//         }
-//     }
-//
-//     pub fn request(&mut self, interrupt: Interrupt) {
-//         match interrupt {
-//             Interrupt::Vblank => self.set_vblank(true),
-//             Interrupt::Lcd => self.set_lcd(true),
-//             Interrupt::Timer => self.set_timer(true),
-//             Interrupt::Serial => self.set_serial(true),
-//             Interrupt::Joypad =>self.set_joypad(true)
-//         }
-//     }
-// }
-//
-// pub enum Interrupt {
-//     Vblank,
-//     Lcd,
-//     Timer,
-//     Serial,
-//     Joypad
-// }
-//
-//
+impl Interrupts {
+    pub fn get(&self) -> u8 {
+        self.into_bytes()[0]
+    }
+
+    pub fn check(&self, requested: u8) -> u8 {
+        self.into_bytes()[0] & requested
+    }
+
+    pub fn set(&self, data: u8) {
+        self.into_bytes()[0] = data
+    }
+
+    pub fn processed(&mut self, interrupt: Interrupt) {
+        match interrupt {
+            Interrupt::Vblank => self.set_vblank(false),
+            Interrupt::Lcd => self.set_lcd(false),
+            Interrupt::Timer => self.set_timer(false),
+            Interrupt::Serial => self.set_serial(false),
+            Interrupt::Joypad => self.set_joypad(false),
+        }
+    }
+
+    pub fn request(&mut self, interrupt: Interrupt) {
+        match interrupt {
+            Interrupt::Vblank => self.set_vblank(true),
+            Interrupt::Lcd => self.set_lcd(true),
+            Interrupt::Timer => self.set_timer(true),
+            Interrupt::Serial => self.set_serial(true),
+            Interrupt::Joypad => self.set_joypad(true),
+        }
+    }
+}
+
+#[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
+#[repr(u32)]
+pub enum Interrupt {
+    Vblank = 0,
+    Lcd = 1,
+    Timer = 2,
+    Serial = 3,
+    Joypad = 4,
+}

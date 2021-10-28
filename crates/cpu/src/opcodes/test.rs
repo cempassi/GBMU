@@ -1,5 +1,6 @@
 use super::consts;
-use crate::registers::{futures::Set, Bits8, Bitwise};
+use crate::futures::Set;
+use crate::registers::{Bits8, Bitwise};
 use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;

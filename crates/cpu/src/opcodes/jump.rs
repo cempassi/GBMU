@@ -1,4 +1,5 @@
-use crate::registers::{futures::Jump as Async, Absolute as J, Bits16, Flag};
+use crate::futures::Jump as Async;
+use crate::registers::{Absolute as J, Bits16, Flag};
 use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
@@ -72,6 +73,7 @@ pub enum Jump {
     ReturnC = 0xD8,
     ReturnNZ = 0xC0,
     ReturnNC = 0xD0,
+    ReturnInterrupt = 0xD9,
 }
 
 impl Decoder for Jump {
@@ -104,6 +106,7 @@ impl Jump {
             Jump::CNN => Async::AbsoluteCheck(Flag::C).jump(cpu).await?,
             Jump::ZR8b => Async::RelativeCheck(Flag::Z).jump(cpu).await?,
             Jump::CR8b => Async::RelativeCheck(Flag::Z).jump(cpu).await?,
+            Jump::ReturnInterrupt => Async::ReturnInterrupt.jump(cpu).await?,
         };
         Ok(cycles)
     }
@@ -132,6 +135,7 @@ impl fmt::Display for Jump {
             Jump::ReturnC => write!(f, "Return if (C)"),
             Jump::ReturnNZ => write!(f, "Return if (!Z)"),
             Jump::ReturnNC => write!(f, "Return if (!C)"),
+            Jump::ReturnInterrupt => write!(f, "Return Interrupt"),
         }
     }
 }

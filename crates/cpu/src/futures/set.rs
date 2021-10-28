@@ -38,6 +38,8 @@ pub(crate) enum Set {
     IONext,
     LoadHLSP,
     LoadSPHL,
+    AtNextA,
+    AAtNext,
 }
 
 impl Set {
@@ -69,6 +71,8 @@ impl Set {
             Set::IONext => Box::pin(set::io_next(cpu)),
             Set::LoadHLSP => Box::pin(load::hl_sp(cpu)),
             Set::LoadSPHL => Box::pin(load::sp_hl(cpu)),
+            Set::AtNextA => Box::pin(load::at_next_a(cpu)),
+            Set::AAtNext => Box::pin(load::a_at_next(cpu)),
         }
     }
 }

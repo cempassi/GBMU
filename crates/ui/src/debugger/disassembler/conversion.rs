@@ -1,4 +1,4 @@
-use super::instruction::{Data, Disass};
+use super::disass::{Data, Disass};
 use cpu::opcodes::Arithmetic;
 use cpu::opcodes::Arithmetic16b;
 use cpu::opcodes::Bitset;
@@ -43,7 +43,7 @@ impl From<Arithmetic16b> for Disass<u8> {
 
 impl From<Control> for Disass<u8> {
     fn from(opcode: Control) -> Self {
-        let name = Self::name(format!("(CB) {}", opcode));
+        let name = Self::name(format!("{}", opcode));
         let (cycles, data): (u8, Data) = match opcode {
             Control::NOP => (4, Data::None),
             Control::STOP => (4, Data::None),
@@ -277,6 +277,8 @@ impl From<Load> for Disass<u8> {
             Load::IOC => (8, Data::None),
             Load::ToIONext => (12, Data::Bits8(0)),
             Load::IONext => (12, Data::Bits8(0)),
+            Load::AtNextA => (16, Data::Bits16(0)),
+            Load::AAtNext => (16, Data::Bits16(0)),
             _ => (4, Data::None),
         };
 
