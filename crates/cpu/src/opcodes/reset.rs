@@ -1,10 +1,9 @@
 use super::consts;
-use crate::cpu::Registers;
 use crate::registers::{
     futures::{CbOperation as Operation, Set},
     Bits8, Bitwise,
 };
-use memory::Memory;
+use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 use std::fmt;
@@ -91,110 +90,78 @@ pub enum Reset {
 }
 
 impl Decoder for Reset {
-    fn decode(self, registers: Registers, memory: Memory) -> Decode {
-        Box::pin(self.exec(registers, memory))
+    fn decode(self, cpu: Cpu) -> Decode {
+        Box::pin(self.exec(cpu))
     }
 }
 
 impl Reset {
-    pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
+    pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         let cycles = match self {
-            Reset::BBit0 => registers.borrow_mut().reset(Bits8::B, consts::BIT0),
-            Reset::BBit1 => registers.borrow_mut().reset(Bits8::B, consts::BIT1),
-            Reset::BBit2 => registers.borrow_mut().reset(Bits8::B, consts::BIT2),
-            Reset::BBit3 => registers.borrow_mut().reset(Bits8::B, consts::BIT3),
-            Reset::BBit4 => registers.borrow_mut().reset(Bits8::B, consts::BIT4),
-            Reset::BBit5 => registers.borrow_mut().reset(Bits8::B, consts::BIT5),
-            Reset::BBit6 => registers.borrow_mut().reset(Bits8::B, consts::BIT6),
-            Reset::BBit7 => registers.borrow_mut().reset(Bits8::B, consts::BIT7),
-            Reset::CBit0 => registers.borrow_mut().reset(Bits8::C, consts::BIT0),
-            Reset::CBit1 => registers.borrow_mut().reset(Bits8::C, consts::BIT1),
-            Reset::CBit2 => registers.borrow_mut().reset(Bits8::C, consts::BIT2),
-            Reset::CBit3 => registers.borrow_mut().reset(Bits8::C, consts::BIT3),
-            Reset::CBit4 => registers.borrow_mut().reset(Bits8::C, consts::BIT4),
-            Reset::CBit5 => registers.borrow_mut().reset(Bits8::C, consts::BIT5),
-            Reset::CBit6 => registers.borrow_mut().reset(Bits8::C, consts::BIT6),
-            Reset::CBit7 => registers.borrow_mut().reset(Bits8::C, consts::BIT7),
-            Reset::DBit0 => registers.borrow_mut().reset(Bits8::D, consts::BIT0),
-            Reset::DBit1 => registers.borrow_mut().reset(Bits8::D, consts::BIT1),
-            Reset::DBit2 => registers.borrow_mut().reset(Bits8::D, consts::BIT2),
-            Reset::DBit3 => registers.borrow_mut().reset(Bits8::D, consts::BIT3),
-            Reset::DBit4 => registers.borrow_mut().reset(Bits8::D, consts::BIT4),
-            Reset::DBit5 => registers.borrow_mut().reset(Bits8::D, consts::BIT5),
-            Reset::DBit6 => registers.borrow_mut().reset(Bits8::D, consts::BIT6),
-            Reset::DBit7 => registers.borrow_mut().reset(Bits8::D, consts::BIT7),
-            Reset::EBit0 => registers.borrow_mut().reset(Bits8::E, consts::BIT0),
-            Reset::EBit1 => registers.borrow_mut().reset(Bits8::E, consts::BIT1),
-            Reset::EBit2 => registers.borrow_mut().reset(Bits8::E, consts::BIT2),
-            Reset::EBit3 => registers.borrow_mut().reset(Bits8::E, consts::BIT3),
-            Reset::EBit4 => registers.borrow_mut().reset(Bits8::E, consts::BIT4),
-            Reset::EBit5 => registers.borrow_mut().reset(Bits8::E, consts::BIT5),
-            Reset::EBit6 => registers.borrow_mut().reset(Bits8::E, consts::BIT6),
-            Reset::EBit7 => registers.borrow_mut().reset(Bits8::E, consts::BIT7),
-            Reset::HBit0 => registers.borrow_mut().reset(Bits8::H, consts::BIT0),
-            Reset::HBit1 => registers.borrow_mut().reset(Bits8::H, consts::BIT1),
-            Reset::HBit2 => registers.borrow_mut().reset(Bits8::H, consts::BIT2),
-            Reset::HBit3 => registers.borrow_mut().reset(Bits8::H, consts::BIT3),
-            Reset::HBit4 => registers.borrow_mut().reset(Bits8::H, consts::BIT4),
-            Reset::HBit5 => registers.borrow_mut().reset(Bits8::H, consts::BIT5),
-            Reset::HBit6 => registers.borrow_mut().reset(Bits8::H, consts::BIT6),
-            Reset::HBit7 => registers.borrow_mut().reset(Bits8::H, consts::BIT7),
-            Reset::LBit0 => registers.borrow_mut().reset(Bits8::L, consts::BIT0),
-            Reset::LBit1 => registers.borrow_mut().reset(Bits8::L, consts::BIT1),
-            Reset::LBit2 => registers.borrow_mut().reset(Bits8::L, consts::BIT2),
-            Reset::LBit3 => registers.borrow_mut().reset(Bits8::L, consts::BIT3),
-            Reset::LBit4 => registers.borrow_mut().reset(Bits8::L, consts::BIT4),
-            Reset::LBit5 => registers.borrow_mut().reset(Bits8::L, consts::BIT5),
-            Reset::LBit6 => registers.borrow_mut().reset(Bits8::L, consts::BIT6),
-            Reset::LBit7 => registers.borrow_mut().reset(Bits8::L, consts::BIT7),
-            Reset::ABit0 => registers.borrow_mut().reset(Bits8::A, consts::BIT0),
-            Reset::ABit1 => registers.borrow_mut().reset(Bits8::A, consts::BIT1),
-            Reset::ABit2 => registers.borrow_mut().reset(Bits8::A, consts::BIT2),
-            Reset::ABit3 => registers.borrow_mut().reset(Bits8::A, consts::BIT3),
-            Reset::ABit4 => registers.borrow_mut().reset(Bits8::A, consts::BIT4),
-            Reset::ABit5 => registers.borrow_mut().reset(Bits8::A, consts::BIT5),
-            Reset::ABit6 => registers.borrow_mut().reset(Bits8::A, consts::BIT6),
-            Reset::ABit7 => registers.borrow_mut().reset(Bits8::A, consts::BIT7),
-            Reset::HLBit0 => {
-                Set::CbHL(Operation::Reset(consts::BIT0))
-                    .run(registers, memory)
-                    .await?
-            }
-            Reset::HLBit1 => {
-                Set::CbHL(Operation::Reset(consts::BIT1))
-                    .run(registers, memory)
-                    .await?
-            }
-            Reset::HLBit2 => {
-                Set::CbHL(Operation::Reset(consts::BIT2))
-                    .run(registers, memory)
-                    .await?
-            }
-            Reset::HLBit3 => {
-                Set::CbHL(Operation::Reset(consts::BIT3))
-                    .run(registers, memory)
-                    .await?
-            }
-            Reset::HLBit4 => {
-                Set::CbHL(Operation::Reset(consts::BIT4))
-                    .run(registers, memory)
-                    .await?
-            }
-            Reset::HLBit5 => {
-                Set::CbHL(Operation::Reset(consts::BIT5))
-                    .run(registers, memory)
-                    .await?
-            }
-            Reset::HLBit6 => {
-                Set::CbHL(Operation::Reset(consts::BIT6))
-                    .run(registers, memory)
-                    .await?
-            }
-            Reset::HLBit7 => {
-                Set::CbHL(Operation::Reset(consts::BIT7))
-                    .run(registers, memory)
-                    .await?
-            }
+            Reset::BBit0 => cpu.registers().borrow_mut().reset(Bits8::B, consts::BIT0),
+            Reset::BBit1 => cpu.registers().borrow_mut().reset(Bits8::B, consts::BIT1),
+            Reset::BBit2 => cpu.registers().borrow_mut().reset(Bits8::B, consts::BIT2),
+            Reset::BBit3 => cpu.registers().borrow_mut().reset(Bits8::B, consts::BIT3),
+            Reset::BBit4 => cpu.registers().borrow_mut().reset(Bits8::B, consts::BIT4),
+            Reset::BBit5 => cpu.registers().borrow_mut().reset(Bits8::B, consts::BIT5),
+            Reset::BBit6 => cpu.registers().borrow_mut().reset(Bits8::B, consts::BIT6),
+            Reset::BBit7 => cpu.registers().borrow_mut().reset(Bits8::B, consts::BIT7),
+            Reset::CBit0 => cpu.registers().borrow_mut().reset(Bits8::C, consts::BIT0),
+            Reset::CBit1 => cpu.registers().borrow_mut().reset(Bits8::C, consts::BIT1),
+            Reset::CBit2 => cpu.registers().borrow_mut().reset(Bits8::C, consts::BIT2),
+            Reset::CBit3 => cpu.registers().borrow_mut().reset(Bits8::C, consts::BIT3),
+            Reset::CBit4 => cpu.registers().borrow_mut().reset(Bits8::C, consts::BIT4),
+            Reset::CBit5 => cpu.registers().borrow_mut().reset(Bits8::C, consts::BIT5),
+            Reset::CBit6 => cpu.registers().borrow_mut().reset(Bits8::C, consts::BIT6),
+            Reset::CBit7 => cpu.registers().borrow_mut().reset(Bits8::C, consts::BIT7),
+            Reset::DBit0 => cpu.registers().borrow_mut().reset(Bits8::D, consts::BIT0),
+            Reset::DBit1 => cpu.registers().borrow_mut().reset(Bits8::D, consts::BIT1),
+            Reset::DBit2 => cpu.registers().borrow_mut().reset(Bits8::D, consts::BIT2),
+            Reset::DBit3 => cpu.registers().borrow_mut().reset(Bits8::D, consts::BIT3),
+            Reset::DBit4 => cpu.registers().borrow_mut().reset(Bits8::D, consts::BIT4),
+            Reset::DBit5 => cpu.registers().borrow_mut().reset(Bits8::D, consts::BIT5),
+            Reset::DBit6 => cpu.registers().borrow_mut().reset(Bits8::D, consts::BIT6),
+            Reset::DBit7 => cpu.registers().borrow_mut().reset(Bits8::D, consts::BIT7),
+            Reset::EBit0 => cpu.registers().borrow_mut().reset(Bits8::E, consts::BIT0),
+            Reset::EBit1 => cpu.registers().borrow_mut().reset(Bits8::E, consts::BIT1),
+            Reset::EBit2 => cpu.registers().borrow_mut().reset(Bits8::E, consts::BIT2),
+            Reset::EBit3 => cpu.registers().borrow_mut().reset(Bits8::E, consts::BIT3),
+            Reset::EBit4 => cpu.registers().borrow_mut().reset(Bits8::E, consts::BIT4),
+            Reset::EBit5 => cpu.registers().borrow_mut().reset(Bits8::E, consts::BIT5),
+            Reset::EBit6 => cpu.registers().borrow_mut().reset(Bits8::E, consts::BIT6),
+            Reset::EBit7 => cpu.registers().borrow_mut().reset(Bits8::E, consts::BIT7),
+            Reset::HBit0 => cpu.registers().borrow_mut().reset(Bits8::H, consts::BIT0),
+            Reset::HBit1 => cpu.registers().borrow_mut().reset(Bits8::H, consts::BIT1),
+            Reset::HBit2 => cpu.registers().borrow_mut().reset(Bits8::H, consts::BIT2),
+            Reset::HBit3 => cpu.registers().borrow_mut().reset(Bits8::H, consts::BIT3),
+            Reset::HBit4 => cpu.registers().borrow_mut().reset(Bits8::H, consts::BIT4),
+            Reset::HBit5 => cpu.registers().borrow_mut().reset(Bits8::H, consts::BIT5),
+            Reset::HBit6 => cpu.registers().borrow_mut().reset(Bits8::H, consts::BIT6),
+            Reset::HBit7 => cpu.registers().borrow_mut().reset(Bits8::H, consts::BIT7),
+            Reset::LBit0 => cpu.registers().borrow_mut().reset(Bits8::L, consts::BIT0),
+            Reset::LBit1 => cpu.registers().borrow_mut().reset(Bits8::L, consts::BIT1),
+            Reset::LBit2 => cpu.registers().borrow_mut().reset(Bits8::L, consts::BIT2),
+            Reset::LBit3 => cpu.registers().borrow_mut().reset(Bits8::L, consts::BIT3),
+            Reset::LBit4 => cpu.registers().borrow_mut().reset(Bits8::L, consts::BIT4),
+            Reset::LBit5 => cpu.registers().borrow_mut().reset(Bits8::L, consts::BIT5),
+            Reset::LBit6 => cpu.registers().borrow_mut().reset(Bits8::L, consts::BIT6),
+            Reset::LBit7 => cpu.registers().borrow_mut().reset(Bits8::L, consts::BIT7),
+            Reset::ABit0 => cpu.registers().borrow_mut().reset(Bits8::A, consts::BIT0),
+            Reset::ABit1 => cpu.registers().borrow_mut().reset(Bits8::A, consts::BIT1),
+            Reset::ABit2 => cpu.registers().borrow_mut().reset(Bits8::A, consts::BIT2),
+            Reset::ABit3 => cpu.registers().borrow_mut().reset(Bits8::A, consts::BIT3),
+            Reset::ABit4 => cpu.registers().borrow_mut().reset(Bits8::A, consts::BIT4),
+            Reset::ABit5 => cpu.registers().borrow_mut().reset(Bits8::A, consts::BIT5),
+            Reset::ABit6 => cpu.registers().borrow_mut().reset(Bits8::A, consts::BIT6),
+            Reset::ABit7 => cpu.registers().borrow_mut().reset(Bits8::A, consts::BIT7),
+            Reset::HLBit0 => Set::CbHL(Operation::Reset(consts::BIT0)).run(cpu).await?,
+            Reset::HLBit1 => Set::CbHL(Operation::Reset(consts::BIT1)).run(cpu).await?,
+            Reset::HLBit2 => Set::CbHL(Operation::Reset(consts::BIT2)).run(cpu).await?,
+            Reset::HLBit3 => Set::CbHL(Operation::Reset(consts::BIT3)).run(cpu).await?,
+            Reset::HLBit4 => Set::CbHL(Operation::Reset(consts::BIT4)).run(cpu).await?,
+            Reset::HLBit5 => Set::CbHL(Operation::Reset(consts::BIT5)).run(cpu).await?,
+            Reset::HLBit6 => Set::CbHL(Operation::Reset(consts::BIT6)).run(cpu).await?,
+            Reset::HLBit7 => Set::CbHL(Operation::Reset(consts::BIT7)).run(cpu).await?,
         };
         Ok(cycles)
     }
@@ -275,21 +242,19 @@ impl fmt::Display for Reset {
 mod test_reset_bit {
     use super::Reset;
     use crate::registers::{Bits16, Bits8, Bus};
-    use crate::{executor, Registers};
-    use memory::Memory;
+    use crate::{executor, Access, Cpu};
 
     #[test]
     fn test_if_bit_6_in_register_b_is_reset() {
         let src = 0b0100_1000;
         let expected = 0b0000_1000;
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Reset::BBit6;
-        register.borrow_mut().set(Bits8::B, src);
+        cpu.registers().borrow_mut().set(Bits8::B, src);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        let result = register.borrow_mut().get(Bits8::B);
+        let result = cpu.registers().borrow_mut().get(Bits8::B);
         assert_eq!(result, expected);
     }
 
@@ -298,15 +263,14 @@ mod test_reset_bit {
         let hl = 0xc008;
         let src = 0b0100_0100;
         let expected = 0b0100_0000;
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Reset::HLBit2;
-        register.borrow_mut().set(Bits16::HL, hl);
-        memory.borrow_mut().set_u8(hl, src).unwrap();
+        cpu.registers().borrow_mut().set(Bits16::HL, hl);
+        cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register, memory.clone())));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        let result = memory.borrow_mut().get_u8(hl).unwrap();
+        let result = cpu.memory().borrow_mut().get_u8(hl).unwrap();
         assert_eq!(result, expected);
     }
 }

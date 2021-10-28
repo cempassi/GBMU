@@ -47,7 +47,7 @@ impl SOC {
             .iter()
             .find_map(|x| {
                 if let Processor::Cpu(cpu, _) = x {
-                    Some(cpu.get_registers())
+                    Some(cpu.borrow().get_registers())
                 } else {
                     None
                 }
@@ -73,7 +73,7 @@ impl SOC {
             .iter()
             .find_map(|x| {
                 if let Processor::Cpu(cpu, _) = x {
-                    Some(cpu.get_memory())
+                    Some(cpu.borrow().get_memory())
                 } else {
                     None
                 }

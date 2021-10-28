@@ -1,10 +1,9 @@
 use super::decode::{Decode, Decoder};
-use crate::cpu::Registers;
 use crate::registers::{
     futures::{Operation, Set},
     Arithmetic as A, Bits8, Complement, IncDec,
 };
-use memory::Memory;
+use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 use std::fmt;
@@ -116,110 +115,70 @@ pub enum Arithmetic {
 }
 
 impl Decoder for Arithmetic {
-    fn decode(self, registers: Registers, memory: Memory) -> Decode {
-        Box::pin(self.exec(registers, memory))
+    fn decode(self, cpu: Cpu) -> Decode {
+        Box::pin(self.exec(cpu))
     }
 }
 
 impl Arithmetic {
-    pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
+    pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         let cycles = match self {
-            Arithmetic::AAA => registers.borrow_mut().add(Bits8::A, false),
-            Arithmetic::AAB => registers.borrow_mut().add(Bits8::B, false),
-            Arithmetic::AAC => registers.borrow_mut().add(Bits8::C, false),
-            Arithmetic::AAD => registers.borrow_mut().add(Bits8::D, false),
-            Arithmetic::AAE => registers.borrow_mut().add(Bits8::E, false),
-            Arithmetic::AAH => registers.borrow_mut().add(Bits8::H, false),
-            Arithmetic::AAL => registers.borrow_mut().add(Bits8::L, false),
-            Arithmetic::AAcA => registers.borrow_mut().add(Bits8::A, true),
-            Arithmetic::AAcB => registers.borrow_mut().add(Bits8::B, true),
-            Arithmetic::AAcC => registers.borrow_mut().add(Bits8::C, true),
-            Arithmetic::AAcD => registers.borrow_mut().add(Bits8::D, true),
-            Arithmetic::AAcE => registers.borrow_mut().add(Bits8::E, true),
-            Arithmetic::AAcH => registers.borrow_mut().add(Bits8::H, true),
-            Arithmetic::AAcL => registers.borrow_mut().add(Bits8::L, true),
-            Arithmetic::SAB => registers.borrow_mut().sub(Bits8::B, false),
-            Arithmetic::SAC => registers.borrow_mut().sub(Bits8::C, false),
-            Arithmetic::SAD => registers.borrow_mut().sub(Bits8::D, false),
-            Arithmetic::SAE => registers.borrow_mut().sub(Bits8::E, false),
-            Arithmetic::SAH => registers.borrow_mut().sub(Bits8::H, false),
-            Arithmetic::SAL => registers.borrow_mut().sub(Bits8::L, false),
-            Arithmetic::SAA => registers.borrow_mut().sub(Bits8::A, false),
-            Arithmetic::SAcB => registers.borrow_mut().sub(Bits8::B, true),
-            Arithmetic::SAcC => registers.borrow_mut().sub(Bits8::C, true),
-            Arithmetic::SAcD => registers.borrow_mut().sub(Bits8::D, true),
-            Arithmetic::SAcE => registers.borrow_mut().sub(Bits8::E, true),
-            Arithmetic::SAcH => registers.borrow_mut().sub(Bits8::H, true),
-            Arithmetic::SAcL => registers.borrow_mut().sub(Bits8::L, true),
-            Arithmetic::SAcA => registers.borrow_mut().sub(Bits8::A, true),
-            Arithmetic::AAc8b => {
-                Set::CalculNext(Operation::AddCarry)
-                    .run(registers, memory)
-                    .await?
-            }
-            Arithmetic::AA8b => {
-                Set::CalculNext(Operation::AddNoCarry)
-                    .run(registers, memory)
-                    .await?
-            }
-            Arithmetic::AAHL => {
-                Set::CalculHL(Operation::AddNoCarry)
-                    .run(registers, memory)
-                    .await?
-            }
-            Arithmetic::AAcHL => {
-                Set::CalculHL(Operation::AddCarry)
-                    .run(registers, memory)
-                    .await?
-            }
-            Arithmetic::SAHL => {
-                Set::CalculHL(Operation::SubNoCarry)
-                    .run(registers, memory)
-                    .await?
-            }
-            Arithmetic::SAcHL => {
-                Set::CalculHL(Operation::SubCarry)
-                    .run(registers, memory)
-                    .await?
-            }
-            Arithmetic::SA8b => {
-                Set::CalculNext(Operation::SubNoCarry)
-                    .run(registers, memory)
-                    .await?
-            }
-            Arithmetic::SAc8b => {
-                Set::CalculNext(Operation::SubCarry)
-                    .run(registers, memory)
-                    .await?
-            }
-            Arithmetic::IncB => registers.borrow_mut().increase(Bits8::B, 1),
-            Arithmetic::IncD => registers.borrow_mut().increase(Bits8::D, 1),
-            Arithmetic::IncH => registers.borrow_mut().increase(Bits8::H, 1),
-            Arithmetic::IncHL => {
-                Set::CalculHL(Operation::Increase)
-                    .run(registers, memory)
-                    .await?
-            }
-            Arithmetic::DecB => registers.borrow_mut().decrease(Bits8::B, 1),
-            Arithmetic::DecD => registers.borrow_mut().decrease(Bits8::D, 1),
-            Arithmetic::DecH => registers.borrow_mut().decrease(Bits8::H, 1),
-            Arithmetic::DecHL => {
-                Set::CalculHL(Operation::Decrease)
-                    .run(registers, memory)
-                    .await?
-            }
-            Arithmetic::IncC => registers.borrow_mut().increase(Bits8::C, 1),
-            Arithmetic::IncE => registers.borrow_mut().increase(Bits8::E, 1),
-            Arithmetic::IncL => registers.borrow_mut().increase(Bits8::L, 1),
-            Arithmetic::IncA => registers.borrow_mut().increase(Bits8::A, 1),
-            Arithmetic::DecC => registers.borrow_mut().decrease(Bits8::C, 1),
-            Arithmetic::DecE => registers.borrow_mut().decrease(Bits8::E, 1),
-            Arithmetic::DecL => registers.borrow_mut().decrease(Bits8::L, 1),
-            Arithmetic::DecA => registers.borrow_mut().decrease(Bits8::A, 1),
-            Arithmetic::DAA => registers.borrow_mut().daa(),
-            Arithmetic::SCF => registers.borrow_mut().set_carry(),
-            Arithmetic::CPL => registers.borrow_mut().complement_a(),
-            Arithmetic::CCF => registers.borrow_mut().complement_carry(),
+            Arithmetic::AAA => cpu.registers().borrow_mut().add(Bits8::A, false),
+            Arithmetic::AAB => cpu.registers().borrow_mut().add(Bits8::B, false),
+            Arithmetic::AAC => cpu.registers().borrow_mut().add(Bits8::C, false),
+            Arithmetic::AAD => cpu.registers().borrow_mut().add(Bits8::D, false),
+            Arithmetic::AAE => cpu.registers().borrow_mut().add(Bits8::E, false),
+            Arithmetic::AAH => cpu.registers().borrow_mut().add(Bits8::H, false),
+            Arithmetic::AAL => cpu.registers().borrow_mut().add(Bits8::L, false),
+            Arithmetic::AAcA => cpu.registers().borrow_mut().add(Bits8::A, true),
+            Arithmetic::AAcB => cpu.registers().borrow_mut().add(Bits8::B, true),
+            Arithmetic::AAcC => cpu.registers().borrow_mut().add(Bits8::C, true),
+            Arithmetic::AAcD => cpu.registers().borrow_mut().add(Bits8::D, true),
+            Arithmetic::AAcE => cpu.registers().borrow_mut().add(Bits8::E, true),
+            Arithmetic::AAcH => cpu.registers().borrow_mut().add(Bits8::H, true),
+            Arithmetic::AAcL => cpu.registers().borrow_mut().add(Bits8::L, true),
+            Arithmetic::SAB => cpu.registers().borrow_mut().sub(Bits8::B, false),
+            Arithmetic::SAC => cpu.registers().borrow_mut().sub(Bits8::C, false),
+            Arithmetic::SAD => cpu.registers().borrow_mut().sub(Bits8::D, false),
+            Arithmetic::SAE => cpu.registers().borrow_mut().sub(Bits8::E, false),
+            Arithmetic::SAH => cpu.registers().borrow_mut().sub(Bits8::H, false),
+            Arithmetic::SAL => cpu.registers().borrow_mut().sub(Bits8::L, false),
+            Arithmetic::SAA => cpu.registers().borrow_mut().sub(Bits8::A, false),
+            Arithmetic::SAcB => cpu.registers().borrow_mut().sub(Bits8::B, true),
+            Arithmetic::SAcC => cpu.registers().borrow_mut().sub(Bits8::C, true),
+            Arithmetic::SAcD => cpu.registers().borrow_mut().sub(Bits8::D, true),
+            Arithmetic::SAcE => cpu.registers().borrow_mut().sub(Bits8::E, true),
+            Arithmetic::SAcH => cpu.registers().borrow_mut().sub(Bits8::H, true),
+            Arithmetic::SAcL => cpu.registers().borrow_mut().sub(Bits8::L, true),
+            Arithmetic::SAcA => cpu.registers().borrow_mut().sub(Bits8::A, true),
+            Arithmetic::AAc8b => Set::CalculNext(Operation::AddCarry).run(cpu).await?,
+            Arithmetic::AA8b => Set::CalculNext(Operation::AddNoCarry).run(cpu).await?,
+            Arithmetic::AAHL => Set::CalculHL(Operation::AddNoCarry).run(cpu).await?,
+            Arithmetic::AAcHL => Set::CalculHL(Operation::AddCarry).run(cpu).await?,
+            Arithmetic::SAHL => Set::CalculHL(Operation::SubNoCarry).run(cpu).await?,
+            Arithmetic::SAcHL => Set::CalculHL(Operation::SubCarry).run(cpu).await?,
+            Arithmetic::SA8b => Set::CalculNext(Operation::SubNoCarry).run(cpu).await?,
+            Arithmetic::SAc8b => Set::CalculNext(Operation::SubCarry).run(cpu).await?,
+            Arithmetic::IncB => cpu.registers().borrow_mut().increase(Bits8::B, 1),
+            Arithmetic::IncD => cpu.registers().borrow_mut().increase(Bits8::D, 1),
+            Arithmetic::IncH => cpu.registers().borrow_mut().increase(Bits8::H, 1),
+            Arithmetic::IncHL => Set::CalculHL(Operation::Increase).run(cpu).await?,
+            Arithmetic::DecB => cpu.registers().borrow_mut().decrease(Bits8::B, 1),
+            Arithmetic::DecD => cpu.registers().borrow_mut().decrease(Bits8::D, 1),
+            Arithmetic::DecH => cpu.registers().borrow_mut().decrease(Bits8::H, 1),
+            Arithmetic::DecHL => Set::CalculHL(Operation::Decrease).run(cpu).await?,
+            Arithmetic::IncC => cpu.registers().borrow_mut().increase(Bits8::C, 1),
+            Arithmetic::IncE => cpu.registers().borrow_mut().increase(Bits8::E, 1),
+            Arithmetic::IncL => cpu.registers().borrow_mut().increase(Bits8::L, 1),
+            Arithmetic::IncA => cpu.registers().borrow_mut().increase(Bits8::A, 1),
+            Arithmetic::DecC => cpu.registers().borrow_mut().decrease(Bits8::C, 1),
+            Arithmetic::DecE => cpu.registers().borrow_mut().decrease(Bits8::E, 1),
+            Arithmetic::DecL => cpu.registers().borrow_mut().decrease(Bits8::L, 1),
+            Arithmetic::DecA => cpu.registers().borrow_mut().decrease(Bits8::A, 1),
+            Arithmetic::DAA => cpu.registers().borrow_mut().daa(),
+            Arithmetic::SCF => cpu.registers().borrow_mut().set_carry(),
+            Arithmetic::CPL => cpu.registers().borrow_mut().complement_a(),
+            Arithmetic::CCF => cpu.registers().borrow_mut().complement_carry(),
         };
         Ok(cycles)
     }
@@ -292,172 +251,160 @@ impl fmt::Display for Arithmetic {
 mod test_arithmetic {
     use super::Arithmetic;
     use crate::registers::{Bits16, Bits8, Bus, Flag};
-    use crate::{executor, Registers};
-    use memory::Memory;
+    use crate::{executor, Access, Cpu};
 
     #[test]
     fn test_add_next_byte_without_carry() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Arithmetic::AA8b;
 
-        register.borrow_mut().set(Bits8::A, 0x4f);
-        register.borrow_mut().set(Flag::C, true);
+        cpu.registers().borrow_mut().set(Bits8::A, 0x4f);
+        cpu.registers().borrow_mut().set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0x80);
-        assert!(register.borrow().get(Flag::H));
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x80);
+        assert!(cpu.registers().borrow().get(Flag::H));
     }
 
     #[test]
     fn test_add_byte_at_address_hl_without_carry() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Arithmetic::AAHL;
 
-        register.borrow_mut().set(Bits8::A, 0xf8);
-        register.borrow_mut().set(Bits16::HL, 0xc008);
-        register.borrow_mut().set(Flag::C, true);
+        cpu.registers().borrow_mut().set(Bits8::A, 0xf8);
+        cpu.registers().borrow_mut().set(Bits16::HL, 0xc008);
+        cpu.registers().borrow_mut().set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
-        assert_eq!(register.borrow().get(Bits8::A), 0xf8);
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0xf8);
     }
 
     #[test]
     fn test_add_byte_in_register_b_without_carry() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Arithmetic::AAB;
 
-        register.borrow_mut().set(Flag::C, true);
+        cpu.registers().borrow_mut().set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0x00);
-        assert!(register.borrow().get(Flag::Z));
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x00);
+        assert!(cpu.registers().borrow().get(Flag::Z));
     }
 
     #[test]
     fn test_add_next_byte_with_carry() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Arithmetic::AAc8b;
 
-        register.borrow_mut().set(Bits8::A, 0x4f);
-        register.borrow_mut().set(Bits16::PC, 0xc000);
-        register.borrow_mut().set(Flag::C, true);
-        memory.borrow_mut().set_u8(0xc000, 0x2F).unwrap();
+        cpu.registers().borrow_mut().set(Bits8::A, 0x4f);
+        cpu.registers().borrow_mut().set(Bits16::PC, 0xc000);
+        cpu.registers().borrow_mut().set(Flag::C, true);
+        cpu.memory().borrow_mut().set_u8(0xc000, 0x2F).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0x7F);
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x7F);
     }
 
     #[test]
     fn test_add_byte_at_address_hl_with_carry() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Arithmetic::AAcHL;
 
-        register.borrow_mut().set(Bits8::A, 0x2a);
-        register.borrow_mut().set(Bits16::HL, 0xc008);
-        register.borrow_mut().set(Flag::C, true);
-        memory.borrow_mut().set_u8(0xc008, 0x2d).unwrap();
+        cpu.registers().borrow_mut().set(Bits8::A, 0x2a);
+        cpu.registers().borrow_mut().set(Bits16::HL, 0xc008);
+        cpu.registers().borrow_mut().set(Flag::C, true);
+        cpu.memory().borrow_mut().set_u8(0xc008, 0x2d).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0x58);
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x58);
     }
 
     #[test]
     fn test_add_byte_in_register_c_with_carry() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Arithmetic::AAcC;
 
-        register.borrow_mut().set(Bits8::A, 0x2B);
-        register.borrow_mut().set(Bits8::C, 0xAA);
-        register.borrow_mut().set(Flag::C, true);
+        cpu.registers().borrow_mut().set(Bits8::A, 0x2B);
+        cpu.registers().borrow_mut().set(Bits8::C, 0xAA);
+        cpu.registers().borrow_mut().set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0xD6);
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0xD6);
     }
 
     #[test]
     fn test_sub_next_byte_without_carry() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Arithmetic::SA8b;
 
-        register.borrow_mut().set(Bits8::A, 0x4f);
-        register.borrow_mut().set(Bits16::PC, 0xc000);
-        register.borrow_mut().set(Flag::C, true);
-        memory.borrow_mut().set_u8(0xc000, 0x2F).unwrap();
+        cpu.registers().borrow_mut().set(Bits8::A, 0x4f);
+        cpu.registers().borrow_mut().set(Bits16::PC, 0xc000);
+        cpu.registers().borrow_mut().set(Flag::C, true);
+        cpu.memory().borrow_mut().set_u8(0xc000, 0x2F).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0x20);
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x20);
     }
 
     #[test]
     fn test_sub_byte_at_address_hl_without_carry() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Arithmetic::SAHL;
 
-        register.borrow_mut().set(Bits8::A, 0xf8);
-        register.borrow_mut().set(Flag::C, true);
-        register.borrow_mut().set(Bits16::HL, 0xc008);
-        memory.borrow_mut().set_u8(0xc008, 0xaa).unwrap();
+        cpu.registers().borrow_mut().set(Bits8::A, 0xf8);
+        cpu.registers().borrow_mut().set(Flag::C, true);
+        cpu.registers().borrow_mut().set(Bits16::HL, 0xc008);
+        cpu.memory().borrow_mut().set_u8(0xc008, 0xaa).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0x4e);
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x4e);
     }
 
     #[test]
     fn test_sub_byte_in_register_b_without_carry() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Arithmetic::SAB;
 
-        register.borrow_mut().set(Flag::C, true);
+        cpu.registers().borrow_mut().set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
-        assert_eq!(register.borrow().get(Bits8::A), 0x00);
-        assert!(register.borrow().get(Flag::Z));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x00);
+        assert!(cpu.registers().borrow().get(Flag::Z));
     }
 
     #[test]
     fn test_sub_byte_at_address_hl_with_carry() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Arithmetic::SAcHL;
 
-        register.borrow_mut().set(Bits8::A, 0xf8);
-        register.borrow_mut().set(Flag::C, true);
-        register.borrow_mut().set(Bits16::HL, 0xc008);
-        memory.borrow_mut().set_u8(0xc008, 0xaa).unwrap();
+        cpu.registers().borrow_mut().set(Bits8::A, 0xf8);
+        cpu.registers().borrow_mut().set(Flag::C, true);
+        cpu.registers().borrow_mut().set(Bits16::HL, 0xc008);
+        cpu.memory().borrow_mut().set_u8(0xc008, 0xaa).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0x4d);
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x4d);
     }
 
     #[test]
     fn test_sub_byte_in_register_l_with_carry() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Arithmetic::SAcL;
 
-        register.borrow_mut().set(Bits8::A, 0xF8);
-        register.borrow_mut().set(Bits8::L, 0xAB);
-        register.borrow_mut().set(Flag::C, true);
+        cpu.registers().borrow_mut().set(Bits8::A, 0xF8);
+        cpu.registers().borrow_mut().set(Bits8::L, 0xAB);
+        cpu.registers().borrow_mut().set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0x4C);
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x4C);
     }
 }

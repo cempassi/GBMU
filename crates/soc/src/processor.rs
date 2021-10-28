@@ -1,4 +1,4 @@
-use cpu::cpu::Cpu;
+use cpu::{Cpu, Make, Run as R};
 use memory::Memory;
 use ppu::{Ppu, Run};
 use shared::Error;
@@ -48,7 +48,7 @@ impl Processor {
     pub fn init(memory: Memory) -> Vec<Self> {
         let ppu = memory.borrow().get_ppu();
         let ppu = Processor::Ppu(ppu, None);
-        let cpu = Processor::Cpu(Cpu::new(memory), None);
+        let cpu = Processor::Cpu(Cpu::make(memory), None);
         vec![cpu, ppu]
     }
 

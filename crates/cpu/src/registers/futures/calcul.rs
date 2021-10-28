@@ -1,7 +1,7 @@
 use super::{AsyncGet, Get};
 use crate::registers::{Arithmetic, Bits16, IncDec, Logical as L};
 use crate::Registers;
-use memory::Memory;
+use crate::{Access, Cpu};
 use shared::Error;
 
 pub enum Operation {
@@ -33,22 +33,12 @@ fn calculate(registers: Registers, data: u8, operation: Operation) -> u8 {
     }
 }
 
-pub(crate) async fn hl(
-    registers: Registers,
-    memory: Memory,
-    operation: Operation,
-) -> Result<u8, Error> {
-    let (data, cycles) = Get::BitsAt(Bits16::HL)
-        .get(registers.clone(), memory)
-        .await?;
-    Ok(calculate(registers, data, operation) + cycles)
+pub(crate) async fn hl(cpu: Cpu, operation: Operation) -> Result<u8, Error> {
+    let (data, cycles) = Get::BitsAt(Bits16::HL).get(cpu.clone()).await?;
+    Ok(calculate(cpu.registers(), data, operation) + cycles)
 }
 
-pub(crate) async fn next(
-    registers: Registers,
-    memory: Memory,
-    operation: Operation,
-) -> Result<u8, Error> {
-    let (data, cycles) = Get::Next.get(registers.clone(), memory).await?;
-    Ok(calculate(registers, data, operation) + cycles)
+pub(crate) async fn next(cpu: Cpu, operation: Operation) -> Result<u8, Error> {
+    let (data, cycles) = Get::Next.get(cpu.clone()).await?;
+    Ok(calculate(cpu.registers(), data, operation) + cycles)
 }

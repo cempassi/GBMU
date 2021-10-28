@@ -1,10 +1,9 @@
 use super::decode::{Decode, Decoder};
-use crate::cpu::Registers;
 use crate::registers::{
     futures::{AsyncGet, Get},
     Arithmetic, Bits16, IncDec,
 };
-use memory::Memory;
+use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 use std::fmt;
@@ -56,28 +55,27 @@ pub enum Arithmetic16b {
 }
 
 impl Decoder for Arithmetic16b {
-    fn decode(self, registers: Registers, memory: Memory) -> Decode {
-        Box::pin(self.exec(registers, memory))
+    fn decode(self, cpu: Cpu) -> Decode {
+        Box::pin(self.exec(cpu))
     }
 }
-
 impl Arithmetic16b {
-    pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
+    pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         match self {
-            Arithmetic16b::IncBC => registers.borrow_mut().increase(Bits16::BC, 1),
-            Arithmetic16b::IncDE => registers.borrow_mut().increase(Bits16::DE, 1),
-            Arithmetic16b::IncHL => registers.borrow_mut().increase(Bits16::HL, 1),
-            Arithmetic16b::IncSP => registers.borrow_mut().increase(Bits16::SP, 1),
-            Arithmetic16b::DecBC => registers.borrow_mut().decrease(Bits16::BC, 1),
-            Arithmetic16b::DecDE => registers.borrow_mut().decrease(Bits16::DE, 1),
-            Arithmetic16b::DecHL => registers.borrow_mut().decrease(Bits16::HL, 1),
-            Arithmetic16b::DecSP => registers.borrow_mut().decrease(Bits16::SP, 1),
-            Arithmetic16b::AddBC => registers.borrow_mut().add(Bits16::BC, false),
-            Arithmetic16b::AddDE => registers.borrow_mut().add(Bits16::DE, false),
-            Arithmetic16b::AddHL => registers.borrow_mut().add(Bits16::HL, false),
-            Arithmetic16b::AddSP => registers.borrow_mut().add(Bits16::SP, false),
+            Arithmetic16b::IncBC => cpu.registers().borrow_mut().increase(Bits16::BC, 1),
+            Arithmetic16b::IncDE => cpu.registers().borrow_mut().increase(Bits16::DE, 1),
+            Arithmetic16b::IncHL => cpu.registers().borrow_mut().increase(Bits16::HL, 1),
+            Arithmetic16b::IncSP => cpu.registers().borrow_mut().increase(Bits16::SP, 1),
+            Arithmetic16b::DecBC => cpu.registers().borrow_mut().decrease(Bits16::BC, 1),
+            Arithmetic16b::DecDE => cpu.registers().borrow_mut().decrease(Bits16::DE, 1),
+            Arithmetic16b::DecHL => cpu.registers().borrow_mut().decrease(Bits16::HL, 1),
+            Arithmetic16b::DecSP => cpu.registers().borrow_mut().decrease(Bits16::SP, 1),
+            Arithmetic16b::AddBC => cpu.registers().borrow_mut().add(Bits16::BC, false),
+            Arithmetic16b::AddDE => cpu.registers().borrow_mut().add(Bits16::DE, false),
+            Arithmetic16b::AddHL => cpu.registers().borrow_mut().add(Bits16::HL, false),
+            Arithmetic16b::AddSP => cpu.registers().borrow_mut().add(Bits16::SP, false),
         };
-        let (_, cycles): (u8, u8) = Get::Nop.get(registers, memory).await?;
+        let (_, cycles): (u8, u8) = Get::Nop.get(cpu).await?;
         Ok(cycles)
     }
 }

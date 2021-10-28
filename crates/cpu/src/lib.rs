@@ -3,6 +3,9 @@ pub(crate) mod executor;
 pub mod interface;
 pub mod opcodes;
 pub mod registers;
+pub mod runner;
 
-pub use crate::cpu::Cpu;
+pub(crate) use crate::interface::Access;
 pub use crate::interface::Registers;
+pub use crate::interface::{Cpu, Make};
+pub use crate::runner::Run;

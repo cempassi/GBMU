@@ -4,8 +4,7 @@ use crate::opcodes::Rotate;
 use crate::opcodes::Shift;
 use crate::opcodes::Test;
 use crate::registers::futures::{AsyncGet, Get};
-use crate::Registers;
-use memory::Memory;
+use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 use std::fmt;
@@ -94,25 +93,25 @@ pub enum Control {
 }
 
 impl Decoder for Control {
-    fn decode(self, registers: Registers, memory: Memory) -> Decode {
-        Box::pin(self.exec(registers, memory))
+    fn decode(self, cpu: Cpu) -> Decode {
+        Box::pin(self.exec(cpu))
     }
 }
 
 impl Control {
-    async fn prefix_cb(registers: Registers, memory: Memory) -> Result<u8, Error> {
-        let (opcode, mut cycles) = Get::Next.get(registers.clone(), memory.clone()).await?;
+    async fn prefix_cb(cpu: Cpu) -> Result<u8, Error> {
+        let (opcode, mut cycles) = Get::Next.get(cpu.clone()).await?;
         cycles += {
             if let Ok(operation) = Rotate::try_from_primitive(opcode) {
-                operation.decode(registers, memory).await?
+                operation.decode(cpu).await?
             } else if let Ok(operation) = Shift::try_from_primitive(opcode) {
-                operation.decode(registers, memory).await?
+                operation.decode(cpu).await?
             } else if let Ok(operation) = Test::try_from_primitive(opcode) {
-                operation.decode(registers, memory).await?
+                operation.decode(cpu).await?
             } else if let Ok(operation) = Reset::try_from_primitive(opcode) {
-                operation.decode(registers, memory).await?
+                operation.decode(cpu).await?
             } else if let Ok(operation) = Bitset::try_from_primitive(opcode) {
-                operation.decode(registers, memory).await?
+                operation.decode(cpu).await?
             } else {
                 unreachable!()
             }
@@ -120,14 +119,14 @@ impl Control {
         Ok(cycles)
     }
 
-    pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
+    pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         let cycles = match self {
             Control::NOP => 0,
-            Control::CB => Control::prefix_cb(registers, memory).await?,
+            Control::CB => Control::prefix_cb(cpu).await?,
             Control::STOP => todo!(),
             Control::HALT => todo!(),
-            Control::EI => memory.borrow_mut().enable_interrupts(),
-            Control::DI => memory.borrow_mut().disable_interrupts(),
+            Control::EI => cpu.memory().borrow_mut().enable_interrupts(),
+            Control::DI => cpu.memory().borrow_mut().disable_interrupts(),
         };
         Ok(cycles)
     }

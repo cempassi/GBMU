@@ -1,7 +1,6 @@
-use crate::cpu::Registers;
 use crate::registers::futures::{Operation, Set};
 use crate::registers::{Bits8, Logical as L, Rotation};
-use memory::Memory;
+use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 use std::fmt;
@@ -152,74 +151,54 @@ pub enum Logic {
 }
 
 impl Decoder for Logic {
-    fn decode(self, registers: Registers, memory: Memory) -> Decode {
-        Box::pin(self.exec(registers, memory))
+    fn decode(self, cpu: Cpu) -> Decode {
+        Box::pin(self.exec(cpu))
     }
 }
 
 impl Logic {
-    pub async fn exec(self, registers: Registers, memory: Memory) -> Result<u8, Error> {
+    pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         let cycles = match self {
-            Logic::RLA => registers.borrow_mut().left_carry(Bits8::A),
-            Logic::RLCA => registers.borrow_mut().left_nocarry(Bits8::A),
-            Logic::RRA => registers.borrow_mut().right_carry(Bits8::A),
-            Logic::RRCA => registers.borrow_mut().right_nocarry(Bits8::A),
-            Logic::AndAA => registers.borrow_mut().and(Bits8::A),
-            Logic::AndAB => registers.borrow_mut().and(Bits8::B),
-            Logic::AndAC => registers.borrow_mut().and(Bits8::C),
-            Logic::AndAD => registers.borrow_mut().and(Bits8::D),
-            Logic::AndAE => registers.borrow_mut().and(Bits8::E),
-            Logic::AndAH => registers.borrow_mut().and(Bits8::H),
-            Logic::AndAL => registers.borrow_mut().and(Bits8::L),
-            Logic::OrAB => registers.borrow_mut().or(Bits8::B),
-            Logic::OrAC => registers.borrow_mut().or(Bits8::C),
-            Logic::OrAD => registers.borrow_mut().or(Bits8::D),
-            Logic::OrAE => registers.borrow_mut().or(Bits8::E),
-            Logic::OrAH => registers.borrow_mut().or(Bits8::H),
-            Logic::OrAL => registers.borrow_mut().or(Bits8::L),
-            Logic::OrAA => registers.borrow_mut().or(Bits8::A),
-            Logic::XorAA => registers.borrow_mut().xor(Bits8::A),
-            Logic::XorAB => registers.borrow_mut().xor(Bits8::B),
-            Logic::XorAC => registers.borrow_mut().xor(Bits8::C),
-            Logic::XorAD => registers.borrow_mut().xor(Bits8::D),
-            Logic::XorAE => registers.borrow_mut().xor(Bits8::E),
-            Logic::XorAH => registers.borrow_mut().xor(Bits8::H),
-            Logic::XorAL => registers.borrow_mut().xor(Bits8::L),
-            Logic::CmpAA => registers.borrow_mut().compare(Bits8::A),
-            Logic::CmpAB => registers.borrow_mut().compare(Bits8::B),
-            Logic::CmpAC => registers.borrow_mut().compare(Bits8::C),
-            Logic::CmpAD => registers.borrow_mut().compare(Bits8::D),
-            Logic::CmpAE => registers.borrow_mut().compare(Bits8::E),
-            Logic::CmpAH => registers.borrow_mut().compare(Bits8::H),
-            Logic::CmpAL => registers.borrow_mut().compare(Bits8::L),
-            Logic::AndAHL => Set::CalculHL(Operation::And).run(registers, memory).await?,
-            Logic::AndA8b => {
-                Set::CalculNext(Operation::And)
-                    .run(registers, memory)
-                    .await?
-            }
-            Logic::OrAHL => Set::CalculHL(Operation::Or).run(registers, memory).await?,
-            Logic::OrA8b => {
-                Set::CalculNext(Operation::Or)
-                    .run(registers, memory)
-                    .await?
-            }
-            Logic::XorAHL => Set::CalculHL(Operation::Xor).run(registers, memory).await?,
-            Logic::XorA8b => {
-                Set::CalculNext(Operation::Xor)
-                    .run(registers, memory)
-                    .await?
-            }
-            Logic::CmpAHL => {
-                Set::CalculHL(Operation::Compare)
-                    .run(registers, memory)
-                    .await?
-            }
-            Logic::CmpA8b => {
-                Set::CalculHL(Operation::Compare)
-                    .run(registers, memory)
-                    .await?
-            }
+            Logic::RLA => cpu.registers().borrow_mut().left_carry(Bits8::A),
+            Logic::RLCA => cpu.registers().borrow_mut().left_nocarry(Bits8::A),
+            Logic::RRA => cpu.registers().borrow_mut().right_carry(Bits8::A),
+            Logic::RRCA => cpu.registers().borrow_mut().right_nocarry(Bits8::A),
+            Logic::AndAA => cpu.registers().borrow_mut().and(Bits8::A),
+            Logic::AndAB => cpu.registers().borrow_mut().and(Bits8::B),
+            Logic::AndAC => cpu.registers().borrow_mut().and(Bits8::C),
+            Logic::AndAD => cpu.registers().borrow_mut().and(Bits8::D),
+            Logic::AndAE => cpu.registers().borrow_mut().and(Bits8::E),
+            Logic::AndAH => cpu.registers().borrow_mut().and(Bits8::H),
+            Logic::AndAL => cpu.registers().borrow_mut().and(Bits8::L),
+            Logic::OrAB => cpu.registers().borrow_mut().or(Bits8::B),
+            Logic::OrAC => cpu.registers().borrow_mut().or(Bits8::C),
+            Logic::OrAD => cpu.registers().borrow_mut().or(Bits8::D),
+            Logic::OrAE => cpu.registers().borrow_mut().or(Bits8::E),
+            Logic::OrAH => cpu.registers().borrow_mut().or(Bits8::H),
+            Logic::OrAL => cpu.registers().borrow_mut().or(Bits8::L),
+            Logic::OrAA => cpu.registers().borrow_mut().or(Bits8::A),
+            Logic::XorAA => cpu.registers().borrow_mut().xor(Bits8::A),
+            Logic::XorAB => cpu.registers().borrow_mut().xor(Bits8::B),
+            Logic::XorAC => cpu.registers().borrow_mut().xor(Bits8::C),
+            Logic::XorAD => cpu.registers().borrow_mut().xor(Bits8::D),
+            Logic::XorAE => cpu.registers().borrow_mut().xor(Bits8::E),
+            Logic::XorAH => cpu.registers().borrow_mut().xor(Bits8::H),
+            Logic::XorAL => cpu.registers().borrow_mut().xor(Bits8::L),
+            Logic::CmpAA => cpu.registers().borrow_mut().compare(Bits8::A),
+            Logic::CmpAB => cpu.registers().borrow_mut().compare(Bits8::B),
+            Logic::CmpAC => cpu.registers().borrow_mut().compare(Bits8::C),
+            Logic::CmpAD => cpu.registers().borrow_mut().compare(Bits8::D),
+            Logic::CmpAE => cpu.registers().borrow_mut().compare(Bits8::E),
+            Logic::CmpAH => cpu.registers().borrow_mut().compare(Bits8::H),
+            Logic::CmpAL => cpu.registers().borrow_mut().compare(Bits8::L),
+            Logic::AndAHL => Set::CalculHL(Operation::And).run(cpu).await?,
+            Logic::AndA8b => Set::CalculNext(Operation::And).run(cpu).await?,
+            Logic::OrAHL => Set::CalculHL(Operation::Or).run(cpu).await?,
+            Logic::OrA8b => Set::CalculNext(Operation::Or).run(cpu).await?,
+            Logic::XorAHL => Set::CalculHL(Operation::Xor).run(cpu).await?,
+            Logic::XorA8b => Set::CalculNext(Operation::Xor).run(cpu).await?,
+            Logic::CmpAHL => Set::CalculHL(Operation::Compare).run(cpu).await?,
+            Logic::CmpA8b => Set::CalculHL(Operation::Compare).run(cpu).await?,
         };
         Ok(cycles)
     }
@@ -276,116 +255,107 @@ impl fmt::Display for Logic {
 mod test_logic_opcodes {
     use super::Logic;
     use crate::registers::{Bits16, Bits8, Bus, Flag};
-    use crate::{executor, Registers};
-    use memory::Memory;
+    use crate::{executor, Access, Cpu};
 
     #[test]
     fn test_and_a_e() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Logic::AndAE;
-        register.borrow_mut().set(Bits8::A, 0x4f);
-        register.borrow_mut().set(Bits8::E, 0x0f);
+        cpu.registers().borrow_mut().set(Bits8::A, 0x4f);
+        cpu.registers().borrow_mut().set(Bits8::E, 0x0f);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0x0f);
-        assert!(register.borrow().get(Flag::H));
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x0f);
+        assert!(cpu.registers().borrow().get(Flag::H));
     }
 
     #[test]
     fn test_and_next_byte() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Logic::AndA8b;
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0x00);
-        assert!(register.borrow().get(Flag::H));
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x00);
+        assert!(cpu.registers().borrow().get(Flag::H));
     }
 
     #[test]
     fn test_or_a_b() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Logic::OrAB;
-        register.borrow_mut().set(Bits8::A, 0x4A);
-        register.borrow_mut().set(Bits8::B, 0xF2);
+        cpu.registers().borrow_mut().set(Bits8::A, 0x4A);
+        cpu.registers().borrow_mut().set(Bits8::B, 0xF2);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0xFA);
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0xFA);
     }
 
     #[test]
     fn test_or_next_byte() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Logic::OrA8b;
 
-        register.borrow_mut().set(Bits8::A, 0x4A);
-        register.borrow_mut().set(Bits16::PC, 0xc000);
-        memory.borrow_mut().set_u8(0xc000, 0xF2).unwrap();
+        cpu.registers().borrow_mut().set(Bits8::A, 0x4A);
+        cpu.registers().borrow_mut().set(Bits16::PC, 0xc000);
+        cpu.memory().borrow_mut().set_u8(0xc000, 0xF2).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0xFA);
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0xFA);
     }
 
     #[test]
     fn test_xor_a_d() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Logic::XorAD;
-        register.borrow_mut().set(Bits8::A, 0x4A);
-        register.borrow_mut().set(Bits8::D, 0xF2);
+        cpu.registers().borrow_mut().set(Bits8::A, 0x4A);
+        cpu.registers().borrow_mut().set(Bits8::D, 0xF2);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0xB8);
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0xB8);
     }
 
     #[test]
     fn test_xor_hl() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Logic::XorAHL;
 
-        register.borrow_mut().set(Bits8::A, 0x4A);
-        register.borrow_mut().set(Bits16::HL, 0xc000);
-        memory.borrow_mut().set_u8(0xc000, 0xF2).unwrap();
+        cpu.registers().borrow_mut().set(Bits8::A, 0x4A);
+        cpu.registers().borrow_mut().set(Bits16::HL, 0xc000);
+        cpu.memory().borrow_mut().set_u8(0xc000, 0xF2).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0xB8);
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0xB8);
     }
 
     #[test]
     fn test_compare_a_l() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Logic::CmpAL;
-        register.borrow_mut().set(Bits8::A, 0x4A);
-        register.borrow_mut().set(Bits8::L, 0xF2);
+        cpu.registers().borrow_mut().set(Bits8::A, 0x4A);
+        cpu.registers().borrow_mut().set(Bits8::L, 0xF2);
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0x4A);
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x4A);
     }
 
     #[test]
     fn test_compare_hl() {
-        let register = Registers::default();
-        let memory = Memory::default();
+        let cpu = Cpu::default();
         let instruction = Logic::CmpAHL;
 
-        register.borrow_mut().set(Bits8::A, 0x4A);
-        register.borrow_mut().set(Bits16::HL, 0xc000);
-        memory.borrow_mut().set_u8(0xc000, 0xF2).unwrap();
+        cpu.registers().borrow_mut().set(Bits8::A, 0x4A);
+        cpu.registers().borrow_mut().set(Bits16::HL, 0xc000);
+        cpu.memory().borrow_mut().set_u8(0xc000, 0xF2).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(register.clone(), memory)));
+        executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(register.borrow().get(Bits8::A), 0x4A);
+        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x4A);
     }
 }
