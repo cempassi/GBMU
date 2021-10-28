@@ -1,8 +1,8 @@
 use super::disass::Disass;
+use crate::debugger::widgets::Cell;
 use iced_wgpu::{Renderer, Row};
 use iced_winit::Element;
 use num_enum::TryFromPrimitive;
-use crate::debugger::widgets::Cell;
 
 use super::DisassMsg;
 use cpu::opcodes::Arithmetic;
@@ -42,7 +42,6 @@ impl Instruction {
             Cycles::Absolute(Disass::<u8>::from(opcode))
         }
     }
-
 
     fn from_jump(jump: Jump) -> Result<Cycles, Error> {
         if let Ok(disass) = Disass::<(u8, u8)>::try_from(jump) {
@@ -89,8 +88,7 @@ impl Instruction {
         Ok(Self {
             address,
             disass,
-            is_jump
-            // is_next,
+            is_jump, // is_next,
         })
     }
 

@@ -39,7 +39,7 @@ pub(crate) enum Set {
     LoadHLSP,
     LoadSPHL,
     AtNextA,
-    AAtNext
+    AAtNext,
 }
 
 impl Set {

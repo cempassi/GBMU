@@ -1,12 +1,9 @@
+use super::DisassMsg;
+use crate::debugger::widgets::Cell;
 use iced_wgpu::{Renderer, Row};
 use iced_winit::Element;
-use crate::debugger::widgets::Cell;
-use super::DisassMsg;
 use memory::Memory;
 use shared::Error;
-
-use cpu::opcodes::Jump;
-use num_enum::TryFromPrimitive;
 
 pub(super) struct Disass<T> {
     pub(super) name: String,

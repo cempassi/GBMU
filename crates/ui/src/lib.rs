@@ -1,5 +1,5 @@
 mod debugger;
-mod style;
 mod error;
+mod style;
 
 pub use debugger::Debugger;

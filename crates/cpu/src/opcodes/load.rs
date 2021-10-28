@@ -196,7 +196,7 @@ pub enum Load {
     ToIONext = 0xE0,
     IONext = 0xF0,
     AtNextA = 0xEA,
-    AAtNext = 0xFA
+    AAtNext = 0xFA,
 }
 
 impl Decoder for Load {
