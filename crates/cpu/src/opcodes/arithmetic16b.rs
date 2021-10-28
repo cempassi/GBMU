@@ -1,8 +1,6 @@
 use super::decode::{Decode, Decoder};
-use crate::registers::{
-    futures::{AsyncGet, Get},
-    Arithmetic, Bits16, IncDec,
-};
+use crate::futures::{AsyncGet, Get};
+use crate::registers::{Arithmetic, Bits16, IncDec};
 use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;

@@ -1,7 +1,5 @@
-use crate::registers::{
-    futures::{CbOperation, Set},
-    Bits8, Rotation,
-};
+use crate::futures::{CbOperation, Set};
+use crate::registers::{Bits8, Rotation};
 use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;

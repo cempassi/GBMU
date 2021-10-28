@@ -1,8 +1,6 @@
 use super::decode::{Decode, Decoder};
-use crate::registers::{
-    futures::{Operation, Set},
-    Arithmetic as A, Bits8, Complement, IncDec,
-};
+use crate::futures::{Operation, Set};
+use crate::registers::{Arithmetic as A, Bits8, Complement, IncDec};
 use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;

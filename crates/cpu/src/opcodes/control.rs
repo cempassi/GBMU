@@ -1,9 +1,9 @@
+use crate::futures::{AsyncGet, Get};
 use crate::opcodes::Bitset;
 use crate::opcodes::Reset;
 use crate::opcodes::Rotate;
 use crate::opcodes::Shift;
 use crate::opcodes::Test;
-use crate::registers::futures::{AsyncGet, Get};
 use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;

@@ -20,6 +20,7 @@ pub enum Jump {
     Return,
     ReturnCheck(Flag),
     ReturnNot(Flag),
+    ReturnInterrupt,
 }
 
 impl Jump {
@@ -37,11 +38,17 @@ impl Jump {
             Jump::Return => Box::pin(ret(cpu)),
             Jump::ReturnCheck(flag) => Box::pin(ret_check(cpu, flag)),
             Jump::ReturnNot(flag) => Box::pin(ret_not(cpu, flag)),
+            Jump::ReturnInterrupt => Box::pin(ret_interrupt(cpu)),
         }
     }
 }
 
 async fn ret(cpu: Cpu) -> Result<u8, Error> {
+    Set::Pop(Bits16::PC).run(cpu).await
+}
+
+async fn ret_interrupt(cpu: Cpu) -> Result<u8, Error> {
+    cpu.memory().borrow_mut().enable_interrupts();
     Set::Pop(Bits16::PC).run(cpu).await
 }
 

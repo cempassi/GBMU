@@ -4,7 +4,6 @@ pub(crate) mod bitwise;
 pub mod bus;
 pub(crate) mod complement;
 pub(crate) mod flags;
-pub(crate) mod futures;
 pub(crate) mod incdec;
 pub(crate) mod jump;
 pub(crate) mod load;

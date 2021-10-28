@@ -1,4 +1,5 @@
-use crate::registers::{futures::Jump as Async, Absolute as J, Bits16, Flag};
+use crate::futures::Jump as Async;
+use crate::registers::{Absolute as J, Bits16, Flag};
 use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;

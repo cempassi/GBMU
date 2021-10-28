@@ -1,7 +1,10 @@
-use crate::Cpu;
+use crate::{Access, Cpu};
 use shared::Error;
 use std::future::Future;
 use std::pin::Pin;
+
+use crate::futures::Set;
+use crate::registers::{Bits16, IncDec};
 
 use crate::opcodes::decode::{Decode, Decoder};
 use crate::opcodes::Arithmetic;
@@ -12,7 +15,7 @@ use crate::opcodes::Load;
 use crate::opcodes::Load16b;
 use crate::opcodes::Logic;
 
-use crate::registers::futures::{AsyncGet, Get};
+use crate::futures::{AsyncGet, Get};
 use num_enum::TryFromPrimitive;
 
 pub type Output = Pin<Box<dyn Future<Output = Result<u8, Error>>>>;
