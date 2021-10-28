@@ -1,10 +1,12 @@
 use crate::registers::lcd;
 use crate::registers::Registers;
+use shared::Interrupts;
 
 #[derive(Debug)]
 pub struct Ppu {
     vram: Vec<u8>,
     registers: Registers,
+    interrupts: Interrupts
 }
 
 impl AsRef<Vec<u8>> for Ppu {
@@ -19,19 +21,15 @@ impl AsRef<Registers> for Ppu {
     }
 }
 
-impl Default for Ppu {
-    fn default() -> Self {
-        Self::new()
+impl From<Interrupts> for Ppu {
+    fn from(interrupts: Interrupts) -> Self {
+        let vram = vec![0; 8192];
+        let registers = Registers::default();
+        Self { vram, registers, interrupts }
     }
 }
 
 impl Ppu {
-    pub fn new() -> Self {
-        let vram = vec![0; 8192];
-        let registers = Registers::default();
-        Self { vram, registers }
-    }
-
     pub fn get_vram(&self, address: usize) -> u8 {
         self.vram[address]
     }
