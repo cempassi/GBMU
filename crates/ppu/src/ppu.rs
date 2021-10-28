@@ -6,7 +6,7 @@ use shared::Interrupts;
 pub struct Ppu {
     vram: Vec<u8>,
     registers: Registers,
-    interrupts: Interrupts
+    interrupts: Interrupts,
 }
 
 impl AsRef<Vec<u8>> for Ppu {
@@ -25,7 +25,11 @@ impl From<Interrupts> for Ppu {
     fn from(interrupts: Interrupts) -> Self {
         let vram = vec![0; 8192];
         let registers = Registers::default();
-        Self { vram, registers, interrupts }
+        Self {
+            vram,
+            registers,
+            interrupts,
+        }
     }
 }
 

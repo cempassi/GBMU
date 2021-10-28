@@ -1,6 +1,6 @@
+use shared::Interrupts;
 use std::cell::RefCell;
 use std::rc::Rc;
-use shared::Interrupts;
 
 pub type Ppu = Rc<RefCell<crate::ppu::Ppu>>;
 

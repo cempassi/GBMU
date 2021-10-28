@@ -15,7 +15,7 @@ pub struct Interrupts {
     pub(crate) serial: bool,
     pub(crate) joypad: bool,
     #[skip]
-    _unused: B3
+    _unused: B3,
 }
 
 impl Interrupts {
@@ -25,7 +25,7 @@ impl Interrupts {
             Interrupt::Lcd => self.set_lcd(false),
             Interrupt::Timer => self.set_timer(false),
             Interrupt::Serial => self.set_serial(false),
-            Interrupt::Joypad =>self.set_joypad(false)
+            Interrupt::Joypad => self.set_joypad(false),
         }
     }
 
@@ -35,7 +35,7 @@ impl Interrupts {
             Interrupt::Lcd => self.set_lcd(true),
             Interrupt::Timer => self.set_timer(true),
             Interrupt::Serial => self.set_serial(true),
-            Interrupt::Joypad =>self.set_joypad(true)
+            Interrupt::Joypad => self.set_joypad(true),
         }
     }
 }
@@ -45,5 +45,5 @@ pub enum Interrupt {
     Lcd,
     Timer,
     Serial,
-    Joypad
+    Joypad,
 }

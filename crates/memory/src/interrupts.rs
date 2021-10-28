@@ -9,12 +9,12 @@ pub struct Interrupts {
     is_interrupted: bool,
     enabled: bool,
     registred: Registered,
-    requested: Registered
+    requested: Registered,
 }
 
 impl Interrupts {
-    pub fn enable(&mut self){
-        if !self.is_interrupted  {
+    pub fn enable(&mut self) {
+        if !self.is_interrupted {
             self.is_interrupted = true;
         } else {
             self.is_interrupted = false;

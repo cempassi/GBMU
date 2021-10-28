@@ -7,13 +7,13 @@ use crate::bios::Bios;
 use crate::bus::MemoryBus;
 use crate::consts;
 use crate::interface::{Bus, Rom};
+use crate::interrupts::Interrupts;
 use crate::io::IO;
 use crate::mbc::default::RomDefault;
 use crate::ram::Ram;
 use crate::state;
-use ppu::{Ppu, New as P};
+use ppu::{New as P, Ppu};
 use shared::Error;
-use crate::interrupts::Interrupts;
 
 #[derive(Debug)]
 pub struct Memory {
@@ -195,7 +195,7 @@ impl Memory {
             ppu,
             io,
             hram,
-            interrupts
+            interrupts,
         }))
     }
 }
