@@ -11,8 +11,9 @@ use crate::io::IO;
 use crate::mbc::default::RomDefault;
 use crate::ram::Ram;
 use crate::state;
-use ppu::Ppu;
+use ppu::{Ppu, New as P};
 use shared::Error;
+use crate::interrupts::Interrupts;
 
 #[derive(Debug)]
 pub struct Memory {
@@ -23,20 +24,23 @@ pub struct Memory {
     pub(crate) ppu: Ppu,
     pub(crate) hram: Bus,
     pub(crate) io: IO,
-    pub(crate) ie: u8,
+    pub(crate) interrupts: Interrupts,
 }
 
 impl Default for Memory {
     fn default() -> Self {
+        let interrupts = Interrupts::default();
+        let requested = interrupts.get_requested();
+        let ppu = <Ppu as P>::new(requested);
         Memory {
             state: state::Rom::Bios,
             bios: Rc::new(RefCell::new(Box::new(Bios::new()))),
             wram: Rc::new(RefCell::new(Box::new(Ram::default()))),
-            ppu: Ppu::default(),
+            ppu,
             rom: Rom::default(),
             io: IO::default(),
             hram: Rc::new(RefCell::new(Box::new(Ram::new(127)))),
-            ie: 0,
+            interrupts,
         }
     }
 }
@@ -58,7 +62,6 @@ impl Memory {
             consts::HRAM_MIN..=consts::HRAM_MAX => {
                 Ok(self.hram.borrow().get(Area::Hram.relative(address)))
             }
-            consts::INTERUPT_ENABLE => Ok(self.ie),
             _ => Err(Error::InvalidGet(address)),
         }
     }
@@ -91,12 +94,26 @@ impl Memory {
                     .set(Area::Hram.relative(address), data);
                 Ok(())
             }
-            consts::INTERUPT_ENABLE => {
-                self.ie = data;
-                Ok(())
-            }
             _ => Err(Error::InvalidSet(address, data)),
         }
+    }
+
+    pub fn enable_interrupts(&mut self) -> u8 {
+        self.interrupts.enable();
+        0
+    }
+
+    pub fn disable_interrupts(&mut self) -> u8 {
+        self.interrupts.disable();
+        0
+    }
+
+    pub fn is_enabled(&self) -> bool {
+        self.interrupts.is_enabled()
+    }
+
+    pub fn check_interrupts(&mut self) {
+        self.interrupts.check()
     }
 
     pub fn get_u16(&self, address: u16) -> Result<u16, Error> {
@@ -147,12 +164,26 @@ impl Memory {
             Cartridge::Mbc5 => Mbc5::new(data),
             _ => unimplemented!(),
         }));
+        // Init state
         let state = state::Rom::Bios;
+
+        // Init Bios
         let bios: Box<dyn MemoryBus> = Box::new(Bios::new());
         let bios = Rc::new(RefCell::new(bios));
+
+        // Init Wram
         let wram: Box<dyn MemoryBus> = Box::new(Ram::default());
         let wram = Rc::new(RefCell::new(wram));
-        let ppu = Ppu::default();
+
+        // Init Interrupts first as several IO need them
+        let interrupts = Interrupts::default();
+
+        // Get Requested memory spaces shared between componnents
+        let requested = interrupts.get_requested();
+
+        // Create memory spaces with fully-qualified syntax
+        let ppu = <Ppu as P>::new(requested);
+
         let io = IO::default();
         let hram: Box<dyn MemoryBus> = Box::new(Ram::new(consts::HIGH_RAM_SIZE));
         let hram = Rc::new(RefCell::new(hram));
@@ -164,7 +195,7 @@ impl Memory {
             ppu,
             io,
             hram,
-            ie: 0,
+            interrupts
         }))
     }
 }

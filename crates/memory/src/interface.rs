@@ -9,3 +9,4 @@ pub type Memory = Rc<RefCell<memory::Memory>>;
 pub type Bus = Rc<RefCell<Box<dyn MemoryBus>>>;
 
 pub type Rom = Rc<RefCell<Box<dyn Mbc>>>;
+
