@@ -5,6 +5,7 @@ mod bus;
 pub(crate) mod consts;
 pub mod futures;
 pub mod interface;
+pub(crate) mod interrupts;
 pub(crate) mod io;
 pub(crate) mod mbc;
 pub mod memory;

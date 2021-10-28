@@ -57,6 +57,11 @@ impl Cpu {
     }
 
     pub async fn run(self) -> Result<u8, Error> {
+        if self.memory.borrow_mut().is_enabled() {
+            println!("Interrupt Execution");
+            //do interupt and return
+        }
+        self.memory.borrow_mut().check_interrupts();
         let (opcode, cycles) = Get::Next
             .get(self.registers.clone(), self.memory.clone())
             .await?;

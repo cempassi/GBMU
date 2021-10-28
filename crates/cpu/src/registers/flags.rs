@@ -4,12 +4,12 @@ use modular_bitfield::{bitfield, specifiers::B4};
 #[bitfield]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Flags {
-    #[skip]
-    pub(crate) unuzed: B4,
     pub(crate) z: bool,
     pub(crate) n: bool,
     pub(crate) h: bool,
     pub(crate) c: bool,
+    #[skip]
+    _unused: B4,
 }
 
 impl Default for Flags {
