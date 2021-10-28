@@ -126,8 +126,8 @@ impl Control {
             Control::CB => Control::prefix_cb(registers, memory).await?,
             Control::STOP => todo!(),
             Control::HALT => todo!(),
-            Control::DI => todo!(),
-            Control::EI => todo!(),
+            Control::EI => memory.borrow_mut().enable_interrupts(),
+            Control::DI => memory.borrow_mut().disable_interrupts(),
         };
         Ok(cycles)
     }
