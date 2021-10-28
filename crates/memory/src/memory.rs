@@ -30,8 +30,8 @@ pub struct Memory {
 impl Default for Memory {
     fn default() -> Self {
         let interrupts = Interrupts::default();
-        let requested = interrupts.get_requested();
-        let ppu = <Ppu as P>::new(requested);
+        let raisable = interrupts.get_raisable();
+        let ppu = <Ppu as P>::new(raisable);
         Memory {
             state: state::Rom::Bios,
             bios: Rc::new(RefCell::new(Box::new(Bios::new()))),
@@ -58,10 +58,12 @@ impl Memory {
             consts::WRAM_MIN..=consts::WRAM_MAX => {
                 Ok(self.wram.borrow().get(Area::Wram.relative(address)))
             }
+            consts::INTERRUPT_FLAGS => Ok(self.interrupts.requested.borrow().get()),
             consts::IOREG_MIN..=consts::IOREM_MAX => Ok(self.io.get(address)),
             consts::HRAM_MIN..=consts::HRAM_MAX => {
                 Ok(self.hram.borrow().get(Area::Hram.relative(address)))
             }
+            consts::INTERRUPT_ENABLED => Ok(self.interrupts.registred.borrow().get()),
             _ => Err(Error::InvalidGet(address)),
         }
     }
@@ -84,8 +86,16 @@ impl Memory {
                 self.ppu.borrow_mut().set(address.into(), data);
                 Ok(())
             }
+            consts::INTERRUPT_FLAGS => {
+                self.interrupts.requested.borrow().set(data);
+                Ok(())
+            }
             consts::IOREG_MIN..=consts::IOREM_MAX => {
                 self.io.set(address, data);
+                Ok(())
+            }
+            consts::INTERRUPT_ENABLED => {
+                self.interrupts.registred.borrow().set(data);
                 Ok(())
             }
             consts::HRAM_MIN..=consts::HRAM_MAX => {
@@ -96,24 +106,6 @@ impl Memory {
             }
             _ => Err(Error::InvalidSet(address, data)),
         }
-    }
-
-    pub fn enable_interrupts(&mut self) -> u8 {
-        self.interrupts.enable();
-        0
-    }
-
-    pub fn disable_interrupts(&mut self) -> u8 {
-        self.interrupts.disable();
-        0
-    }
-
-    pub fn is_enabled(&self) -> bool {
-        self.interrupts.is_enabled()
-    }
-
-    pub fn check_interrupts(&mut self) {
-        self.interrupts.check()
     }
 
     pub fn get_u16(&self, address: u16) -> Result<u16, Error> {
@@ -179,7 +171,7 @@ impl Memory {
         let interrupts = Interrupts::default();
 
         // Get Requested memory spaces shared between componnents
-        let requested = interrupts.get_requested();
+        let requested = interrupts.get_raisable();
 
         // Create memory spaces with fully-qualified syntax
         let ppu = <Ppu as P>::new(requested);

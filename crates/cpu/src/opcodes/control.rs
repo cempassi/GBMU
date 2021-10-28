@@ -124,7 +124,7 @@ impl Control {
             Control::NOP => 0,
             Control::CB => Control::prefix_cb(cpu).await?,
             Control::STOP => todo!(),
-            Control::HALT => todo!(),
+            Control::HALT => cpu.borrow_mut().set_halt(),
             Control::EI => cpu.memory().borrow_mut().enable_interrupts(),
             Control::DI => cpu.memory().borrow_mut().disable_interrupts(),
         };

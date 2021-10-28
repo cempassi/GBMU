@@ -1,5 +1,6 @@
 use crate::registers::lcd;
 use crate::registers::Registers;
+use shared::Interrupt;
 use shared::Interrupts;
 
 #[derive(Debug)]
@@ -56,5 +57,9 @@ impl Ppu {
 
     pub fn clear(&mut self, register: lcd::Field) {
         self.registers.lcd.clear(register);
+    }
+
+    pub fn raise_vblank(&self) {
+        self.interrupts.borrow_mut().request(Interrupt::Lcd);
     }
 }

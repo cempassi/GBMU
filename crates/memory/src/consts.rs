@@ -18,3 +18,6 @@ pub const HRAM_MIN: u16 = 0xff80;
 pub const HRAM_MAX: u16 = 0xfffe;
 
 pub const HIGH_RAM_SIZE: usize = 127;
+
+pub const INTERRUPT_FLAGS: u16 = 0xFF0F;
+pub const INTERRUPT_ENABLED: u16 = 0xFFFF;
