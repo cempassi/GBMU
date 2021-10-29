@@ -33,7 +33,7 @@ impl Finished {
     pub fn cpu(result: Result<u8, Error>) -> Self {
         match result {
             Ok(cycles) => {
-                println!("CPU finished, cycles: {}", cycles);
+                //println!("CPU finished, cycles: {}", cycles);
                 Self::Cpu(cycles)
             }
             Err(error) => {
