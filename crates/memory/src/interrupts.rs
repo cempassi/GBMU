@@ -38,7 +38,7 @@ impl Interrupts {
     }
 
     pub fn requested(&self) -> u8 {
-        let requested = self.requested.borrow().get();
+        let requested = self.requested.borrow().get().unwrap();
 
         self.registred.borrow().check(requested)
     }

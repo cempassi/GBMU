@@ -21,3 +21,8 @@ pub const HIGH_RAM_SIZE: usize = 127;
 
 pub const INTERRUPT_FLAGS: u16 = 0xFF0F;
 pub const INTERRUPT_ENABLED: u16 = 0xFFFF;
+
+pub const LCD_CONTROL: u16 = 0xFF40;
+pub const LY_COMPARE: u16 = 0xFF45;
+pub const YWINDOW: u16 = 0xFF4A;
+pub const XWINDOW: u16 = 0xFF4B;
