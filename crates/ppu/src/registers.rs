@@ -1,4 +1,8 @@
+pub mod coordinates;
 pub(crate) mod lcd;
+
+pub use coordinates::{Coordinates, Field};
+use num_enum::TryFromPrimitive;
 mod palette;
 
 pub use lcd::Lcd;
@@ -58,4 +62,30 @@ pub struct Registers {
                   // hdma3: u8,
                   // hdma4: u8,
                   // hdma5: u8
+}
+
+impl Registers {
+    pub fn get(&self, address: u16) -> u8 {
+        match address {
+            0xFF40 => self.lcd.get_status(),
+            0xFF41 => self.lcd.get_control(),
+            0xFF42..=0xFF45 | 0xFF4A | 0xFF4B => {
+                let field = lcd::Field::try_from_primitive(address).unwrap();
+                self.lcd.get_coordinates(field)
+            }
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn set(&mut self, address: u16, data: u8) {
+        match address {
+            0xFF40 => self.lcd.set_status(data),
+            0xFF41 => self.lcd.set_control(data),
+            0xFF42..=0xFF45 | 0xFF4A | 0xFF4B => {
+                let field = lcd::Field::try_from_primitive(address).unwrap();
+                self.lcd.set_coordinates(field, data);
+            }
+            _ => unreachable!(),
+        }
+    }
 }
