@@ -108,6 +108,8 @@ impl Carry<u8> for Flags {
 
 impl Carry<u16> for Flags {
     fn is_half_carry(&mut self, a: u16, b: u16) {
+        let a = u32::from(a);
+        let b = u32::from(b);
         let sum = a + b;
         let check_half = (a ^ b ^ sum) & 0x1000 == 0x1000;
         self.set_h(check_half);

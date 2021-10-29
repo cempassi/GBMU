@@ -27,7 +27,8 @@ pub trait Run {
 pub async fn interrupt_handler(cpu: Cpu) -> Result<u8, Error> {
     println!("Interrupt Execution");
     let requested = cpu.memory().borrow_mut().get_requested()?;
-    cpu.borrow_mut().unset_halt();
+    cpu.borrow_mut().halt = false;
+    cpu.borrow_mut().stop = false;
 
     cpu.memory().borrow().is_enabled()?;
 
@@ -60,7 +61,10 @@ async fn decode(cpu: Cpu, opcode: u8) -> Result<Decode, Error> {
     } else if let Ok(operation) = Logic::try_from_primitive(opcode) {
         Ok(operation.decode(cpu))
     } else {
-        println!("Something went wrong?, opcode: {}", opcode);
+        println!(
+            "Something went wrong(Decode in runner.rs), opcode: {}",
+            opcode
+        );
         Err(Error::Unimplemented)
     }
 }
@@ -74,8 +78,11 @@ pub async fn run(cpu: Cpu) -> Result<u8, Error> {
     }
     cpu.memory().borrow_mut().check_interrupts();
     let (opcode, cycles) = Get::Next.get(cpu.clone()).await?;
-    println!("New Cpu Execution, Opcode: {:#X}", opcode);
-    if cpu.borrow().is_halted() {
+    //println!("New Cpu Execution, Opcode: {:#X}", opcode);
+    if cpu.borrow().stop {
+        println!("Cpu is stoped, Opcode: {:#X}", opcode);
+    }
+    if cpu.borrow().halt {
         println!("Cpu is halted, Opcode: {:#X}", opcode);
     }
 
