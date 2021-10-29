@@ -63,7 +63,10 @@ impl From<MenuMsg> for Message {
 }
 
 impl UserInterface {
-    pub fn refresh(&self) {}
+    pub fn refresh(&mut self) {
+        let _ = self.disassembler.update(DisassMsg::Reload);
+        self.ppu.update(PpuMsg::Refresh)
+    }
 }
 
 impl Program for UserInterface {
@@ -89,7 +92,7 @@ impl Program for UserInterface {
             }
         };
         self.soc.run();
-        let _ = self.disassembler.update(DisassMsg::Refresh);
+        self.refresh();
         Command::none()
     }
 
@@ -107,7 +110,11 @@ impl Program for UserInterface {
             .cpu_registers
             .view(self.theme)
             .map(|message| Message::Registers(message));
-        let row = Row::new().push(cpu_registers).push(disassembler);
+        let ppu = self
+            .ppu
+            .view(self.theme)
+            .map(|message| Message::Ppu(message));
+        let row = Row::new().push(cpu_registers).push(disassembler).push(ppu);
         let memory = self
             .memory
             .view(self.theme)

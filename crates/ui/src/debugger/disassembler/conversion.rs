@@ -181,6 +181,14 @@ impl TryFrom<Jump> for Disass<u8> {
             Jump::R8b => Ok((12, Data::Bits8(0))),
             Jump::Call => Ok((24, Data::Bits16(0))),
             Jump::Return => Ok((16, Data::None)),
+            Jump::Reset00 => Ok((16, Data::None)),
+            Jump::Reset10 => Ok((16, Data::None)),
+            Jump::Reset20 => Ok((16, Data::None)),
+            Jump::Reset30 => Ok((16, Data::None)),
+            Jump::Reset08 => Ok((16, Data::None)),
+            Jump::Reset18 => Ok((16, Data::None)),
+            Jump::Reset28 => Ok((16, Data::None)),
+            Jump::Reset38 => Ok((16, Data::None)),
             _ => Err(Error::Unimplemented),
         }?;
         let code: u8 = opcode.into();

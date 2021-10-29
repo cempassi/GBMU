@@ -1,3 +1,7 @@
+use crate::style::Theme;
+use iced_wgpu::Renderer;
+use iced_winit::Element;
+
 use super::lcd::Lcd;
 
 pub struct Ppu {
@@ -6,7 +10,9 @@ pub struct Ppu {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub enum PpuMsg {}
+pub enum PpuMsg {
+    Refresh,
+}
 
 impl Ppu {
     pub fn new(ppu: ppu::Ppu) -> Self {
@@ -16,5 +22,9 @@ impl Ppu {
 
     pub fn update(&mut self, _message: PpuMsg) {
         self.lcd.update(self.ppu.borrow().get_lcd())
+    }
+
+    pub fn view(&self, _theme: Theme) -> Element<PpuMsg, Renderer> {
+        self.lcd.view()
     }
 }
