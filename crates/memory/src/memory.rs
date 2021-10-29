@@ -49,62 +49,63 @@ impl Memory {
     pub fn get_u8(&self, address: u16) -> Result<u8, Error> {
         match address {
             consts::BIOS_MIN..=consts::BIOS_MAX if self.state == state::Rom::Bios => {
-                Ok(self.bios.borrow().get(Area::Bios.relative(address)))
+                self.bios.borrow().get(Area::Bios.relative(address))
             }
-            consts::ROM_MIN..=consts::ROM_MAX => {
-                Ok(self.rom.borrow().get(Area::Rom.relative(address)))
-            }
-            consts::VRAM_MIN..=consts::VRAM_MAX => Ok(self.ppu.borrow().get(address.into())),
+            consts::ROM_MIN..=consts::ROM_MAX => self.rom.borrow().get(Area::Rom.relative(address)),
+            consts::VRAM_MIN..=consts::VRAM_MAX => self.ppu.borrow().get(address.into()),
             consts::WRAM_MIN..=consts::WRAM_MAX => {
-                Ok(self.wram.borrow().get(Area::Wram.relative(address)))
+                self.wram.borrow().get(Area::Wram.relative(address))
             }
-            consts::INTERRUPT_FLAGS => Ok(self.interrupts.requested.borrow().get()),
-            consts::IOREG_MIN..=consts::IOREM_MAX => Ok(self.io.get(address)),
+            consts::IOREG_MIN..=consts::IOREM_MAX => self.get_io(address),
             consts::HRAM_MIN..=consts::HRAM_MAX => {
-                Ok(self.hram.borrow().get(Area::Hram.relative(address)))
+                self.hram.borrow().get(Area::Hram.relative(address))
             }
-            consts::INTERRUPT_ENABLED => Ok(self.interrupts.registred.borrow().get()),
-            _ => Err(Error::InvalidGet(address)),
+            consts::INTERRUPT_ENABLED => self.interrupts.registred.borrow().get(),
+            _ => Err(Error::InvalidGet(address.into())),
+        }
+    }
+
+    fn get_io(&self, address: u16) -> Result<u8, Error> {
+        match address {
+            consts::LCD_CONTROL..=consts::LY_COMPARE => self.ppu.borrow_mut().get(address.into()),
+            consts::YWINDOW | consts::XWINDOW => self.ppu.borrow_mut().get(address.into()),
+            consts::INTERRUPT_FLAGS => self.interrupts.requested.borrow().get(),
+            _ => Ok(self.io.get(address)),
         }
     }
 
     pub fn set_u8(&mut self, address: u16, data: u8) -> Result<(), Error> {
         match address {
-            consts::WRAM_MIN..=consts::WRAM_MAX => {
-                self.wram
-                    .borrow_mut()
-                    .set(Area::Wram.relative(address), data);
-                Ok(())
+            consts::WRAM_MIN..=consts::WRAM_MAX => self
+                .wram
+                .borrow_mut()
+                .set(Area::Wram.relative(address), data),
+            consts::ROM_MIN..=consts::ROM_MAX => self
+                .wram
+                .borrow_mut()
+                .set(Area::Rom.relative(address), data),
+            consts::VRAM_MIN..=consts::VRAM_MAX => self.ppu.borrow_mut().set(address.into(), data),
+            consts::IOREG_MIN..=consts::IOREM_MAX => self.set_io(address, data),
+            consts::INTERRUPT_ENABLED => self.interrupts.registred.borrow().set(data),
+            consts::HRAM_MIN..=consts::HRAM_MAX => self
+                .hram
+                .borrow_mut()
+                .set(Area::Hram.relative(address), data),
+            _ => Err(Error::InvalidSet(address.into(), data)),
+        }
+    }
+
+    fn set_io(&mut self, address: u16, data: u8) -> Result<(), Error> {
+        match address {
+            consts::LCD_CONTROL..=consts::LY_COMPARE => {
+                self.ppu.borrow_mut().set(address.into(), data)
             }
-            consts::ROM_MIN..=consts::ROM_MAX => {
-                self.wram
-                    .borrow_mut()
-                    .set(Area::Rom.relative(address), data);
-                Ok(())
-            }
-            consts::VRAM_MIN..=consts::VRAM_MAX => {
-                self.ppu.borrow_mut().set(address.into(), data);
-                Ok(())
-            }
-            consts::INTERRUPT_FLAGS => {
-                self.interrupts.requested.borrow().set(data);
-                Ok(())
-            }
-            consts::IOREG_MIN..=consts::IOREM_MAX => {
+            consts::YWINDOW | consts::XWINDOW => self.ppu.borrow_mut().set(address.into(), data),
+            consts::INTERRUPT_FLAGS => self.interrupts.requested.borrow().set(data),
+            _ => {
                 self.io.set(address, data);
                 Ok(())
             }
-            consts::INTERRUPT_ENABLED => {
-                self.interrupts.registred.borrow().set(data);
-                Ok(())
-            }
-            consts::HRAM_MIN..=consts::HRAM_MAX => {
-                self.hram
-                    .borrow_mut()
-                    .set(Area::Hram.relative(address), data);
-                Ok(())
-            }
-            _ => Err(Error::InvalidSet(address, data)),
         }
     }
 
