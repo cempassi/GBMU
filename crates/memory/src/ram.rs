@@ -1,4 +1,5 @@
 use crate::MemoryBus;
+use shared::Error;
 use std::convert::AsRef;
 
 const WRAM_SIZE: usize = 8192;
@@ -21,12 +22,13 @@ impl AsRef<Vec<u8>> for Ram {
 }
 
 impl MemoryBus for Ram {
-    fn get(&self, address: usize) -> u8 {
-        self.data[address]
+    fn get(&self, address: usize) -> Result<u8, Error> {
+        Ok(self.data[address])
     }
 
-    fn set(&mut self, address: usize, data: u8) {
+    fn set(&mut self, address: usize, data: u8) -> Result<(), Error> {
         self.data[address] = data;
+        Ok(())
     }
 }
 
@@ -47,15 +49,15 @@ mod test_wram {
     fn test_read_wram() {
         let wram = Ram::default();
 
-        assert_eq!(wram.get(0x10), 0);
+        assert_eq!(wram.get(0x10).unwrap(), 0);
     }
 
     #[test]
     fn test_write_read_wram() {
         let mut wram = Ram::default();
 
-        wram.set(0x42, 42);
-        let read = wram.get(0x42);
+        wram.set(0x42, 42).unwrap();
+        let read = wram.get(0x42).unwrap();
 
         assert_eq!(read, 42);
     }

@@ -31,11 +31,13 @@ impl MbcBus for Mbc0 {
 }
 
 impl MemoryBus for Mbc0 {
-    fn get(&self, address: usize) -> u8 {
-        self.data[address]
+    fn get(&self, address: usize) -> Result<u8, Error> {
+        Ok(self.data[address])
     }
 
-    fn set(&mut self, _address: usize, _data: u8) {}
+    fn set(&mut self, _address: usize, _data: u8) -> Result<(), Error> {
+        Ok(())
+    }
 }
 
 impl Mbc for Mbc0 {}
@@ -56,7 +58,7 @@ mod test_nombc {
     fn test_read_nombc() {
         let mbc0 = Mbc0::default();
 
-        assert_eq!(mbc0.get(0x10), 0);
+        assert_eq!(mbc0.get(0x10).unwrap(), 0);
     }
 
     #[test]
