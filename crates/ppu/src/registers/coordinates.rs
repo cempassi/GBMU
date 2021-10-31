@@ -40,6 +40,10 @@ impl Coordinates {
         self.ly == self.lycompare
     }
 
+    pub fn update(&self, dst: &mut Self) {
+        *dst = Self { ..*self };
+    }
+
     pub fn get(&self, field: Field) -> u8 {
         match field {
             Field::Xscroll => self.xscroll,
@@ -106,3 +110,5 @@ impl Coordinates {
         }
     }
 }
+
+

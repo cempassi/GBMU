@@ -1,4 +1,3 @@
-use crate::registers::lcd;
 use crate::registers::Registers;
 use shared::Interrupts;
 use shared::{Error, Interrupt};
@@ -6,7 +5,7 @@ use shared::{Error, Interrupt};
 #[derive(Debug)]
 pub struct Ppu {
     vram: Vec<u8>,
-    registers: Registers,
+    pub(crate) registers: Registers,
     interrupts: Interrupts,
 }
 
@@ -44,6 +43,10 @@ impl Ppu {
         Ok(())
     }
 
+    pub fn reload_coordinates(&self, coordinates: &mut super::Coordinates) {
+        self.registers.coordinates.update(coordinates)
+    }
+
     pub fn get_registers(&self, address: u16) -> Result<u8, Error> {
         Ok(self.registers.get(address))
     }
@@ -53,23 +56,9 @@ impl Ppu {
         Ok(())
     }
 
-    pub fn get_lcd(&self) -> &lcd::Lcd {
-        &self.registers.lcd
-    }
-
-    pub fn is_lower(&mut self, register: lcd::Field, nbr: u8) -> bool {
-        self.registers.lcd.is_lower(register, nbr)
-    }
-
-    pub fn increase(&mut self, register: lcd::Field) {
-        self.registers.lcd.increase(register);
-    }
-
-    pub fn clear(&mut self, register: lcd::Field) {
-        self.registers.lcd.clear(register);
-    }
-
     pub fn raise_vblank(&self) {
         self.interrupts.borrow_mut().request(Interrupt::Lcd);
     }
 }
+
+

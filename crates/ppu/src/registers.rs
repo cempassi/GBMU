@@ -1,11 +1,15 @@
+#![allow(dead_code, unused_attributes, unused_imports)]
 pub mod coordinates;
 pub(crate) mod lcd;
+pub mod control;
+pub mod status;
 
 pub use coordinates::{Coordinates, Field};
 use num_enum::TryFromPrimitive;
 mod palette;
 
-pub use lcd::Lcd;
+pub use control::Control;
+pub use status::Status;
 
 // /// 1 LCD Control Register
 // ///
@@ -46,7 +50,10 @@ pub use lcd::Lcd;
 
 #[derive(Debug, Default)]
 pub struct Registers {
-    pub lcd: Lcd, // // bgp: palette::Monochrome,
+    control: Control,
+    status: Status,
+    pub(crate) coordinates: Coordinates
+    // // bgp: palette::Monochrome,
                   // // objp0: palette::Monochrome,
                   // // objp1: palette::Monochrome,
 
@@ -67,11 +74,11 @@ pub struct Registers {
 impl Registers {
     pub fn get(&self, address: u16) -> u8 {
         match address {
-            0xFF40 => self.lcd.get_status(),
-            0xFF41 => self.lcd.get_control(),
+            0xFF40 => self.status.into_bytes()[0],
+            0xFF41 => self.control.into_bytes()[0],
             0xFF42..=0xFF45 | 0xFF4A | 0xFF4B => {
                 let field = lcd::Field::try_from_primitive(address).unwrap();
-                self.lcd.get_coordinates(field)
+                self.coordinates.get(field)
             }
             _ => unreachable!(),
         }
@@ -79,13 +86,15 @@ impl Registers {
 
     pub fn set(&mut self, address: u16, data: u8) {
         match address {
-            0xFF40 => self.lcd.set_status(data),
-            0xFF41 => self.lcd.set_control(data),
+            0xFF40 => self.status.into_bytes()[0] = data,
+            0xFF41 => self.control.into_bytes()[0] = data,
             0xFF42..=0xFF45 | 0xFF4A | 0xFF4B => {
                 let field = lcd::Field::try_from_primitive(address).unwrap();
-                self.lcd.set_coordinates(field, data);
+                self.coordinates.set(field, data);
             }
             _ => unreachable!(),
         }
     }
 }
+
+
