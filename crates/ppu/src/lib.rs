@@ -9,5 +9,5 @@ pub(crate) mod tile;
 pub(crate) mod transfert;
 
 pub use crate::interface::{New, Ppu};
-pub use crate::registers::{Lcd, Registers};
+pub use crate::registers::{lcd::Field, Lcd, Registers};
 pub use crate::runner::Run;

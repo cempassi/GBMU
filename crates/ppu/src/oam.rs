@@ -26,7 +26,7 @@ impl Future for Oam {
             Cycle::Finished => Poll::Ready(42),
             Cycle::Ppu(ref mut ticks) => {
                 *ticks += 1;
-                if *ticks == 39 {
+                if *ticks == 20 {
                     self.cycle = Cycle::Finished;
                 }
                 Poll::Pending

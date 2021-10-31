@@ -26,7 +26,7 @@ impl Future for Pixel {
             Cycle::Finished => Poll::Ready(42),
             Cycle::Ppu(ref mut ticks) => {
                 *ticks += 1;
-                if *ticks == 159 {
+                if *ticks == 43 {
                     println!("Pixel transfert finished: {} cycles", *ticks);
                     self.cycle = Cycle::Finished;
                 }

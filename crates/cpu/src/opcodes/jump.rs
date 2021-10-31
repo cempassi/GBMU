@@ -1,4 +1,4 @@
-use crate::futures::Jump as Async;
+use crate::futures::{Jump as Async, Reset};
 use crate::registers::{Absolute as J, Bits16, Flag};
 use crate::{Access, Cpu};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
@@ -74,6 +74,14 @@ pub enum Jump {
     ReturnNZ = 0xC0,
     ReturnNC = 0xD0,
     ReturnInterrupt = 0xD9,
+    Reset00 = 0xC7,
+    Reset10 = 0xD7,
+    Reset20 = 0xE7,
+    Reset30 = 0xF7,
+    Reset08 = 0xCF,
+    Reset18 = 0xDF,
+    Reset28 = 0xEF,
+    Reset38 = 0xFF,
 }
 
 impl Decoder for Jump {
@@ -107,6 +115,14 @@ impl Jump {
             Jump::ZR8b => Async::RelativeCheck(Flag::Z).jump(cpu).await?,
             Jump::CR8b => Async::RelativeCheck(Flag::Z).jump(cpu).await?,
             Jump::ReturnInterrupt => Async::ReturnInterrupt.jump(cpu).await?,
+            Jump::Reset00 => Async::Reset(Reset::H00).jump(cpu).await?,
+            Jump::Reset10 => Async::Reset(Reset::H10).jump(cpu).await?,
+            Jump::Reset20 => Async::Reset(Reset::H20).jump(cpu).await?,
+            Jump::Reset30 => Async::Reset(Reset::H30).jump(cpu).await?,
+            Jump::Reset08 => Async::Reset(Reset::H08).jump(cpu).await?,
+            Jump::Reset18 => Async::Reset(Reset::H18).jump(cpu).await?,
+            Jump::Reset28 => Async::Reset(Reset::H28).jump(cpu).await?,
+            Jump::Reset38 => Async::Reset(Reset::H38).jump(cpu).await?,
         };
         Ok(cycles)
     }
@@ -136,6 +152,14 @@ impl fmt::Display for Jump {
             Jump::ReturnNZ => write!(f, "Return if (!Z)"),
             Jump::ReturnNC => write!(f, "Return if (!C)"),
             Jump::ReturnInterrupt => write!(f, "Return Interrupt"),
+            Jump::Reset00 => write!(f, "Reset H00"),
+            Jump::Reset10 => write!(f, "Reset H10"),
+            Jump::Reset20 => write!(f, "Reset H20"),
+            Jump::Reset30 => write!(f, "Reset H30"),
+            Jump::Reset08 => write!(f, "Reset H08"),
+            Jump::Reset18 => write!(f, "Reset H18"),
+            Jump::Reset28 => write!(f, "Reset H28"),
+            Jump::Reset38 => write!(f, "Reset H38"),
         }
     }
 }

@@ -46,27 +46,28 @@ impl MbcBus for Mbc2 {
 }
 
 impl MemoryBus for Mbc2 {
-    fn get(&self, address: usize) -> u8 {
+    fn get(&self, address: usize) -> Result<u8, Error> {
         match address {
-            consts::MBC_BANK0_START..=consts::MBC_BANK0_END => self.data[address],
+            consts::MBC_BANK0_START..=consts::MBC_BANK0_END => Ok(self.data[address]),
             consts::MBC_BANK1_START..=consts::MBC_BANK1_END => {
-                self.data[(self.rom_bank as usize * consts::MBC_BANK1_START)
-                    + (address - consts::MBC_BANK1_START)]
+                Ok(self.data[(self.rom_bank as usize * consts::MBC_BANK1_START)
+                    + (address - consts::MBC_BANK1_START)])
             }
             consts::MBC_RAM_START..=consts::MBC2_ERAM_END => {
                 if self.ram_lock {
-                    self.data[address - self.get_ram_offset(address)] & 0xf
+                    Ok(self.data[address - self.get_ram_offset(address)] & 0xf)
                 } else {
                     // Should be Undefined behavior or raise an Error
-                    0
+                    Ok(0)
                 }
             }
             _ => unreachable!(),
         }
     }
 
-    fn set(&mut self, address: usize, data: u8) {
+    fn set(&mut self, address: usize, data: u8) -> Result<(), Error> {
         let _ = <Self as MbcBus>::set(self, address, data);
+        Ok(())
     }
 }
 
@@ -120,7 +121,7 @@ mod mbc2_test {
         let rom_file = FILE.to_vec();
         let mbc = Mbc2::new(rom_file);
         let data = mbc.get(0);
-        assert_eq!(data, 0xc3);
+        assert_eq!(data.unwrap(), 0xc3);
     }
 
     #[test]
@@ -134,7 +135,7 @@ mod mbc2_test {
         <Mbc2 as MbcBus>::set(&mut mbc, 0x0000a0e0, 0xeb).unwrap();
 
         let data = mbc.get(0x0000a0e0);
-        assert_eq!(data, 0x0b);
+        assert_eq!(data.unwrap(), 0x0b);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x00).unwrap();
         assert!(!mbc.ram_lock);
@@ -199,7 +200,7 @@ mod mbc2_test {
         <Mbc2 as MbcBus>::set(&mut mbc, 0x0000a130, 0xca).unwrap();
 
         let data = mbc.get(0x0000a130);
-        assert_eq!(data, 0x0a);
+        assert_eq!(data.unwrap(), 0x0a);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x00).unwrap();
         assert!(!mbc.ram_lock);
@@ -214,7 +215,7 @@ mod mbc2_test {
         assert!(mbc.ram_lock);
 
         let data = mbc.get(0x0000a630);
-        assert_eq!(data, 0x0E);
+        assert_eq!(data.unwrap(), 0x0E);
 
         <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x00).unwrap();
         assert!(!mbc.ram_lock);

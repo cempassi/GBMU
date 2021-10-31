@@ -4,8 +4,8 @@ use std::fmt;
 pub enum Error {
     InvalidPC(u16),
     IllegalSet(usize, u8),
-    InvalidGet(u16),
-    InvalidSet(u16, u8),
+    InvalidGet(usize),
+    InvalidSet(usize, u8),
     InvalidInterupt(u32),
     DisabledInterrupts,
     RamLock(usize),

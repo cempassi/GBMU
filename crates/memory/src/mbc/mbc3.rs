@@ -79,20 +79,21 @@ impl MbcBus for Mbc3 {
 }
 
 impl MemoryBus for Mbc3 {
-    fn get(&self, address: usize) -> u8 {
+    fn get(&self, address: usize) -> Result<u8, Error> {
         match address {
-            consts::MBC_BANK0_START..=consts::MBC_BANK0_END => self.data[address],
+            consts::MBC_BANK0_START..=consts::MBC_BANK0_END => Ok(self.data[address]),
             consts::MBC_BANK1_START..=consts::MBC_BANK1_END => {
-                self.data[(self.rom_bank as usize * consts::MBC_BANK1_START)
-                    + (address - consts::MBC_BANK1_START)]
+                Ok(self.data[(self.rom_bank as usize * consts::MBC_BANK1_START)
+                    + (address - consts::MBC_BANK1_START)])
             }
-            consts::MBC_RAM_START..=consts::MBC_RAM_END => self.get_ram(address),
+            consts::MBC_RAM_START..=consts::MBC_RAM_END => Ok(self.get_ram(address)),
             _ => unreachable!(),
         }
     }
 
-    fn set(&mut self, address: usize, data: u8) {
+    fn set(&mut self, address: usize, data: u8) -> Result<(), Error> {
         let _ = <Self as MbcBus>::set(self, address, data);
+        Ok(())
     }
 }
 
@@ -272,7 +273,7 @@ mod mbc3_test {
         let rom_file = FILE.to_vec();
         let mbc = Mbc3::new(rom_file);
         let data = mbc.get(0x00000040);
-        assert_eq!(data, 0xc3);
+        assert_eq!(data.unwrap(), 0xc3);
     }
 
     #[test]
@@ -348,7 +349,7 @@ mod mbc3_test {
         mbc.set(0x0000a010, 0xca);
 
         let data = mbc.get(0x0000a010);
-        assert_eq!(data, 0xca);
+        assert_eq!(data.unwrap(), 0xca);
 
         mbc.set(0x01ff, 0x00);
         assert!(!mbc.ram_lock);
@@ -383,7 +384,7 @@ mod mbc3_test {
         mbc.set(0x0aff, 0x28);
 
         let data = mbc.get(0x0aff);
-        assert_eq!(data, 0xc9);
+        assert_eq!(data.unwrap(), 0xc9);
 
         mbc.set(0x01ff, 0x00);
         assert!(!mbc.ram_lock);
@@ -403,7 +404,7 @@ mod mbc3_test {
         mbc.set(0x0aff, 0x29);
 
         let data = mbc.get(0x0aff);
-        assert_eq!(data, 0xc9);
+        assert_eq!(data.unwrap(), 0xc9);
 
         mbc.set(0x01ff, 0x00);
         assert!(!mbc.ram_lock);
@@ -423,7 +424,7 @@ mod mbc3_test {
         mbc.set(0x0aff, 0x30);
 
         let data = mbc.get(0x0aff);
-        assert_eq!(data, 0xc9);
+        assert_eq!(data.unwrap(), 0xc9);
 
         mbc.set(0x01ff, 0x00);
         assert!(!mbc.ram_lock);
@@ -443,7 +444,7 @@ mod mbc3_test {
         mbc.set(0xb010, 0x31);
 
         let data = mbc.get(0xb010);
-        assert_eq!(data, 0x31);
+        assert_eq!(data.unwrap(), 0x31);
 
         mbc.set(0x01ff, 0x00);
         assert!(!mbc.ram_lock);
@@ -463,7 +464,7 @@ mod mbc3_test {
         mbc.set(0xb210, 0x0a);
 
         let data = mbc.get(0xb210);
-        assert_eq!(data, 0x0a);
+        assert_eq!(data.unwrap(), 0x0a);
 
         mbc.set(0x01ff, 0x00);
         assert!(!mbc.ram_lock);
@@ -481,7 +482,7 @@ mod mbc3_test {
         assert_eq!(mbc.ram_bank, 12);
 
         let data = mbc.get(0xb040);
-        assert_eq!(data, 0x00);
+        assert_eq!(data.unwrap(), 0x00);
 
         mbc.set(0x01ff, 0x00);
         assert!(!mbc.ram_lock);
@@ -499,7 +500,7 @@ mod mbc3_test {
         assert_eq!(mbc.ram_bank, 8);
 
         let data = mbc.get(0x0aff);
-        assert_eq!(data, 0xc9);
+        assert_eq!(data.unwrap(), 0xc9);
 
         mbc.set(0x01ff, 0x00);
         assert!(!mbc.ram_lock);
@@ -517,7 +518,7 @@ mod mbc3_test {
         assert_eq!(mbc.ram_bank, 9);
 
         let data = mbc.get(0xb080);
-        assert_eq!(data, 0x02);
+        assert_eq!(data.unwrap(), 0x02);
 
         mbc.set(0x01ff, 0x00);
         assert!(!mbc.ram_lock);
@@ -535,7 +536,7 @@ mod mbc3_test {
         assert_eq!(mbc.ram_bank, 10);
 
         let data = mbc.get(0xbf00);
-        assert_eq!(data, 0x01);
+        assert_eq!(data.unwrap(), 0x01);
 
         mbc.set(0x01ff, 0x00);
         assert!(!mbc.ram_lock);
@@ -553,7 +554,7 @@ mod mbc3_test {
         assert_eq!(mbc.ram_bank, 11);
 
         let data = mbc.get(0xb0f0);
-        assert_eq!(data, 0);
+        assert_eq!(data.unwrap(), 0);
 
         mbc.set(0x01ff, 0x00);
         assert!(!mbc.ram_lock);
@@ -576,26 +577,26 @@ mod mbc3_test {
         mbc.set(0x4f4f, 0x08);
         assert_eq!(mbc.ram_bank, 8); //seconds
         let seconds = mbc.get(0xb080);
-        assert_eq!(mbc.rtc.seconds, seconds);
+        assert_eq!(mbc.rtc.seconds, seconds.unwrap());
 
         mbc.set(0x4f4f, 0x09);
         assert_eq!(mbc.ram_bank, 9); //minutes
         let minutes = mbc.get(0xb080);
-        assert_eq!(mbc.rtc.minutes, minutes);
+        assert_eq!(mbc.rtc.minutes, minutes.unwrap());
 
         mbc.set(0x4f4f, 0x0a);
         assert_eq!(mbc.ram_bank, 10);
         let hours = mbc.get(0xbf00); //hours
-        assert_eq!(mbc.rtc.hours, hours);
+        assert_eq!(mbc.rtc.hours, hours.unwrap());
 
         mbc.set(0x4f4f, 0x0b);
         assert_eq!(mbc.ram_bank, 11);
         let dc_lower = mbc.get(0xb0f0); //dc_lower
-        assert_eq!(mbc.rtc.dc_lower, dc_lower);
+        assert_eq!(mbc.rtc.dc_lower, dc_lower.unwrap());
 
         mbc.set(0x4f4f, 0x0c);
         assert_eq!(mbc.ram_bank, 12);
         let dc_upper = mbc.get(0xb040); //dc_upper
-        assert_eq!(mbc.rtc.dc_upper, dc_upper);
+        assert_eq!(mbc.rtc.dc_upper, dc_upper.unwrap());
     }
 }

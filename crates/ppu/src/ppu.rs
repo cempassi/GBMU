@@ -1,7 +1,7 @@
 use crate::registers::lcd;
 use crate::registers::Registers;
-use shared::Interrupt;
 use shared::Interrupts;
+use shared::{Error, Interrupt};
 
 #[derive(Debug)]
 pub struct Ppu {
@@ -35,16 +35,26 @@ impl From<Interrupts> for Ppu {
 }
 
 impl Ppu {
-    pub fn get_vram(&self, address: usize) -> u8 {
-        self.vram[address]
+    pub fn get_vram(&self, address: usize) -> Result<u8, Error> {
+        Ok(self.vram[address])
+    }
+
+    pub fn set_vram(&mut self, address: usize, data: u8) -> Result<(), Error> {
+        self.vram[address] = data;
+        Ok(())
+    }
+
+    pub fn get_registers(&self, address: u16) -> Result<u8, Error> {
+        Ok(self.registers.get(address))
+    }
+
+    pub fn set_registers(&mut self, address: u16, data: u8) -> Result<(), Error> {
+        self.registers.set(address, data);
+        Ok(())
     }
 
     pub fn get_lcd(&self) -> &lcd::Lcd {
         &self.registers.lcd
-    }
-
-    pub fn set_vram(&mut self, address: usize, data: u8) {
-        self.vram[address] = data;
     }
 
     pub fn is_lower(&mut self, register: lcd::Field, nbr: u8) -> bool {

@@ -46,17 +46,18 @@ impl MbcBus for Mbc1 {
 }
 
 impl MemoryBus for Mbc1 {
-    fn get(&self, address: usize) -> u8 {
+    fn get(&self, address: usize) -> Result<u8, Error> {
         match address {
-            consts::MBC_BANK0_START..=consts::MBC_BANK0_END => self.data[address],
-            consts::MBC_BANK1_START..=consts::MBC_BANK1_END => self.swap_bank_nbr(address),
-            consts::MBC_RAM_START..=consts::MBC_RAM_END => self.swap_bank_nbr(address),
+            consts::MBC_BANK0_START..=consts::MBC_BANK0_END => Ok(self.data[address]),
+            consts::MBC_BANK1_START..=consts::MBC_BANK1_END => Ok(self.swap_bank_nbr(address)),
+            consts::MBC_RAM_START..=consts::MBC_RAM_END => Ok(self.swap_bank_nbr(address)),
             _ => unreachable!(),
         }
     }
 
-    fn set(&mut self, address: usize, data: u8) {
+    fn set(&mut self, address: usize, data: u8) -> Result<(), Error> {
         let _ = <Self as MbcBus>::set(self, address, data);
+        Ok(())
     }
 }
 
@@ -171,7 +172,7 @@ mod mbc1_test {
         let rom_file = FILE.to_vec();
         let mbc = Mbc1::new(rom_file);
         let data = mbc.get(0x00000000);
-        assert_eq!(data, 0xc3);
+        assert_eq!(data.unwrap(), 0xc3);
     }
 
     #[test]
@@ -290,7 +291,7 @@ mod mbc1_test {
         mbc.set(0x0000a630, 0xca);
 
         let data = mbc.get(0x0000a630);
-        assert_eq!(data, 0xca);
+        assert_eq!(data.unwrap(), 0xca);
 
         mbc.set(0x01ff, 0x00);
         assert!(!mbc.ram_lock);

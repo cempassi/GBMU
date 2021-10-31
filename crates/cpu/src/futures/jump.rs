@@ -7,6 +7,32 @@ use std::pin::Pin;
 
 type Jumper = Pin<Box<dyn Future<Output = Result<u8, Error>>>>;
 
+pub enum Reset {
+    H00,
+    H10,
+    H20,
+    H30,
+    H08,
+    H18,
+    H28,
+    H38,
+}
+
+impl Reset {
+    pub fn dst(self) -> u16 {
+        match self {
+            Reset::H00 => 0x00,
+            Reset::H10 => 0x10,
+            Reset::H20 => 0x20,
+            Reset::H30 => 0x30,
+            Reset::H08 => 0x08,
+            Reset::H18 => 0x18,
+            Reset::H28 => 0x28,
+            Reset::H38 => 0x38,
+        }
+    }
+}
+
 pub enum Jump {
     Absolute,
     AbsoluteCheck(Flag),
@@ -21,6 +47,7 @@ pub enum Jump {
     ReturnCheck(Flag),
     ReturnNot(Flag),
     ReturnInterrupt,
+    Reset(Reset),
 }
 
 impl Jump {
@@ -39,8 +66,16 @@ impl Jump {
             Jump::ReturnCheck(flag) => Box::pin(ret_check(cpu, flag)),
             Jump::ReturnNot(flag) => Box::pin(ret_not(cpu, flag)),
             Jump::ReturnInterrupt => Box::pin(ret_interrupt(cpu)),
+            Jump::Reset(reset) => Box::pin(res(cpu, reset)),
         }
     }
+}
+
+async fn res(cpu: Cpu, reset: Reset) -> Result<u8, Error> {
+    let (_, mut cycles): (u8, u8) = Get::Next.get(cpu.clone()).await?;
+    cpu.registers().borrow_mut().set(Bits16::PC, reset.dst());
+    cycles += Set::Push(Bits16::PC).run(cpu).await?;
+    Ok(cycles)
 }
 
 async fn ret(cpu: Cpu) -> Result<u8, Error> {

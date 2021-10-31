@@ -4,8 +4,8 @@ use std::task::{Context, Poll};
 
 use crate::cycle::Cycle;
 
-pub const VBLANK: u32 = 83776;
-pub const HBLANK: u32 = 272;
+pub const VBLANK: u32 = 1024;
+pub const HBLANK: u32 = 51;
 
 pub struct Blank {
     cycle: Cycle,
@@ -23,7 +23,6 @@ impl Future for Blank {
             Cycle::Ppu(ref mut ticks) => {
                 *ticks += 1;
                 if *ticks as u32 == length - 1 {
-                    println!("Blank Period finished: {} cycles", ticks);
                     self.cycle = Cycle::Finished;
                 }
                 Poll::Pending

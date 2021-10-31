@@ -5,7 +5,8 @@ use memory::Memory;
 pub struct Cpu {
     memory: Memory,
     registers: Registers,
-    halt: bool,
+    pub(crate) halt: bool,
+    pub(crate) stop: bool,
 }
 
 impl Cpu {
@@ -14,19 +15,8 @@ impl Cpu {
             memory,
             registers: Registers::default(),
             halt: false,
+            stop: false,
         }
-    }
-
-    pub fn set_halt(&mut self) -> u8 {
-        self.halt = true;
-        0
-    }
-    pub fn unset_halt(&mut self) {
-        self.halt = false;
-    }
-
-    pub fn is_halted(&self) -> bool {
-        self.halt
     }
 
     pub fn get_memory(&self) -> Memory {

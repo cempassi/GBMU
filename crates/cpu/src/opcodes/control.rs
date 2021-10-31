@@ -123,8 +123,14 @@ impl Control {
         let cycles = match self {
             Control::NOP => 0,
             Control::CB => Control::prefix_cb(cpu).await?,
-            Control::STOP => todo!(),
-            Control::HALT => cpu.borrow_mut().set_halt(),
+            Control::STOP => {
+                cpu.borrow_mut().stop = true;
+                0
+            }
+            Control::HALT => {
+                cpu.borrow_mut().halt = true;
+                0
+            }
             Control::EI => cpu.memory().borrow_mut().enable_interrupts(),
             Control::DI => cpu.memory().borrow_mut().disable_interrupts(),
         };

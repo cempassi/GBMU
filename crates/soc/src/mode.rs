@@ -53,7 +53,6 @@ impl Mode {
                 *self = Self::Idle;
                 true
             }
-            Self::Ppu | Self::Cpu => true,
             _ => false,
         }
     }

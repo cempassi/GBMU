@@ -1,12 +1,15 @@
 use crate::style::fonts;
 use iced_wgpu::Text as T;
 
-pub struct Text<'a> {
-    text: &'a str,
+pub struct Text<Name: Into<String>> {
+    text: Name,
 }
 
-impl<'a> Text<'a> {
-    pub fn new(text: &'a str) -> Self {
+impl<Name> Text<Name>
+where
+    Name: Into<String>,
+{
+    pub fn new(text: Name) -> Self {
         Self { text }
     }
 

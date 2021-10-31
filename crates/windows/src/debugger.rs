@@ -82,7 +82,7 @@ impl Debugger {
         let title = "Debugger";
         let window = Window::new(event_loop).unwrap();
         let modifiers = ModifiersState::default();
-        let size = Size::Physical(PhysicalSize::new(1024, 768));
+        let size = Size::Physical(PhysicalSize::new(1248, 768));
         window.set_title(title);
         window.set_resizable(false);
         window.set_inner_size(size);

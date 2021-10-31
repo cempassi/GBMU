@@ -19,12 +19,12 @@ impl Cycle {
     pub fn check_redraw(&mut self, status: &mut Vec<Finished>) {
         for status in status {
             match status {
-                Finished::Cpu(cycles) => {
+                Finished::Cpu(cycles) if self.mode == Mode::Cpu => {
                     self.mode.update_processing();
                     self.last_cpu = *cycles;
                     self.redraw = true;
                 }
-                Finished::Ppu(cycles) => {
+                Finished::Ppu(cycles) if self.mode == Mode::Ppu => {
                     self.mode.update_processing();
                     self.last_ppu = *cycles;
                     self.redraw = true;

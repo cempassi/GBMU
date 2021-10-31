@@ -1,4 +1,5 @@
 #![allow(dead_code, unused_attributes, unused_imports)]
+use crate::Error;
 use modular_bitfield::{bitfield, specifiers::B3};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
@@ -21,16 +22,17 @@ pub struct Interrupts {
 }
 
 impl Interrupts {
-    pub fn get(&self) -> u8 {
-        self.into_bytes()[0]
+    pub fn get(&self) -> Result<u8, Error> {
+        Ok(self.into_bytes()[0])
     }
 
     pub fn check(&self, requested: u8) -> u8 {
         self.into_bytes()[0] & requested
     }
 
-    pub fn set(&self, data: u8) {
-        self.into_bytes()[0] = data
+    pub fn set(&self, data: u8) -> Result<(), Error> {
+        self.into_bytes()[0] = data;
+        Ok(())
     }
 
     pub fn processed(&mut self, interrupt: Interrupt) {

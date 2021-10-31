@@ -1,4 +1,5 @@
 use crate::MemoryBus;
+use shared::Error;
 use std::convert::AsRef;
 use std::fs;
 use std::path::PathBuf;
@@ -22,17 +23,20 @@ impl AsRef<Vec<u8>> for Bios {
 }
 
 impl MemoryBus for Bios {
-    fn set(&mut self, address: usize, data: u8) {
+    fn set(&mut self, address: usize, data: u8) -> Result<(), Error> {
         if let Some(index) = self.data.get_mut(address) {
             *index = data;
+            Ok(())
+        } else {
+            Err(Error::InvalidSet(address, data))
         }
     }
 
-    fn get(&self, address: usize) -> u8 {
+    fn get(&self, address: usize) -> Result<u8, Error> {
         if let Some(index) = self.data.get(address) {
-            *index
+            Ok(*index)
         } else {
-            0
+            Ok(0)
         }
     }
 }
