@@ -3,26 +3,31 @@ use super::PpuMsg;
 use crate::debugger::widgets::Register;
 use iced_wgpu::{Column, Renderer, Row};
 use iced_winit::Element;
+use ppu::Coordinates;
 use ppu::Field;
 
 pub struct Lcd {
-    lcd: ppu::Lcd,
+    coordinates: Coordinates,
     builder: Register,
 }
 
 impl Lcd {
-    pub fn new(src: &ppu::Lcd) -> Self {
-        let lcd = Clone::clone(&*src);
+    pub fn new(ppu: &ppu::Ppu) -> Self {
         let builder = Register::new(20, 5, 8);
-        Self { lcd, builder }
+        let mut coordinates = Coordinates::default();
+        ppu.borrow().reload_coordinates(&mut coordinates);
+        Self {
+            coordinates,
+            builder,
+        }
     }
 
-    pub fn update(&mut self, lcd: &ppu::Lcd) {
-        lcd.set(&mut self.lcd)
+    pub fn update(&mut self, ppu: &ppu::Ppu) {
+        ppu.borrow().reload_coordinates(&mut self.coordinates);
     }
 
     pub fn make(&self, field: Field) -> Row<PpuMsg> {
-        let data = self.lcd.get_lcd(field).to_string();
+        let data = self.coordinates.get(field).to_string();
         let name = format!("{}", field);
         self.builder.render(name, data)
     }

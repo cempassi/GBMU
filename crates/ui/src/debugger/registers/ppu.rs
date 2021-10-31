@@ -16,12 +16,12 @@ pub enum PpuMsg {
 
 impl Ppu {
     pub fn new(ppu: ppu::Ppu) -> Self {
-        let lcd = Lcd::new(ppu.borrow().get_lcd());
+        let lcd = Lcd::new(&ppu);
         Self { ppu, lcd }
     }
 
     pub fn update(&mut self, _message: PpuMsg) {
-        self.lcd.update(self.ppu.borrow().get_lcd())
+        self.lcd.update(&self.ppu)
     }
 
     pub fn view(&self, _theme: Theme) -> Element<PpuMsg, Renderer> {
