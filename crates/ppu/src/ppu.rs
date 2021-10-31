@@ -60,5 +60,3 @@ impl Ppu {
         self.interrupts.borrow_mut().request(Interrupt::Lcd);
     }
 }
-
-

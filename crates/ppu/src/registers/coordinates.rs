@@ -110,5 +110,3 @@ impl Coordinates {
         }
     }
 }
-
-

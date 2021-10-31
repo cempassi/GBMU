@@ -1,7 +1,7 @@
 #![allow(dead_code, unused_attributes, unused_imports)]
+pub mod control;
 pub mod coordinates;
 pub(crate) mod lcd;
-pub mod control;
 pub mod status;
 
 pub use coordinates::{Coordinates, Field};
@@ -52,23 +52,22 @@ pub use status::Status;
 pub struct Registers {
     control: Control,
     status: Status,
-    pub(crate) coordinates: Coordinates
-    // // bgp: palette::Monochrome,
-                  // // objp0: palette::Monochrome,
-                  // // objp1: palette::Monochrome,
+    pub(crate) coordinates: Coordinates, // // bgp: palette::Monochrome,
+                                         // // objp0: palette::Monochrome,
+                                         // // objp1: palette::Monochrome,
 
-                  // // bcps: palette::Index,
-                  // // bcpd: palette::Data,
-                  // // ocps: palette::Index,
-                  // // ocpd: palette::Data,
+                                         // // bcps: palette::Index,
+                                         // // bcpd: palette::Data,
+                                         // // ocps: palette::Index,
+                                         // // ocpd: palette::Data,
 
-                  //dma_transfer: u8,
+                                         //dma_transfer: u8,
 
-                  // // hdma1: u8,
-                  // hdma2: u8,
-                  // hdma3: u8,
-                  // hdma4: u8,
-                  // hdma5: u8
+                                         // // hdma1: u8,
+                                         // hdma2: u8,
+                                         // hdma3: u8,
+                                         // hdma4: u8,
+                                         // hdma5: u8
 }
 
 impl Registers {
@@ -96,5 +95,3 @@ impl Registers {
         }
     }
 }
-
-
