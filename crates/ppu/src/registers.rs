@@ -11,6 +11,8 @@ mod palette;
 pub use control::Control;
 pub use status::Status;
 
+use self::status::Mode;
+
 // /// 1 LCD Control Register
 // ///
 // ///     1.1 FF40 - LCDC - LCD Control (R/W)
@@ -73,8 +75,8 @@ pub struct Registers {
 impl Registers {
     pub fn get(&self, address: u16) -> u8 {
         match address {
-            0xFF40 => self.status.into_bytes()[0],
-            0xFF41 => self.control.into_bytes()[0],
+            0xFF40 => self.control.into_bytes()[0],
+            0xFF41 => self.status.into_bytes()[0],
             0xFF42..=0xFF45 | 0xFF4A | 0xFF4B => {
                 let field = lcd::Field::try_from_primitive(address).unwrap();
                 self.coordinates.get(field)
@@ -85,13 +87,23 @@ impl Registers {
 
     pub fn set(&mut self, address: u16, data: u8) {
         match address {
-            0xFF40 => self.status.into_bytes()[0] = data,
-            0xFF41 => self.control.into_bytes()[0] = data,
+            0xFF40 => {
+                self.control.into_bytes()[0] = data;
+                //self.check_disabled()
+            }
+            0xFF41 => self.status.into_bytes()[0] = data,
             0xFF42..=0xFF45 | 0xFF4A | 0xFF4B => {
                 let field = lcd::Field::try_from_primitive(address).unwrap();
                 self.coordinates.set(field, data);
             }
             _ => unreachable!(),
+        }
+    }
+
+    fn check_disabled(&mut self) {
+        if !self.control.enabled() {
+            self.status.set_mode(Mode::Vblank);
+            self.coordinates.set(Field::Ly, 0);
         }
     }
 }

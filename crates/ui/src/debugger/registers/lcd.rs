@@ -13,7 +13,7 @@ pub struct Lcd {
 
 impl Lcd {
     pub fn new(ppu: &ppu::Ppu) -> Self {
-        let builder = Register::new(20, 5, 8);
+        let builder = Register::new(20, 7, 8);
         let mut coordinates = Coordinates::default();
         ppu.borrow().reload_coordinates(&mut coordinates);
         Self {
@@ -40,7 +40,9 @@ impl Lcd {
 
     pub fn view(&self) -> Element<PpuMsg, Renderer> {
         let pair1 = self.pair(Field::Ly, Field::LyCmp);
+        let pair2 = self.pair(Field::Yscroll, Field::Xscroll);
+        let pair3 = self.pair(Field::Ywindow, Field::Xwindow);
 
-        Column::new().push(pair1).into()
+        Column::new().push(pair1).push(pair2).push(pair3).into()
     }
 }

@@ -17,12 +17,12 @@ use modular_bitfield::{bitfield, specifiers::B2};
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 #[allow(dead_code)]
 pub struct Control {
-    priority: bool,
-    obj_enabled: bool,
-    obj_size: bool,
-    bg_area: bool,
-    tile_data: bool,
-    window_enabled: bool,
-    window_area: bool,
-    enabled: bool,
+    pub(super) priority: bool,
+    pub(super) obj_enabled: bool,
+    pub(super) obj_size: bool,
+    pub(super) bg_area: bool,
+    pub(super) tile_data: bool,
+    pub(super) window_enabled: bool,
+    pub(super) window_area: bool,
+    pub(super) enabled: bool,
 }
