@@ -8,6 +8,7 @@ pub enum Error {
     InvalidSet(usize, u8),
     InvalidInterupt(u32),
     DisabledInterrupts,
+    FifoNotReady,
     RamLock(usize),
     Unimplemented,
 }
@@ -33,6 +34,7 @@ impl fmt::Display for Error {
                 write!(f, "Invalid Interrupt. value: {}", interrupt)
             }
             Error::DisabledInterrupts => write!(f, "Disabled interrupts"),
+            Error::FifoNotReady => write!(f, "Fifo Not Ready"),
         }
     }
 }
