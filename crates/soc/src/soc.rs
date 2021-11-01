@@ -102,7 +102,7 @@ impl SOC {
     }
 
     pub fn run(&mut self) {
-        let waker = crate::waker::create();
+        let waker = shared::waker::create();
         let mut context = Context::from_waker(&waker);
         let mut status = Vec::new();
 
