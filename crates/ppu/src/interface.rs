@@ -13,3 +13,13 @@ impl New for Ppu {
         Rc::new(RefCell::new(super::ppu::Ppu::from(interrupts)))
     }
 }
+
+pub trait Push<'push> {
+    fn push(&self, data: Vec<u8>) -> crate::fifo::Pusher;
+}
+
+impl<'push> Push<'push> for Ppu {
+    fn push(&self, data: Vec<u8>) -> crate::fifo::Pusher {
+        crate::fifo::Pusher::new(self, data)
+    }
+}
