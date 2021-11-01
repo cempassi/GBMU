@@ -70,9 +70,9 @@ impl Emulator {
 
     pub fn process_event(&mut self, event: WindowEvent, control_flow: &mut ControlFlow) {
         match event {
-             WindowEvent::Resized(_physical_size) => {
-                 self.resized = true;
-             }
+            WindowEvent::Resized(_physical_size) => {
+                self.resized = true;
+            }
             WindowEvent::CloseRequested => {
                 println!("Request to close on debugger");
                 *control_flow = ControlFlow::Exit;
@@ -98,9 +98,9 @@ impl Emulator {
     }
 
     pub fn redraw(&mut self, control_flow: &mut ControlFlow) {
-         if self.resized {
-             self.resize()
-         }
+        if self.resized {
+            self.resize()
+        }
 
         let render_result = self.pixels.render_with(|encoder, view, context| {
             let device = &context.device;

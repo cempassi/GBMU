@@ -20,6 +20,5 @@ impl Program for UserInterface {
 
     fn view(&mut self) -> iced_native::Element<'_, Self::Message, Self::Renderer> {
         Text::new("Hello Mate").size(20).into()
-
     }
 }

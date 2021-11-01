@@ -178,9 +178,7 @@ impl Debugger {
                     });
 
                 // Generate the frame that we will render to.
-                let view = frame
-                    .texture
-                    .create_view(&TextureViewDescriptor::default());
+                let view = frame.texture.create_view(&TextureViewDescriptor::default());
 
                 // Clear the screen to white before drawing
                 let _render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {

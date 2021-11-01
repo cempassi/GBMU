@@ -87,9 +87,7 @@ impl Debugger {
         staging_belt: &mut StagingBelt,
     ) -> Interaction {
         let mut encoder = device.create_command_encoder(&CommandEncoderDescriptor { label: None });
-        let view = frame
-            .texture
-            .create_view(&TextureViewDescriptor::default());
+        let view = frame.texture.create_view(&TextureViewDescriptor::default());
         self.renderer.backend_mut().draw(
             device,
             staging_belt,
