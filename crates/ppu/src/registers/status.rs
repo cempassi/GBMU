@@ -1,4 +1,5 @@
-use modular_bitfield::{bitfield, specifiers::B2};
+use super::Control;
+use modular_bitfield::{bitfield, specifiers::B2, BitfieldSpecifier};
 // /// Bit     Name                                    Usage notes
 // /// 6       LYC=LY STAT Interrupt source            (1=Enable) (Read/Write)
 // /// 5       Mode 2 OAM STAT Interrupt source        (1=Enable) (Read/Write)
@@ -14,7 +15,8 @@ use modular_bitfield::{bitfield, specifiers::B2};
 #[bitfield]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct Status {
-    mode: B2,
+    #[bits = 2]
+    pub(crate) mode: Mode,
     pub lyc_ly: bool,
     hblank_interupt: bool,
     vblank_interupt: bool,
@@ -22,4 +24,24 @@ pub struct Status {
     lyc_ly_interupt: bool,
     #[skip]
     unused: bool,
+}
+
+#[derive(BitfieldSpecifier, Debug, Copy, Clone, PartialEq)]
+pub enum Mode {
+    Hblank,
+    Vblank,
+    Oam,
+    Transfert,
+}
+
+impl Default for Mode {
+    fn default() -> Self {
+        Mode::Hblank
+    }
+}
+
+impl Status {
+    pub fn get_mode(&self) -> Mode {
+        self.mode()
+    }
 }
