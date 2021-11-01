@@ -40,6 +40,7 @@ fn init_device(
         let adapter = instance
             .request_adapter(&RequestAdapterOptions {
                 power_preference: PowerPreference::HighPerformance,
+                force_fallback_adapter: false,
                 compatible_surface: Some(surface),
             })
             .await
@@ -167,7 +168,7 @@ impl Debugger {
             self.resize();
         }
 
-        match self.surface.get_current_frame() {
+        match self.surface.get_current_texture() {
             Ok(frame) => {
                 // Generate the encoder to create the actual commands to send to the gpu.
                 let mut encoder = self
@@ -178,7 +179,6 @@ impl Debugger {
 
                 // Generate the frame that we will render to.
                 let view = frame
-                    .output
                     .texture
                     .create_view(&TextureViewDescriptor::default());
 
@@ -216,6 +216,7 @@ impl Debugger {
                 // Then we submit the work
                 self.staging_belt.finish();
                 self.queue.submit(Some(encoder.finish()));
+                frame.present();
 
                 // Update the mouse cursor
                 self.window.set_cursor_icon(mouse_interaction(mouse_action));
