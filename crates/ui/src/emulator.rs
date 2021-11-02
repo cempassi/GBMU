@@ -1,25 +1,17 @@
-mod button;
-mod disassembler;
-mod memory_map;
-mod menu;
-mod registers;
 mod ui;
-mod widgets;
-
-use soc::SOC;
 
 use self::ui::UserInterface;
+
 use iced_wgpu::wgpu::util::StagingBelt;
-use iced_wgpu::wgpu::{
-    CommandEncoderDescriptor, Device, SurfaceTexture, TextureFormat, TextureViewDescriptor,
-};
+use iced_wgpu::wgpu::{CommandEncoder, Device, TextureView};
 use iced_wgpu::{Backend, Renderer, Settings, Viewport};
 use iced_winit::winit::dpi::PhysicalSize;
 use iced_winit::winit::{dpi::PhysicalPosition, window::Window};
 use iced_winit::Clipboard;
 use iced_winit::{mouse::Interaction, program, Debug, Point, Size};
+use pixels::Pixels;
 
-pub struct Debugger {
+pub struct Emulator {
     pub state: program::State<UserInterface>,
     pub clipboard: Clipboard,
     pub debug: Debug,
@@ -28,9 +20,9 @@ pub struct Debugger {
     pub cursor: PhysicalPosition<f64>,
 }
 
-impl Debugger {
-    pub fn new(window: &Window, device: &Device, format: TextureFormat, soc: SOC) -> Self {
-        let user_interface = UserInterface::from(soc);
+impl Emulator {
+    pub fn new(window: &Window, pixels: &Pixels) -> Self {
+        let user_interface = UserInterface::default();
         let mut debug = Debug::new();
         let clipboard = Clipboard::connect(window);
 
@@ -42,7 +34,11 @@ impl Debugger {
         let logical_cursor = cursor.to_logical(window.scale_factor());
         let point = Point::new(logical_cursor.x, logical_cursor.y);
 
-        let mut renderer = Renderer::new(Backend::new(device, Settings::default(), format));
+        let mut renderer = Renderer::new(Backend::new(
+            pixels.device(),
+            Settings::default(),
+            pixels.render_texture_format(),
+        ));
 
         let state = program::State::new(
             user_interface,
@@ -82,17 +78,16 @@ impl Debugger {
 
     pub fn draw(
         &mut self,
-        frame: &SurfaceTexture,
-        device: &mut Device,
+        encoder: &mut CommandEncoder,
+        view: &TextureView,
+        device: &Device,
         staging_belt: &mut StagingBelt,
     ) -> Interaction {
-        let mut encoder = device.create_command_encoder(&CommandEncoderDescriptor { label: None });
-        let view = frame.texture.create_view(&TextureViewDescriptor::default());
         self.renderer.backend_mut().draw(
             device,
             staging_belt,
-            &mut encoder,
-            &view,
+            encoder,
+            view,
             &self.viewport,
             self.state.primitive(),
             &self.debug.overlay(),
