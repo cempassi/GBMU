@@ -1,4 +1,5 @@
-use iced_wgpu::wgpu::{self, util::StagingBelt};
+use iced_wgpu::wgpu::util::StagingBelt;
+use soc::SOC;
 
 use pixels::SurfaceTexture;
 
@@ -26,10 +27,11 @@ pub struct Emulator {
     pub staging_belt: StagingBelt,
     pub format_pool: LocalPool,
     pub pixels: Pixels,
+    pub soc: SOC,
 }
 
 impl Emulator {
-    pub fn new(event_loop: &EventLoop<()>) -> Self {
+    pub fn new(event_loop: &EventLoop<()>, soc: SOC) -> Self {
         let title = "GBMU";
         let window = {
             let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
@@ -65,13 +67,15 @@ impl Emulator {
             staging_belt,
             format_pool,
             pixels,
+            soc,
         }
     }
 
     pub fn process_event(&mut self, event: WindowEvent, control_flow: &mut ControlFlow) {
         match event {
-            WindowEvent::Resized(_physical_size) => {
-                self.resized = true;
+            WindowEvent::Resized(size) => {
+                self.state.resize(size, self.window.scale_factor());
+                self.pixels.resize_surface(size.width, size.height);
             }
             WindowEvent::CloseRequested => {
                 println!("Request to close on debugger");
@@ -91,39 +95,39 @@ impl Emulator {
         self.state.update(self.window.scale_factor());
     }
 
-    fn resize(&mut self) {
-        let size = self.window.inner_size();
-        self.pixels.resize_surface(size.width, size.height);
-        self.resized = false;
+    pub fn request_redraw(&mut self) {
+        self.state.update(self.window.scale_factor());
+        self.window.request_redraw();
     }
 
     pub fn redraw(&mut self, control_flow: &mut ControlFlow) {
-        if self.resized {
-            self.resize()
-        }
+        let ppu = self.soc.borrow().get_ppu();
+        let frame = self.pixels.get_frame();
+        ppu.borrow_mut().render(frame);
 
         let render_result = self.pixels.render_with(|encoder, view, context| {
             let device = &context.device;
 
-            // Clear the screen to white before drawing
-            let _render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                label: Some("Reset Screen"),
-                color_attachments: &[wgpu::RenderPassColorAttachment {
-                    view,
-                    resolve_target: None,
-                    ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 1.0,
-                            g: 1.0,
-                            b: 1.0,
-                            a: 1.0,
-                        }),
-                        store: true,
-                    },
-                }],
-                depth_stencil_attachment: None,
-            });
-            drop(_render_pass);
+            // // Clear the screen to white before drawing
+            // let _render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            //     label: Some("Reset Screen"),
+            //     color_attachments: &[wgpu::RenderPassColorAttachment {
+            //         view,
+            //         resolve_target: None,
+            //         ops: wgpu::Operations {
+            //             load: wgpu::LoadOp::Clear(wgpu::Color {
+            //                 r: 1.0,
+            //                 g: 1.0,
+            //                 b: 1.0,
+            //                 a: 1.0,
+            //             }),
+            //             store: true,
+            //         },
+            //     }],
+            //     depth_stencil_attachment: None,
+            // });
+            // drop(_render_pass);
+            context.scaling_renderer.render(encoder, view);
 
             let interaction = self
                 .state
