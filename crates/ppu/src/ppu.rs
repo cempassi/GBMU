@@ -7,6 +7,7 @@ pub const VRAM_START: u16 = 0x8000;
 
 #[derive(Debug)]
 pub struct Ppu {
+    pub vram_lock: bool,
     vram: Vec<u8>,
     pub(crate) registers: Registers,
     interrupts: Interrupts,
