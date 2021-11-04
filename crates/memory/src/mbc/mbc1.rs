@@ -182,10 +182,10 @@ mod mbc1_test {
 
         assert_eq!(mbc.data[0x147], 0x03);
 
-        mbc.set(0x01f5, 0x0a);
+        mbc.set(0x01f5, 0x0a).unwrap();
         assert!(mbc.ram_lock);
 
-        mbc.set(0x034b, 0x03);
+        mbc.set(0x034b, 0x03).unwrap();
         assert!(!mbc.ram_lock);
     }
 
@@ -194,10 +194,10 @@ mod mbc1_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc1::new(rom_file);
 
-        mbc.set(0x6abc, 4);
+        mbc.set(0x6abc, 4).unwrap();
         assert!(!mbc.bank_mode);
 
-        mbc.set(0x7abc, 3);
+        mbc.set(0x7abc, 3).unwrap();
         assert!(mbc.bank_mode);
     }
 
@@ -206,7 +206,7 @@ mod mbc1_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc1::new(rom_file);
 
-        mbc.set(0x2156, 0x00);
+        mbc.set(0x2156, 0x00).unwrap();
         assert_eq!(mbc.rom_bank, 0x01);
     }
 
@@ -215,7 +215,7 @@ mod mbc1_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc1::new(rom_file);
 
-        mbc.set(0x2156, 0x1a);
+        mbc.set(0x2156, 0x1a).unwrap();
         assert_eq!(mbc.rom_bank, 0x1a);
     }
 
@@ -224,7 +224,7 @@ mod mbc1_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc1::new(rom_file);
 
-        mbc.set(0x2fff, 0x14);
+        mbc.set(0x2fff, 0x14).unwrap();
         assert_eq!(mbc.rom_bank, 0x15);
     }
 
@@ -233,9 +233,9 @@ mod mbc1_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc1::new(rom_file);
 
-        mbc.set(0x4f4f, 0x01);
+        mbc.set(0x4f4f, 0x01).unwrap();
         assert_eq!(mbc.rom_bank, 0x20);
-        mbc.set(0x2fff, 0x08);
+        mbc.set(0x2fff, 0x08).unwrap();
         assert_eq!(mbc.rom_bank, 0x29);
     }
 
@@ -244,9 +244,9 @@ mod mbc1_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc1::new(rom_file);
 
-        mbc.set(0x4f4f, 0x01);
+        mbc.set(0x4f4f, 0x01).unwrap();
         assert_eq!(mbc.rom_bank, 0x20);
-        mbc.set(0x2fff, 0x1c);
+        mbc.set(0x2fff, 0x1c).unwrap();
         assert_eq!(mbc.rom_bank, 0x3d);
     }
 
@@ -255,9 +255,9 @@ mod mbc1_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc1::new(rom_file);
 
-        mbc.set(0x4f4f, 0x03);
+        mbc.set(0x4f4f, 0x03).unwrap();
         assert_eq!(mbc.rom_bank, 0x60);
-        mbc.set(0x2fff, 0x14);
+        mbc.set(0x2fff, 0x14).unwrap();
         assert_eq!(mbc.rom_bank, 0x74);
     }
 
@@ -266,9 +266,9 @@ mod mbc1_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc1::new(rom_file);
 
-        mbc.set(0x4f4f, 0x03);
+        mbc.set(0x4f4f, 0x03).unwrap();
         assert_eq!(mbc.rom_bank, 0x60);
-        mbc.set(0x2fff, 0x1f);
+        mbc.set(0x2fff, 0x1f).unwrap();
         assert_eq!(mbc.rom_bank, 0x7f);
         // let data = mbc.get(0x7b80);
         // assert_eq!(data, 0xc0);
@@ -279,21 +279,21 @@ mod mbc1_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc1::new(rom_file);
 
-        mbc.set(0x01f5, 0x0a);
+        mbc.set(0x01f5, 0x0a).unwrap();
         assert!(mbc.ram_lock);
 
-        mbc.set(0x7abc, 3); // enable bank_mode
+        mbc.set(0x7abc, 3).unwrap(); // enable bank_mod
         assert!(mbc.bank_mode);
 
-        mbc.set(0x4f4f, 0x00);
+        mbc.set(0x4f4f, 0x00).unwrap();
         assert_eq!(mbc.ram_bank, 0);
 
-        mbc.set(0x0000a630, 0xca);
+        mbc.set(0x0000a630, 0xca).unwrap();
 
         let data = mbc.get(0x0000a630);
         assert_eq!(data.unwrap(), 0xca);
 
-        mbc.set(0x01ff, 0x00);
+        mbc.set(0x01ff, 0x00).unwrap();
         assert!(!mbc.ram_lock);
     }
 
@@ -302,16 +302,16 @@ mod mbc1_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc1::new(rom_file);
 
-        mbc.set(0x01f5, 0x0a);
+        mbc.set(0x01f5, 0x0a).unwrap();
         assert!(mbc.ram_lock);
 
-        mbc.set(0x7abc, 3);
+        mbc.set(0x7abc, 3).unwrap();
         assert!(mbc.bank_mode);
 
-        mbc.set(0x4f4f, 0x01);
+        mbc.set(0x4f4f, 0x01).unwrap();
         assert_eq!(mbc.ram_bank, 1);
 
-        mbc.set(0x01ff, 0x00);
+        mbc.set(0x01ff, 0x00).unwrap();
         assert!(!mbc.ram_lock);
     }
 }

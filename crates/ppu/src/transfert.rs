@@ -20,9 +20,10 @@ impl Pixel {
 
     pub async fn start(self) -> Result<u8, Error> {
         let ly = self.ppu.borrow().registers.coordinates.get(Field::Ly);
+        let bg_area = self.ppu.borrow().registers.control.bg_area;
         let line = ly % 8;
         let mut id = 0;
-        let id_address = 0x9800 + ((ly as u16 / 8) * 32);
+        let id_address = bg_area + ((ly as u16 / 8) * 32);
 
         let fetcher = Fetcher::new(self.ppu.clone(), id_address, id).fetch(line);
         let mut fetching = Box::pin(fetcher).fuse();

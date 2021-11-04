@@ -9,7 +9,6 @@ use soc::SOC;
 use std::convert::From;
 
 pub struct UserInterface {
-    soc: SOC,
     theme: Theme,
     cpu_registers: Cpu,
     ppu: Ppu,
@@ -20,12 +19,11 @@ pub struct UserInterface {
 
 impl From<SOC> for UserInterface {
     fn from(soc: SOC) -> UserInterface {
-        let cpu_registers = soc.get_cpu_registers();
-        let memory = soc.get_memory();
-        let runner = soc.get_runner();
-        let ppu = soc.get_ppu();
+        let cpu_registers = soc.borrow().get_cpu_registers();
+        let memory = soc.borrow().get_memory();
+        let runner = soc.borrow().get_runner();
+        let ppu = soc.borrow().get_ppu();
         Self {
-            soc,
             theme: Theme::default(),
             cpu_registers: Cpu::new(cpu_registers.clone()),
             memory: <Memory as From<memory::Memory>>::from(memory.clone()),
@@ -91,7 +89,6 @@ impl Program for UserInterface {
                 self.ppu.update(message);
             }
         };
-        self.soc.run();
         self.refresh();
         Command::none()
     }

@@ -1,4 +1,5 @@
 pub(crate) mod blanks;
+pub mod colors;
 pub(crate) mod cycle;
 pub(crate) mod fifo;
 pub(crate) mod futures;
@@ -10,5 +11,5 @@ pub mod runner;
 pub(crate) mod transfert;
 
 pub use crate::interface::{New, Ppu};
-pub use crate::registers::{lcd::Field, Coordinates, Registers};
+pub use crate::registers::{Coordinates, Field, Registers};
 pub use crate::runner::Run;

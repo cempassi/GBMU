@@ -101,18 +101,20 @@ impl SOC {
         self.runner.borrow_mut().redraw = false;
     }
 
-    pub fn run(&mut self) {
+    pub fn run(&mut self) -> bool {
+        if self.runner.borrow().is_idle() {
+            return false;
+        }
         let waker = shared::waker::create();
         let mut context = Context::from_waker(&waker);
         let mut status = Vec::new();
 
         self.redraw_init();
-        while !self.redraw_ready() {
-            self.step();
-            for processor in &mut self.processors {
-                status.push(processor.run(&mut context));
-            }
-            self.check_redraw(&mut status);
+        self.step();
+        for processor in &mut self.processors {
+            status.push(processor.run(&mut context));
         }
+        self.check_redraw(&mut status);
+        self.redraw_ready()
     }
 }

@@ -1,9 +1,10 @@
 use crate::blanks::{Blank, HBLANK, VBLANK};
 use crate::oam::Oam;
-use crate::registers::lcd;
+use crate::registers as lcd;
 use crate::transfert::Pixel;
 use crate::Ppu;
 use shared::Error;
+
 use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
