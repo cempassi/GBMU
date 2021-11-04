@@ -36,7 +36,7 @@ impl fmt::Display for Field {
 }
 
 impl Coordinates {
-    pub fn ly_cmp(&self) -> bool {
+    pub fn ly_compare(&self) -> bool {
         self.ly == self.lycompare
     }
 
