@@ -62,6 +62,10 @@ impl Cycle {
         }
     }
 
+    pub fn is_idle(&self) -> bool {
+        self.mode == Mode::Idle
+    }
+
     pub fn tick(&mut self) {
         self.mode = Mode::Tick;
     }
