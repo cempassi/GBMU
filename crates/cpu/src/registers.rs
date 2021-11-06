@@ -37,3 +37,9 @@ pub struct Registers {
     pub(crate) sp: u16,
     pub pc: u16,
 }
+
+impl Registers {
+    pub fn update(&self, dst: &mut Self) {
+        *dst = Self { ..*self };
+    }
+}
