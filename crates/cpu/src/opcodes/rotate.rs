@@ -1,6 +1,6 @@
 use crate::futures::{CbOperation, Set};
 use crate::registers::{Bits8, Rotation};
-use crate::{Access, Cpu};
+use crate::Cpu;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 use std::fmt;
@@ -101,34 +101,34 @@ impl Decoder for Rotate {
 impl Rotate {
     pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         let cycles = match self {
-            Rotate::LA => cpu.registers().borrow_mut().left_carry(Bits8::A),
-            Rotate::LB => cpu.registers().borrow_mut().left_carry(Bits8::B),
-            Rotate::LC => cpu.registers().borrow_mut().left_carry(Bits8::C),
-            Rotate::LD => cpu.registers().borrow_mut().left_carry(Bits8::D),
-            Rotate::LE => cpu.registers().borrow_mut().left_carry(Bits8::E),
-            Rotate::LH => cpu.registers().borrow_mut().left_carry(Bits8::H),
-            Rotate::LL => cpu.registers().borrow_mut().left_carry(Bits8::L),
-            Rotate::LCA => cpu.registers().borrow_mut().left_nocarry(Bits8::A),
-            Rotate::LCB => cpu.registers().borrow_mut().left_nocarry(Bits8::B),
-            Rotate::LCC => cpu.registers().borrow_mut().left_nocarry(Bits8::C),
-            Rotate::LCD => cpu.registers().borrow_mut().left_nocarry(Bits8::D),
-            Rotate::LCE => cpu.registers().borrow_mut().left_nocarry(Bits8::E),
-            Rotate::LCH => cpu.registers().borrow_mut().left_nocarry(Bits8::H),
-            Rotate::LCL => cpu.registers().borrow_mut().left_nocarry(Bits8::L),
-            Rotate::RA => cpu.registers().borrow_mut().right_carry(Bits8::A),
-            Rotate::RB => cpu.registers().borrow_mut().right_carry(Bits8::B),
-            Rotate::RC => cpu.registers().borrow_mut().right_carry(Bits8::C),
-            Rotate::RD => cpu.registers().borrow_mut().right_carry(Bits8::D),
-            Rotate::RE => cpu.registers().borrow_mut().right_carry(Bits8::E),
-            Rotate::RH => cpu.registers().borrow_mut().right_carry(Bits8::H),
-            Rotate::RL => cpu.registers().borrow_mut().right_carry(Bits8::L),
-            Rotate::RCA => cpu.registers().borrow_mut().right_nocarry(Bits8::A),
-            Rotate::RCB => cpu.registers().borrow_mut().right_nocarry(Bits8::B),
-            Rotate::RCC => cpu.registers().borrow_mut().right_nocarry(Bits8::C),
-            Rotate::RCD => cpu.registers().borrow_mut().right_nocarry(Bits8::D),
-            Rotate::RCE => cpu.registers().borrow_mut().right_nocarry(Bits8::E),
-            Rotate::RCH => cpu.registers().borrow_mut().right_nocarry(Bits8::H),
-            Rotate::RCL => cpu.registers().borrow_mut().right_nocarry(Bits8::L),
+            Rotate::LA => cpu.borrow_mut().registers.left_carry(Bits8::A),
+            Rotate::LB => cpu.borrow_mut().registers.left_carry(Bits8::B),
+            Rotate::LC => cpu.borrow_mut().registers.left_carry(Bits8::C),
+            Rotate::LD => cpu.borrow_mut().registers.left_carry(Bits8::D),
+            Rotate::LE => cpu.borrow_mut().registers.left_carry(Bits8::E),
+            Rotate::LH => cpu.borrow_mut().registers.left_carry(Bits8::H),
+            Rotate::LL => cpu.borrow_mut().registers.left_carry(Bits8::L),
+            Rotate::LCA => cpu.borrow_mut().registers.left_nocarry(Bits8::A),
+            Rotate::LCB => cpu.borrow_mut().registers.left_nocarry(Bits8::B),
+            Rotate::LCC => cpu.borrow_mut().registers.left_nocarry(Bits8::C),
+            Rotate::LCD => cpu.borrow_mut().registers.left_nocarry(Bits8::D),
+            Rotate::LCE => cpu.borrow_mut().registers.left_nocarry(Bits8::E),
+            Rotate::LCH => cpu.borrow_mut().registers.left_nocarry(Bits8::H),
+            Rotate::LCL => cpu.borrow_mut().registers.left_nocarry(Bits8::L),
+            Rotate::RA => cpu.borrow_mut().registers.right_carry(Bits8::A),
+            Rotate::RB => cpu.borrow_mut().registers.right_carry(Bits8::B),
+            Rotate::RC => cpu.borrow_mut().registers.right_carry(Bits8::C),
+            Rotate::RD => cpu.borrow_mut().registers.right_carry(Bits8::D),
+            Rotate::RE => cpu.borrow_mut().registers.right_carry(Bits8::E),
+            Rotate::RH => cpu.borrow_mut().registers.right_carry(Bits8::H),
+            Rotate::RL => cpu.borrow_mut().registers.right_carry(Bits8::L),
+            Rotate::RCA => cpu.borrow_mut().registers.right_nocarry(Bits8::A),
+            Rotate::RCB => cpu.borrow_mut().registers.right_nocarry(Bits8::B),
+            Rotate::RCC => cpu.borrow_mut().registers.right_nocarry(Bits8::C),
+            Rotate::RCD => cpu.borrow_mut().registers.right_nocarry(Bits8::D),
+            Rotate::RCE => cpu.borrow_mut().registers.right_nocarry(Bits8::E),
+            Rotate::RCH => cpu.borrow_mut().registers.right_nocarry(Bits8::H),
+            Rotate::RCL => cpu.borrow_mut().registers.right_nocarry(Bits8::L),
             Rotate::LHL => Set::CbHL(CbOperation::RLCarry).run(cpu).await?,
             Rotate::LCHL => Set::CbHL(CbOperation::RLNOCarry).run(cpu).await?,
             Rotate::RHL => Set::CbHL(CbOperation::RRCarry).run(cpu).await?,
@@ -189,12 +189,12 @@ mod test_rotate {
         let expected = 0b10001000;
         let cpu = Cpu::default();
         let instruction = Rotate::RCA;
-        cpu.registers().borrow_mut().set(Bits8::A, src);
+        cpu.borrow_mut().registers.set(Bits8::A, src);
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        let result = cpu.registers().borrow().get(Bits8::A);
-        let carry = cpu.registers().borrow_mut().get(Flag::C);
+        let result = cpu.borrow().registers.get(Bits8::A);
+        let carry = cpu.borrow().registers.get(Flag::C);
         assert_eq!(result, expected);
         assert!(carry);
     }
@@ -205,13 +205,13 @@ mod test_rotate {
         let expected = 0b10001000;
         let cpu = Cpu::default();
         let instruction = Rotate::RA;
-        cpu.registers().borrow_mut().set(Flag::C, true);
-        cpu.registers().borrow_mut().set(Bits8::A, src);
+        cpu.borrow_mut().registers.set(Flag::C, true);
+        cpu.borrow_mut().registers.set(Bits8::A, src);
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        let result = cpu.registers().borrow_mut().get(Bits8::A);
-        let carry = cpu.registers().borrow_mut().get(Flag::C);
+        let result = cpu.borrow().registers.get(Bits8::A);
+        let carry = cpu.borrow().registers.get(Flag::C);
         assert_eq!(result, expected);
         assert!(!carry);
     }
@@ -223,13 +223,13 @@ mod test_rotate {
         let expected = 0b10001000;
         let cpu = Cpu::default();
         let instruction = Rotate::RCHL;
-        cpu.registers().borrow_mut().set(Bits16::HL, hl);
+        cpu.borrow_mut().registers.set(Bits16::HL, hl);
         cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
         let result = cpu.memory().borrow_mut().get_u8(hl).unwrap();
-        let carry = cpu.registers().borrow_mut().get(Flag::C);
+        let carry = cpu.borrow().registers.get(Flag::C);
         assert_eq!(result, expected);
         assert!(carry);
     }
@@ -241,14 +241,14 @@ mod test_rotate {
         let expected = 0b10001000;
         let cpu = Cpu::default();
         let instruction = Rotate::RHL;
-        cpu.registers().borrow_mut().set(Bits16::HL, hl);
-        cpu.registers().borrow_mut().set(Flag::C, true);
+        cpu.borrow_mut().registers.set(Bits16::HL, hl);
+        cpu.borrow_mut().registers.set(Flag::C, true);
         cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
         let result = cpu.memory().borrow_mut().get_u8(hl).unwrap();
-        let carry = cpu.registers().borrow_mut().get(Flag::C);
+        let carry = cpu.borrow().registers.get(Flag::C);
         assert_eq!(result, expected);
         assert!(!carry);
     }
@@ -259,12 +259,12 @@ mod test_rotate {
         let expected = 0b00010001;
         let cpu = Cpu::default();
         let instruction = Rotate::LCA;
-        cpu.registers().borrow_mut().set(Bits8::A, src);
+        cpu.borrow_mut().registers.set(Bits8::A, src);
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        let result = cpu.registers().borrow().get(Bits8::A);
-        let carry = cpu.registers().borrow_mut().get(Flag::C);
+        let result = cpu.borrow().registers.get(Bits8::A);
+        let carry = cpu.borrow().registers.get(Flag::C);
         assert_eq!(result, expected);
         assert!(carry);
     }
@@ -275,12 +275,12 @@ mod test_rotate {
         let expected = 0b00010000;
         let cpu = Cpu::default();
         let instruction = Rotate::LA;
-        cpu.registers().borrow_mut().set(Bits8::A, src);
+        cpu.borrow_mut().registers.set(Bits8::A, src);
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        let result = cpu.registers().borrow_mut().get(Bits8::A);
-        let carry = cpu.registers().borrow_mut().get(Flag::C);
+        let result = cpu.borrow().registers.get(Bits8::A);
+        let carry = cpu.borrow().registers.get(Flag::C);
         assert_eq!(result, expected);
         assert!(carry);
     }
@@ -292,13 +292,13 @@ mod test_rotate {
         let expected = 0b00010001;
         let cpu = Cpu::default();
         let instruction = Rotate::LCHL;
-        cpu.registers().borrow_mut().set(Bits16::HL, hl);
+        cpu.borrow_mut().registers.set(Bits16::HL, hl);
         cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
         let result = cpu.memory().borrow_mut().get_u8(hl).unwrap();
-        let carry = cpu.registers().borrow_mut().get(Flag::C);
+        let carry = cpu.borrow().registers.get(Flag::C);
         assert_eq!(result, expected);
         assert!(carry);
     }
@@ -310,13 +310,13 @@ mod test_rotate {
         let expected = 0b00010000;
         let cpu = Cpu::default();
         let instruction = Rotate::LHL;
-        cpu.registers().borrow_mut().set(Bits16::HL, hl);
+        cpu.borrow_mut().registers.set(Bits16::HL, hl);
         cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
         let result = cpu.memory().borrow_mut().get_u8(hl).unwrap();
-        let carry = cpu.registers().borrow_mut().get(Flag::C);
+        let carry = cpu.borrow().registers.get(Flag::C);
         assert_eq!(result, expected);
         assert!(carry);
     }

@@ -1,7 +1,7 @@
 use super::consts;
 use crate::futures::Set;
 use crate::registers::{Bits8, Bitwise};
-use crate::{Access, Cpu};
+use crate::Cpu;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 use std::fmt;
@@ -101,62 +101,62 @@ impl Decoder for Test {
 impl Test {
     pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         let cycles = match self {
-            Test::BBit0 => cpu.registers().borrow_mut().test(Bits8::B, consts::BIT0),
-            Test::BBit1 => cpu.registers().borrow_mut().test(Bits8::B, consts::BIT1),
-            Test::BBit2 => cpu.registers().borrow_mut().test(Bits8::B, consts::BIT2),
-            Test::BBit3 => cpu.registers().borrow_mut().test(Bits8::B, consts::BIT3),
-            Test::BBit4 => cpu.registers().borrow_mut().test(Bits8::B, consts::BIT4),
-            Test::BBit5 => cpu.registers().borrow_mut().test(Bits8::B, consts::BIT5),
-            Test::BBit6 => cpu.registers().borrow_mut().test(Bits8::B, consts::BIT6),
-            Test::BBit7 => cpu.registers().borrow_mut().test(Bits8::B, consts::BIT7),
-            Test::CBit0 => cpu.registers().borrow_mut().test(Bits8::C, consts::BIT0),
-            Test::CBit1 => cpu.registers().borrow_mut().test(Bits8::C, consts::BIT1),
-            Test::CBit2 => cpu.registers().borrow_mut().test(Bits8::C, consts::BIT2),
-            Test::CBit3 => cpu.registers().borrow_mut().test(Bits8::C, consts::BIT3),
-            Test::CBit4 => cpu.registers().borrow_mut().test(Bits8::C, consts::BIT4),
-            Test::CBit5 => cpu.registers().borrow_mut().test(Bits8::C, consts::BIT5),
-            Test::CBit6 => cpu.registers().borrow_mut().test(Bits8::C, consts::BIT6),
-            Test::CBit7 => cpu.registers().borrow_mut().test(Bits8::C, consts::BIT7),
-            Test::DBit0 => cpu.registers().borrow_mut().test(Bits8::D, consts::BIT0),
-            Test::DBit1 => cpu.registers().borrow_mut().test(Bits8::D, consts::BIT1),
-            Test::DBit2 => cpu.registers().borrow_mut().test(Bits8::D, consts::BIT2),
-            Test::DBit3 => cpu.registers().borrow_mut().test(Bits8::D, consts::BIT3),
-            Test::DBit4 => cpu.registers().borrow_mut().test(Bits8::D, consts::BIT4),
-            Test::DBit5 => cpu.registers().borrow_mut().test(Bits8::D, consts::BIT5),
-            Test::DBit6 => cpu.registers().borrow_mut().test(Bits8::D, consts::BIT6),
-            Test::DBit7 => cpu.registers().borrow_mut().test(Bits8::D, consts::BIT7),
-            Test::EBit0 => cpu.registers().borrow_mut().test(Bits8::E, consts::BIT0),
-            Test::EBit1 => cpu.registers().borrow_mut().test(Bits8::E, consts::BIT1),
-            Test::EBit2 => cpu.registers().borrow_mut().test(Bits8::E, consts::BIT2),
-            Test::EBit3 => cpu.registers().borrow_mut().test(Bits8::E, consts::BIT3),
-            Test::EBit4 => cpu.registers().borrow_mut().test(Bits8::E, consts::BIT4),
-            Test::EBit5 => cpu.registers().borrow_mut().test(Bits8::E, consts::BIT5),
-            Test::EBit6 => cpu.registers().borrow_mut().test(Bits8::E, consts::BIT6),
-            Test::EBit7 => cpu.registers().borrow_mut().test(Bits8::E, consts::BIT7),
-            Test::HBit0 => cpu.registers().borrow_mut().test(Bits8::H, consts::BIT0),
-            Test::HBit1 => cpu.registers().borrow_mut().test(Bits8::H, consts::BIT1),
-            Test::HBit2 => cpu.registers().borrow_mut().test(Bits8::H, consts::BIT2),
-            Test::HBit3 => cpu.registers().borrow_mut().test(Bits8::H, consts::BIT3),
-            Test::HBit4 => cpu.registers().borrow_mut().test(Bits8::H, consts::BIT4),
-            Test::HBit5 => cpu.registers().borrow_mut().test(Bits8::H, consts::BIT5),
-            Test::HBit6 => cpu.registers().borrow_mut().test(Bits8::H, consts::BIT6),
-            Test::HBit7 => cpu.registers().borrow_mut().test(Bits8::H, consts::BIT7),
-            Test::LBit0 => cpu.registers().borrow_mut().test(Bits8::L, consts::BIT0),
-            Test::LBit1 => cpu.registers().borrow_mut().test(Bits8::L, consts::BIT1),
-            Test::LBit2 => cpu.registers().borrow_mut().test(Bits8::L, consts::BIT2),
-            Test::LBit3 => cpu.registers().borrow_mut().test(Bits8::L, consts::BIT3),
-            Test::LBit4 => cpu.registers().borrow_mut().test(Bits8::L, consts::BIT4),
-            Test::LBit5 => cpu.registers().borrow_mut().test(Bits8::L, consts::BIT5),
-            Test::LBit6 => cpu.registers().borrow_mut().test(Bits8::L, consts::BIT6),
-            Test::LBit7 => cpu.registers().borrow_mut().test(Bits8::L, consts::BIT7),
-            Test::ABit0 => cpu.registers().borrow_mut().test(Bits8::A, consts::BIT0),
-            Test::ABit1 => cpu.registers().borrow_mut().test(Bits8::A, consts::BIT1),
-            Test::ABit2 => cpu.registers().borrow_mut().test(Bits8::A, consts::BIT2),
-            Test::ABit3 => cpu.registers().borrow_mut().test(Bits8::A, consts::BIT3),
-            Test::ABit4 => cpu.registers().borrow_mut().test(Bits8::A, consts::BIT4),
-            Test::ABit5 => cpu.registers().borrow_mut().test(Bits8::A, consts::BIT5),
-            Test::ABit6 => cpu.registers().borrow_mut().test(Bits8::A, consts::BIT6),
-            Test::ABit7 => cpu.registers().borrow_mut().test(Bits8::A, consts::BIT7),
+            Test::BBit0 => cpu.borrow_mut().registers.test(Bits8::B, consts::BIT0),
+            Test::BBit1 => cpu.borrow_mut().registers.test(Bits8::B, consts::BIT1),
+            Test::BBit2 => cpu.borrow_mut().registers.test(Bits8::B, consts::BIT2),
+            Test::BBit3 => cpu.borrow_mut().registers.test(Bits8::B, consts::BIT3),
+            Test::BBit4 => cpu.borrow_mut().registers.test(Bits8::B, consts::BIT4),
+            Test::BBit5 => cpu.borrow_mut().registers.test(Bits8::B, consts::BIT5),
+            Test::BBit6 => cpu.borrow_mut().registers.test(Bits8::B, consts::BIT6),
+            Test::BBit7 => cpu.borrow_mut().registers.test(Bits8::B, consts::BIT7),
+            Test::CBit0 => cpu.borrow_mut().registers.test(Bits8::C, consts::BIT0),
+            Test::CBit1 => cpu.borrow_mut().registers.test(Bits8::C, consts::BIT1),
+            Test::CBit2 => cpu.borrow_mut().registers.test(Bits8::C, consts::BIT2),
+            Test::CBit3 => cpu.borrow_mut().registers.test(Bits8::C, consts::BIT3),
+            Test::CBit4 => cpu.borrow_mut().registers.test(Bits8::C, consts::BIT4),
+            Test::CBit5 => cpu.borrow_mut().registers.test(Bits8::C, consts::BIT5),
+            Test::CBit6 => cpu.borrow_mut().registers.test(Bits8::C, consts::BIT6),
+            Test::CBit7 => cpu.borrow_mut().registers.test(Bits8::C, consts::BIT7),
+            Test::DBit0 => cpu.borrow_mut().registers.test(Bits8::D, consts::BIT0),
+            Test::DBit1 => cpu.borrow_mut().registers.test(Bits8::D, consts::BIT1),
+            Test::DBit2 => cpu.borrow_mut().registers.test(Bits8::D, consts::BIT2),
+            Test::DBit3 => cpu.borrow_mut().registers.test(Bits8::D, consts::BIT3),
+            Test::DBit4 => cpu.borrow_mut().registers.test(Bits8::D, consts::BIT4),
+            Test::DBit5 => cpu.borrow_mut().registers.test(Bits8::D, consts::BIT5),
+            Test::DBit6 => cpu.borrow_mut().registers.test(Bits8::D, consts::BIT6),
+            Test::DBit7 => cpu.borrow_mut().registers.test(Bits8::D, consts::BIT7),
+            Test::EBit0 => cpu.borrow_mut().registers.test(Bits8::E, consts::BIT0),
+            Test::EBit1 => cpu.borrow_mut().registers.test(Bits8::E, consts::BIT1),
+            Test::EBit2 => cpu.borrow_mut().registers.test(Bits8::E, consts::BIT2),
+            Test::EBit3 => cpu.borrow_mut().registers.test(Bits8::E, consts::BIT3),
+            Test::EBit4 => cpu.borrow_mut().registers.test(Bits8::E, consts::BIT4),
+            Test::EBit5 => cpu.borrow_mut().registers.test(Bits8::E, consts::BIT5),
+            Test::EBit6 => cpu.borrow_mut().registers.test(Bits8::E, consts::BIT6),
+            Test::EBit7 => cpu.borrow_mut().registers.test(Bits8::E, consts::BIT7),
+            Test::HBit0 => cpu.borrow_mut().registers.test(Bits8::H, consts::BIT0),
+            Test::HBit1 => cpu.borrow_mut().registers.test(Bits8::H, consts::BIT1),
+            Test::HBit2 => cpu.borrow_mut().registers.test(Bits8::H, consts::BIT2),
+            Test::HBit3 => cpu.borrow_mut().registers.test(Bits8::H, consts::BIT3),
+            Test::HBit4 => cpu.borrow_mut().registers.test(Bits8::H, consts::BIT4),
+            Test::HBit5 => cpu.borrow_mut().registers.test(Bits8::H, consts::BIT5),
+            Test::HBit6 => cpu.borrow_mut().registers.test(Bits8::H, consts::BIT6),
+            Test::HBit7 => cpu.borrow_mut().registers.test(Bits8::H, consts::BIT7),
+            Test::LBit0 => cpu.borrow_mut().registers.test(Bits8::L, consts::BIT0),
+            Test::LBit1 => cpu.borrow_mut().registers.test(Bits8::L, consts::BIT1),
+            Test::LBit2 => cpu.borrow_mut().registers.test(Bits8::L, consts::BIT2),
+            Test::LBit3 => cpu.borrow_mut().registers.test(Bits8::L, consts::BIT3),
+            Test::LBit4 => cpu.borrow_mut().registers.test(Bits8::L, consts::BIT4),
+            Test::LBit5 => cpu.borrow_mut().registers.test(Bits8::L, consts::BIT5),
+            Test::LBit6 => cpu.borrow_mut().registers.test(Bits8::L, consts::BIT6),
+            Test::LBit7 => cpu.borrow_mut().registers.test(Bits8::L, consts::BIT7),
+            Test::ABit0 => cpu.borrow_mut().registers.test(Bits8::A, consts::BIT0),
+            Test::ABit1 => cpu.borrow_mut().registers.test(Bits8::A, consts::BIT1),
+            Test::ABit2 => cpu.borrow_mut().registers.test(Bits8::A, consts::BIT2),
+            Test::ABit3 => cpu.borrow_mut().registers.test(Bits8::A, consts::BIT3),
+            Test::ABit4 => cpu.borrow_mut().registers.test(Bits8::A, consts::BIT4),
+            Test::ABit5 => cpu.borrow_mut().registers.test(Bits8::A, consts::BIT5),
+            Test::ABit6 => cpu.borrow_mut().registers.test(Bits8::A, consts::BIT6),
+            Test::ABit7 => cpu.borrow_mut().registers.test(Bits8::A, consts::BIT7),
             Test::HLBit0 => Set::TestHL(consts::BIT0).run(cpu).await?,
             Test::HLBit1 => Set::TestHL(consts::BIT1).run(cpu).await?,
             Test::HLBit2 => Set::TestHL(consts::BIT2).run(cpu).await?,
@@ -253,11 +253,11 @@ mod test_test_bit {
         let expected = false;
         let cpu = Cpu::default();
         let instruction = Test::BBit6;
-        cpu.registers().borrow_mut().set(Bits8::B, src);
+        cpu.borrow_mut().registers.set(Bits8::B, src);
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        let is_zero = cpu.registers().borrow_mut().get(Flag::Z);
+        let is_zero = cpu.borrow().registers.get(Flag::Z);
         assert!(is_zero == expected);
     }
 
@@ -269,7 +269,7 @@ mod test_test_bit {
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        let is_zero = cpu.registers().borrow_mut().get(Flag::Z);
+        let is_zero = cpu.borrow().registers.get(Flag::Z);
         assert!(is_zero == expected);
     }
 
@@ -280,12 +280,12 @@ mod test_test_bit {
         let expected = false;
         let cpu = Cpu::default();
         let instruction = Test::HLBit2;
-        cpu.registers().borrow_mut().set(Bits16::HL, hl);
+        cpu.borrow_mut().registers.set(Bits16::HL, hl);
         cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        let is_zero = cpu.registers().borrow_mut().get(Flag::Z);
+        let is_zero = cpu.borrow().registers.get(Flag::Z);
         assert!(is_zero == expected);
     }
 }

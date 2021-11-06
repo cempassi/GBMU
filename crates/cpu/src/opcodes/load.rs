@@ -1,6 +1,6 @@
 use crate::futures::Set;
 use crate::registers::{Bits16, Bits8, Load as L};
-use crate::{Access, Cpu};
+use crate::Cpu;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 use std::fmt;
@@ -208,55 +208,55 @@ impl Decoder for Load {
 impl Load {
     pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         let cycles = match self {
-            Load::AA => cpu.registers().borrow_mut().load(Bits8::A, Bits8::A),
-            Load::AB => cpu.registers().borrow_mut().load(Bits8::A, Bits8::B),
-            Load::AC => cpu.registers().borrow_mut().load(Bits8::A, Bits8::C),
-            Load::AD => cpu.registers().borrow_mut().load(Bits8::A, Bits8::D),
-            Load::AE => cpu.registers().borrow_mut().load(Bits8::A, Bits8::E),
-            Load::AH => cpu.registers().borrow_mut().load(Bits8::A, Bits8::H),
-            Load::AL => cpu.registers().borrow_mut().load(Bits8::A, Bits8::L),
-            Load::BB => cpu.registers().borrow_mut().load(Bits8::B, Bits8::B),
-            Load::BC => cpu.registers().borrow_mut().load(Bits8::B, Bits8::C),
-            Load::BD => cpu.registers().borrow_mut().load(Bits8::B, Bits8::D),
-            Load::BE => cpu.registers().borrow_mut().load(Bits8::B, Bits8::E),
-            Load::BH => cpu.registers().borrow_mut().load(Bits8::B, Bits8::H),
-            Load::BL => cpu.registers().borrow_mut().load(Bits8::B, Bits8::L),
-            Load::CB => cpu.registers().borrow_mut().load(Bits8::C, Bits8::B),
-            Load::CC => cpu.registers().borrow_mut().load(Bits8::C, Bits8::C),
-            Load::CD => cpu.registers().borrow_mut().load(Bits8::C, Bits8::D),
-            Load::CE => cpu.registers().borrow_mut().load(Bits8::C, Bits8::E),
-            Load::CH => cpu.registers().borrow_mut().load(Bits8::C, Bits8::H),
-            Load::CL => cpu.registers().borrow_mut().load(Bits8::C, Bits8::L),
-            Load::DB => cpu.registers().borrow_mut().load(Bits8::D, Bits8::B),
-            Load::DC => cpu.registers().borrow_mut().load(Bits8::D, Bits8::C),
-            Load::DD => cpu.registers().borrow_mut().load(Bits8::D, Bits8::D),
-            Load::DE => cpu.registers().borrow_mut().load(Bits8::D, Bits8::E),
-            Load::DH => cpu.registers().borrow_mut().load(Bits8::D, Bits8::H),
-            Load::DL => cpu.registers().borrow_mut().load(Bits8::D, Bits8::L),
-            Load::EB => cpu.registers().borrow_mut().load(Bits8::E, Bits8::B),
-            Load::EC => cpu.registers().borrow_mut().load(Bits8::E, Bits8::C),
-            Load::ED => cpu.registers().borrow_mut().load(Bits8::E, Bits8::D),
-            Load::EE => cpu.registers().borrow_mut().load(Bits8::E, Bits8::E),
-            Load::EH => cpu.registers().borrow_mut().load(Bits8::E, Bits8::H),
-            Load::EL => cpu.registers().borrow_mut().load(Bits8::E, Bits8::L),
-            Load::HB => cpu.registers().borrow_mut().load(Bits8::H, Bits8::B),
-            Load::HC => cpu.registers().borrow_mut().load(Bits8::H, Bits8::C),
-            Load::HD => cpu.registers().borrow_mut().load(Bits8::H, Bits8::D),
-            Load::HE => cpu.registers().borrow_mut().load(Bits8::H, Bits8::E),
-            Load::HH => cpu.registers().borrow_mut().load(Bits8::H, Bits8::H),
-            Load::HL => cpu.registers().borrow_mut().load(Bits8::H, Bits8::L),
-            Load::LB => cpu.registers().borrow_mut().load(Bits8::L, Bits8::B),
-            Load::LC => cpu.registers().borrow_mut().load(Bits8::L, Bits8::C),
-            Load::LD => cpu.registers().borrow_mut().load(Bits8::L, Bits8::D),
-            Load::LE => cpu.registers().borrow_mut().load(Bits8::L, Bits8::E),
-            Load::LH => cpu.registers().borrow_mut().load(Bits8::L, Bits8::H),
-            Load::LL => cpu.registers().borrow_mut().load(Bits8::L, Bits8::L),
-            Load::BA => cpu.registers().borrow_mut().load(Bits8::B, Bits8::A),
-            Load::DA => cpu.registers().borrow_mut().load(Bits8::D, Bits8::A),
-            Load::HA => cpu.registers().borrow_mut().load(Bits8::H, Bits8::A),
-            Load::CA => cpu.registers().borrow_mut().load(Bits8::C, Bits8::A),
-            Load::EA => cpu.registers().borrow_mut().load(Bits8::E, Bits8::A),
-            Load::LA => cpu.registers().borrow_mut().load(Bits8::L, Bits8::A),
+            Load::AA => cpu.borrow_mut().registers.load(Bits8::A, Bits8::A),
+            Load::AB => cpu.borrow_mut().registers.load(Bits8::A, Bits8::B),
+            Load::AC => cpu.borrow_mut().registers.load(Bits8::A, Bits8::C),
+            Load::AD => cpu.borrow_mut().registers.load(Bits8::A, Bits8::D),
+            Load::AE => cpu.borrow_mut().registers.load(Bits8::A, Bits8::E),
+            Load::AH => cpu.borrow_mut().registers.load(Bits8::A, Bits8::H),
+            Load::AL => cpu.borrow_mut().registers.load(Bits8::A, Bits8::L),
+            Load::BB => cpu.borrow_mut().registers.load(Bits8::B, Bits8::B),
+            Load::BC => cpu.borrow_mut().registers.load(Bits8::B, Bits8::C),
+            Load::BD => cpu.borrow_mut().registers.load(Bits8::B, Bits8::D),
+            Load::BE => cpu.borrow_mut().registers.load(Bits8::B, Bits8::E),
+            Load::BH => cpu.borrow_mut().registers.load(Bits8::B, Bits8::H),
+            Load::BL => cpu.borrow_mut().registers.load(Bits8::B, Bits8::L),
+            Load::CB => cpu.borrow_mut().registers.load(Bits8::C, Bits8::B),
+            Load::CC => cpu.borrow_mut().registers.load(Bits8::C, Bits8::C),
+            Load::CD => cpu.borrow_mut().registers.load(Bits8::C, Bits8::D),
+            Load::CE => cpu.borrow_mut().registers.load(Bits8::C, Bits8::E),
+            Load::CH => cpu.borrow_mut().registers.load(Bits8::C, Bits8::H),
+            Load::CL => cpu.borrow_mut().registers.load(Bits8::C, Bits8::L),
+            Load::DB => cpu.borrow_mut().registers.load(Bits8::D, Bits8::B),
+            Load::DC => cpu.borrow_mut().registers.load(Bits8::D, Bits8::C),
+            Load::DD => cpu.borrow_mut().registers.load(Bits8::D, Bits8::D),
+            Load::DE => cpu.borrow_mut().registers.load(Bits8::D, Bits8::E),
+            Load::DH => cpu.borrow_mut().registers.load(Bits8::D, Bits8::H),
+            Load::DL => cpu.borrow_mut().registers.load(Bits8::D, Bits8::L),
+            Load::EB => cpu.borrow_mut().registers.load(Bits8::E, Bits8::B),
+            Load::EC => cpu.borrow_mut().registers.load(Bits8::E, Bits8::C),
+            Load::ED => cpu.borrow_mut().registers.load(Bits8::E, Bits8::D),
+            Load::EE => cpu.borrow_mut().registers.load(Bits8::E, Bits8::E),
+            Load::EH => cpu.borrow_mut().registers.load(Bits8::E, Bits8::H),
+            Load::EL => cpu.borrow_mut().registers.load(Bits8::E, Bits8::L),
+            Load::HB => cpu.borrow_mut().registers.load(Bits8::H, Bits8::B),
+            Load::HC => cpu.borrow_mut().registers.load(Bits8::H, Bits8::C),
+            Load::HD => cpu.borrow_mut().registers.load(Bits8::H, Bits8::D),
+            Load::HE => cpu.borrow_mut().registers.load(Bits8::H, Bits8::E),
+            Load::HH => cpu.borrow_mut().registers.load(Bits8::H, Bits8::H),
+            Load::HL => cpu.borrow_mut().registers.load(Bits8::H, Bits8::L),
+            Load::LB => cpu.borrow_mut().registers.load(Bits8::L, Bits8::B),
+            Load::LC => cpu.borrow_mut().registers.load(Bits8::L, Bits8::C),
+            Load::LD => cpu.borrow_mut().registers.load(Bits8::L, Bits8::D),
+            Load::LE => cpu.borrow_mut().registers.load(Bits8::L, Bits8::E),
+            Load::LH => cpu.borrow_mut().registers.load(Bits8::L, Bits8::H),
+            Load::LL => cpu.borrow_mut().registers.load(Bits8::L, Bits8::L),
+            Load::BA => cpu.borrow_mut().registers.load(Bits8::B, Bits8::A),
+            Load::DA => cpu.borrow_mut().registers.load(Bits8::D, Bits8::A),
+            Load::HA => cpu.borrow_mut().registers.load(Bits8::H, Bits8::A),
+            Load::CA => cpu.borrow_mut().registers.load(Bits8::C, Bits8::A),
+            Load::EA => cpu.borrow_mut().registers.load(Bits8::E, Bits8::A),
+            Load::LA => cpu.borrow_mut().registers.load(Bits8::L, Bits8::A),
             Load::HLB => Set::HL(Bits8::B).run(cpu).await?,
             Load::HLC => Set::HL(Bits8::C).run(cpu).await?,
             Load::HLD => Set::HL(Bits8::D).run(cpu).await?,
@@ -402,8 +402,8 @@ mod test_instruction_load_reg_reg {
         let instruction = Load::HL;
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
         assert_eq!(
-            cpu.registers().borrow().get(Bits8::H),
-            cpu.registers().borrow().get(Bits8::L)
+            cpu.borrow().registers.get(Bits8::H),
+            cpu.borrow().registers.get(Bits8::L)
         );
     }
 
@@ -413,10 +413,10 @@ mod test_instruction_load_reg_reg {
         let instruction = Load::BHL;
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
         assert_eq!(
-            cpu.registers().borrow().get(Bits8::B),
+            cpu.borrow().registers.get(Bits8::B),
             cpu.memory()
                 .borrow()
-                .get_u8(cpu.registers().borrow().get(Bits16::HL))
+                .get_u8(cpu.borrow().registers.get(Bits16::HL))
                 .unwrap()
         );
     }
@@ -429,20 +429,20 @@ mod test_instruction_load_reg_reg {
         assert_eq!(byte, 0x31);
         let future = ldr8b.exec(cpu.clone());
         executor::execute(Box::pin(future));
-        assert_eq!(byte, cpu.registers().borrow().get(Bits8::B));
+        assert_eq!(byte, cpu.borrow().registers.get(Bits8::B));
     }
 
     #[test]
     fn test_load_hl_from_reg_b() {
         let cpu = Cpu::default();
         let instruction = Load::HLB;
-        cpu.registers().borrow_mut().set(Bits16::HL, 0xc042);
+        cpu.borrow_mut().registers.set(Bits16::HL, 0xc042);
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
         assert_eq!(
-            cpu.registers().borrow().get(Bits8::B),
+            cpu.borrow().registers.get(Bits8::B),
             cpu.memory()
                 .borrow()
-                .get_u8(cpu.registers().borrow().get(Bits16::HL))
+                .get_u8(cpu.borrow().registers.get(Bits16::HL))
                 .unwrap()
         );
     }
@@ -454,7 +454,7 @@ mod test_instruction_load_reg_reg {
         let byte = cpu
             .memory()
             .borrow()
-            .get_u8(cpu.registers().borrow().pc)
+            .get_u8(cpu.borrow().registers.pc)
             .unwrap();
         assert_eq!(byte, 0x31);
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
@@ -462,7 +462,7 @@ mod test_instruction_load_reg_reg {
             byte,
             cpu.memory()
                 .borrow()
-                .get_u8(cpu.registers().borrow().get(Bits16::HL))
+                .get_u8(cpu.borrow().registers.get(Bits16::HL))
                 .unwrap()
         );
     }
