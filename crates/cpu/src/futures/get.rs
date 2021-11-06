@@ -1,4 +1,4 @@
-use crate::registers::{Bits16, Bus};
+use crate::registers::{Bits16, Bus, IncDec};
 use crate::{Access, Cpu};
 use memory::{Async, Memory};
 use shared::Error;
@@ -48,25 +48,25 @@ pub async fn nop_u16(memory: Memory) -> Result<(u16, u8), Error> {
 }
 
 pub async fn bits8(cpu: Cpu) -> Result<(u8, u8), Error> {
-    let pc = cpu.registers().borrow().pc;
-    let data = cpu.memory().get::<u8>(pc).await?;
-    cpu.registers().borrow_mut().pc = pc.wrapping_add(1);
+    let pc = cpu.borrow().registers.pc;
+    let data = { cpu.memory().get::<u8>(pc).await? };
+    cpu.borrow_mut().registers.increase(Bits16::PC, 1);
     Ok(data)
 }
 
 pub async fn bits16(cpu: Cpu) -> Result<(u16, u8), Error> {
-    let pc = cpu.registers().borrow().pc;
+    let pc = cpu.borrow().registers.pc;
     let data = cpu.memory().get::<u16>(pc).await?;
-    cpu.registers().borrow_mut().pc = pc.wrapping_add(2);
+    cpu.borrow_mut().registers.increase(Bits16::PC, 2);
     Ok(data)
 }
 
 pub async fn u8_at(cpu: Cpu, area: Bits16) -> Result<(u8, u8), Error> {
-    let address = cpu.registers().borrow().get(area);
+    let address = cpu.borrow().registers.get(area);
     cpu.memory().get::<u8>(address).await
 }
 
 pub async fn u16_at(cpu: Cpu, area: Bits16) -> Result<(u16, u8), Error> {
-    let address = cpu.registers().borrow().get(area);
+    let address = cpu.borrow().registers.get(area);
     cpu.memory().get::<u16>(address).await
 }

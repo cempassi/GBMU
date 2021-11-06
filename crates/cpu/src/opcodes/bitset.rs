@@ -1,7 +1,7 @@
 use super::consts;
 use crate::futures::{CbOperation as Operation, Set};
 use crate::registers::{Bits8, Bitwise};
-use crate::{Access, Cpu};
+use crate::Cpu;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 use std::fmt;
@@ -96,62 +96,62 @@ impl Decoder for Bitset {
 impl Bitset {
     pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         let cycles = match self {
-            Bitset::BBit0 => cpu.registers().borrow_mut().bitset(Bits8::B, consts::BIT0),
-            Bitset::BBit1 => cpu.registers().borrow_mut().bitset(Bits8::B, consts::BIT1),
-            Bitset::BBit2 => cpu.registers().borrow_mut().bitset(Bits8::B, consts::BIT2),
-            Bitset::BBit3 => cpu.registers().borrow_mut().bitset(Bits8::B, consts::BIT3),
-            Bitset::BBit4 => cpu.registers().borrow_mut().bitset(Bits8::B, consts::BIT4),
-            Bitset::BBit5 => cpu.registers().borrow_mut().bitset(Bits8::B, consts::BIT5),
-            Bitset::BBit6 => cpu.registers().borrow_mut().bitset(Bits8::B, consts::BIT6),
-            Bitset::BBit7 => cpu.registers().borrow_mut().bitset(Bits8::B, consts::BIT7),
-            Bitset::CBit0 => cpu.registers().borrow_mut().bitset(Bits8::C, consts::BIT0),
-            Bitset::CBit1 => cpu.registers().borrow_mut().bitset(Bits8::C, consts::BIT1),
-            Bitset::CBit2 => cpu.registers().borrow_mut().bitset(Bits8::C, consts::BIT2),
-            Bitset::CBit3 => cpu.registers().borrow_mut().bitset(Bits8::C, consts::BIT3),
-            Bitset::CBit4 => cpu.registers().borrow_mut().bitset(Bits8::C, consts::BIT4),
-            Bitset::CBit5 => cpu.registers().borrow_mut().bitset(Bits8::C, consts::BIT5),
-            Bitset::CBit6 => cpu.registers().borrow_mut().bitset(Bits8::C, consts::BIT6),
-            Bitset::CBit7 => cpu.registers().borrow_mut().bitset(Bits8::C, consts::BIT7),
-            Bitset::DBit0 => cpu.registers().borrow_mut().bitset(Bits8::D, consts::BIT0),
-            Bitset::DBit1 => cpu.registers().borrow_mut().bitset(Bits8::D, consts::BIT1),
-            Bitset::DBit2 => cpu.registers().borrow_mut().bitset(Bits8::D, consts::BIT2),
-            Bitset::DBit3 => cpu.registers().borrow_mut().bitset(Bits8::D, consts::BIT3),
-            Bitset::DBit4 => cpu.registers().borrow_mut().bitset(Bits8::D, consts::BIT4),
-            Bitset::DBit5 => cpu.registers().borrow_mut().bitset(Bits8::D, consts::BIT5),
-            Bitset::DBit6 => cpu.registers().borrow_mut().bitset(Bits8::D, consts::BIT6),
-            Bitset::DBit7 => cpu.registers().borrow_mut().bitset(Bits8::D, consts::BIT7),
-            Bitset::EBit0 => cpu.registers().borrow_mut().bitset(Bits8::E, consts::BIT0),
-            Bitset::EBit1 => cpu.registers().borrow_mut().bitset(Bits8::E, consts::BIT1),
-            Bitset::EBit2 => cpu.registers().borrow_mut().bitset(Bits8::E, consts::BIT2),
-            Bitset::EBit3 => cpu.registers().borrow_mut().bitset(Bits8::E, consts::BIT3),
-            Bitset::EBit4 => cpu.registers().borrow_mut().bitset(Bits8::E, consts::BIT4),
-            Bitset::EBit5 => cpu.registers().borrow_mut().bitset(Bits8::E, consts::BIT5),
-            Bitset::EBit6 => cpu.registers().borrow_mut().bitset(Bits8::E, consts::BIT6),
-            Bitset::EBit7 => cpu.registers().borrow_mut().bitset(Bits8::E, consts::BIT7),
-            Bitset::HBit0 => cpu.registers().borrow_mut().bitset(Bits8::H, consts::BIT0),
-            Bitset::HBit1 => cpu.registers().borrow_mut().bitset(Bits8::H, consts::BIT1),
-            Bitset::HBit2 => cpu.registers().borrow_mut().bitset(Bits8::H, consts::BIT2),
-            Bitset::HBit3 => cpu.registers().borrow_mut().bitset(Bits8::H, consts::BIT3),
-            Bitset::HBit4 => cpu.registers().borrow_mut().bitset(Bits8::H, consts::BIT4),
-            Bitset::HBit5 => cpu.registers().borrow_mut().bitset(Bits8::H, consts::BIT5),
-            Bitset::HBit6 => cpu.registers().borrow_mut().bitset(Bits8::H, consts::BIT6),
-            Bitset::HBit7 => cpu.registers().borrow_mut().bitset(Bits8::H, consts::BIT7),
-            Bitset::LBit0 => cpu.registers().borrow_mut().bitset(Bits8::L, consts::BIT0),
-            Bitset::LBit1 => cpu.registers().borrow_mut().bitset(Bits8::L, consts::BIT1),
-            Bitset::LBit2 => cpu.registers().borrow_mut().bitset(Bits8::L, consts::BIT2),
-            Bitset::LBit3 => cpu.registers().borrow_mut().bitset(Bits8::L, consts::BIT3),
-            Bitset::LBit4 => cpu.registers().borrow_mut().bitset(Bits8::L, consts::BIT4),
-            Bitset::LBit5 => cpu.registers().borrow_mut().bitset(Bits8::L, consts::BIT5),
-            Bitset::LBit6 => cpu.registers().borrow_mut().bitset(Bits8::L, consts::BIT6),
-            Bitset::LBit7 => cpu.registers().borrow_mut().bitset(Bits8::L, consts::BIT7),
-            Bitset::ABit0 => cpu.registers().borrow_mut().bitset(Bits8::A, consts::BIT0),
-            Bitset::ABit1 => cpu.registers().borrow_mut().bitset(Bits8::A, consts::BIT1),
-            Bitset::ABit2 => cpu.registers().borrow_mut().bitset(Bits8::A, consts::BIT2),
-            Bitset::ABit3 => cpu.registers().borrow_mut().bitset(Bits8::A, consts::BIT3),
-            Bitset::ABit4 => cpu.registers().borrow_mut().bitset(Bits8::A, consts::BIT4),
-            Bitset::ABit5 => cpu.registers().borrow_mut().bitset(Bits8::A, consts::BIT5),
-            Bitset::ABit6 => cpu.registers().borrow_mut().bitset(Bits8::A, consts::BIT6),
-            Bitset::ABit7 => cpu.registers().borrow_mut().bitset(Bits8::A, consts::BIT7),
+            Bitset::BBit0 => cpu.borrow_mut().registers.bitset(Bits8::B, consts::BIT0),
+            Bitset::BBit1 => cpu.borrow_mut().registers.bitset(Bits8::B, consts::BIT1),
+            Bitset::BBit2 => cpu.borrow_mut().registers.bitset(Bits8::B, consts::BIT2),
+            Bitset::BBit3 => cpu.borrow_mut().registers.bitset(Bits8::B, consts::BIT3),
+            Bitset::BBit4 => cpu.borrow_mut().registers.bitset(Bits8::B, consts::BIT4),
+            Bitset::BBit5 => cpu.borrow_mut().registers.bitset(Bits8::B, consts::BIT5),
+            Bitset::BBit6 => cpu.borrow_mut().registers.bitset(Bits8::B, consts::BIT6),
+            Bitset::BBit7 => cpu.borrow_mut().registers.bitset(Bits8::B, consts::BIT7),
+            Bitset::CBit0 => cpu.borrow_mut().registers.bitset(Bits8::C, consts::BIT0),
+            Bitset::CBit1 => cpu.borrow_mut().registers.bitset(Bits8::C, consts::BIT1),
+            Bitset::CBit2 => cpu.borrow_mut().registers.bitset(Bits8::C, consts::BIT2),
+            Bitset::CBit3 => cpu.borrow_mut().registers.bitset(Bits8::C, consts::BIT3),
+            Bitset::CBit4 => cpu.borrow_mut().registers.bitset(Bits8::C, consts::BIT4),
+            Bitset::CBit5 => cpu.borrow_mut().registers.bitset(Bits8::C, consts::BIT5),
+            Bitset::CBit6 => cpu.borrow_mut().registers.bitset(Bits8::C, consts::BIT6),
+            Bitset::CBit7 => cpu.borrow_mut().registers.bitset(Bits8::C, consts::BIT7),
+            Bitset::DBit0 => cpu.borrow_mut().registers.bitset(Bits8::D, consts::BIT0),
+            Bitset::DBit1 => cpu.borrow_mut().registers.bitset(Bits8::D, consts::BIT1),
+            Bitset::DBit2 => cpu.borrow_mut().registers.bitset(Bits8::D, consts::BIT2),
+            Bitset::DBit3 => cpu.borrow_mut().registers.bitset(Bits8::D, consts::BIT3),
+            Bitset::DBit4 => cpu.borrow_mut().registers.bitset(Bits8::D, consts::BIT4),
+            Bitset::DBit5 => cpu.borrow_mut().registers.bitset(Bits8::D, consts::BIT5),
+            Bitset::DBit6 => cpu.borrow_mut().registers.bitset(Bits8::D, consts::BIT6),
+            Bitset::DBit7 => cpu.borrow_mut().registers.bitset(Bits8::D, consts::BIT7),
+            Bitset::EBit0 => cpu.borrow_mut().registers.bitset(Bits8::E, consts::BIT0),
+            Bitset::EBit1 => cpu.borrow_mut().registers.bitset(Bits8::E, consts::BIT1),
+            Bitset::EBit2 => cpu.borrow_mut().registers.bitset(Bits8::E, consts::BIT2),
+            Bitset::EBit3 => cpu.borrow_mut().registers.bitset(Bits8::E, consts::BIT3),
+            Bitset::EBit4 => cpu.borrow_mut().registers.bitset(Bits8::E, consts::BIT4),
+            Bitset::EBit5 => cpu.borrow_mut().registers.bitset(Bits8::E, consts::BIT5),
+            Bitset::EBit6 => cpu.borrow_mut().registers.bitset(Bits8::E, consts::BIT6),
+            Bitset::EBit7 => cpu.borrow_mut().registers.bitset(Bits8::E, consts::BIT7),
+            Bitset::HBit0 => cpu.borrow_mut().registers.bitset(Bits8::H, consts::BIT0),
+            Bitset::HBit1 => cpu.borrow_mut().registers.bitset(Bits8::H, consts::BIT1),
+            Bitset::HBit2 => cpu.borrow_mut().registers.bitset(Bits8::H, consts::BIT2),
+            Bitset::HBit3 => cpu.borrow_mut().registers.bitset(Bits8::H, consts::BIT3),
+            Bitset::HBit4 => cpu.borrow_mut().registers.bitset(Bits8::H, consts::BIT4),
+            Bitset::HBit5 => cpu.borrow_mut().registers.bitset(Bits8::H, consts::BIT5),
+            Bitset::HBit6 => cpu.borrow_mut().registers.bitset(Bits8::H, consts::BIT6),
+            Bitset::HBit7 => cpu.borrow_mut().registers.bitset(Bits8::H, consts::BIT7),
+            Bitset::LBit0 => cpu.borrow_mut().registers.bitset(Bits8::L, consts::BIT0),
+            Bitset::LBit1 => cpu.borrow_mut().registers.bitset(Bits8::L, consts::BIT1),
+            Bitset::LBit2 => cpu.borrow_mut().registers.bitset(Bits8::L, consts::BIT2),
+            Bitset::LBit3 => cpu.borrow_mut().registers.bitset(Bits8::L, consts::BIT3),
+            Bitset::LBit4 => cpu.borrow_mut().registers.bitset(Bits8::L, consts::BIT4),
+            Bitset::LBit5 => cpu.borrow_mut().registers.bitset(Bits8::L, consts::BIT5),
+            Bitset::LBit6 => cpu.borrow_mut().registers.bitset(Bits8::L, consts::BIT6),
+            Bitset::LBit7 => cpu.borrow_mut().registers.bitset(Bits8::L, consts::BIT7),
+            Bitset::ABit0 => cpu.borrow_mut().registers.bitset(Bits8::A, consts::BIT0),
+            Bitset::ABit1 => cpu.borrow_mut().registers.bitset(Bits8::A, consts::BIT1),
+            Bitset::ABit2 => cpu.borrow_mut().registers.bitset(Bits8::A, consts::BIT2),
+            Bitset::ABit3 => cpu.borrow_mut().registers.bitset(Bits8::A, consts::BIT3),
+            Bitset::ABit4 => cpu.borrow_mut().registers.bitset(Bits8::A, consts::BIT4),
+            Bitset::ABit5 => cpu.borrow_mut().registers.bitset(Bits8::A, consts::BIT5),
+            Bitset::ABit6 => cpu.borrow_mut().registers.bitset(Bits8::A, consts::BIT6),
+            Bitset::ABit7 => cpu.borrow_mut().registers.bitset(Bits8::A, consts::BIT7),
             Bitset::HLBit0 => Set::CbHL(Operation::Bitset(consts::BIT0)).run(cpu).await?,
             Bitset::HLBit1 => Set::CbHL(Operation::Bitset(consts::BIT1)).run(cpu).await?,
             Bitset::HLBit2 => Set::CbHL(Operation::Bitset(consts::BIT2)).run(cpu).await?,
@@ -248,11 +248,11 @@ mod test_set_bit {
         let expected = 0b0100_1000;
         let cpu = Cpu::default();
         let instruction = Bitset::BBit6;
-        cpu.registers().borrow_mut().set(Bits8::B, src);
+        cpu.borrow_mut().registers.set(Bits8::B, src);
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        let result = cpu.registers().borrow_mut().get(Bits8::B);
+        let result = cpu.borrow_mut().registers.get(Bits8::B);
         assert_eq!(result, expected);
     }
 
@@ -263,7 +263,7 @@ mod test_set_bit {
         let expected = 0b0100_0100;
         let cpu = Cpu::default();
         let instruction = Bitset::HLBit2;
-        cpu.registers().borrow_mut().set(Bits16::HL, hl);
+        cpu.borrow_mut().registers.set(Bits16::HL, hl);
         cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));

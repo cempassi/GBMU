@@ -8,6 +8,7 @@ use iced_winit::{alignment::Alignment, Element, Length, Space};
 use itertools::Itertools;
 
 pub struct Cpu {
+    cpu: cpu::Cpu,
     registers: cpu::Registers,
     ui: Vec<RegisterPair>,
 }
@@ -19,8 +20,10 @@ pub enum CpuMsg {
 }
 
 impl Cpu {
-    pub fn new(registers: cpu::Registers) -> Self {
+    pub fn new(cpu: cpu::Cpu) -> Self {
+        let mut registers = cpu::Registers::default();
         let mut ui = Vec::new();
+        cpu.borrow().registers.update(&mut registers);
         for (left, right) in Bits8::into_enum_iter().tuples() {
             if left == Bits8::H {
                 ui.push(RegisterPair::Merged(Bits16::HL));
@@ -30,10 +33,11 @@ impl Cpu {
         }
         ui.push(RegisterPair::NoSplit(Bits16::SP));
         ui.push(RegisterPair::NoSplit(Bits16::PC));
-        Self { registers, ui }
+        Self { cpu, registers, ui }
     }
 
     pub fn update(&mut self, message: CpuMsg) {
+        self.cpu.borrow().registers.update(&mut self.registers);
         match message {
             CpuMsg::Merge(index) => {
                 let ui = self.ui.remove(index);
@@ -51,7 +55,7 @@ impl Cpu {
                 .iter()
                 .enumerate()
                 .fold(Column::new(), |column, (index, register_ui)| {
-                    let element = register_ui.view(self.registers.clone(), theme);
+                    let element = register_ui.view(&self.registers, theme);
                     column.push(element.map(move |_message| CpuMsg::Merge(index)))
                 });
         cpu_registers.push(column.padding(15).spacing(5)).into()
@@ -78,13 +82,13 @@ impl RegisterPair {
 
     fn view_register(
         &self,
-        registers: cpu::Registers,
+        registers: &cpu::Registers,
         theme: Theme,
     ) -> Element<RegisterMsg, Renderer> {
         let space = Space::new(Length::Units(10), Length::Units(5));
         match self {
             RegisterPair::Splited(left, right) => Row::new()
-                .push(left.view(registers.clone(), theme))
+                .push(left.view(registers, theme))
                 .push(space)
                 .push(right.view(registers, theme))
                 .into(),
@@ -102,7 +106,7 @@ impl RegisterPair {
         }
     }
 
-    pub fn view(&self, registers: cpu::Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
+    pub fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
         let checkbox = Checkbox::new(self.is_merged(), "", |_| RegisterMsg::MergeToogle);
         let register = self.view_register(registers, theme);
         let space = Space::new(Length::Units(35), Length::Units(0));

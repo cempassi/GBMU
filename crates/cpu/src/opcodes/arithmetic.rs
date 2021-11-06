@@ -1,7 +1,7 @@
 use super::decode::{Decode, Decoder};
 use crate::futures::{Operation, Set};
 use crate::registers::{Arithmetic as A, Bits8, Complement, IncDec};
-use crate::{Access, Cpu};
+use crate::Cpu;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use shared::Error;
 use std::fmt;
@@ -121,34 +121,34 @@ impl Decoder for Arithmetic {
 impl Arithmetic {
     pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         let cycles = match self {
-            Arithmetic::AAA => cpu.registers().borrow_mut().add(Bits8::A, false),
-            Arithmetic::AAB => cpu.registers().borrow_mut().add(Bits8::B, false),
-            Arithmetic::AAC => cpu.registers().borrow_mut().add(Bits8::C, false),
-            Arithmetic::AAD => cpu.registers().borrow_mut().add(Bits8::D, false),
-            Arithmetic::AAE => cpu.registers().borrow_mut().add(Bits8::E, false),
-            Arithmetic::AAH => cpu.registers().borrow_mut().add(Bits8::H, false),
-            Arithmetic::AAL => cpu.registers().borrow_mut().add(Bits8::L, false),
-            Arithmetic::AAcA => cpu.registers().borrow_mut().add(Bits8::A, true),
-            Arithmetic::AAcB => cpu.registers().borrow_mut().add(Bits8::B, true),
-            Arithmetic::AAcC => cpu.registers().borrow_mut().add(Bits8::C, true),
-            Arithmetic::AAcD => cpu.registers().borrow_mut().add(Bits8::D, true),
-            Arithmetic::AAcE => cpu.registers().borrow_mut().add(Bits8::E, true),
-            Arithmetic::AAcH => cpu.registers().borrow_mut().add(Bits8::H, true),
-            Arithmetic::AAcL => cpu.registers().borrow_mut().add(Bits8::L, true),
-            Arithmetic::SAB => cpu.registers().borrow_mut().sub(Bits8::B, false),
-            Arithmetic::SAC => cpu.registers().borrow_mut().sub(Bits8::C, false),
-            Arithmetic::SAD => cpu.registers().borrow_mut().sub(Bits8::D, false),
-            Arithmetic::SAE => cpu.registers().borrow_mut().sub(Bits8::E, false),
-            Arithmetic::SAH => cpu.registers().borrow_mut().sub(Bits8::H, false),
-            Arithmetic::SAL => cpu.registers().borrow_mut().sub(Bits8::L, false),
-            Arithmetic::SAA => cpu.registers().borrow_mut().sub(Bits8::A, false),
-            Arithmetic::SAcB => cpu.registers().borrow_mut().sub(Bits8::B, true),
-            Arithmetic::SAcC => cpu.registers().borrow_mut().sub(Bits8::C, true),
-            Arithmetic::SAcD => cpu.registers().borrow_mut().sub(Bits8::D, true),
-            Arithmetic::SAcE => cpu.registers().borrow_mut().sub(Bits8::E, true),
-            Arithmetic::SAcH => cpu.registers().borrow_mut().sub(Bits8::H, true),
-            Arithmetic::SAcL => cpu.registers().borrow_mut().sub(Bits8::L, true),
-            Arithmetic::SAcA => cpu.registers().borrow_mut().sub(Bits8::A, true),
+            Arithmetic::AAA => cpu.borrow_mut().registers.add(Bits8::A, false),
+            Arithmetic::AAB => cpu.borrow_mut().registers.add(Bits8::B, false),
+            Arithmetic::AAC => cpu.borrow_mut().registers.add(Bits8::C, false),
+            Arithmetic::AAD => cpu.borrow_mut().registers.add(Bits8::D, false),
+            Arithmetic::AAE => cpu.borrow_mut().registers.add(Bits8::E, false),
+            Arithmetic::AAH => cpu.borrow_mut().registers.add(Bits8::H, false),
+            Arithmetic::AAL => cpu.borrow_mut().registers.add(Bits8::L, false),
+            Arithmetic::AAcA => cpu.borrow_mut().registers.add(Bits8::A, true),
+            Arithmetic::AAcB => cpu.borrow_mut().registers.add(Bits8::B, true),
+            Arithmetic::AAcC => cpu.borrow_mut().registers.add(Bits8::C, true),
+            Arithmetic::AAcD => cpu.borrow_mut().registers.add(Bits8::D, true),
+            Arithmetic::AAcE => cpu.borrow_mut().registers.add(Bits8::E, true),
+            Arithmetic::AAcH => cpu.borrow_mut().registers.add(Bits8::H, true),
+            Arithmetic::AAcL => cpu.borrow_mut().registers.add(Bits8::L, true),
+            Arithmetic::SAB => cpu.borrow_mut().registers.sub(Bits8::B, false),
+            Arithmetic::SAC => cpu.borrow_mut().registers.sub(Bits8::C, false),
+            Arithmetic::SAD => cpu.borrow_mut().registers.sub(Bits8::D, false),
+            Arithmetic::SAE => cpu.borrow_mut().registers.sub(Bits8::E, false),
+            Arithmetic::SAH => cpu.borrow_mut().registers.sub(Bits8::H, false),
+            Arithmetic::SAL => cpu.borrow_mut().registers.sub(Bits8::L, false),
+            Arithmetic::SAA => cpu.borrow_mut().registers.sub(Bits8::A, false),
+            Arithmetic::SAcB => cpu.borrow_mut().registers.sub(Bits8::B, true),
+            Arithmetic::SAcC => cpu.borrow_mut().registers.sub(Bits8::C, true),
+            Arithmetic::SAcD => cpu.borrow_mut().registers.sub(Bits8::D, true),
+            Arithmetic::SAcE => cpu.borrow_mut().registers.sub(Bits8::E, true),
+            Arithmetic::SAcH => cpu.borrow_mut().registers.sub(Bits8::H, true),
+            Arithmetic::SAcL => cpu.borrow_mut().registers.sub(Bits8::L, true),
+            Arithmetic::SAcA => cpu.borrow_mut().registers.sub(Bits8::A, true),
             Arithmetic::AAc8b => Set::CalculNext(Operation::AddCarry).run(cpu).await?,
             Arithmetic::AA8b => Set::CalculNext(Operation::AddNoCarry).run(cpu).await?,
             Arithmetic::AAHL => Set::CalculHL(Operation::AddNoCarry).run(cpu).await?,
@@ -157,26 +157,26 @@ impl Arithmetic {
             Arithmetic::SAcHL => Set::CalculHL(Operation::SubCarry).run(cpu).await?,
             Arithmetic::SA8b => Set::CalculNext(Operation::SubNoCarry).run(cpu).await?,
             Arithmetic::SAc8b => Set::CalculNext(Operation::SubCarry).run(cpu).await?,
-            Arithmetic::IncB => cpu.registers().borrow_mut().increase(Bits8::B, 1),
-            Arithmetic::IncD => cpu.registers().borrow_mut().increase(Bits8::D, 1),
-            Arithmetic::IncH => cpu.registers().borrow_mut().increase(Bits8::H, 1),
+            Arithmetic::IncB => cpu.borrow_mut().registers.increase(Bits8::B, 1),
+            Arithmetic::IncD => cpu.borrow_mut().registers.increase(Bits8::D, 1),
+            Arithmetic::IncH => cpu.borrow_mut().registers.increase(Bits8::H, 1),
             Arithmetic::IncHL => Set::CalculHL(Operation::Increase).run(cpu).await?,
-            Arithmetic::DecB => cpu.registers().borrow_mut().decrease(Bits8::B, 1),
-            Arithmetic::DecD => cpu.registers().borrow_mut().decrease(Bits8::D, 1),
-            Arithmetic::DecH => cpu.registers().borrow_mut().decrease(Bits8::H, 1),
+            Arithmetic::DecB => cpu.borrow_mut().registers.decrease(Bits8::B, 1),
+            Arithmetic::DecD => cpu.borrow_mut().registers.decrease(Bits8::D, 1),
+            Arithmetic::DecH => cpu.borrow_mut().registers.decrease(Bits8::H, 1),
             Arithmetic::DecHL => Set::CalculHL(Operation::Decrease).run(cpu).await?,
-            Arithmetic::IncC => cpu.registers().borrow_mut().increase(Bits8::C, 1),
-            Arithmetic::IncE => cpu.registers().borrow_mut().increase(Bits8::E, 1),
-            Arithmetic::IncL => cpu.registers().borrow_mut().increase(Bits8::L, 1),
-            Arithmetic::IncA => cpu.registers().borrow_mut().increase(Bits8::A, 1),
-            Arithmetic::DecC => cpu.registers().borrow_mut().decrease(Bits8::C, 1),
-            Arithmetic::DecE => cpu.registers().borrow_mut().decrease(Bits8::E, 1),
-            Arithmetic::DecL => cpu.registers().borrow_mut().decrease(Bits8::L, 1),
-            Arithmetic::DecA => cpu.registers().borrow_mut().decrease(Bits8::A, 1),
-            Arithmetic::DAA => cpu.registers().borrow_mut().daa(),
-            Arithmetic::SCF => cpu.registers().borrow_mut().set_carry(),
-            Arithmetic::CPL => cpu.registers().borrow_mut().complement_a(),
-            Arithmetic::CCF => cpu.registers().borrow_mut().complement_carry(),
+            Arithmetic::IncC => cpu.borrow_mut().registers.increase(Bits8::C, 1),
+            Arithmetic::IncE => cpu.borrow_mut().registers.increase(Bits8::E, 1),
+            Arithmetic::IncL => cpu.borrow_mut().registers.increase(Bits8::L, 1),
+            Arithmetic::IncA => cpu.borrow_mut().registers.increase(Bits8::A, 1),
+            Arithmetic::DecC => cpu.borrow_mut().registers.decrease(Bits8::C, 1),
+            Arithmetic::DecE => cpu.borrow_mut().registers.decrease(Bits8::E, 1),
+            Arithmetic::DecL => cpu.borrow_mut().registers.decrease(Bits8::L, 1),
+            Arithmetic::DecA => cpu.borrow_mut().registers.decrease(Bits8::A, 1),
+            Arithmetic::DAA => cpu.borrow_mut().registers.daa(),
+            Arithmetic::SCF => cpu.borrow_mut().registers.set_carry(),
+            Arithmetic::CPL => cpu.borrow_mut().registers.complement_a(),
+            Arithmetic::CCF => cpu.borrow_mut().registers.complement_carry(),
         };
         Ok(cycles)
     }
@@ -256,13 +256,13 @@ mod test_arithmetic {
         let cpu = Cpu::default();
         let instruction = Arithmetic::AA8b;
 
-        cpu.registers().borrow_mut().set(Bits8::A, 0x4f);
-        cpu.registers().borrow_mut().set(Flag::C, true);
+        cpu.borrow_mut().registers.set(Bits8::A, 0x4f);
+        cpu.borrow_mut().registers.set(Flag::C, true);
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x80);
-        assert!(cpu.registers().borrow().get(Flag::H));
+        assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0x80);
+        assert!(cpu.borrow_mut().registers.get(Flag::H));
     }
 
     #[test]
@@ -270,12 +270,12 @@ mod test_arithmetic {
         let cpu = Cpu::default();
         let instruction = Arithmetic::AAHL;
 
-        cpu.registers().borrow_mut().set(Bits8::A, 0xf8);
-        cpu.registers().borrow_mut().set(Bits16::HL, 0xc008);
-        cpu.registers().borrow_mut().set(Flag::C, true);
+        cpu.borrow_mut().registers.set(Bits8::A, 0xf8);
+        cpu.borrow_mut().registers.set(Bits16::HL, 0xc008);
+        cpu.borrow_mut().registers.set(Flag::C, true);
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
-        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0xf8);
+        assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0xf8);
     }
 
     #[test]
@@ -283,12 +283,12 @@ mod test_arithmetic {
         let cpu = Cpu::default();
         let instruction = Arithmetic::AAB;
 
-        cpu.registers().borrow_mut().set(Flag::C, true);
+        cpu.borrow_mut().registers.set(Flag::C, true);
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x00);
-        assert!(cpu.registers().borrow().get(Flag::Z));
+        assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0x00);
+        assert!(cpu.borrow_mut().registers.get(Flag::Z));
     }
 
     #[test]
@@ -296,14 +296,14 @@ mod test_arithmetic {
         let cpu = Cpu::default();
         let instruction = Arithmetic::AAc8b;
 
-        cpu.registers().borrow_mut().set(Bits8::A, 0x4f);
-        cpu.registers().borrow_mut().set(Bits16::PC, 0xc000);
-        cpu.registers().borrow_mut().set(Flag::C, true);
+        cpu.borrow_mut().registers.set(Bits8::A, 0x4f);
+        cpu.borrow_mut().registers.set(Bits16::PC, 0xc000);
+        cpu.borrow_mut().registers.set(Flag::C, true);
         cpu.memory().borrow_mut().set_u8(0xc000, 0x2F).unwrap();
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x7F);
+        assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0x7F);
     }
 
     #[test]
@@ -311,14 +311,14 @@ mod test_arithmetic {
         let cpu = Cpu::default();
         let instruction = Arithmetic::AAcHL;
 
-        cpu.registers().borrow_mut().set(Bits8::A, 0x2a);
-        cpu.registers().borrow_mut().set(Bits16::HL, 0xc008);
-        cpu.registers().borrow_mut().set(Flag::C, true);
+        cpu.borrow_mut().registers.set(Bits8::A, 0x2a);
+        cpu.borrow_mut().registers.set(Bits16::HL, 0xc008);
+        cpu.borrow_mut().registers.set(Flag::C, true);
         cpu.memory().borrow_mut().set_u8(0xc008, 0x2d).unwrap();
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x58);
+        assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0x58);
     }
 
     #[test]
@@ -326,13 +326,13 @@ mod test_arithmetic {
         let cpu = Cpu::default();
         let instruction = Arithmetic::AAcC;
 
-        cpu.registers().borrow_mut().set(Bits8::A, 0x2B);
-        cpu.registers().borrow_mut().set(Bits8::C, 0xAA);
-        cpu.registers().borrow_mut().set(Flag::C, true);
+        cpu.borrow_mut().registers.set(Bits8::A, 0x2B);
+        cpu.borrow_mut().registers.set(Bits8::C, 0xAA);
+        cpu.borrow_mut().registers.set(Flag::C, true);
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0xD6);
+        assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0xD6);
     }
 
     #[test]
@@ -340,14 +340,14 @@ mod test_arithmetic {
         let cpu = Cpu::default();
         let instruction = Arithmetic::SA8b;
 
-        cpu.registers().borrow_mut().set(Bits8::A, 0x4f);
-        cpu.registers().borrow_mut().set(Bits16::PC, 0xc000);
-        cpu.registers().borrow_mut().set(Flag::C, true);
+        cpu.borrow_mut().registers.set(Bits8::A, 0x4f);
+        cpu.borrow_mut().registers.set(Bits16::PC, 0xc000);
+        cpu.borrow_mut().registers.set(Flag::C, true);
         cpu.memory().borrow_mut().set_u8(0xc000, 0x2F).unwrap();
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x20);
+        assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0x20);
     }
 
     #[test]
@@ -355,14 +355,14 @@ mod test_arithmetic {
         let cpu = Cpu::default();
         let instruction = Arithmetic::SAHL;
 
-        cpu.registers().borrow_mut().set(Bits8::A, 0xf8);
-        cpu.registers().borrow_mut().set(Flag::C, true);
-        cpu.registers().borrow_mut().set(Bits16::HL, 0xc008);
+        cpu.borrow_mut().registers.set(Bits8::A, 0xf8);
+        cpu.borrow_mut().registers.set(Flag::C, true);
+        cpu.borrow_mut().registers.set(Bits16::HL, 0xc008);
         cpu.memory().borrow_mut().set_u8(0xc008, 0xaa).unwrap();
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x4e);
+        assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0x4e);
     }
 
     #[test]
@@ -370,11 +370,11 @@ mod test_arithmetic {
         let cpu = Cpu::default();
         let instruction = Arithmetic::SAB;
 
-        cpu.registers().borrow_mut().set(Flag::C, true);
+        cpu.borrow_mut().registers.set(Flag::C, true);
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
-        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x00);
-        assert!(cpu.registers().borrow().get(Flag::Z));
+        assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0x00);
+        assert!(cpu.borrow_mut().registers.get(Flag::Z));
     }
 
     #[test]
@@ -382,14 +382,14 @@ mod test_arithmetic {
         let cpu = Cpu::default();
         let instruction = Arithmetic::SAcHL;
 
-        cpu.registers().borrow_mut().set(Bits8::A, 0xf8);
-        cpu.registers().borrow_mut().set(Flag::C, true);
-        cpu.registers().borrow_mut().set(Bits16::HL, 0xc008);
+        cpu.borrow_mut().registers.set(Bits8::A, 0xf8);
+        cpu.borrow_mut().registers.set(Flag::C, true);
+        cpu.borrow_mut().registers.set(Bits16::HL, 0xc008);
         cpu.memory().borrow_mut().set_u8(0xc008, 0xaa).unwrap();
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x4d);
+        assert_eq!(cpu.borrow().registers.get(Bits8::A), 0x4d);
     }
 
     #[test]
@@ -397,12 +397,12 @@ mod test_arithmetic {
         let cpu = Cpu::default();
         let instruction = Arithmetic::SAcL;
 
-        cpu.registers().borrow_mut().set(Bits8::A, 0xF8);
-        cpu.registers().borrow_mut().set(Bits8::L, 0xAB);
-        cpu.registers().borrow_mut().set(Flag::C, true);
+        cpu.borrow_mut().registers.set(Bits8::A, 0xF8);
+        cpu.borrow_mut().registers.set(Bits8::L, 0xAB);
+        cpu.borrow_mut().registers.set(Flag::C, true);
 
         executor::execute(Box::pin(instruction.exec(cpu.clone())));
 
-        assert_eq!(cpu.registers().borrow().get(Bits8::A), 0x4C);
+        assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0x4C);
     }
 }

@@ -54,18 +54,18 @@ impl Split for Bits16 {
 }
 
 pub trait View {
-    fn get_data(&self, registers: Registers) -> String;
+    fn get_data(&self, registers: &Registers) -> String;
     fn get_name(&self) -> String;
 
-    fn view(&self, registers: Registers, theme: Theme) -> Element<RegisterMsg, Renderer>;
+    fn view(&self, registers: &Registers, theme: Theme) -> Element<RegisterMsg, Renderer>;
 }
 
 impl View for Bits8 {
-    fn get_data(&self, registers: Registers) -> String {
+    fn get_data(&self, registers: &Registers) -> String {
         if *self == Bits8::F {
-            format!("{:04b}", registers.borrow().get(*self))
+            format!("{:04b}", registers.get(*self))
         } else {
-            format!("{:#x}", registers.borrow().get(*self))
+            format!("{:#x}", registers.get(*self))
         }
     }
 
@@ -73,7 +73,7 @@ impl View for Bits8 {
         format!("{:?}", self)
     }
 
-    fn view(&self, registers: Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
+    fn view(&self, registers: &Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
         let name = Text::new(self.get_name())
             .font(fonts::HASKLIG_BOLD)
             .size(20);
@@ -99,15 +99,15 @@ impl View for Bits8 {
 }
 
 impl View for Bits16 {
-    fn get_data(&self, registers: Registers) -> String {
-        format!("{:#x}", registers.borrow().get(*self))
+    fn get_data(&self, registers: &Registers) -> String {
+        format!("{:#x}", registers.get(*self))
     }
 
     fn get_name(&self) -> String {
         format!("{:?}", self)
     }
 
-    fn view(&self, registers: Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
+    fn view(&self, registers: &Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
         let name = Text::new(self.get_name())
             .font(fonts::HASKLIG_BOLD)
             .size(20);

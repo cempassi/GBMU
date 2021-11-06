@@ -36,10 +36,10 @@ pub async fn interrupt_handler(cpu: Cpu) -> Result<u8, Error> {
 
     let address = cpu.memory().borrow_mut().get_interrupt_address(requested)?;
 
-    cpu.registers().borrow_mut().decrease(Bits16::SP, 2);
-    let pc = cpu.registers().borrow().pc;
+    cpu.borrow_mut().registers.decrease(Bits16::SP, 2);
+    let pc = cpu.borrow().registers.pc;
 
-    cpu.registers().borrow_mut().pc = address;
+    cpu.borrow_mut().registers.pc = address;
     let cycles = Set::Bits16At(Bits16::SP, pc).run(cpu).await?;
 
     Ok(cycles)
