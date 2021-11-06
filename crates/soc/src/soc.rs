@@ -5,7 +5,6 @@ use std::fs;
 use std::task::Context;
 
 use crate::header::Header;
-use cpu::Registers;
 use memory;
 
 const ROM_START: usize = 0x150;
@@ -42,12 +41,12 @@ impl TryFrom<&str> for SOC {
 }
 
 impl SOC {
-    pub fn get_cpu_registers(&self) -> Registers {
+    pub fn get_ppu(&self) -> ppu::Ppu {
         self.processors
             .iter()
             .find_map(|x| {
-                if let Processor::Cpu(cpu, _) = x {
-                    Some(cpu.borrow().get_registers())
+                if let Processor::Ppu(ppu, _) = x {
+                    Some(ppu.clone())
                 } else {
                     None
                 }
@@ -55,12 +54,12 @@ impl SOC {
             .unwrap()
     }
 
-    pub fn get_ppu(&self) -> ppu::Ppu {
+    pub fn get_cpu(&self) -> cpu::Cpu {
         self.processors
             .iter()
             .find_map(|x| {
-                if let Processor::Ppu(ppu, _) = x {
-                    Some(ppu.clone())
+                if let Processor::Cpu(cpu, _) = x {
+                    Some(cpu.clone())
                 } else {
                     None
                 }
