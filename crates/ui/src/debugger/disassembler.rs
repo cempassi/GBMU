@@ -4,8 +4,6 @@ use iced_graphics::Alignment;
 use iced_wgpu::{Column, Renderer};
 use iced_winit::Element;
 
-use cpu::Registers;
-use memory::Memory;
 mod conversion;
 mod disass;
 mod header;
@@ -16,8 +14,7 @@ use instruction::Instruction;
 
 pub struct Disassembler {
     header: Header,
-    registers: Registers,
-    memory: Memory,
+    cpu: cpu::Cpu,
     instructions: Vec<Option<Instruction>>,
     next: u16,
     is_jump: bool,
@@ -30,16 +27,15 @@ pub enum DisassMsg {
 }
 
 impl Disassembler {
-    pub fn new(registers: Registers, memory: Memory) -> Self {
+    pub fn new(cpu: cpu::Cpu) -> Self {
         let instructions = Vec::new();
         let header = Header::new();
         let next = 0;
         let is_jump = false;
 
         let mut disassembler = Self {
+            cpu,
             header,
-            registers,
-            memory,
             instructions,
             next,
             is_jump,
@@ -49,7 +45,7 @@ impl Disassembler {
     }
 
     fn check_pc(&mut self, message: DisassMsg) -> Result<u16, Error> {
-        let pc = self.registers.borrow().pc;
+        let pc = self.cpu.borrow().registers.pc;
         if self.is_jump {
             self.is_jump = false;
             Ok(pc)
@@ -66,7 +62,9 @@ impl Disassembler {
         let mut pc = self.check_pc(message)?;
         self.instructions.clear();
         for id in 0..5 {
-            if let Ok(instruction) = Instruction::try_new(pc, &self.memory, false) {
+            if let Ok(instruction) =
+                Instruction::try_new(pc, &self.cpu.borrow().get_memory(), false)
+            {
                 pc += instruction.fetched();
                 if id == 0 {
                     if instruction.is_jump {

@@ -10,7 +10,7 @@ use std::convert::From;
 
 pub struct UserInterface {
     theme: Theme,
-    cpu_registers: Cpu,
+    cpu: Cpu,
     ppu: Ppu,
     memory: Memory,
     menu: Menu,
@@ -19,16 +19,16 @@ pub struct UserInterface {
 
 impl From<SOC> for UserInterface {
     fn from(soc: SOC) -> UserInterface {
-        let cpu_registers = soc.borrow().get_cpu_registers();
-        let memory = soc.borrow().get_memory();
         let runner = soc.borrow().get_runner();
         let ppu = soc.borrow().get_ppu();
+        let cpu = soc.borrow().get_cpu();
+        let memory = cpu.borrow().get_memory();
         Self {
             theme: Theme::default(),
-            cpu_registers: Cpu::new(cpu_registers.clone()),
-            memory: <Memory as From<memory::Memory>>::from(memory.clone()),
+            cpu: Cpu::new(cpu.clone()),
+            memory: <Memory as From<memory::Memory>>::from(memory),
             menu: Menu::new(runner),
-            disassembler: Disassembler::new(cpu_registers, memory),
+            disassembler: Disassembler::new(cpu),
             ppu: Ppu::new(ppu),
         }
     }
@@ -63,7 +63,8 @@ impl From<MenuMsg> for Message {
 impl UserInterface {
     pub fn refresh(&mut self) {
         let _ = self.disassembler.update(DisassMsg::Reload);
-        self.ppu.update(PpuMsg::Refresh)
+        self.ppu.update(PpuMsg::Refresh);
+        self.cpu.update(CpuMsg::Refresh)
     }
 }
 
@@ -74,7 +75,7 @@ impl Program for UserInterface {
     fn update(&mut self, message: Message) -> Command<Self::Message> {
         match message {
             Message::Registers(message) => {
-                self.cpu_registers.update(message);
+                self.cpu.update(message);
             }
             Message::Memory(message) => {
                 self.memory.update(message);
@@ -104,7 +105,7 @@ impl Program for UserInterface {
             .view()
             .map(|message| Message::Disassembler(message));
         let cpu_registers = self
-            .cpu_registers
+            .cpu
             .view(self.theme)
             .map(|message| Message::Registers(message));
         let ppu = self
