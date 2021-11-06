@@ -1,10 +1,10 @@
-pub use crate::interface::Registers;
+use crate::registers::Registers;
 use memory::Memory;
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub struct Cpu {
     memory: Memory,
-    registers: Registers,
+    pub registers: Registers,
     pub(crate) halt: bool,
     pub(crate) stop: bool,
 }
@@ -21,10 +21,6 @@ impl Cpu {
 
     pub fn get_memory(&self) -> Memory {
         self.memory.clone()
-    }
-
-    pub fn get_registers(&self) -> Registers {
-        self.registers.clone()
     }
 
     pub fn interrupt_enabled(&self) -> bool {

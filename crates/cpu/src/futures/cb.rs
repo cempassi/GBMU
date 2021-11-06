@@ -1,7 +1,7 @@
 use super::{AsyncGet, Get, Set};
 use crate::registers::{Bits16, Bitwise, Rotation, Shift};
+use crate::Cpu;
 use crate::Registers;
-use crate::{Access, Cpu};
 use shared::Error;
 
 /// RL = Rotate Left
@@ -21,8 +21,7 @@ pub enum Operation {
     Bitset(u8),
 }
 
-fn calculate(registers: Registers, data: u8, operation: Operation) -> u8 {
-    let mut registers = registers.borrow_mut();
+fn calculate(registers: &mut Registers, data: u8, operation: Operation) -> u8 {
     match operation {
         Operation::RLCarry => registers.left_carry(data),
         Operation::RLNOCarry => registers.left_nocarry(data),
@@ -39,12 +38,12 @@ fn calculate(registers: Registers, data: u8, operation: Operation) -> u8 {
 
 pub(crate) async fn hl(cpu: Cpu, operation: Operation) -> Result<u8, Error> {
     let (data, cycles) = Get::BitsAt(Bits16::HL).get(cpu.clone()).await?;
-    let data = calculate(cpu.registers(), data, operation);
+    let data = calculate(&mut cpu.borrow_mut().registers, data, operation);
     Ok(Set::Bits8At(Bits16::HL, data).run(cpu).await? + cycles)
 }
 
 pub(crate) async fn test(cpu: Cpu, bit: u8) -> Result<u8, Error> {
     let (data, cycles): (u8, u8) = Get::BitsAt(Bits16::HL).get(cpu.clone()).await?;
-    cpu.registers().borrow_mut().test(data, bit);
+    cpu.borrow_mut().registers.test(data, bit);
     Ok(cycles)
 }
