@@ -1,12 +1,8 @@
 use super::mode::Mode;
-use super::processor::Finished;
-use std::cell::RefCell;
-use std::rc::Rc;
-
-pub type Runner = Rc<RefCell<Cycle>>;
+use shared::Finished;
 
 #[derive(Debug, Default)]
-pub struct Cycle {
+pub struct Status {
     mode: Mode,
     pub(crate) redraw: bool,
     lines: u32,
@@ -15,7 +11,7 @@ pub struct Cycle {
     last_ppu: u8,
 }
 
-impl Cycle {
+impl Status {
     pub fn check_redraw(&mut self, status: &mut Vec<Finished>) {
         for status in status {
             match status {
@@ -24,7 +20,12 @@ impl Cycle {
                     self.last_cpu = *cycles;
                     self.redraw = true;
                 }
-                Finished::Ppu(cycles) if self.mode == Mode::Ppu => {
+                Finished::Line(cycles) if self.mode == Mode::Ppu => {
+                    self.mode.update_processing();
+                    self.last_ppu = *cycles;
+                    self.redraw = true;
+                }
+                Finished::Frame(cycles) if self.mode == Mode::Ppu => {
                     self.mode.update_processing();
                     self.last_ppu = *cycles;
                     self.redraw = true;
