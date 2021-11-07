@@ -1,90 +1,111 @@
-use super::mode::Mode;
-use super::processor::Finished;
-use std::cell::RefCell;
-use std::rc::Rc;
+use cpu::{Cpu, Make, Run as R};
+use memory::Memory;
+use ppu::{Ppu, Run};
+use shared::Error;
+use std::future::Future;
+use std::pin::Pin;
+use std::task::{Context, Poll};
 
-pub type Runner = Rc<RefCell<Cycle>>;
+pub type State = Option<Pin<Box<dyn Future<Output = Result<u8, Error>>>>>;
 
-#[derive(Debug, Default)]
-pub struct Cycle {
-    mode: Mode,
-    pub(crate) redraw: bool,
-    lines: u32,
-    ticks: u32,
-    last_cpu: u8,
-    last_ppu: u8,
+pub enum Processor {
+    Ppu(Ppu, State),
+    Cpu(Cpu, State),
 }
 
-impl Cycle {
-    pub fn check_redraw(&mut self, status: &mut Vec<Finished>) {
-        for status in status {
-            match status {
-                Finished::Cpu(cycles) if self.mode == Mode::Cpu => {
-                    self.mode.update_processing();
-                    self.last_cpu = *cycles;
-                    self.redraw = true;
-                }
-                Finished::Ppu(cycles) if self.mode == Mode::Ppu => {
-                    self.mode.update_processing();
-                    self.last_ppu = *cycles;
-                    self.redraw = true;
-                }
-                Finished::Error(_) => self.redraw = true,
-                Finished::Nope if self.mode.is_processing() => (),
-                Finished::Nope if !self.redraw => self.redraw = self.mode.check_redraw(),
-                _ => (),
+pub enum Finished {
+    Cpu(u8),
+    Ppu(u8),
+    Error(Error),
+    Nope,
+}
+
+impl Finished {
+    pub fn ppu(result: Result<u8, Error>) -> Self {
+        match result {
+            Ok(cycles) => {
+                println!("PPU finised, cycles: {}", cycles);
+                Self::Ppu(cycles)
+            }
+            Err(error) => Self::Error(error),
+        }
+    }
+    pub fn cpu(result: Result<u8, Error>) -> Self {
+        match result {
+            Ok(cycles) => {
+                //println!("CPU finished, cycles: {}", cycles);
+                Self::Cpu(cycles)
+            }
+            Err(error) => {
+                println!("CPU ERROR, error: {}", error);
+                Self::Error(error)
             }
         }
     }
+}
 
-    pub fn step(&mut self) {
-        if let Mode::Line(ticks) = self.mode {
-            println!("Processing line, currently at tick {} on 456", ticks);
-            if self.mode.increase() {
-                self.lines += 1;
-                self.ticks = 0;
+impl Processor {
+    pub fn init(memory: Memory) -> Vec<Self> {
+        let ppu = memory.borrow().get_ppu();
+        let ppu = Processor::Ppu(ppu, None);
+        let cpu = Processor::Cpu(Cpu::make(memory), None);
+        vec![cpu, ppu]
+    }
+
+    pub fn run(&mut self, context: &mut Context) -> Finished {
+        match self {
+            Processor::Ppu(ppu, ref mut state) => {
+                if let Some(mut task) = state.take() {
+                    match task.as_mut().poll(context) {
+                        Poll::Ready(status) => {
+                            state.replace(Box::pin(ppu.clone().run()));
+                            Finished::ppu(status)
+                        }
+                        Poll::Pending => {
+                            state.replace(task);
+                            Finished::Nope
+                        }
+                    }
+                } else {
+                    let mut task = Box::pin(ppu.clone().run());
+                    match task.as_mut().poll(context) {
+                        Poll::Pending => {
+                            state.replace(task);
+                            Finished::Nope
+                        }
+                        Poll::Ready(status) => {
+                            state.replace(Box::pin(ppu.clone().run()));
+                            Finished::ppu(status)
+                        }
+                    }
+                }
             }
-        } else if let Mode::Frame(lines) = self.mode {
-            println!("Processing frame, currently at line {} on 120", lines);
-            if self.mode.increase() {
-                self.lines = 0;
-            }
-        } else {
-            self.ticks += 1;
-            if Mode::is_eol(self.ticks) {
-                self.lines += 1;
-                self.ticks = 0;
-            }
-            if Mode::is_eof(self.ticks) {
-                self.lines = 0;
-                self.ticks = 0;
+            Processor::Cpu(cpu, ref mut state) => {
+                if let Some(mut task) = state.take() {
+                    match task.as_mut().poll(context) {
+                        Poll::Ready(status) => {
+                            state.replace(Box::pin(cpu.clone().run()));
+                            Finished::cpu(status)
+                        }
+                        Poll::Pending => {
+                            state.replace(task);
+                            Finished::Nope
+                        }
+                    }
+                } else {
+                    let mut task = Box::pin(cpu.clone().run());
+                    match task.as_mut().poll(context) {
+                        Poll::Pending => {
+                            state.replace(task);
+                            Finished::Nope
+                        }
+                        Poll::Ready(status) => {
+                            state.replace(Box::pin(cpu.clone().run()));
+                            Finished::cpu(status)
+                        }
+                    }
+                }
             }
         }
-    }
-
-    pub fn is_idle(&self) -> bool {
-        self.mode == Mode::Idle
-    }
-
-    pub fn tick(&mut self) {
-        self.mode = Mode::Tick;
-    }
-
-    pub fn line(&mut self) {
-        self.mode = Mode::Line(self.ticks);
-        self.ticks = 0;
-    }
-
-    pub fn frame(&mut self) {
-        self.mode = Mode::Line(self.lines);
-        self.lines = 0;
-    }
-
-    pub fn ppu(&mut self) {
-        self.mode = Mode::Ppu;
-    }
-
-    pub fn cpu(&mut self) {
-        self.mode = Mode::Cpu;
     }
 }

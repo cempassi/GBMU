@@ -1,9 +1,10 @@
-use super::{AsyncGet, Get};
+use super::{AsyncGet, Get, Set};
 use crate::registers::{Arithmetic, Bits16, IncDec, Logical as L};
 use crate::Cpu;
 use crate::Registers;
 use shared::Error;
 
+#[derive(PartialEq, Eq)]
 pub enum Operation {
     AddCarry,
     SubCarry,
@@ -33,8 +34,14 @@ fn calculate(registers: &mut Registers, data: u8, operation: Operation) -> u8 {
 }
 
 pub(crate) async fn hl(cpu: Cpu, operation: Operation) -> Result<u8, Error> {
-    let (data, cycles) = Get::BitsAt(Bits16::HL).get(cpu.clone()).await?;
-    Ok(calculate(&mut cpu.borrow_mut().registers, data, operation) + cycles)
+    let (data, mut cycles) = Get::BitsAt(Bits16::HL).get(cpu.clone()).await?;
+    if operation == Operation::Increase || operation == Operation::Decrease {
+        let data = calculate(&mut cpu.borrow_mut().registers, data, operation);
+        cycles += Set::Bits8At(Bits16::HL, data).run(cpu).await?;
+        Ok(cycles)
+    } else {
+        Ok(calculate(&mut cpu.borrow_mut().registers, data, operation) + cycles)
+    }
 }
 
 pub(crate) async fn next(cpu: Cpu, operation: Operation) -> Result<u8, Error> {
