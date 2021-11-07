@@ -7,7 +7,7 @@ use std::fmt;
 
 use super::decode::{Decode, Decoder};
 
-/// JP nn
+/// Jump nn
 /// Unconditional jump to the absolute address specified in the next 16-bits.
 /// Cycle: 16
 /// Bytes: 3
@@ -47,7 +47,6 @@ use super::decode::{Decode, Decoder};
 /// N - Unused
 /// H - Unused
 /// C - Unused
-
 #[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
@@ -223,7 +222,7 @@ mod test_jumps {
     #[test]
     fn test_jump_to_address_in_next_16bits_if_zero_false() {
         let src = 0xc000;
-        let expected = 0xc002;
+        let expected = 0xc050;
 
         let cpu = Cpu::default();
 
