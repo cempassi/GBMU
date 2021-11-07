@@ -68,7 +68,6 @@ async fn decode(cpu: Cpu, opcode: u8) -> Result<Decode, Error> {
 }
 
 pub async fn run(cpu: Cpu) -> Result<Finished, Error> {
-    println!("Running the cpu!");
     if cpu.borrow().interrupt_enabled() {
         match interrupt_handler(cpu.clone()).await {
             Err(Error::DisabledInterrupts) => (),

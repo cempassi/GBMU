@@ -35,18 +35,14 @@ impl Run for Ppu {
 }
 
 async fn run(ppu: Ppu) -> Result<Finished, Error> {
-    println!("Running the ppu!");
     if ppu.borrow_mut().registers.is_lower(lcd::Field::Ly, 144) {
         Oam::search(ppu.clone()).await;
-        let cycles = Pixel::transfert(ppu.clone()).start().await?;
-        println!("Finished pixel transfert, cycles: {}", cycles);
+        let _cycles = Pixel::transfert(ppu.clone()).start().await?;
         Blank::new(HBLANK).await;
         ppu.borrow_mut().registers.increase(lcd::Field::Ly);
-        let ly = ppu.borrow_mut().registers.coordinates.get(lcd::Field::Ly);
-        println!("Finished a Line, Ly: {}", ly);
+        let _ly = ppu.borrow_mut().registers.coordinates.get(lcd::Field::Ly);
         Ok(Finished::Line(42))
     } else {
-        println!("Finished a Frame!");
         ppu.borrow().raise_vblank();
         Blank::new(VBLANK).await;
         ppu.borrow_mut().registers.clear(lcd::Field::Ly);
