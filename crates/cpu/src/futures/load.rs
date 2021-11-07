@@ -72,11 +72,11 @@ pub async fn push(cpu: Cpu, area: Bits16) -> Result<u8, Error> {
 
 /// SP instructions take an extra 4 clocks to execute
 pub async fn pop(cpu: Cpu, area: Bits16) -> Result<u8, Error> {
-    let (_, delay) = cpu.memory().clone().get::<u8>(0xc00).await?;
+    //let (_, delay) = cpu.memory().clone().get::<u8>(0xc00).await?;
     let (data, cycles): (u16, u8) = Get::BitsAt(Bits16::SP).get(cpu.clone()).await?;
     cpu.borrow_mut().registers.set(area, data);
     cpu.borrow_mut().registers.increase(Bits16::SP, 2);
-    Ok(cycles + delay)
+    Ok(cycles)
 }
 
 pub async fn io_c(cpu: Cpu) -> Result<u8, Error> {
