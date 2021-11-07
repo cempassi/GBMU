@@ -78,7 +78,7 @@ impl Emulator {
                 self.pixels.resize_surface(size.width, size.height);
             }
             WindowEvent::CloseRequested => {
-                println!("Request to close on debugger");
+                println!("Request to close on Emulator");
                 *control_flow = ControlFlow::Exit;
             }
             WindowEvent::ModifiersChanged(new_modifiers) => {
@@ -92,61 +92,45 @@ impl Emulator {
     }
 
     pub fn update(&mut self) {
-        self.state.update(self.window.scale_factor());
+        self.state.update();
     }
 
     pub fn request_redraw(&mut self) {
-        self.state.update(self.window.scale_factor());
+        self.state.update();
         self.window.request_redraw();
     }
 
     pub fn redraw(&mut self, control_flow: &mut ControlFlow) {
         let ppu = self.soc.borrow().get_ppu();
-        let frame = self.pixels.get_frame();
-        ppu.borrow_mut().render(frame);
+        if ppu.borrow_mut().is_frame_ready() {
+            let frame = self.pixels.get_frame();
+            ppu.borrow_mut().render(frame);
+        }
 
         let render_result = self.pixels.render_with(|encoder, view, context| {
             let device = &context.device;
 
-            // // Clear the screen to white before drawing
-            // let _render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-            //     label: Some("Reset Screen"),
-            //     color_attachments: &[wgpu::RenderPassColorAttachment {
-            //         view,
-            //         resolve_target: None,
-            //         ops: wgpu::Operations {
-            //             load: wgpu::LoadOp::Clear(wgpu::Color {
-            //                 r: 1.0,
-            //                 g: 1.0,
-            //                 b: 1.0,
-            //                 a: 1.0,
-            //             }),
-            //             store: true,
-            //         },
-            //     }],
-            //     depth_stencil_attachment: None,
-            // });
-            // drop(_render_pass);
             context.scaling_renderer.render(encoder, view);
 
             let interaction = self
                 .state
                 .draw(encoder, view, device, &mut self.staging_belt);
+            self.staging_belt.finish();
 
             // Update the mouse cursor
             self.window.set_cursor_icon(mouse_interaction(interaction));
 
-            // And recall staging buffers
-            self.format_pool
-                .spawner()
-                .spawn(self.staging_belt.recall())
-                .expect("Recall staging buffers");
-
-            self.staging_belt.finish();
-            self.format_pool.run_until_stalled();
             Ok(())
         });
+        // Recall staging buffers
+        self.format_pool
+            .spawner()
+            .spawn(self.staging_belt.recall())
+            .expect("Recall staging buffers");
+
+        self.format_pool.run_until_stalled();
         if render_result.is_err() {
+            println!("I quited from here!!");
             *control_flow = ControlFlow::Exit;
         }
         // Then we submit the work

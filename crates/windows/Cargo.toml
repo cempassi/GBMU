@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 pixels = "0.7.0"
+cocoa = "0.24.0"
 iced_wgpu = {git = "https://github.com/hecrj/iced"}
 iced_winit = {git = "https://github.com/hecrj/iced"}
 ui = { path = "../ui" }
