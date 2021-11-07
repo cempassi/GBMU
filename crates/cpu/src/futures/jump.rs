@@ -141,18 +141,30 @@ async fn absolute(cpu: Cpu) -> Result<u8, Error> {
     Ok(cycles + delay)
 }
 
-/// TODO: Refacto les saut check, c'est incorrect!!!!
 async fn abs_check(cpu: Cpu, flag: Flag) -> Result<u8, Error> {
     let (address, cycles): (u16, u8) = Get::Next.get(cpu.clone()).await?;
-    cpu.borrow_mut().registers.absolute_check(address, flag);
-    Ok(cycles)
+    let delay = {
+        if cpu.borrow_mut().registers.absolute_check(address, flag) {
+            let (_, delay) = cpu.memory().get::<u8>(0xc00).await?;
+            delay
+        } else {
+            0
+        }
+    };
+    Ok(cycles + delay)
 }
 
-/// TODO: Refacto les saut check, c'est incorrect!!!!
 async fn abs_not(cpu: Cpu, flag: Flag) -> Result<u8, Error> {
     let (address, cycles): (u16, u8) = Get::Next.get(cpu.clone()).await?;
-    cpu.borrow_mut().registers.absolute_check(address, flag);
-    Ok(cycles)
+    let delay = {
+        if cpu.borrow_mut().registers.absolute_not(address, flag) {
+            let (_, delay) = cpu.memory().get::<u8>(0xc00).await?;
+            delay
+        } else {
+            0
+        }
+    };
+    Ok(cycles + delay)
 }
 
 // Vigilence sur la conversion en i8
@@ -163,20 +175,29 @@ async fn relative(cpu: Cpu) -> Result<u8, Error> {
     Ok(cycles + delay)
 }
 
-/// TODO: Refacto les saut check, c'est incorrect!!!!
 async fn rel_check(cpu: Cpu, flag: Flag) -> Result<u8, Error> {
-    let (offset, cycles): (u8, u8) = Get::Next.get(cpu.clone()).await?;
-    cpu.borrow_mut()
-        .registers
-        .relative_check(offset as i8, flag);
-    Ok(cycles)
+    let (data, cycles): (u8, u8) = Get::Next.get(cpu.clone()).await?;
+
+    let delay = {
+        if cpu.borrow_mut().registers.relative_check(data as i8, flag) {
+            let (_, delay) = cpu.memory().get::<u8>(0xc00).await?;
+            delay
+        } else {
+            0
+        }
+    };
+    Ok(cycles + delay)
 }
 
-/// TODO: Refacto les saut check, c'est incorrect!!!!
 async fn rel_not(cpu: Cpu, flag: Flag) -> Result<u8, Error> {
     let (offset, cycles): (u8, u8) = Get::Next.get(cpu.clone()).await?;
-    cpu.borrow_mut()
-        .registers
-        .relative_check(offset as i8, flag);
-    Ok(cycles)
+    let delay = {
+        if cpu.borrow_mut().registers.relative_not(offset as i8, flag) {
+            let (_, delay) = cpu.memory().get::<u8>(0xc00).await?;
+            delay
+        } else {
+            0
+        }
+    };
+    Ok(cycles + delay)
 }
