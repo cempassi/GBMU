@@ -33,11 +33,8 @@ impl Button {
             MenuMsg::Frame => {
                 self.status.borrow_mut().frame();
             }
-            MenuMsg::Ppu => {
-                self.status.borrow_mut().ppu();
-            }
-            MenuMsg::Cpu => {
-                self.status.borrow_mut().cpu();
+            MenuMsg::Instruction => {
+                self.status.borrow_mut().instruction();
             }
         }
     }

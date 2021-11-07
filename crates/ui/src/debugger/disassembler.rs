@@ -67,7 +67,7 @@ impl Disassembler {
             {
                 pc += instruction.fetched();
                 if id == 0 {
-                    instruction.get_cycle();
+                    //instruction.get_cycle();
                     if instruction.is_jump {
                         self.is_jump = true
                     };

@@ -15,21 +15,19 @@ pub enum MenuMsg {
     Tick,
     Line,
     Frame,
-    Cpu,
-    Ppu,
+    Instruction,
 }
 
 impl Menu {
     pub fn new(status: Status) -> Self {
         let tick = Button::new(status.clone(), MenuMsg::Tick);
+        let instruction = Button::new(status.clone(), MenuMsg::Instruction);
         let line = Button::new(status.clone(), MenuMsg::Line);
-        let frame = Button::new(status.clone(), MenuMsg::Frame);
-        let cpu = Button::new(status.clone(), MenuMsg::Cpu);
-        let ppu = Button::new(status, MenuMsg::Ppu);
+        let frame = Button::new(status, MenuMsg::Frame);
 
         Self {
-            left: vec![cpu, ppu],
-            right: vec![tick, line, frame],
+            left: vec![],
+            right: vec![frame, line, instruction, tick],
         }
     }
 
