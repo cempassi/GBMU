@@ -2,7 +2,7 @@ use crate::MemoryBus;
 use shared::Error;
 use std::convert::AsRef;
 
-const WRAM_SIZE: usize = 8192;
+const WRAM_SIZE: usize = 8193;
 
 #[derive(Debug)]
 pub struct Ram {

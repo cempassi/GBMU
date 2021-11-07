@@ -37,7 +37,7 @@ impl Future for Getter<u8> {
             },
             Cycle::Cpu(ref mut ticks) => {
                 *ticks += 1;
-                if *ticks == 3 {
+                if *ticks == 4 {
                     self.cycle = Cycle::Finished;
                 }
                 Poll::Pending
@@ -57,7 +57,7 @@ impl Future for Getter<u16> {
             },
             Cycle::Cpu(ref mut ticks) => {
                 *ticks += 1;
-                if *ticks == 7 {
+                if *ticks == 8 {
                     self.cycle = Cycle::Finished;
                 }
                 Poll::Pending

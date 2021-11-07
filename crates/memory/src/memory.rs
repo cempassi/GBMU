@@ -12,7 +12,7 @@ use crate::io::IO;
 use crate::mbc::default::RomDefault;
 use crate::ram::Ram;
 use crate::state;
-use ppu::{New as P, Ppu};
+use ppu::Ppu;
 use shared::Error;
 
 #[derive(Debug)]
@@ -31,7 +31,7 @@ impl Default for Memory {
     fn default() -> Self {
         let interrupts = Interrupts::default();
         let raisable = interrupts.get_raisable();
-        let ppu = <Ppu as P>::new(raisable);
+        let ppu = Ppu::new(raisable);
         Memory {
             state: state::Rom::Bios,
             bios: Rc::new(RefCell::new(Box::new(Bios::new()))),
@@ -175,9 +175,11 @@ impl Memory {
         let requested = interrupts.get_raisable();
 
         // Create memory spaces with fully-qualified syntax
-        let ppu = <Ppu as P>::new(requested);
+        let ppu = Ppu::new(requested);
 
         let io = IO::default();
+
+        // Init Hram
         let hram: Box<dyn MemoryBus> = Box::new(Ram::new(consts::HIGH_RAM_SIZE));
         let hram = Rc::new(RefCell::new(hram));
         Rc::new(RefCell::new(Self {
