@@ -7,7 +7,10 @@ edition = "2021"
 
 [dependencies]
 pixels = "0.7.0"
-iced_wgpu = {git = "https://github.com/hecrj/iced"}
-iced_winit = {git = "https://github.com/hecrj/iced"}
+iced_wgpu = {git = "https://github.com/hecrj/iced", rev = "65f690b07559a36fe8bfcba31edd851c5c286704"}
+iced_winit = {git = "https://github.com/hecrj/iced", rev = "65f690b07559a36fe8bfcba31edd851c5c286704"}
 ui = { path = "../ui" }
 soc = { path = "../soc" }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+cocoa = "0.24.0"

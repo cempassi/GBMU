@@ -1,8 +1,7 @@
-use super::processor::Finished;
-use crate::processor::Processor;
 use crate::runner::Runner;
+use crate::Status;
+use shared::Finished;
 use std::fs;
-use std::task::Context;
 
 use crate::header::Header;
 use memory;
@@ -14,8 +13,8 @@ const HEAD_LEN: usize = 0x100;
 
 /// The SOC is the GBMU async executor
 pub struct SOC {
-    runner: Runner,
-    processors: Vec<Processor>,
+    status: Status,
+    processor: Runner,
 }
 
 impl TryFrom<&str> for SOC {
@@ -33,87 +32,57 @@ impl TryFrom<&str> for SOC {
         println!("Header: {:#?}", header);
 
         let memory: memory::Memory = memory::memory::Memory::new(header.cartridge, rom);
-        let processors = Processor::init(memory);
-        let runner = Runner::default();
+        let processor = Runner::new(memory);
+        let runner = Status::default();
 
-        Ok(SOC { processors, runner })
+        Ok(SOC {
+            processor,
+            status: runner,
+        })
     }
 }
 
 impl SOC {
     pub fn get_ppu(&self) -> ppu::Ppu {
-        self.processors
-            .iter()
-            .find_map(|x| {
-                if let Processor::Ppu(ppu, _) = x {
-                    Some(ppu.clone())
-                } else {
-                    None
-                }
-            })
-            .unwrap()
+        self.processor.ppu.clone()
     }
 
     pub fn get_cpu(&self) -> cpu::Cpu {
-        self.processors
-            .iter()
-            .find_map(|x| {
-                if let Processor::Cpu(cpu, _) = x {
-                    Some(cpu.clone())
-                } else {
-                    None
-                }
-            })
-            .unwrap()
+        self.processor.cpu.clone()
     }
 
     pub fn get_memory(&self) -> memory::Memory {
-        self.processors
-            .iter()
-            .find_map(|x| {
-                if let Processor::Cpu(cpu, _) = x {
-                    Some(cpu.borrow().get_memory())
-                } else {
-                    None
-                }
-            })
-            .unwrap()
+        self.processor.memory.clone()
     }
 
-    pub fn get_runner(&self) -> Runner {
-        self.runner.clone()
+    pub fn get_status(&self) -> Status {
+        self.status.clone()
     }
 
     fn step(&mut self) {
-        self.runner.borrow_mut().step()
+        self.status.borrow_mut().step()
     }
 
     fn check_redraw(&mut self, status: &mut Vec<Finished>) {
-        self.runner.borrow_mut().check_redraw(status)
+        self.status.borrow_mut().check_redraw(status)
     }
 
     fn redraw_ready(&self) -> bool {
-        self.runner.borrow().redraw
+        self.status.borrow().redraw
     }
 
     fn redraw_init(&self) {
-        self.runner.borrow_mut().redraw = false;
+        self.status.borrow_mut().redraw = false;
     }
 
     pub fn run(&mut self) -> bool {
-        if self.runner.borrow().is_idle() {
+        if self.status.borrow().is_idle() {
             return false;
         }
-        let waker = shared::waker::create();
-        let mut context = Context::from_waker(&waker);
-        let mut status = Vec::new();
-
         self.redraw_init();
         self.step();
-        for processor in &mut self.processors {
-            status.push(processor.run(&mut context));
-        }
-        self.check_redraw(&mut status);
+        let status = &mut self.processor.run();
+        self.check_redraw(status);
         self.redraw_ready()
     }
 }

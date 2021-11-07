@@ -202,7 +202,7 @@ dependencies = [
  "block",
  "cocoa-foundation",
  "core-foundation 0.9.2",
- "core-graphics 0.22.2",
+ "core-graphics 0.22.3",
  "foreign-types",
  "libc",
  "objc",
@@ -285,9 +285,9 @@ dependencies = [
 
 [[package]]
 name = "core-graphics"
-version = "0.22.2"
+version = "0.22.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "269f35f69b542b80e736a20a89a05215c0ce80c2c03c514abb2e318b78379d86"
+checksum = "2581bbab3b8ffc6fcbd550bf46c355135d16e9ff2a6ea032ad6b9bf1d7efe4fb"
 dependencies = [
  "bitflags",
  "core-foundation 0.9.2",
@@ -796,7 +796,7 @@ checksum = "dfa686283ad6dd069f105e5ab091b04c62850d3e4cf5d67debad1933f55023df"
 [[package]]
 name = "iced_core"
 version = "0.4.0"
-source = "git+https://github.com/hecrj/iced#8a2a7f7e2144542b47c1d259f296ad7dcc5f3cf9"
+source = "git+https://github.com/hecrj/iced?rev=65f690b07559a36fe8bfcba31edd851c5c286704#65f690b07559a36fe8bfcba31edd851c5c286704"
 dependencies = [
  "bitflags",
 ]
@@ -804,7 +804,7 @@ dependencies = [
 [[package]]
 name = "iced_futures"
 version = "0.3.0"
-source = "git+https://github.com/hecrj/iced#8a2a7f7e2144542b47c1d259f296ad7dcc5f3cf9"
+source = "git+https://github.com/hecrj/iced?rev=65f690b07559a36fe8bfcba31edd851c5c286704#65f690b07559a36fe8bfcba31edd851c5c286704"
 dependencies = [
  "futures",
  "log",
@@ -814,7 +814,7 @@ dependencies = [
 [[package]]
 name = "iced_graphics"
 version = "0.2.0"
-source = "git+https://github.com/hecrj/iced#8a2a7f7e2144542b47c1d259f296ad7dcc5f3cf9"
+source = "git+https://github.com/hecrj/iced?rev=65f690b07559a36fe8bfcba31edd851c5c286704#65f690b07559a36fe8bfcba31edd851c5c286704"
 dependencies = [
  "bytemuck",
  "glam",
@@ -827,7 +827,7 @@ dependencies = [
 [[package]]
 name = "iced_native"
 version = "0.4.0"
-source = "git+https://github.com/hecrj/iced#8a2a7f7e2144542b47c1d259f296ad7dcc5f3cf9"
+source = "git+https://github.com/hecrj/iced?rev=65f690b07559a36fe8bfcba31edd851c5c286704#65f690b07559a36fe8bfcba31edd851c5c286704"
 dependencies = [
  "iced_core",
  "iced_futures",
@@ -839,7 +839,7 @@ dependencies = [
 [[package]]
 name = "iced_style"
 version = "0.3.0"
-source = "git+https://github.com/hecrj/iced#8a2a7f7e2144542b47c1d259f296ad7dcc5f3cf9"
+source = "git+https://github.com/hecrj/iced?rev=65f690b07559a36fe8bfcba31edd851c5c286704#65f690b07559a36fe8bfcba31edd851c5c286704"
 dependencies = [
  "iced_core",
 ]
@@ -847,7 +847,7 @@ dependencies = [
 [[package]]
 name = "iced_wgpu"
 version = "0.4.0"
-source = "git+https://github.com/hecrj/iced#8a2a7f7e2144542b47c1d259f296ad7dcc5f3cf9"
+source = "git+https://github.com/hecrj/iced?rev=65f690b07559a36fe8bfcba31edd851c5c286704#65f690b07559a36fe8bfcba31edd851c5c286704"
 dependencies = [
  "bitflags",
  "bytemuck",
@@ -866,7 +866,7 @@ dependencies = [
 [[package]]
 name = "iced_winit"
 version = "0.3.0"
-source = "git+https://github.com/hecrj/iced#8a2a7f7e2144542b47c1d259f296ad7dcc5f3cf9"
+source = "git+https://github.com/hecrj/iced?rev=65f690b07559a36fe8bfcba31edd851c5c286704#65f690b07559a36fe8bfcba31edd851c5c286704"
 dependencies = [
  "iced_futures",
  "iced_graphics",
@@ -963,9 +963,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.106"
+version = "0.2.107"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a60553f9a9e039a333b4e9b20573b9e9b9c0bb3a11e201ccc48ef4283456d673"
+checksum = "fbe5e23404da5b4f555ef85ebed98fb4083e55a00c317800bc2a50ede9f3d219"
 
 [[package]]
 name = "libloading"
@@ -1060,9 +1060,9 @@ dependencies = [
 
 [[package]]
 name = "minimal-lexical"
-version = "0.1.4"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c64630dcdd71f1a64c435f54885086a0de5d6a12d104d69b165fb7d5286d677"
+checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 
 [[package]]
 name = "mio"
@@ -1204,9 +1204,9 @@ dependencies = [
 
 [[package]]
 name = "nom"
-version = "7.0.0"
+version = "7.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7ffd9d26838a953b4af82cbeb9f1592c6798916983959be223a7124e992742c1"
+checksum = "1b1d11e1ef389c76fe5b81bcaf2ea32cf88b62bc494e19f493d0b30e7a930109"
 dependencies = [
  "memchr",
  "minimal-lexical",
@@ -1663,6 +1663,7 @@ name = "soc"
 version = "0.1.0"
 dependencies = [
  "cpu",
+ "futures",
  "memory",
  "num_enum",
  "ppu",
@@ -2145,6 +2146,7 @@ dependencies = [
 name = "windows"
 version = "0.1.0"
 dependencies = [
+ "cocoa",
  "iced_wgpu",
  "iced_winit",
  "pixels",
@@ -2161,7 +2163,7 @@ dependencies = [
  "block",
  "cocoa",
  "core-foundation 0.9.2",
- "core-graphics 0.22.2",
+ "core-graphics 0.22.3",
  "core-video-sys",
  "dispatch",
  "instant",

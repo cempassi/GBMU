@@ -10,12 +10,13 @@ const HEIGHT: usize = 144;
 
 #[derive(Debug)]
 pub struct Ppu {
-    pub vram_lock: bool,
     vram: Vec<u8>,
-    pub(crate) registers: Registers,
     interrupts: Interrupts,
-    pub(crate) fifo: Fifo,
     screen: Vec<Color>,
+    pub frame_ready: bool,
+    pub vram_lock: bool,
+    pub(crate) registers: Registers,
+    pub(crate) fifo: Fifo,
     pub(crate) x: usize,
 }
 
@@ -38,7 +39,9 @@ impl From<Interrupts> for Ppu {
         let fifo = Fifo::new();
         let screen = vec![Color::White; WIDTH * HEIGHT];
         let x = 0;
+        let frame_ready = true;
         Self {
+            frame_ready,
             vram_lock: false,
             vram,
             registers,
@@ -54,6 +57,15 @@ impl Ppu {
     pub fn get_vram(&self, address: u16) -> Result<u8, Error> {
         let address: usize = (address - VRAM_START) as usize;
         Ok(self.vram[address])
+    }
+
+    pub fn is_frame_ready(&mut self) -> bool {
+        if self.frame_ready {
+            self.frame_ready = false;
+            true
+        } else {
+            false
+        }
     }
 
     pub fn render(&mut self, frame: &mut [u8]) {

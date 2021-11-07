@@ -1,9 +1,8 @@
 mod header;
 pub mod interface;
 pub mod mode;
-pub(crate) mod processor;
-pub mod runner;
+pub(crate) mod runner;
 pub mod soc;
+pub mod status;
 
-pub use crate::interface::{TryInit, SOC};
-pub use crate::runner::Runner;
+pub use crate::interface::{Status, TryInit, SOC};

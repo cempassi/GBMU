@@ -1,6 +1,7 @@
 use super::{AsyncGet, Get, Set};
 use crate::registers::{Absolute, Bits16, Bus, Flag, Relative};
 use crate::{Access, Cpu};
+use memory::Async;
 use shared::Error;
 use std::future::Future;
 use std::pin::Pin;
@@ -79,18 +80,19 @@ async fn res(cpu: Cpu, reset: Reset) -> Result<u8, Error> {
 }
 
 async fn ret(cpu: Cpu) -> Result<u8, Error> {
-    Set::Pop(Bits16::PC).run(cpu).await
+    let (_, delay) = cpu.memory().get::<u8>(0xc00).await?;
+    Ok(Set::Pop(Bits16::PC).run(cpu).await? + delay)
 }
 
 async fn ret_interrupt(cpu: Cpu) -> Result<u8, Error> {
     cpu.memory().borrow_mut().enable_interrupts();
-    Set::Pop(Bits16::PC).run(cpu).await
+    ret(cpu).await
 }
 
 async fn ret_check(cpu: Cpu, flag: Flag) -> Result<u8, Error> {
     let flag = cpu.borrow().registers.get(flag);
     if flag {
-        Set::Pop(Bits16::PC).run(cpu).await
+        ret(cpu).await
     } else {
         Ok(0)
     }
@@ -99,7 +101,7 @@ async fn ret_check(cpu: Cpu, flag: Flag) -> Result<u8, Error> {
 async fn ret_not(cpu: Cpu, flag: Flag) -> Result<u8, Error> {
     let flag = cpu.borrow().registers.get(flag);
     if !flag {
-        Set::Pop(Bits16::PC).run(cpu).await
+        ret(cpu).await
     } else {
         Ok(0)
     }
@@ -134,29 +136,34 @@ async fn call_not(cpu: Cpu, flag: Flag) -> Result<u8, Error> {
 
 async fn absolute(cpu: Cpu) -> Result<u8, Error> {
     let (address, cycles): (u16, u8) = Get::Next.get(cpu.clone()).await?;
+    let (_, delay) = cpu.memory().get::<u8>(0xc00).await?;
     cpu.borrow_mut().registers.absolute(address);
-    Ok(cycles)
+    Ok(cycles + delay)
 }
 
-// Vigilence sur la conversion en i8
-async fn relative(cpu: Cpu) -> Result<u8, Error> {
-    let (offset, cycles): (u8, u8) = Get::Next.get(cpu.clone()).await?;
-    cpu.borrow_mut().registers.relative(offset as i8);
-    Ok(cycles)
-}
-
+/// TODO: Refacto les saut check, c'est incorrect!!!!
 async fn abs_check(cpu: Cpu, flag: Flag) -> Result<u8, Error> {
     let (address, cycles): (u16, u8) = Get::Next.get(cpu.clone()).await?;
     cpu.borrow_mut().registers.absolute_check(address, flag);
     Ok(cycles)
 }
 
+/// TODO: Refacto les saut check, c'est incorrect!!!!
 async fn abs_not(cpu: Cpu, flag: Flag) -> Result<u8, Error> {
     let (address, cycles): (u16, u8) = Get::Next.get(cpu.clone()).await?;
     cpu.borrow_mut().registers.absolute_check(address, flag);
     Ok(cycles)
 }
 
+// Vigilence sur la conversion en i8
+async fn relative(cpu: Cpu) -> Result<u8, Error> {
+    let (_, delay) = cpu.memory().get::<u8>(0xc00).await?;
+    let (offset, cycles): (u8, u8) = Get::Next.get(cpu.clone()).await?;
+    cpu.borrow_mut().registers.relative(offset as i8);
+    Ok(cycles + delay)
+}
+
+/// TODO: Refacto les saut check, c'est incorrect!!!!
 async fn rel_check(cpu: Cpu, flag: Flag) -> Result<u8, Error> {
     let (offset, cycles): (u8, u8) = Get::Next.get(cpu.clone()).await?;
     cpu.borrow_mut()
@@ -165,6 +172,7 @@ async fn rel_check(cpu: Cpu, flag: Flag) -> Result<u8, Error> {
     Ok(cycles)
 }
 
+/// TODO: Refacto les saut check, c'est incorrect!!!!
 async fn rel_not(cpu: Cpu, flag: Flag) -> Result<u8, Error> {
     let (offset, cycles): (u8, u8) = Get::Next.get(cpu.clone()).await?;
     cpu.borrow_mut()

@@ -3,6 +3,8 @@ use std::rc::Rc;
 
 pub type SOC = Rc<RefCell<crate::soc::SOC>>;
 
+pub type Status = Rc<RefCell<crate::status::Status>>;
+
 pub trait TryInit {
     fn try_init(rom: &str) -> Result<Self, std::io::Error>
     where

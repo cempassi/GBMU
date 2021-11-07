@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 num_enum = "0.5.3"
 pretty-hex = "0.2.1"
+futures = "0.3.17"
 memory = { path = "../memory" }
 shared = { path = "../shared" }
 cpu = { path = "../cpu" }

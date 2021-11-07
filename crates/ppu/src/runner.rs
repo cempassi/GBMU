@@ -3,13 +3,11 @@ use crate::oam::Oam;
 use crate::registers as lcd;
 use crate::transfert::Pixel;
 use crate::Ppu;
-use shared::Error;
+use shared::{Error, Finished, Output, Run};
 
 use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
-
-type Output = Pin<Box<dyn Future<Output = Result<u8, Error>>>>;
 
 pub struct Runner<T> {
     inner: Pin<Box<dyn Future<Output = T>>>,
@@ -29,10 +27,6 @@ impl<T> Future for Runner<T> {
     }
 }
 
-pub trait Run {
-    fn run(self) -> Output;
-}
-
 impl Run for Ppu {
     fn run(self) -> Output {
         let inner = Box::pin(run(self));
@@ -40,7 +34,7 @@ impl Run for Ppu {
     }
 }
 
-async fn run(ppu: Ppu) -> Result<u8, Error> {
+async fn run(ppu: Ppu) -> Result<Finished, Error> {
     println!("Running the ppu!");
     if ppu.borrow_mut().registers.is_lower(lcd::Field::Ly, 144) {
         Oam::search(ppu.clone()).await;
@@ -50,12 +44,13 @@ async fn run(ppu: Ppu) -> Result<u8, Error> {
         ppu.borrow_mut().registers.increase(lcd::Field::Ly);
         let ly = ppu.borrow_mut().registers.coordinates.get(lcd::Field::Ly);
         println!("Finished a Line, Ly: {}", ly);
-        Ok(42)
+        Ok(Finished::Line(42))
     } else {
         println!("Finished a Frame!");
         ppu.borrow().raise_vblank();
         Blank::new(VBLANK).await;
         ppu.borrow_mut().registers.clear(lcd::Field::Ly);
-        Ok(42)
+        ppu.borrow_mut().frame_ready = true;
+        Ok(Finished::Frame(42))
     }
 }

@@ -3,7 +3,7 @@ use crate::style::Theme;
 use iced_native::Length;
 use iced_wgpu::{Renderer, Row, Space};
 use iced_winit::Element;
-use soc::Runner;
+use soc::Status;
 
 pub struct Menu {
     right: Vec<Button>,
@@ -20,12 +20,12 @@ pub enum MenuMsg {
 }
 
 impl Menu {
-    pub fn new(runner: Runner) -> Self {
-        let tick = Button::new(runner.clone(), MenuMsg::Tick);
-        let line = Button::new(runner.clone(), MenuMsg::Line);
-        let frame = Button::new(runner.clone(), MenuMsg::Frame);
-        let cpu = Button::new(runner.clone(), MenuMsg::Cpu);
-        let ppu = Button::new(runner, MenuMsg::Ppu);
+    pub fn new(status: Status) -> Self {
+        let tick = Button::new(status.clone(), MenuMsg::Tick);
+        let line = Button::new(status.clone(), MenuMsg::Line);
+        let frame = Button::new(status.clone(), MenuMsg::Frame);
+        let cpu = Button::new(status.clone(), MenuMsg::Cpu);
+        let ppu = Button::new(status, MenuMsg::Ppu);
 
         Self {
             left: vec![cpu, ppu],

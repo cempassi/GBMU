@@ -7,6 +7,5 @@ pub mod registers;
 pub mod runner;
 
 pub(crate) use crate::interface::Access;
-pub use crate::interface::{Cpu, Make};
+pub use crate::interface::Cpu;
 pub use crate::registers::Registers;
-pub use crate::runner::Run;

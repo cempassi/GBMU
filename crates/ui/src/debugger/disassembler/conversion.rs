@@ -230,11 +230,11 @@ impl From<Rotate> for Disass<u8> {
     fn from(opcode: Rotate) -> Self {
         let name = Self::name(format!("(CB) {}", opcode));
         let (cycles, data): (u8, Data) = match opcode {
-            Rotate::LCHL => (8, Data::Cb),
-            Rotate::LHL => (8, Data::Cb),
-            Rotate::RCHL => (8, Data::Cb),
-            Rotate::RHL => (8, Data::Cb),
-            _ => (4, Data::Cb),
+            Rotate::LCHL => (16, Data::Cb),
+            Rotate::LHL => (16, Data::Cb),
+            Rotate::RCHL => (16, Data::Cb),
+            Rotate::RHL => (16, Data::Cb),
+            _ => (8, Data::Cb),
         };
 
         let code: u8 = opcode.into();
@@ -331,11 +331,11 @@ impl From<Shift> for Disass<u8> {
     fn from(opcode: Shift) -> Self {
         let name = Self::name(format!("(CB) {}", opcode));
         let (cycles, data): (u8, Data) = match opcode {
-            Shift::LHL => (8, Data::Cb),
-            Shift::RAHL => (8, Data::Cb),
-            Shift::SHL => (8, Data::Cb),
-            Shift::RLHL => (8, Data::Cb),
-            _ => (4, Data::Cb),
+            Shift::LHL => (16, Data::Cb),
+            Shift::RAHL => (16, Data::Cb),
+            Shift::SHL => (16, Data::Cb),
+            Shift::RLHL => (16, Data::Cb),
+            _ => (8, Data::Cb),
         };
 
         let code: u8 = opcode.into();
@@ -360,6 +360,8 @@ impl From<Arithmetic> for Disass<u8> {
             Arithmetic::SAA => (8, Data::None),
             Arithmetic::SAcHL => (8, Data::None),
             Arithmetic::SA8b => (8, Data::Bits8(0)),
+            Arithmetic::IncHL => (12, Data::None),
+            Arithmetic::DecHL => (12, Data::None),
             _ => (4, Data::None),
         };
 

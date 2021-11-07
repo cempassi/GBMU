@@ -13,7 +13,7 @@ use iced_winit::{
         dpi::{PhysicalSize, Size},
         event::{ModifiersState, WindowEvent},
         event_loop::{ControlFlow, EventLoop},
-        window::{Window, WindowId},
+        window::{Window, WindowBuilder, WindowId},
     },
 };
 
@@ -81,12 +81,15 @@ fn init_device(
 impl Debugger {
     pub fn new(event_loop: &EventLoop<()>, instance: &Instance, soc: SOC) -> Self {
         let title = "Debugger";
-        let window = Window::new(event_loop).unwrap();
-        let modifiers = ModifiersState::default();
         let size = Size::Physical(PhysicalSize::new(1248, 768));
-        window.set_title(title);
-        window.set_resizable(false);
-        window.set_inner_size(size);
+        let window = WindowBuilder::new()
+            .with_title(title)
+            .with_resizable(false)
+            .with_inner_size(size)
+            .build(event_loop)
+            .unwrap();
+
+        let modifiers = ModifiersState::default();
 
         let id = window.id();
         let resized = false;
@@ -125,6 +128,7 @@ impl Debugger {
             WindowEvent::CloseRequested => {
                 println!("Request to close on debugger");
                 *control_flow = ControlFlow::Exit;
+                return;
             }
             WindowEvent::ModifiersChanged(new_modifiers) => {
                 self.modifiers = new_modifiers;
@@ -142,7 +146,7 @@ impl Debugger {
     }
 
     pub fn request_redraw(&mut self) {
-        self.state.update(self.window.scale_factor());
+        self.state.update();
         self.window.request_redraw();
     }
 
@@ -214,7 +218,6 @@ impl Debugger {
                 // Then we submit the work
                 self.staging_belt.finish();
                 self.queue.submit(Some(encoder.finish()));
-                frame.present();
 
                 // Update the mouse cursor
                 self.window.set_cursor_icon(mouse_interaction(mouse_action));
@@ -226,6 +229,7 @@ impl Debugger {
                     .expect("Recall staging buffers");
 
                 self.format_pool.run_until_stalled();
+                frame.present();
             }
             Err(error) => match error {
                 SurfaceError::OutOfMemory => {
