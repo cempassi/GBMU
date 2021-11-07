@@ -59,7 +59,7 @@ impl Decoder for Arithmetic16b {
 }
 impl Arithmetic16b {
     pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
-        match self {
+        let cycles = match self {
             Arithmetic16b::IncBC => cpu.borrow_mut().registers.increase(Bits16::BC, 1),
             Arithmetic16b::IncDE => cpu.borrow_mut().registers.increase(Bits16::DE, 1),
             Arithmetic16b::IncHL => cpu.borrow_mut().registers.increase(Bits16::HL, 1),
@@ -73,8 +73,8 @@ impl Arithmetic16b {
             Arithmetic16b::AddHL => cpu.borrow_mut().registers.add(Bits16::HL, false),
             Arithmetic16b::AddSP => cpu.borrow_mut().registers.add(Bits16::SP, false),
         };
-        let (_, cycles): (u8, u8) = Get::Nop.get(cpu).await?;
-        Ok(cycles)
+        let (_, delay): (u8, u8) = Get::Nop.get(cpu).await?;
+        Ok(cycles + delay)
     }
 }
 
