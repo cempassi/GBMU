@@ -1,16 +1,30 @@
 use shared::Interrupts;
 use std::cell::RefCell;
+use std::ops::{Deref, DerefMut};
 use std::rc::Rc;
 
-pub type Ppu = Rc<RefCell<crate::ppu::Ppu>>;
+#[derive(Debug, Clone)]
+pub struct Ppu(Rc<RefCell<super::ppu::Ppu>>);
 
-pub trait New {
-    fn new(interrupts: Interrupts) -> Self;
+impl Deref for Ppu {
+    type Target = Rc<RefCell<super::ppu::Ppu>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
 
-impl New for Ppu {
-    fn new(interrupts: Interrupts) -> Self {
-        Rc::new(RefCell::new(super::ppu::Ppu::from(interrupts)))
+impl DerefMut for Ppu {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl Ppu {
+    pub fn new(interrupts: Interrupts) -> Self {
+        Self {
+            0: Rc::new(RefCell::new(super::ppu::Ppu::from(interrupts))),
+        }
     }
 }
 

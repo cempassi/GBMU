@@ -1,7 +1,5 @@
 use crate::{Access, Cpu};
-use shared::Error;
-use std::future::Future;
-use std::pin::Pin;
+use shared::{Error, Finished, Output, Run};
 
 use crate::futures::Set;
 use crate::registers::{Bits16, IncDec};
@@ -18,13 +16,13 @@ use crate::opcodes::Logic;
 use crate::futures::{AsyncGet, Get};
 use num_enum::TryFromPrimitive;
 
-pub type Output = Pin<Box<dyn Future<Output = Result<u8, Error>>>>;
-
-pub trait Run {
-    fn run(self) -> Output;
+impl Run for Cpu {
+    fn run(self) -> Output {
+        Box::pin(run(self))
+    }
 }
 
-pub async fn interrupt_handler(cpu: Cpu) -> Result<u8, Error> {
+pub async fn interrupt_handler(cpu: Cpu) -> Result<Finished, Error> {
     println!("Interrupt Execution");
     let requested = cpu.memory().borrow_mut().get_requested()?;
     cpu.borrow_mut().halt = false;
@@ -42,7 +40,7 @@ pub async fn interrupt_handler(cpu: Cpu) -> Result<u8, Error> {
     cpu.borrow_mut().registers.pc = address;
     let cycles = Set::Bits16At(Bits16::SP, pc).run(cpu).await?;
 
-    Ok(cycles)
+    Ok(Finished::Cpu(cycles))
 }
 
 async fn decode(cpu: Cpu, opcode: u8) -> Result<Decode, Error> {
@@ -69,7 +67,8 @@ async fn decode(cpu: Cpu, opcode: u8) -> Result<Decode, Error> {
     }
 }
 
-pub async fn run(cpu: Cpu) -> Result<u8, Error> {
+pub async fn run(cpu: Cpu) -> Result<Finished, Error> {
+    println!("Running the cpu!");
     if cpu.borrow().interrupt_enabled() {
         match interrupt_handler(cpu.clone()).await {
             Err(Error::DisabledInterrupts) => (),
@@ -87,11 +86,5 @@ pub async fn run(cpu: Cpu) -> Result<u8, Error> {
     }
 
     let execute = decode(cpu, opcode).await?;
-    Ok(execute.await? + cycles)
-}
-
-impl Run for Cpu {
-    fn run(self) -> Output {
-        Box::pin(run(self))
-    }
+    Ok(Finished::Cpu(execute.await? + cycles))
 }

@@ -10,6 +10,5 @@ pub mod registers;
 pub mod runner;
 pub(crate) mod transfert;
 
-pub use crate::interface::{New, Ppu};
+pub use crate::interface::Ppu;
 pub use crate::registers::{Coordinates, Field, Registers};
-pub use crate::runner::Run;

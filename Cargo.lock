@@ -1663,6 +1663,7 @@ name = "soc"
 version = "0.1.0"
 dependencies = [
  "cpu",
+ "futures",
  "memory",
  "num_enum",
  "ppu",
@@ -2145,6 +2146,7 @@ dependencies = [
 name = "windows"
 version = "0.1.0"
 dependencies = [
+ "cocoa",
  "iced_wgpu",
  "iced_winit",
  "pixels",
