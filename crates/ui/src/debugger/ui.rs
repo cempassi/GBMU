@@ -19,18 +19,20 @@ pub struct UserInterface {
 
 impl From<SOC> for UserInterface {
     fn from(soc: SOC) -> UserInterface {
-        let runner = soc.borrow().get_runner();
+        let runner = soc.borrow().get_status();
         let ppu = soc.borrow().get_ppu();
         let cpu = soc.borrow().get_cpu();
         let memory = cpu.borrow().get_memory();
-        Self {
+        let mut ui = Self {
             theme: Theme::default(),
             cpu: Cpu::new(cpu.clone()),
             memory: <Memory as From<memory::Memory>>::from(memory),
             menu: Menu::new(runner),
             disassembler: Disassembler::new(cpu),
             ppu: Ppu::new(ppu),
-        }
+        };
+        ui.refresh();
+        ui
     }
 }
 
@@ -41,6 +43,7 @@ pub enum Message {
     Menu(MenuMsg),
     Disassembler(DisassMsg),
     Ppu(PpuMsg),
+    Refresh,
 }
 
 impl From<CpuMsg> for Message {
@@ -73,6 +76,7 @@ impl Program for UserInterface {
     type Renderer = Renderer;
 
     fn update(&mut self, message: Message) -> Command<Self::Message> {
+        println!("UI is beeing refreshed!");
         match message {
             Message::Registers(message) => {
                 self.cpu.update(message);
@@ -89,8 +93,10 @@ impl Program for UserInterface {
             Message::Ppu(message) => {
                 self.ppu.update(message);
             }
+            Message::Refresh => {
+                self.refresh();
+            }
         };
-        self.refresh();
         Command::none()
     }
 

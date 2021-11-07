@@ -62,7 +62,12 @@ impl Debugger {
         }
     }
 
-    pub fn update(&mut self, scale_factor: f64) {
+    pub fn refresh(&mut self) {
+        self.state.queue_message(self::ui::Message::Refresh);
+    }
+
+    pub fn update(&mut self) {
+        let scale_factor = self.viewport.scale_factor();
         let logical_cursor = self.cursor.to_logical(scale_factor);
         let point = Point::new(logical_cursor.x, logical_cursor.y);
 

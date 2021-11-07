@@ -4,19 +4,19 @@ use iced_winit::Element;
 
 use super::menu::MenuMsg;
 use super::widgets::Text;
-use soc::Runner;
+use soc::Status;
 
 pub struct Button {
-    runner: Runner,
+    status: Status,
     message: MenuMsg,
     state: button::State,
 }
 
 impl Button {
-    pub fn new(runner: Runner, message: MenuMsg) -> Self {
+    pub fn new(status: Status, message: MenuMsg) -> Self {
         let state = button::State::default();
         Self {
-            runner,
+            status,
             state,
             message,
         }
@@ -25,19 +25,19 @@ impl Button {
     pub fn update(&self) {
         match self.message {
             MenuMsg::Tick => {
-                self.runner.borrow_mut().tick();
+                self.status.borrow_mut().tick();
             }
             MenuMsg::Line => {
-                self.runner.borrow_mut().line();
+                self.status.borrow_mut().line();
             }
             MenuMsg::Frame => {
-                self.runner.borrow_mut().frame();
+                self.status.borrow_mut().frame();
             }
             MenuMsg::Ppu => {
-                self.runner.borrow_mut().ppu();
+                self.status.borrow_mut().ppu();
             }
             MenuMsg::Cpu => {
-                self.runner.borrow_mut().cpu();
+                self.status.borrow_mut().cpu();
             }
         }
     }
