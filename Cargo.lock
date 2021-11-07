@@ -2150,6 +2150,7 @@ dependencies = [
  "iced_wgpu",
  "iced_winit",
  "pixels",
+ "shared",
  "soc",
  "ui",
 ]

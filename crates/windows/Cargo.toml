@@ -11,6 +11,7 @@ iced_wgpu = {git = "https://github.com/hecrj/iced", rev = "65f690b07559a36fe8bfc
 iced_winit = {git = "https://github.com/hecrj/iced", rev = "65f690b07559a36fe8bfcba31edd851c5c286704"}
 ui = { path = "../ui" }
 soc = { path = "../soc" }
+shared = {path = "../shared" }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 cocoa = "0.24.0"

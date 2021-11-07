@@ -1,6 +1,7 @@
 use iced_wgpu::wgpu::Instance;
 use iced_winit::winit::event::{Event, StartCause};
 use iced_winit::winit::event_loop::{ControlFlow, EventLoop};
+use shared::Redraw;
 use soc::{TryInit, SOC};
 
 use crate::debugger;
@@ -50,8 +51,14 @@ impl Windows {
             };
 
             // Run Emulator here
-            if soc.borrow_mut().run() {
-                debugger.state.refresh();
+            match soc.borrow_mut().run() {
+                Redraw::Emulator => emulator.request_redraw(),
+                Redraw::Debugger => debugger.state.refresh(),
+                Redraw::All => {
+                    debugger.state.refresh();
+                    emulator.request_redraw();
+                }
+                Redraw::Nope => (),
             }
         })
     }
