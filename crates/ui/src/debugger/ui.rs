@@ -1,7 +1,8 @@
+use super::cpu::{Cpu, CpuMsg};
 use super::disassembler::{DisassMsg, Disassembler};
-use super::memory_map::{Memory, MemoryMsg};
+use super::memory::{Memory, MemoryMsg};
 use super::menu::{Menu, MenuMsg};
-use super::registers::{Cpu, CpuMsg, Ppu, PpuMsg};
+use super::ppu::{Ppu, PpuMsg};
 use crate::style::Theme;
 use iced_wgpu::{Column, Renderer, Row};
 use iced_winit::{Command, Element, Program};
@@ -76,7 +77,6 @@ impl Program for UserInterface {
     type Renderer = Renderer;
 
     fn update(&mut self, message: Message) -> Command<Self::Message> {
-        println!("UI is beeing refreshed!");
         match message {
             Message::Registers(message) => {
                 self.cpu.update(message);
@@ -106,19 +106,23 @@ impl Program for UserInterface {
             .menu
             .view(self.theme)
             .map(|message| Message::Menu(message));
+        let cpu = self
+            .cpu
+            .view(self.theme)
+            .map(|message| Message::Registers(message));
         let disassembler = self
             .disassembler
             .view()
             .map(|message| Message::Disassembler(message));
-        let cpu_registers = self
-            .cpu
-            .view(self.theme)
-            .map(|message| Message::Registers(message));
         let ppu = self
             .ppu
             .view(self.theme)
             .map(|message| Message::Ppu(message));
-        let row = Row::new().push(cpu_registers).push(disassembler).push(ppu);
+        let row = Row::new()
+            .spacing(20)
+            .push(cpu)
+            .push(disassembler)
+            .push(ppu);
         let memory = self
             .memory
             .view(self.theme)

@@ -1,6 +1,6 @@
-//use enum_iterator::IntoEnumIterator;
 use super::PpuMsg;
 use crate::debugger::widgets::Register;
+use iced_native::Length;
 use iced_wgpu::{Column, Renderer, Row};
 use iced_winit::Element;
 use ppu::Coordinates;
@@ -13,7 +13,7 @@ pub struct Lcd {
 
 impl Lcd {
     pub fn new(ppu: &ppu::Ppu) -> Self {
-        let builder = Register::new(20, 7, 8);
+        let builder = Register::new(20, 10, 5);
         let mut coordinates = Coordinates::default();
         ppu.borrow().reload_coordinates(&mut coordinates);
         Self {
@@ -43,6 +43,11 @@ impl Lcd {
         let pair2 = self.pair(Field::Yscroll, Field::Xscroll);
         let pair3 = self.pair(Field::Ywindow, Field::Xwindow);
 
-        Column::new().push(pair1).push(pair2).push(pair3).into()
+        Column::new()
+            .push(pair1)
+            .push(pair2)
+            .push(pair3)
+            .width(Length::Shrink)
+            .into()
     }
 }

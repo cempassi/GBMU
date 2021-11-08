@@ -2,8 +2,8 @@ use crate::style::Theme;
 use iced_wgpu::{button, Renderer};
 use iced_winit::Element;
 
-use super::menu::MenuMsg;
-use super::widgets::Text;
+use super::MenuMsg;
+use crate::debugger::widgets::Text;
 use soc::Status;
 
 pub struct Button {
@@ -33,11 +33,8 @@ impl Button {
             MenuMsg::Frame => {
                 self.status.borrow_mut().frame();
             }
-            MenuMsg::Ppu => {
-                self.status.borrow_mut().ppu();
-            }
-            MenuMsg::Cpu => {
-                self.status.borrow_mut().cpu();
+            MenuMsg::Instruction => {
+                self.status.borrow_mut().instruction();
             }
         }
     }

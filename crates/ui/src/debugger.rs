@@ -1,12 +1,11 @@
-mod button;
+mod cpu;
 mod disassembler;
-mod memory_map;
+mod memory;
 mod menu;
-mod registers;
 mod ui;
 mod widgets;
-
 use soc::SOC;
+mod ppu;
 
 use self::ui::UserInterface;
 use iced_wgpu::wgpu::util::StagingBelt;

@@ -1786,6 +1786,7 @@ dependencies = [
  "num_enum",
  "pixels",
  "ppu",
+ "pretty-hex",
  "shared",
  "soc",
 ]
@@ -2150,6 +2151,7 @@ dependencies = [
  "iced_wgpu",
  "iced_winit",
  "pixels",
+ "shared",
  "soc",
  "ui",
 ]

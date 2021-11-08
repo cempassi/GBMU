@@ -145,6 +145,10 @@ impl Memory {
     pub fn get_ppu(&self) -> Ppu {
         self.ppu.clone()
     }
+
+    pub fn get_rom(&self) -> Rom {
+        self.rom.clone()
+    }
 }
 
 impl Memory {

@@ -1,6 +1,6 @@
 use crate::runner::Runner;
 use crate::Status;
-use shared::Finished;
+use shared::Redraw;
 use std::fs;
 
 use crate::header::Header;
@@ -63,26 +63,15 @@ impl SOC {
         self.status.borrow_mut().step()
     }
 
-    fn check_redraw(&mut self, status: &mut Vec<Finished>) {
-        self.status.borrow_mut().check_redraw(status)
-    }
-
-    fn redraw_ready(&self) -> bool {
-        self.status.borrow().redraw
-    }
-
-    fn redraw_init(&self) {
-        self.status.borrow_mut().redraw = false;
-    }
-
-    pub fn run(&mut self) -> bool {
+    pub fn run(&mut self) -> Redraw {
         if self.status.borrow().is_idle() {
-            return false;
+            return Redraw::Nope;
         }
-        self.redraw_init();
-        self.step();
-        let status = &mut self.processor.run();
-        self.check_redraw(status);
-        self.redraw_ready()
+        while !self.status.borrow().is_idle() {
+            self.step();
+            let status = &mut self.processor.run();
+            self.status.borrow_mut().check_redraw(status)
+        }
+        self.status.borrow().redraw
     }
 }

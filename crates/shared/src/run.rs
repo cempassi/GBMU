@@ -32,7 +32,7 @@ pub enum Process {
 
 impl Finished {
     pub fn finish(result: Result<Self, Error>) -> Self {
-        println!("{:?}", result);
+        //println!("{:?}", result);
         if let Err(error) = result {
             Self::Error(error)
         } else {

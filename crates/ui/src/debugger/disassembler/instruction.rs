@@ -93,7 +93,8 @@ impl Instruction {
     }
 
     pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
-        let address = Cell::light(format!("{:^12}", format!("{:#04X}", self.address)), 20);
+        let address = format!("{:#04X}", self.address);
+        let address = Cell::light(format!("{:^10}", address), 20);
         Row::new().push(address).push(self.disass.view()).into()
     }
 
@@ -103,19 +104,20 @@ impl Instruction {
             Cycles::Conditionnal(disass) => disass.fetched(),
         }
     }
-    pub fn get_cycle(&self) {
-        match &self.disass {
-            Cycles::Absolute(disass) => {
-                println!("Cycle of next instruction: {}", disass.cycles);
-            }
-            Cycles::Conditionnal(disass) => {
-                println!(
-                    "Cycle of next instruction: {} or {}",
-                    disass.cycles.0, disass.cycles.1
-                );
-            }
-        }
-    }
+
+    // pub fn get_cycle(&self) {
+    //     match &self.disass {
+    //         Cycles::Absolute(disass) => {
+    //             println!("Cycle of next instruction: {}", disass.cycles);
+    //         }
+    //         Cycles::Conditionnal(disass) => {
+    //             println!(
+    //                 "Cycle of next instruction: {} or {}",
+    //                 disass.cycles.0, disass.cycles.1
+    //             );
+    //         }
+    //     }
+    // }
 }
 
 enum Cycles {

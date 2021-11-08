@@ -1,8 +1,11 @@
-use crate::style::Theme;
-use iced_wgpu::Renderer;
-use iced_winit::Element;
+mod lcd;
 
-use super::lcd::Lcd;
+use crate::debugger::widgets::Text;
+use crate::style::Theme;
+use iced_graphics::Alignment;
+use iced_wgpu::{Column, Renderer};
+use iced_winit::Element;
+use lcd::Lcd;
 
 pub struct Ppu {
     ppu: ppu::Ppu,
@@ -25,6 +28,8 @@ impl Ppu {
     }
 
     pub fn view(&self, _theme: Theme) -> Element<PpuMsg, Renderer> {
-        self.lcd.view()
+        let title = Text::new("Ppu").medium_it(20);
+        let ppu = Column::new().align_items(Alignment::Center);
+        ppu.push(title).push(self.lcd.view()).into()
     }
 }

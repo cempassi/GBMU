@@ -22,7 +22,7 @@ pub enum Bits16 {
     HL,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, IntoEnumIterator, PartialEq, Clone, Copy)]
 pub enum Flag {
     /// Zero flag
     /// This flag is set when :

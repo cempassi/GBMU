@@ -1,66 +1,75 @@
 use super::mode::Mode;
-use shared::Finished;
+use shared::{Finished, Redraw};
 
 #[derive(Debug, Default)]
 pub struct Status {
     mode: Mode,
-    pub(crate) redraw: bool,
+    pub redraw: Redraw,
     lines: u32,
     ticks: u32,
-    last_cpu: u8,
-    last_ppu: u8,
+    last_cpu_cycle: u8,
+    last_line_cycle: u8,
+    last_frame_cycle: u8,
 }
 
 impl Status {
     pub fn check_redraw(&mut self, status: &mut Vec<Finished>) {
+        self.redraw = Redraw::Nope;
         for status in status {
-            match status {
-                Finished::Cpu(cycles) if self.mode == Mode::Cpu => {
-                    self.mode.update_processing();
-                    self.last_cpu = *cycles;
-                    self.redraw = true;
+            match (status, self.mode) {
+                (Finished::Cpu(cycles), Mode::Instruction) => {
+                    self.mode.idle();
+                    self.last_cpu_cycle = *cycles;
+                    self.redraw.update(Redraw::Debugger);
                 }
-                Finished::Line(cycles) if self.mode == Mode::Ppu => {
-                    self.mode.update_processing();
-                    self.last_ppu = *cycles;
-                    self.redraw = true;
+                (Finished::Line(cycles), Mode::Line) => {
+                    self.mode.idle();
+                    self.add_line();
+                    self.last_line_cycle = *cycles;
+                    self.redraw.update(Redraw::Debugger);
                 }
-                Finished::Frame(cycles) if self.mode == Mode::Ppu => {
-                    self.mode.update_processing();
-                    self.last_ppu = *cycles;
-                    self.redraw = true;
+                (Finished::Frame(cycles), Mode::Frame) => {
+                    self.mode.idle();
+                    self.reset_count();
+                    self.last_frame_cycle = *cycles;
+                    self.redraw.update(Redraw::All);
                 }
-                Finished::Error(_) => self.redraw = true,
-                Finished::Nope if self.mode.is_processing() => (),
-                Finished::Nope if !self.redraw => self.redraw = self.mode.check_redraw(),
+                (Finished::Cpu(cycles), _) => {
+                    self.last_cpu_cycle = *cycles;
+                }
+                (Finished::Line(cycles), _) => {
+                    self.add_line();
+                    self.last_line_cycle = *cycles;
+                }
+                (Finished::Frame(cycles), _) => {
+                    self.reset_count();
+                    self.last_frame_cycle = *cycles;
+                    self.redraw.update(Redraw::All);
+                }
+                (_, Mode::Tick) => {
+                    self.mode.idle();
+                    self.redraw.update(Redraw::Debugger);
+                }
+                (Finished::Error(_), _) => {
+                    self.redraw.update(Redraw::All);
+                }
                 _ => (),
             }
         }
     }
 
     pub fn step(&mut self) {
-        if let Mode::Line(ticks) = self.mode {
-            println!("Processing line, currently at tick {} on 456", ticks);
-            if self.mode.increase() {
-                self.lines += 1;
-                self.ticks = 0;
-            }
-        } else if let Mode::Frame(lines) = self.mode {
-            println!("Processing frame, currently at line {} on 120", lines);
-            if self.mode.increase() {
-                self.lines = 0;
-            }
-        } else {
-            self.ticks += 1;
-            if Mode::is_eol(self.ticks) {
-                self.lines += 1;
-                self.ticks = 0;
-            }
-            if Mode::is_eof(self.ticks) {
-                self.lines = 0;
-                self.ticks = 0;
-            }
-        }
+        self.ticks += 1;
+    }
+
+    pub fn add_line(&mut self) {
+        self.lines += 1;
+        self.ticks = 0;
+    }
+
+    pub fn reset_count(&mut self) {
+        self.lines = 0;
+        self.ticks = 0;
     }
 
     pub fn is_idle(&self) -> bool {
@@ -72,20 +81,14 @@ impl Status {
     }
 
     pub fn line(&mut self) {
-        self.mode = Mode::Line(self.ticks);
-        self.ticks = 0;
+        self.mode = Mode::Line;
     }
 
     pub fn frame(&mut self) {
-        self.mode = Mode::Line(self.lines);
-        self.lines = 0;
+        self.mode = Mode::Frame;
     }
 
-    pub fn ppu(&mut self) {
-        self.mode = Mode::Ppu;
-    }
-
-    pub fn cpu(&mut self) {
-        self.mode = Mode::Cpu;
+    pub fn instruction(&mut self) {
+        self.mode = Mode::Instruction;
     }
 }
