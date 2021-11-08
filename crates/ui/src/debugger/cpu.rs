@@ -71,8 +71,8 @@ impl Cpu {
     }
 
     pub fn view(&mut self, theme: Theme) -> Element<CpuMsg, Renderer> {
-        let title = Text::new("Registers").medium_it(20);
-        let cpu_registers = Column::new().push(title).align_items(Alignment::Center);
+        let title = Text::new("Cpu").medium_it(20);
+        let cpu = Column::new().push(title).align_items(Alignment::Center);
         let registers = self.registers.iter().enumerate().fold(
             Column::new().padding(15).spacing(5),
             |column, (index, ui)| {
@@ -81,6 +81,6 @@ impl Cpu {
             },
         );
         let flags = self.flags.view(&self.data, theme);
-        cpu_registers.push(registers).push(flags).into()
+        cpu.push(registers).push(flags).into()
     }
 }

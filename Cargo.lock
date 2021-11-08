@@ -1786,6 +1786,7 @@ dependencies = [
  "num_enum",
  "pixels",
  "ppu",
+ "pretty-hex",
  "shared",
  "soc",
 ]
