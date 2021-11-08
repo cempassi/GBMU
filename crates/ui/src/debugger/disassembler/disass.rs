@@ -15,9 +15,13 @@ pub(super) struct Disass<T> {
 impl Disass<u8> {
     pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
         let name = Cell::light(self.name.clone(), 20);
+
         let code = format!("{:#04X}", self.opcode);
-        let code = Cell::light(format!("{:^14}", code), 20);
-        let cycles = Cell::light(format!("{:^12}", format!("{:>2}", self.cycles)), 20);
+        let code = Cell::light(format!("{:^6}", code), 20);
+
+        let cycles = format!("{:>2}", self.cycles);
+        let cycles = Cell::light(format!("{:^12}", cycles), 20);
+
         let data = Cell::light(self.data.to_string(), 20);
 
         Row::new()
@@ -43,11 +47,14 @@ impl Disass<u8> {
 
 impl Disass<(u8, u8)> {
     pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
-        let name = Cell::light(self.name.to_string(), 20);
+        let name = Cell::light(self.name.clone(), 20);
+
         let code = format!("{:#X}", self.opcode);
-        let code = Cell::light(format!("{:^12}", code), 20);
-        let cycles = format!("{:^12}", format!("{}/{}", self.cycles.0, self.cycles.1));
-        let cycles = Cell::light(cycles, 20);
+        let code = Cell::light(format!("{:^6}", code), 20);
+
+        let cycles = format!("{}/{}", self.cycles.0, self.cycles.1);
+        let cycles = Cell::light(format!("{:^12}", cycles), 20);
+
         let data = Cell::light(self.data.to_string(), 20);
 
         Row::new()
@@ -61,7 +68,7 @@ impl Disass<(u8, u8)> {
 
 impl<T> Disass<T> {
     pub fn name(name: String) -> String {
-        format!("{:^16}", name)
+        format!("{:^26}", name)
     }
 }
 
@@ -96,12 +103,12 @@ impl Data {
 impl ToString for Data {
     fn to_string(&self) -> String {
         match self {
-            Data::None | Data::Cb => format!("{:^16}", "None"),
+            Data::None | Data::Cb => format!("{:^6}", "None"),
             Data::Bits8(data) => {
-                format!("{:^16}", format!("{:#X}", *data))
+                format!("{:^6}", format!("{:#X}", *data))
             }
             Data::Bits16(data) => {
-                format!("{:^16}", format!("{:#X}", *data))
+                format!("{:^6}", format!("{:#X}", *data))
             }
         }
     }

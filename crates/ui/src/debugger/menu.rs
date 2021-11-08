@@ -1,7 +1,7 @@
 mod button;
 
-use button::Button;
 use crate::style::Theme;
+use button::Button;
 use iced_native::Length;
 use iced_wgpu::{Renderer, Row, Space};
 use iced_winit::Element;
@@ -68,4 +68,3 @@ impl Menu {
             .into()
     }
 }
-

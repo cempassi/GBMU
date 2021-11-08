@@ -57,7 +57,9 @@ impl Registers {
         let checkbox = Checkbox::new(self.is_merged(), "", |_| RegisterMsg::MergeToogle);
         let register = self.view_register(registers, theme);
         let space = Space::new(Length::Units(35), Length::Units(0));
-        let row = Row::new().align_items(Alignment::Center).width(Length::Shrink);
+        let row = Row::new()
+            .align_items(Alignment::Center)
+            .width(Length::Shrink);
         let row = match self {
             Registers::Splited(_, _) | Registers::Merged(_) => row.push(checkbox),
             Registers::NoSplit(_) => row.push(space),
@@ -110,7 +112,6 @@ impl Split for Bits16 {
         }
     }
 }
-
 
 impl View<RegisterMsg> for Bits8 {
     fn get_data(&self, registers: &cpu::Registers) -> String {

@@ -1,14 +1,17 @@
 use super::{CpuMsg, View};
-use iced_graphics::Alignment;
-use itertools::Itertools;
 use cpu::registers::{self, Bus};
+use iced_graphics::Alignment;
 use iced_native::Element;
-use iced_wgpu::{Column, Row, Renderer};
+use iced_wgpu::{Column, Renderer, Row};
+use itertools::Itertools;
 
-use crate::{debugger::widgets::{Flag, Text}, style::Theme};
+use crate::{
+    debugger::widgets::{Flag, Text},
+    style::Theme,
+};
 
 pub struct Flags {
-    flags: Vec<cpu::registers::Flag>
+    flags: Vec<cpu::registers::Flag>,
 }
 
 impl Flags {
@@ -40,6 +43,8 @@ impl View<CpuMsg> for registers::Flag {
 
     fn view(&self, registers: &cpu::Registers, _theme: Theme) -> Element<CpuMsg, Renderer> {
         let builder = Flag::new(20, 1, 5);
-        builder.render(self.get_name(), self.get_data(registers)).into()
+        builder
+            .render(self.get_name(), self.get_data(registers))
+            .into()
     }
 }

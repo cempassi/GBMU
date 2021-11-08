@@ -1,9 +1,9 @@
+mod cpu;
 mod disassembler;
 mod memory;
 mod menu;
 mod ui;
 mod widgets;
-mod cpu;
 use soc::SOC;
 mod ppu;
 

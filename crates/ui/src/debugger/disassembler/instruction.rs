@@ -93,7 +93,8 @@ impl Instruction {
     }
 
     pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
-        let address = Cell::light(format!("{:^12}", format!("{:#04X}", self.address)), 20);
+        let address = format!("{:#04X}", self.address);
+        let address = Cell::light(format!("{:^10}", address), 20);
         Row::new().push(address).push(self.disass.view()).into()
     }
 

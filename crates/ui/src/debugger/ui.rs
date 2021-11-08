@@ -1,7 +1,7 @@
+use super::cpu::{Cpu, CpuMsg};
 use super::disassembler::{DisassMsg, Disassembler};
 use super::memory::{Memory, MemoryMsg};
 use super::menu::{Menu, MenuMsg};
-use super::cpu::{Cpu, CpuMsg};
 use super::ppu::{Ppu, PpuMsg};
 use crate::style::Theme;
 use iced_wgpu::{Column, Renderer, Row};
@@ -106,7 +106,7 @@ impl Program for UserInterface {
             .menu
             .view(self.theme)
             .map(|message| Message::Menu(message));
-        let cpu_registers = self
+        let cpu = self
             .cpu
             .view(self.theme)
             .map(|message| Message::Registers(message));
@@ -118,7 +118,11 @@ impl Program for UserInterface {
             .ppu
             .view(self.theme)
             .map(|message| Message::Ppu(message));
-        let row = Row::new().push(cpu_registers).push(disassembler).push(ppu);
+        let row = Row::new()
+            .spacing(20)
+            .push(cpu)
+            .push(disassembler)
+            .push(ppu);
         let memory = self
             .memory
             .view(self.theme)
