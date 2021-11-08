@@ -1,6 +1,7 @@
 use crate::debugger::widgets::Text;
 use crate::error::Error;
 use iced_graphics::Alignment;
+use iced_native::Length;
 use iced_wgpu::{Column, Renderer};
 use iced_winit::Element;
 
@@ -83,7 +84,10 @@ impl Disassembler {
 
     pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
         let title = Text::new("Disassembler").medium_it(20);
-        let disassembler = Column::new().push(title).align_items(Alignment::Center);
+        let disassembler = Column::new()
+            .push(title)
+            .align_items(Alignment::Center)
+            .width(Length::Shrink);
         let mut column = Column::new();
         column = column.push(self.header.view());
         for instruction in &mut self.instructions {

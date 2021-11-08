@@ -1,12 +1,70 @@
 use crate::style::fonts;
 use crate::style::{Register, Style, Theme};
-use cpu::Registers;
-use iced_wgpu::{Container, Renderer, Row, Text};
+use iced_wgpu::{Checkbox, Container, Renderer, Row, Text};
 use iced_winit::{
     alignment::Alignment, alignment::Horizontal, alignment::Vertical, Element, Length, Space,
 };
 
+use super::View;
+
 use cpu::registers::{Bits16, Bits8, Bus};
+
+pub enum Registers {
+    Splited(Bits8, Bits8),
+    Merged(Bits16),
+    NoSplit(Bits16),
+}
+
+impl Registers {
+    pub fn swap(self) -> Self {
+        match self {
+            Registers::Splited(left, right) => Registers::Merged(left.merge(right)),
+            Registers::Merged(register) => {
+                let (left, right) = register.split();
+                Registers::Splited(left, right)
+            }
+            Registers::NoSplit(register) => Registers::NoSplit(register),
+        }
+    }
+
+    fn view_register(
+        &self,
+        registers: &cpu::Registers,
+        theme: Theme,
+    ) -> Element<RegisterMsg, Renderer> {
+        let space = Space::new(Length::Units(10), Length::Units(5));
+        match self {
+            Registers::Splited(left, right) => Row::new()
+                .push(left.view(registers, theme))
+                .push(space)
+                .push(right.view(registers, theme))
+                .into(),
+            Registers::Merged(register) | Registers::NoSplit(register) => {
+                register.view(registers, theme)
+            }
+        }
+    }
+
+    fn is_merged(&self) -> bool {
+        match self {
+            Registers::Splited(_, _) => false,
+            Registers::Merged(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
+        let checkbox = Checkbox::new(self.is_merged(), "", |_| RegisterMsg::MergeToogle);
+        let register = self.view_register(registers, theme);
+        let space = Space::new(Length::Units(35), Length::Units(0));
+        let row = Row::new().align_items(Alignment::Center).width(Length::Shrink);
+        let row = match self {
+            Registers::Splited(_, _) | Registers::Merged(_) => row.push(checkbox),
+            Registers::NoSplit(_) => row.push(space),
+        };
+        row.push(register).into()
+    }
+}
 
 #[derive(Debug, Clone)]
 pub enum RegisterMsg {
@@ -53,15 +111,9 @@ impl Split for Bits16 {
     }
 }
 
-pub trait View {
-    fn get_data(&self, registers: &Registers) -> String;
-    fn get_name(&self) -> String;
 
-    fn view(&self, registers: &Registers, theme: Theme) -> Element<RegisterMsg, Renderer>;
-}
-
-impl View for Bits8 {
-    fn get_data(&self, registers: &Registers) -> String {
+impl View<RegisterMsg> for Bits8 {
+    fn get_data(&self, registers: &cpu::Registers) -> String {
         if *self == Bits8::F {
             format!("{:04b}", registers.get(*self))
         } else {
@@ -73,7 +125,7 @@ impl View for Bits8 {
         format!("{:?}", self)
     }
 
-    fn view(&self, registers: &Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
+    fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
         let name = Text::new(self.get_name())
             .font(fonts::HASKLIG_BOLD)
             .size(20);
@@ -98,8 +150,8 @@ impl View for Bits8 {
     }
 }
 
-impl View for Bits16 {
-    fn get_data(&self, registers: &Registers) -> String {
+impl View<RegisterMsg> for Bits16 {
+    fn get_data(&self, registers: &cpu::Registers) -> String {
         format!("{:#x}", registers.get(*self))
     }
 
@@ -107,7 +159,7 @@ impl View for Bits16 {
         format!("{:?}", self)
     }
 
-    fn view(&self, registers: &Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
+    fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
         let name = Text::new(self.get_name())
             .font(fonts::HASKLIG_BOLD)
             .size(20);

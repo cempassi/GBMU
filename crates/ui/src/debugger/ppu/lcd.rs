@@ -1,6 +1,6 @@
-//use enum_iterator::IntoEnumIterator;
 use super::PpuMsg;
 use crate::debugger::widgets::Register;
+use iced_native::Length;
 use iced_wgpu::{Column, Renderer, Row};
 use iced_winit::Element;
 use ppu::Coordinates;
@@ -43,6 +43,6 @@ impl Lcd {
         let pair2 = self.pair(Field::Yscroll, Field::Xscroll);
         let pair3 = self.pair(Field::Ywindow, Field::Xwindow);
 
-        Column::new().push(pair1).push(pair2).push(pair3).into()
+        Column::new().push(pair1).push(pair2).push(pair3).width(Length::Shrink).into()
     }
 }

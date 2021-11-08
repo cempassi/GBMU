@@ -1,7 +1,8 @@
 use super::disassembler::{DisassMsg, Disassembler};
-use super::memory_map::{Memory, MemoryMsg};
+use super::memory::{Memory, MemoryMsg};
 use super::menu::{Menu, MenuMsg};
-use super::registers::{Cpu, CpuMsg, Ppu, PpuMsg};
+use super::cpu::{Cpu, CpuMsg};
+use super::ppu::{Ppu, PpuMsg};
 use crate::style::Theme;
 use iced_wgpu::{Column, Renderer, Row};
 use iced_winit::{Command, Element, Program};
@@ -105,14 +106,14 @@ impl Program for UserInterface {
             .menu
             .view(self.theme)
             .map(|message| Message::Menu(message));
-        let disassembler = self
-            .disassembler
-            .view()
-            .map(|message| Message::Disassembler(message));
         let cpu_registers = self
             .cpu
             .view(self.theme)
             .map(|message| Message::Registers(message));
+        let disassembler = self
+            .disassembler
+            .view()
+            .map(|message| Message::Disassembler(message));
         let ppu = self
             .ppu
             .view(self.theme)

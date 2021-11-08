@@ -11,10 +11,10 @@ pub(crate) mod logical;
 pub(crate) mod rotation;
 pub(crate) mod shift;
 
+pub use bus::Bus;
 pub use area::{Bits16, Bits8, Flag};
 pub(crate) use arithmetic::Arithmetic;
 pub(crate) use bitwise::Bitwise;
-pub use bus::Bus;
 pub(crate) use complement::Complement;
 pub(crate) use flags::{Carry, Flags};
 pub(crate) use incdec::IncDec;

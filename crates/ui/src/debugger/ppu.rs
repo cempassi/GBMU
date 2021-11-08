@@ -1,8 +1,9 @@
+mod lcd;
+
+use lcd::Lcd;
 use crate::style::Theme;
 use iced_wgpu::Renderer;
 use iced_winit::Element;
-
-use super::lcd::Lcd;
 
 pub struct Ppu {
     ppu: ppu::Ppu,

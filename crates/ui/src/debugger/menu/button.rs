@@ -2,8 +2,8 @@ use crate::style::Theme;
 use iced_wgpu::{button, Renderer};
 use iced_winit::Element;
 
-use super::menu::MenuMsg;
-use super::widgets::Text;
+use super::MenuMsg;
+use crate::debugger::widgets::Text;
 use soc::Status;
 
 pub struct Button {
