@@ -81,7 +81,7 @@ fn init_device(
 impl Debugger {
     pub fn new(event_loop: &EventLoop<()>, instance: &Instance, soc: SOC) -> Self {
         let title = "Debugger";
-        let size = Size::Physical(PhysicalSize::new(1248, 768));
+        let size = Size::Physical(PhysicalSize::new(1340, 768));
         let window = WindowBuilder::new()
             .with_title(title)
             .with_resizable(false)

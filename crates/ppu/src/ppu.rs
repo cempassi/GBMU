@@ -15,7 +15,7 @@ pub struct Ppu {
     screen: Vec<Color>,
     pub frame_ready: bool,
     pub vram_lock: bool,
-    pub(crate) registers: Registers,
+    pub registers: Registers,
     pub(crate) fifo: Fifo,
     pub(crate) x: usize,
 }
@@ -75,6 +75,10 @@ impl Ppu {
 
             pixel.copy_from_slice(&to_display);
         }
+    }
+
+    pub fn update_registers(&self, registers: &mut Registers) {
+        registers.update(&self.registers)
     }
 
     pub fn set_vram(&mut self, address: u16, data: u8) -> Result<(), Error> {

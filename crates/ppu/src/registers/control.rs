@@ -14,14 +14,14 @@
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[allow(dead_code)]
 pub struct Control {
-    pub(crate) lcd_enabled: bool,
-    pub(crate) window_area: u16,
-    pub(crate) window_enabled: bool,
-    pub(crate) data_area: u16,
-    pub(crate) bg_area: u16,
-    pub(crate) sprite_size: u8,
-    pub(crate) sprite_enabled: bool,
-    pub(crate) priority: bool,
+    pub lcd_enabled: bool,
+    pub window_area: u16,
+    pub window_enabled: bool,
+    pub data_area: u16,
+    pub bg_area: u16,
+    pub sprite_size: u8,
+    pub sprite_enabled: bool,
+    pub priority: bool,
 }
 
 impl Default for Control {

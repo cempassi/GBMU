@@ -63,18 +63,18 @@ pub use control::Control;
 
 #[derive(Debug, Default)]
 pub struct Registers {
-    pub(super) control: Control,
+    pub control: Control,
 
     // Status
-    pub(crate) mode: Mode,
+    pub mode: Mode,
     pub lyc_ly: bool,
-    hblank_interupt: bool,
-    vblank_interupt: bool,
-    oam_interupt: bool,
-    lyc_ly_interupt: bool,
+    pub hblank_interupt: bool,
+    pub vblank_interupt: bool,
+    pub oam_interupt: bool,
+    pub lyc_ly_interupt: bool,
 
     //Lcd Coordinates
-    pub(crate) coordinates: Coordinates,
+    pub coordinates: Coordinates,
     // bgp: palette::Monochrome,
     // objp0: palette::Monochrome,
     // objp1: palette::Monochrome,
@@ -100,6 +100,10 @@ impl Registers {
     pub fn increase(&mut self, field: Field) {
         self.coordinates.increase(field);
         self.check_ly();
+    }
+
+    pub fn update(&mut self, src: &Self) {
+        *self = Self { ..*src };
     }
 
     pub fn clear(&mut self, field: Field) {

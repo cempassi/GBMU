@@ -44,6 +44,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8da52d66c7071e2e3fa2a1e5c6d088fec47b593032b254f5e980de8ea54454d6"
 
 [[package]]
+name = "ascii"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbf56136a5198c7b01a49e3afcbef6cf84597273d298f54432926024107b0109"
+
+[[package]]
 name = "ash"
 version = "0.33.3+1.2.191"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1399,6 +1405,7 @@ checksum = "bb20dcc30536a1508e75d47dd0e399bb2fe7354dcf35cda9127f2bf1ed92e30e"
 name = "ppu"
 version = "0.1.0"
 dependencies = [
+ "enum-iterator",
  "futures",
  "modular-bitfield",
  "num_enum",
@@ -1775,6 +1782,7 @@ dependencies = [
 name = "ui"
 version = "0.1.0"
 dependencies = [
+ "ascii",
  "cpu",
  "enum-iterator",
  "iced_graphics",

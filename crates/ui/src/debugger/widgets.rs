@@ -1,6 +1,6 @@
 pub(crate) mod cell;
 pub(crate) mod flag;
-pub mod hexdump;
+pub(crate) mod memory;
 pub(crate) mod register;
 pub(crate) mod text;
 
