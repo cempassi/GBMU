@@ -1,3 +1,4 @@
+use enum_iterator::IntoEnumIterator;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use std::fmt;
 
@@ -12,12 +13,12 @@ pub struct Coordinates {
 }
 
 #[repr(u16)]
-#[derive(Debug, TryFromPrimitive, IntoPrimitive, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, TryFromPrimitive, IntoPrimitive, IntoEnumIterator, PartialEq, Eq, Clone, Copy)]
 pub enum Field {
-    Yscroll = 0xFF42,
-    Xscroll = 0xFF43,
     Ly = 0xFF44,
     LyCmp = 0xFF45,
+    Yscroll = 0xFF42,
+    Xscroll = 0xFF43,
     Ywindow = 0xFF4A,
     Xwindow = 0xFF4B,
 }
