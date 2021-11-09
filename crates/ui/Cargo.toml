@@ -10,6 +10,7 @@ authors = [
 
 [dependencies]
 pixels = "0.7.0"
+ascii = "1.0.0"
 pretty-hex = "0.2.1"
 enum-iterator = "0.7.0"
 num_enum = "0.5.3"

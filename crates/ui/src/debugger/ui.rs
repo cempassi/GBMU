@@ -27,7 +27,7 @@ impl From<SOC> for UserInterface {
         let mut ui = Self {
             theme: Theme::default(),
             cpu: Cpu::new(cpu.clone()),
-            memory: <Memory as From<memory::Memory>>::from(memory),
+            memory: Memory::new(memory),
             menu: Menu::new(runner),
             disassembler: Disassembler::new(cpu),
             ppu: Ppu::new(ppu),
@@ -106,6 +106,7 @@ impl Program for UserInterface {
             .menu
             .view(self.theme)
             .map(|message| Message::Menu(message));
+        let main = Column::new().push(menu);
         let cpu = self
             .cpu
             .view(self.theme)
@@ -114,19 +115,19 @@ impl Program for UserInterface {
             .disassembler
             .view()
             .map(|message| Message::Disassembler(message));
-        let ppu = self
-            .ppu
-            .view(self.theme)
-            .map(|message| Message::Ppu(message));
-        let row = Row::new()
-            .spacing(20)
-            .push(cpu)
-            .push(disassembler)
-            .push(ppu);
+        let cpu_disass = Row::new().push(cpu).push(disassembler);
+
         let memory = self
             .memory
             .view(self.theme)
             .map(|message| Message::Memory(message));
-        Column::new().push(menu).push(row).push(memory).into()
+        let left = Column::new().push(cpu_disass).push(memory);
+
+        let ppu = self
+            .ppu
+            .view(self.theme)
+            .map(|message| Message::Ppu(message));
+        let debugger = Row::new().push(left).push(ppu);
+        main.push(debugger).into()
     }
 }
