@@ -1,5 +1,5 @@
 use super::Text;
-use iced_wgpu::Row;
+use iced::Row;
 
 pub struct Cell {}
 

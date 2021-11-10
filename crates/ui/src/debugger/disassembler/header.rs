@@ -1,5 +1,4 @@
-use iced_wgpu::{Renderer, Row};
-use iced_winit::Element;
+use iced::{Element, Row};
 
 use super::DisassMsg;
 use crate::debugger::widgets::Cell;
@@ -11,7 +10,7 @@ impl Header {
         Self {}
     }
 
-    pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
+    pub fn view(&mut self) -> Element<DisassMsg> {
         let address = Cell::bold(format!("{:^10}", "Address"), 20);
         let instruction = Cell::bold(format!("{:^26}", "Instruction"), 20);
         let opcode = Cell::bold(format!("{:^6}", "Opcode"), 20);

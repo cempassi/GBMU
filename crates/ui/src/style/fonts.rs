@@ -1,4 +1,4 @@
-use iced_winit::Font;
+use iced::Font;
 
 pub const HASKLIG_BOLD: Font = Font::External {
     name: "Hasklig Bold",

@@ -1,8 +1,6 @@
 use super::{CpuMsg, View};
 use cpu::registers::{self, Bus};
-use iced_graphics::Alignment;
-use iced_native::Element;
-use iced_wgpu::{Column, Renderer, Row};
+use iced::{Alignment,Element, Column, Row};
 use itertools::Itertools;
 
 use crate::{
@@ -19,7 +17,7 @@ impl Flags {
         Self { flags }
     }
 
-    pub fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<CpuMsg, Renderer> {
+    pub fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<CpuMsg> {
         let title = Text::new("Flags").medium_it(20);
         let mut column = Column::new().push(title).align_items(Alignment::Center);
         for (left, right) in self.flags.iter().tuples() {
@@ -41,7 +39,7 @@ impl View<CpuMsg> for registers::Flag {
         format!("{:?}", *self)
     }
 
-    fn view(&self, registers: &cpu::Registers, _theme: Theme) -> Element<CpuMsg, Renderer> {
+    fn view(&self, registers: &cpu::Registers, _theme: Theme) -> Element<CpuMsg> {
         let builder = Flag::new(20, 1, 5);
         builder
             .render(self.get_name(), self.get_data(registers))

@@ -1,6 +1,5 @@
 use crate::style::Theme;
-use iced_wgpu::{button, Renderer};
-use iced_winit::Element;
+use iced::{button, Element};
 
 use super::MenuMsg;
 use crate::debugger::widgets::Text;
@@ -43,7 +42,7 @@ impl Button {
         self.message == message
     }
 
-    pub fn view(&mut self, theme: Theme) -> Element<MenuMsg, Renderer> {
+    pub fn view(&mut self, theme: Theme) -> Element<MenuMsg> {
         let text = format!("{:?}", self.message);
         let text = format!("{:^10}", text);
         let text = Text::new(&text).medium(20);

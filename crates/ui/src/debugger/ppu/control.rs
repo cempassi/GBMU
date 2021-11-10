@@ -1,7 +1,5 @@
 use super::View;
-use iced_graphics::Alignment;
-use iced_native::Element;
-use iced_wgpu::{Column, Renderer, Row};
+use iced::{Alignment, Column, Element, Row};
 use ppu::registers::Control;
 
 use super::PpuMsg;
@@ -11,7 +9,7 @@ use crate::{
 };
 
 impl View<PpuMsg> for Control {
-    fn view(&self, _theme: Theme) -> Element<PpuMsg, Renderer> {
+    fn view(&self, _theme: Theme) -> Element<PpuMsg> {
         let title = Text::new("Control").medium_it(20);
         let control = Column::new().align_items(Alignment::Center).push(title);
 

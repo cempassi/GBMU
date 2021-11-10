@@ -1,5 +1,4 @@
-use iced_wgpu::{button, checkbox, container, Color};
-use iced_winit::Vector;
+use iced::{button, checkbox, container, Color, Vector};
 
 const BACKGROUND: Color = Color::from_rgb(
     0xFF as f32 / 255.0,

@@ -1,5 +1,5 @@
 use super::Text;
-use iced_wgpu::{Container, Row};
+use iced::{Container, Row};
 use std::fmt::Display;
 
 const TEXT_SIZE: u16 = 20;

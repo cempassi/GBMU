@@ -1,7 +1,6 @@
 use super::DisassMsg;
 use crate::debugger::widgets::Cell;
-use iced_wgpu::{Renderer, Row};
-use iced_winit::Element;
+use iced::{Element ,Row};
 use memory::Memory;
 use shared::Error;
 
@@ -13,7 +12,7 @@ pub(super) struct Disass<T> {
 }
 
 impl Disass<u8> {
-    pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
+    pub fn view(&mut self) -> Element<DisassMsg> {
         let name = Cell::light(self.name.clone(), 20);
 
         let code = format!("{:#04X}", self.opcode);
@@ -46,7 +45,7 @@ impl Disass<u8> {
 }
 
 impl Disass<(u8, u8)> {
-    pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
+    pub fn view(&mut self) -> Element<DisassMsg> {
         let name = Cell::light(self.name.clone(), 20);
 
         let code = format!("{:#X}", self.opcode);

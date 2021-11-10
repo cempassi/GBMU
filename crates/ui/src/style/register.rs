@@ -1,6 +1,5 @@
 use super::{Style, Theme};
-use iced_wgpu::{container, Color};
-use iced_winit::Background;
+use iced::{container, Color, Background};
 
 pub struct Register {
     text_color: Option<Color>,

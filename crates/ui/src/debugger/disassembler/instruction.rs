@@ -1,7 +1,6 @@
 use super::disass::Disass;
 use crate::debugger::widgets::Cell;
-use iced_wgpu::{Renderer, Row};
-use iced_winit::Element;
+use iced::{Element, Row};
 use num_enum::TryFromPrimitive;
 
 use super::DisassMsg;
@@ -92,7 +91,7 @@ impl Instruction {
         })
     }
 
-    pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
+    pub fn view(&mut self) -> Element<DisassMsg> {
         let address = format!("{:#04X}", self.address);
         let address = Cell::light(format!("{:^10}", address), 20);
         Row::new().push(address).push(self.disass.view()).into()
@@ -137,7 +136,7 @@ impl Cycles {
         }
     }
 
-    pub fn view(&mut self) -> Element<DisassMsg, Renderer> {
+    pub fn view(&mut self) -> Element<DisassMsg> {
         match self {
             Cycles::Absolute(ref mut disass) => Disass::<u8>::view(disass),
             Cycles::Conditionnal(ref mut disass) => Disass::<(u8, u8)>::view(disass),

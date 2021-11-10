@@ -1,4 +1,4 @@
-use iced_native::Command;
+use iced::{Command, Element};
 use iced_wgpu::Renderer;
 use iced_wgpu::Text;
 use iced_winit::Program;
@@ -14,11 +14,11 @@ impl Program for UserInterface {
 
     type Message = Message;
 
-    fn update(&mut self, _message: Self::Message) -> iced_native::Command<Self::Message> {
+    fn update(&mut self, _message: Self::Message) -> Command<Self::Message> {
         Command::none()
     }
 
-    fn view(&mut self) -> iced_native::Element<'_, Self::Message, Self::Renderer> {
+    fn view(&mut self) -> Element<Self::Message> {
         Text::new("Hello Mate").size(20).into()
     }
 }

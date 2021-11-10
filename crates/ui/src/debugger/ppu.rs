@@ -3,9 +3,7 @@ mod coordinates;
 
 use crate::debugger::widgets::{Register, Text};
 use crate::style::Theme;
-use iced_graphics::Alignment;
-use iced_wgpu::{Column, Renderer, Row};
-use iced_winit::Element;
+use iced::{Column, Element, Row, Alignment};
 use ppu::Registers;
 
 pub struct Ppu {
@@ -14,7 +12,7 @@ pub struct Ppu {
 }
 
 pub trait View<Msg> {
-    fn view(&self, theme: Theme) -> Element<Msg, Renderer>;
+    fn view(&self, theme: Theme) -> Element<Msg>;
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -32,13 +30,13 @@ impl Ppu {
         self.ppu.borrow().update_registers(&mut self.data);
     }
 
-    pub fn view(&self, theme: Theme) -> Element<PpuMsg, Renderer> {
+    pub fn view(&self, theme: Theme) -> Element<PpuMsg> {
         self.data.view(theme)
     }
 }
 
 impl View<PpuMsg> for Registers {
-    fn view(&self, theme: Theme) -> Element<PpuMsg, Renderer> {
+    fn view(&self, theme: Theme) -> Element<PpuMsg> {
         let ppu = Text::new("Ppu").medium_it(20);
         let ppu = Column::new()
             .align_items(Alignment::Center)
