@@ -84,7 +84,7 @@ impl Debugger {
         let size = Size::Physical(PhysicalSize::new(1340, 768));
         let window = WindowBuilder::new()
             .with_title(title)
-            .with_resizable(false)
+            .with_resizable(true)
             .with_inner_size(size)
             .build(event_loop)
             .unwrap();
@@ -141,7 +141,7 @@ impl Debugger {
         if let Some(event) =
             iced_winit::conversion::window_event(&event, self.window.scale_factor(), self.modifiers)
         {
-            self.state.state.queue_event(event);
+                self.state.state.queue_event(event);
         }
     }
 
@@ -181,7 +181,7 @@ impl Debugger {
                         label: Some("Render Encoder"),
                     });
 
-                // Generate the frame that we will render to.
+                // Generate the view that we will render to.
                 let view = frame.texture.create_view(&TextureViewDescriptor::default());
 
                 // Clear the screen to white before drawing
@@ -218,6 +218,7 @@ impl Debugger {
                 // Then we submit the work
                 self.staging_belt.finish();
                 self.queue.submit(Some(encoder.finish()));
+                frame.present();
 
                 // Update the mouse cursor
                 self.window.set_cursor_icon(mouse_interaction(mouse_action));
@@ -229,7 +230,6 @@ impl Debugger {
                     .expect("Recall staging buffers");
 
                 self.format_pool.run_until_stalled();
-                frame.present();
             }
             Err(error) => match error {
                 SurfaceError::OutOfMemory => {
@@ -237,6 +237,7 @@ impl Debugger {
                 }
                 _ => {
                     // Try rendering again next frame.
+                    println!("Couldn't get current texture");
                     self.window.request_redraw();
                 }
             },

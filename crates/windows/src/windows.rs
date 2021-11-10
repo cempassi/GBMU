@@ -1,6 +1,6 @@
 use iced_wgpu::wgpu::Instance;
 use iced_winit::winit::event::{Event, StartCause};
-use iced_winit::winit::event_loop::{ControlFlow, EventLoop};
+use iced_winit::winit::event_loop::EventLoop;
 use shared::Redraw;
 use soc::{TryInit, SOC};
 
@@ -26,8 +26,6 @@ impl Windows {
         let mut debugger = debugger::Debugger::new(&event_loop, &instance, soc.clone());
         let mut emulator = emulator::Emulator::new(&event_loop, soc.clone());
         event_loop.run(move |event, _, flow| {
-            *flow = ControlFlow::Poll;
-
             // Handle Events
             match event {
                 Event::NewEvents(StartCause::Init) => {}
@@ -38,8 +36,14 @@ impl Windows {
                     emulator.process_event(event, flow);
                 }
                 Event::MainEventsCleared => {
-                    debugger.request_redraw();
-                    emulator.request_redraw();
+                    if !debugger.state.state.is_queue_empty() {
+                        println!("Requesting debugger redraw");
+                        debugger.request_redraw();
+                    }
+                    if !emulator.state.state.is_queue_empty() {
+                        println!("Requesting emulator redraw");
+                        emulator.request_redraw();
+                    }
                 }
                 Event::RedrawRequested(window_id) if window_id == debugger.id => {
                     debugger.redraw();
