@@ -35,6 +35,9 @@ impl Button {
             MenuMsg::Instruction => {
                 self.status.borrow_mut().instruction();
             }
+            MenuMsg::Second => {
+                self.status.borrow_mut().second();
+            }
         }
     }
 

@@ -1,11 +1,13 @@
 mod fetcher;
-use futures::future::FutureExt;
+use std::task::{Context, Poll};
 
-use crate::futures::Writer;
-use futures::{pending, select};
+use futures::Future;
+
+use crate::futures::Pop;
+use futures::pending;
 use shared::Error;
 
-use crate::{Field, Ppu};
+use crate::Ppu;
 use fetcher::Fetcher;
 
 #[allow(dead_code)]
@@ -19,36 +21,31 @@ impl Pixel {
     }
 
     pub async fn start(self) -> Result<u8, Error> {
-        let ly = self.ppu.borrow().registers.coordinates.get(Field::Ly);
-        let bg_area = self.ppu.borrow().registers.control.bg_area;
-        let line = ly % 8;
-        let mut id = 0;
-        let id_address = bg_area + ((ly as u16 / 8) * 32);
+        // Remember: The fetcher works on a line basis
+        // The future is created here, but the actual fetching is made
+        // after
+        let waker = shared::waker::create();
+        let mut context = Context::from_waker(&waker);
 
-        let fetcher = Fetcher::new(self.ppu.clone(), id_address, id).fetch(line);
-        let mut fetching = Box::pin(fetcher).fuse();
-        let mut writer = Box::pin(Writer::new(&self.ppu)).fuse();
+        let fetcher = Fetcher::new(self.ppu.clone()).fetch();
+        let mut fetching = Box::pin(fetcher);
+        let mut pop = Box::pin(Pop::new(&self.ppu));
 
-        // Mot sure about the timings here, needs further investigation
-        while !self.ppu.borrow_mut().line_finished() {
-            select! {
-                _ = fetching => {
-                    id += 1;
-                    let fetcher = Fetcher::new(self.ppu.clone(), id_address,  id).fetch(line);
-                    fetching =  Box::pin(fetcher).fuse();
-                },
-                _ = writer => {
-                writer =  Box::pin(Writer::new(&self.ppu)).fuse();
-                    },
-                complete => {
-                    id += 1;
-                    let fetcher = Fetcher::new(self.ppu.clone(), id_address,  id).fetch(line);
-                    fetching =  Box::pin(fetcher).fuse();
-                    writer =  Box::pin(Writer::new(&self.ppu)).fuse();
+        let mut cycles = 0;
+        loop {
+            match fetching.as_mut().poll(&mut context) {
+                Poll::Ready(_) => break,
+                Poll::Pending => (),
+            }
+            match pop.as_mut().poll(&mut context) {
+                Poll::Ready(ticks) => {
+                    cycles = ticks;
+                    break;
                 }
-            };
+                Poll::Pending => (),
+            }
             pending!();
         }
-        Ok(0)
+        Ok(cycles)
     }
 }

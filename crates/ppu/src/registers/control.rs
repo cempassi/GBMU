@@ -15,10 +15,10 @@
 #[allow(dead_code)]
 pub struct Control {
     pub lcd_enabled: bool,
-    pub window_area: u16,
     pub window_enabled: bool,
-    pub data_area: u16,
     pub bg_area: u16,
+    pub window_area: u16,
+    pub data_area: u16,
     pub sprite_size: u8,
     pub sprite_enabled: bool,
     pub priority: bool,

@@ -45,6 +45,26 @@ impl Coordinates {
         *dst = Self { ..*self };
     }
 
+    pub fn line(&self) -> usize {
+        (self.ly % 8) as usize
+    }
+
+    pub fn y(&self) -> usize {
+        self.ly.wrapping_add(self.yscroll) as usize
+    }
+
+    pub fn x(&self, x: usize) -> usize {
+        usize::from(self.xscroll).wrapping_add(x)
+    }
+
+    pub fn row(&self) -> usize {
+        self.y() / 8
+    }
+
+    pub fn offset(&self, x: usize) -> usize {
+        self.ly as usize * crate::ppu::WIDTH + x
+    }
+
     pub fn get(&self, field: Field) -> u8 {
         match field {
             Field::Xscroll => self.xscroll,
@@ -109,5 +129,10 @@ impl Coordinates {
             Field::Ywindow => self.ywindow = 0,
             Field::Xwindow => self.xwindow = 0,
         }
+    }
+
+    /// Get a reference to the coordinates's xscroll.
+    pub fn xscroll(&self) -> u8 {
+        self.xscroll
     }
 }
