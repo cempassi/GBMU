@@ -16,6 +16,7 @@ pub enum MenuMsg {
     Line,
     Frame,
     Instruction,
+    Second,
 }
 
 impl Menu {
@@ -23,11 +24,12 @@ impl Menu {
         let tick = Button::new(status.clone(), MenuMsg::Tick);
         let instruction = Button::new(status.clone(), MenuMsg::Instruction);
         let line = Button::new(status.clone(), MenuMsg::Line);
-        let frame = Button::new(status, MenuMsg::Frame);
+        let frame = Button::new(status.clone(), MenuMsg::Frame);
+        let second = Button::new(status, MenuMsg::Second);
 
         Self {
             left: vec![],
-            right: vec![frame, line, instruction, tick],
+            right: vec![second, frame, line, instruction, tick],
         }
     }
 

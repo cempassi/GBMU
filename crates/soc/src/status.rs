@@ -1,5 +1,6 @@
 use super::mode::Mode;
 use shared::{Finished, Redraw};
+use std::time::Instant;
 
 #[derive(Debug, Default)]
 pub struct Status {
@@ -17,6 +18,10 @@ impl Status {
         self.redraw = Redraw::Nope;
         for status in status {
             match (status, self.mode) {
+                (_, Mode::Second(time)) if time.elapsed().as_secs() > 1 => {
+                    self.mode.idle();
+                    self.redraw.update(Redraw::All);
+                }
                 (Finished::Cpu(cycles), Mode::Instruction) => {
                     self.mode.idle();
                     self.last_cpu_cycle = *cycles;
@@ -90,5 +95,9 @@ impl Status {
 
     pub fn instruction(&mut self) {
         self.mode = Mode::Instruction;
+    }
+
+    pub fn second(&mut self) {
+        self.mode = Mode::Second(Instant::now());
     }
 }
