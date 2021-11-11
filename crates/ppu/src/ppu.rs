@@ -5,8 +5,8 @@ use shared::Interrupts;
 use shared::{Error, Interrupt};
 
 pub const VRAM_START: u16 = 0x8000;
-const WIDTH: usize = 160;
-const HEIGHT: usize = 144;
+pub const WIDTH: usize = 160;
+pub const HEIGHT: usize = 144;
 
 #[derive(Debug)]
 pub struct Ppu {
@@ -108,23 +108,27 @@ impl Ppu {
         self.interrupts.borrow_mut().request(Interrupt::Lcd);
     }
 
-    pub fn line_finished(&mut self) -> bool {
-        if self.x == 160 {
-            self.x = 0;
+    pub fn pop(&mut self) -> bool {
+        if let Some(pixel) = self.fifo.try_pop() {
+            let color = Color::from(pixel);
+            let offset = self.registers.coordinates.offset(self.x);
+            println!(
+                "[FIFO] Poped data. x: {}, offset: {}, len {}",
+                self.x,
+                offset,
+                self.fifo.len()
+            );
+            self.screen[offset] = color;
+            self.x += 1;
             true
         } else {
+            println!("Cannot write. Data in fifo: {}", self.fifo.len());
             false
         }
     }
 
-    pub fn write(&mut self) -> Option<()> {
-        if let Some(pixel) = self.fifo.pop() {
-            let color = Color::from(pixel);
-            self.screen[self.x] = color;
-            self.x += 1;
-            Some(())
-        } else {
-            None
-        }
+    /// Get a reference to the ppu's registers.
+    pub fn registers(&self) -> &Registers {
+        &self.registers
     }
 }

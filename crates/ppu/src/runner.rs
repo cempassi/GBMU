@@ -36,11 +36,12 @@ impl Run for Ppu {
 
 async fn run(ppu: Ppu) -> Result<Finished, Error> {
     if ppu.borrow_mut().registers.is_lower(lcd::Field::Ly, 144) {
+        ppu.borrow_mut().x = 0;
         Oam::search(ppu.clone()).await;
-        let _cycles = Pixel::transfert(ppu.clone()).start().await?;
+        let cycles = Pixel::transfert(ppu.clone()).start().await?;
+        println!("[FETCHER] fetcher ticks: {}", cycles);
         Blank::new(HBLANK).await;
         ppu.borrow_mut().registers.increase(lcd::Field::Ly);
-        let _ly = ppu.borrow_mut().registers.coordinates.get(lcd::Field::Ly);
         Ok(Finished::Line(42))
     } else {
         ppu.borrow().raise_vblank();

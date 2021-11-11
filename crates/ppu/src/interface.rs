@@ -3,6 +3,8 @@ use std::cell::RefCell;
 use std::ops::{Deref, DerefMut};
 use std::rc::Rc;
 
+use crate::futures;
+
 #[derive(Debug, Clone)]
 pub struct Ppu(Rc<RefCell<super::ppu::Ppu>>);
 
@@ -29,11 +31,11 @@ impl Ppu {
 }
 
 pub trait Push<'push> {
-    fn push(&self, data: Vec<u8>) -> crate::fifo::Pusher;
+    fn push(&self, data: Vec<u8>) -> futures::Push;
 }
 
 impl<'push> Push<'push> for Ppu {
-    fn push(&self, data: Vec<u8>) -> crate::fifo::Pusher {
-        crate::fifo::Pusher::new(self, data)
+    fn push(&self, data: Vec<u8>) -> futures::Push {
+        futures::Push::new(self, data)
     }
 }
