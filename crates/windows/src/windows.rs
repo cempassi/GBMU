@@ -37,11 +37,9 @@ impl Windows {
                 }
                 Event::MainEventsCleared => {
                     if !debugger.state.state.is_queue_empty() {
-                        println!("Requesting debugger redraw");
                         debugger.request_redraw();
                     }
                     if !emulator.state.state.is_queue_empty() {
-                        println!("Requesting emulator redraw");
                         emulator.request_redraw();
                     }
                 }
