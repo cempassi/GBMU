@@ -21,7 +21,7 @@ impl<T> Hexdump<T> {
         Text::new(self.name.clone()).bold(10)
     }
 
-    pub fn name(&self) -> String {
+    pub fn _name(&self) -> String {
         self.name.clone()
     }
 

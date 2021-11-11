@@ -15,7 +15,6 @@ pretty-hex = "0.2.1"
 enum-iterator = "0.7.0"
 num_enum = "0.5.3"
 itertools = "0.10.1"
-iced_aw = { git = "https://github.com/cempassi/iced_aw.git", branch = "wgpu", default-features = false, features = ["tabs"] }
 iced_graphics = {git = "https://github.com/hecrj/iced", rev = "20177e423cd2bdc08f8060b31c379a6f764e3df6"}
 iced_native = {git = "https://github.com/hecrj/iced", rev = "20177e423cd2bdc08f8060b31c379a6f764e3df6"}
 iced_wgpu = {git = "https://github.com/hecrj/iced", rev = "20177e423cd2bdc08f8060b31c379a6f764e3df6"}

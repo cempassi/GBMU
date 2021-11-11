@@ -5,7 +5,6 @@ use iced::{
     alignment::{Horizontal, Vertical},
     Column, Container, Length, Text,
 };
-use iced_aw::TabLabel;
 use memory::{Bus, Rom};
 use ppu::Ppu;
 
@@ -13,8 +12,6 @@ const TAB_PADDING: u16 = 16;
 
 pub trait View {
     fn title(&self) -> Text;
-
-    fn tab_label(&self) -> TabLabel;
 
     fn view(&mut self, theme: Theme) -> Container<MemoryMsg> {
         let column = Column::new()
@@ -44,10 +41,6 @@ impl View for Hexdump<Bus> {
     fn title(&self) -> Text {
         self.title()
     }
-
-    fn tab_label(&self) -> TabLabel {
-        TabLabel::Text(self.name())
-    }
 }
 
 impl View for Hexdump<Rom> {
@@ -61,10 +54,6 @@ impl View for Hexdump<Rom> {
     fn title(&self) -> Text {
         self.title()
     }
-
-    fn tab_label(&self) -> TabLabel {
-        TabLabel::Text(self.name())
-    }
 }
 
 impl View for Hexdump<Ppu> {
@@ -77,9 +66,5 @@ impl View for Hexdump<Ppu> {
 
     fn title(&self) -> Text {
         self.title()
-    }
-
-    fn tab_label(&self) -> TabLabel {
-        TabLabel::Text(self.name())
     }
 }

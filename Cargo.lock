@@ -147,9 +147,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.0.71"
+version = "1.0.72"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "79c2681d6594606957bbb8631c4b90a7fcaaa72cdb714743a437b156d6a7eedd"
+checksum = "22a9137b95ea06864e018375b72adfb7db6e6f68cfc8df5a04d00288050485ee"
 
 [[package]]
 name = "cfg-if"
@@ -958,38 +958,15 @@ name = "iced"
 version = "0.3.0"
 source = "git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6#20177e423cd2bdc08f8060b31c379a6f764e3df6"
 dependencies = [
- "iced_core 0.4.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
- "iced_futures 0.3.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
- "iced_web 0.4.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
- "iced_wgpu 0.4.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
+ "iced_core",
+ "iced_futures",
+ "iced_web",
+ "iced_wgpu",
  "iced_winit",
  "thiserror",
 ]
 
 [[package]]
-name = "iced_aw"
-version = "0.1.0"
-source = "git+https://github.com/cempassi/iced_aw.git?branch=wgpu#949ca49a6e36b7e9f5fc10c11c405ca02e95df7d"
-dependencies = [
- "dodrio",
- "iced_graphics 0.2.0 (git+https://github.com/hecrj/iced.git?rev=20177e4)",
- "iced_native 0.4.0 (git+https://github.com/hecrj/iced.git?rev=20177e4)",
- "iced_style 0.3.0 (git+https://github.com/hecrj/iced.git?rev=20177e4)",
- "iced_web 0.4.0 (git+https://github.com/hecrj/iced.git?rev=20177e4)",
- "iced_wgpu 0.4.0 (git+https://github.com/hecrj/iced.git?rev=20177e4)",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
-name = "iced_core"
-version = "0.4.0"
-source = "git+https://github.com/hecrj/iced.git?rev=20177e4#20177e423cd2bdc08f8060b31c379a6f764e3df6"
-dependencies = [
- "bitflags",
-]
-
-[[package]]
 name = "iced_core"
 version = "0.4.0"
 source = "git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6#20177e423cd2bdc08f8060b31c379a6f764e3df6"
@@ -1000,34 +977,11 @@ dependencies = [
 [[package]]
 name = "iced_futures"
 version = "0.3.0"
-source = "git+https://github.com/hecrj/iced.git?rev=20177e4#20177e423cd2bdc08f8060b31c379a6f764e3df6"
-dependencies = [
- "futures",
- "log",
- "wasm-bindgen-futures",
-]
-
-[[package]]
-name = "iced_futures"
-version = "0.3.0"
 source = "git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6#20177e423cd2bdc08f8060b31c379a6f764e3df6"
 dependencies = [
  "futures",
  "log",
  "wasm-bindgen-futures",
-]
-
-[[package]]
-name = "iced_graphics"
-version = "0.2.0"
-source = "git+https://github.com/hecrj/iced.git?rev=20177e4#20177e423cd2bdc08f8060b31c379a6f764e3df6"
-dependencies = [
- "bytemuck",
- "glam",
- "iced_native 0.4.0 (git+https://github.com/hecrj/iced.git?rev=20177e4)",
- "iced_style 0.3.0 (git+https://github.com/hecrj/iced.git?rev=20177e4)",
- "raw-window-handle",
- "thiserror",
 ]
 
 [[package]]
@@ -1038,8 +992,8 @@ dependencies = [
  "bytemuck",
  "font-kit",
  "glam",
- "iced_native 0.4.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
- "iced_style 0.3.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
+ "iced_native",
+ "iced_style",
  "raw-window-handle",
  "thiserror",
 ]
@@ -1047,22 +1001,10 @@ dependencies = [
 [[package]]
 name = "iced_native"
 version = "0.4.0"
-source = "git+https://github.com/hecrj/iced.git?rev=20177e4#20177e423cd2bdc08f8060b31c379a6f764e3df6"
-dependencies = [
- "iced_core 0.4.0 (git+https://github.com/hecrj/iced.git?rev=20177e4)",
- "iced_futures 0.3.0 (git+https://github.com/hecrj/iced.git?rev=20177e4)",
- "num-traits",
- "twox-hash",
- "unicode-segmentation",
-]
-
-[[package]]
-name = "iced_native"
-version = "0.4.0"
 source = "git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6#20177e423cd2bdc08f8060b31c379a6f764e3df6"
 dependencies = [
- "iced_core 0.4.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
- "iced_futures 0.3.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
+ "iced_core",
+ "iced_futures",
  "num-traits",
  "twox-hash",
  "unicode-segmentation",
@@ -1071,34 +1013,9 @@ dependencies = [
 [[package]]
 name = "iced_style"
 version = "0.3.0"
-source = "git+https://github.com/hecrj/iced.git?rev=20177e4#20177e423cd2bdc08f8060b31c379a6f764e3df6"
-dependencies = [
- "iced_core 0.4.0 (git+https://github.com/hecrj/iced.git?rev=20177e4)",
-]
-
-[[package]]
-name = "iced_style"
-version = "0.3.0"
 source = "git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6#20177e423cd2bdc08f8060b31c379a6f764e3df6"
 dependencies = [
- "iced_core 0.4.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
-]
-
-[[package]]
-name = "iced_web"
-version = "0.4.0"
-source = "git+https://github.com/hecrj/iced.git?rev=20177e4#20177e423cd2bdc08f8060b31c379a6f764e3df6"
-dependencies = [
- "base64",
- "dodrio",
- "iced_core 0.4.0 (git+https://github.com/hecrj/iced.git?rev=20177e4)",
- "iced_futures 0.3.0 (git+https://github.com/hecrj/iced.git?rev=20177e4)",
- "iced_style 0.3.0 (git+https://github.com/hecrj/iced.git?rev=20177e4)",
- "num-traits",
- "url",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
+ "iced_core",
 ]
 
 [[package]]
@@ -1108,33 +1025,14 @@ source = "git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f
 dependencies = [
  "base64",
  "dodrio",
- "iced_core 0.4.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
- "iced_futures 0.3.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
- "iced_style 0.3.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
+ "iced_core",
+ "iced_futures",
+ "iced_style",
  "num-traits",
  "url",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
-]
-
-[[package]]
-name = "iced_wgpu"
-version = "0.4.0"
-source = "git+https://github.com/hecrj/iced.git?rev=20177e4#20177e423cd2bdc08f8060b31c379a6f764e3df6"
-dependencies = [
- "bitflags",
- "bytemuck",
- "futures",
- "glyph_brush",
- "guillotiere",
- "iced_graphics 0.2.0 (git+https://github.com/hecrj/iced.git?rev=20177e4)",
- "iced_native 0.4.0 (git+https://github.com/hecrj/iced.git?rev=20177e4)",
- "kamadak-exif",
- "log",
- "raw-window-handle",
- "wgpu",
- "wgpu_glyph",
 ]
 
 [[package]]
@@ -1147,8 +1045,8 @@ dependencies = [
  "futures",
  "glyph_brush",
  "guillotiere",
- "iced_graphics 0.2.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
- "iced_native 0.4.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
+ "iced_graphics",
+ "iced_native",
  "kamadak-exif",
  "log",
  "raw-window-handle",
@@ -1161,9 +1059,9 @@ name = "iced_winit"
 version = "0.3.0"
 source = "git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6#20177e423cd2bdc08f8060b31c379a6f764e3df6"
 dependencies = [
- "iced_futures 0.3.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
- "iced_graphics 0.2.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
- "iced_native 0.4.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
+ "iced_futures",
+ "iced_graphics",
+ "iced_native",
  "log",
  "thiserror",
  "winapi",
@@ -2212,10 +2110,9 @@ dependencies = [
  "cpu",
  "enum-iterator",
  "iced",
- "iced_aw",
- "iced_graphics 0.2.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
- "iced_native 0.4.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
- "iced_wgpu 0.4.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
+ "iced_graphics",
+ "iced_native",
+ "iced_wgpu",
  "iced_winit",
  "itertools",
  "memory",
@@ -2622,7 +2519,7 @@ name = "windows"
 version = "0.1.0"
 dependencies = [
  "cocoa",
- "iced_wgpu 0.4.0 (git+https://github.com/hecrj/iced?rev=20177e423cd2bdc08f8060b31c379a6f764e3df6)",
+ "iced_wgpu",
  "iced_winit",
  "pixels",
  "shared",
