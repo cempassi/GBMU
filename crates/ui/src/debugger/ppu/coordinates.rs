@@ -3,7 +3,7 @@ use super::View;
 use crate::debugger::widgets::Register;
 use crate::debugger::widgets::Text;
 use enum_iterator::IntoEnumIterator;
-use iced::{Alignment, Element, Column, Row};
+use iced::{Alignment, Column, Element, Row};
 use itertools::Itertools;
 use ppu::Coordinates;
 use ppu::Field;

@@ -1,6 +1,6 @@
 use crate::debugger::widgets::Text;
 use crate::error::Error;
-use iced::{Alignment, Length, Column, Element};
+use iced::{Alignment, Column, Element, Length};
 
 mod conversion;
 mod disass;

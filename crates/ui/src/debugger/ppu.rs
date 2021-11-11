@@ -3,7 +3,7 @@ mod coordinates;
 
 use crate::debugger::widgets::{Register, Text};
 use crate::style::Theme;
-use iced::{Column, Element, Row, Alignment};
+use iced::{Alignment, Column, Element, Row};
 use ppu::Registers;
 
 pub struct Ppu {

@@ -1,5 +1,5 @@
 use super::{Style, Theme};
-use iced::{container, Color, Background};
+use iced::{container, Background, Color};
 
 pub struct Register {
     text_color: Option<Color>,

@@ -1,6 +1,6 @@
 use super::{CpuMsg, View};
 use cpu::registers::{self, Bus};
-use iced::{Alignment,Element, Column, Row};
+use iced::{Alignment, Column, Element, Row};
 use itertools::Itertools;
 
 use crate::{

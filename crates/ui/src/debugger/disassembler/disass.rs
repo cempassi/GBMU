@@ -1,6 +1,6 @@
 use super::DisassMsg;
 use crate::debugger::widgets::Cell;
-use iced::{Element ,Row};
+use iced::{Element, Row};
 use memory::Memory;
 use shared::Error;
 

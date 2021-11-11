@@ -1,14 +1,14 @@
 use super::Text;
 use crate::debugger::memory::MemoryMsg;
 use ascii::{AsciiChar, AsciiString, ToAsciiChar};
-use iced::{scrollable, Length, Column, Row, Scrollable};
+use iced::{scrollable, Column, Length, Row, Scrollable};
 
 const TEXT_SIZE: u16 = 20;
 
 pub struct Hexdump<T> {
     name: String,
     state: scrollable::State,
-    data: T
+    data: T,
 }
 
 impl<T> Hexdump<T> {
@@ -37,10 +37,7 @@ impl<T> Hexdump<T> {
         let ascii_template = "0123456789ABCDEF".to_string();
         let ascii = Text::new(&ascii_template).bold(TEXT_SIZE);
 
-        let title = Row::new()
-            .push(addresses)
-            .push(bytes)
-            .push(ascii);
+        let title = Row::new().push(addresses).push(bytes).push(ascii);
 
         let mut hexdump = Scrollable::new(&mut self.state)
             .width(Length::Shrink)
@@ -57,7 +54,7 @@ impl<T> Hexdump<T> {
                     _ => ascii_str.push(AsciiChar::Dot),
                 }
             }
-            let line =  format!("{:#08X}", i * 0x10) + &byte_str + &ascii_str.to_string();
+            let line = format!("{:#08X}", i * 0x10) + &byte_str + &ascii_str.to_string();
             row = row.push(Text::new(line).light(TEXT_SIZE));
             hexdump = hexdump.push(row);
         }
