@@ -1,5 +1,5 @@
 use crate::style::fonts;
-use iced_wgpu::Text as T;
+use iced::Text as T;
 
 pub struct Text<Name: Into<String>> {
     text: Name,

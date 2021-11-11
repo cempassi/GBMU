@@ -15,10 +15,11 @@ pretty-hex = "0.2.1"
 enum-iterator = "0.7.0"
 num_enum = "0.5.3"
 itertools = "0.10.1"
-iced_wgpu = {git = "https://github.com/hecrj/iced", rev = "65f690b07559a36fe8bfcba31edd851c5c286704"}
-iced_winit = {git = "https://github.com/hecrj/iced", rev = "65f690b07559a36fe8bfcba31edd851c5c286704"}
-iced_native = {git = "https://github.com/hecrj/iced", rev = "65f690b07559a36fe8bfcba31edd851c5c286704"}
-iced_graphics = {git = "https://github.com/hecrj/iced", rev = "65f690b07559a36fe8bfcba31edd851c5c286704"}
+iced_graphics = {git = "https://github.com/hecrj/iced", rev = "20177e423cd2bdc08f8060b31c379a6f764e3df6"}
+iced_native = {git = "https://github.com/hecrj/iced", rev = "20177e423cd2bdc08f8060b31c379a6f764e3df6"}
+iced_wgpu = {git = "https://github.com/hecrj/iced", rev = "20177e423cd2bdc08f8060b31c379a6f764e3df6"}
+iced = {git = "https://github.com/hecrj/iced", rev = "20177e423cd2bdc08f8060b31c379a6f764e3df6"}
+iced_winit = {git = "https://github.com/hecrj/iced", rev = "20177e423cd2bdc08f8060b31c379a6f764e3df6"}
 shared = { path = "../shared" }
 soc = { path = "../soc" }
 cpu = { path = "../cpu" }

@@ -7,8 +7,8 @@ edition = "2021"
 
 [dependencies]
 pixels = "0.7.0"
-iced_wgpu = {git = "https://github.com/hecrj/iced", rev = "65f690b07559a36fe8bfcba31edd851c5c286704"}
-iced_winit = {git = "https://github.com/hecrj/iced", rev = "65f690b07559a36fe8bfcba31edd851c5c286704"}
+iced_wgpu = {git = "https://github.com/hecrj/iced", rev = "20177e423cd2bdc08f8060b31c379a6f764e3df6"}
+iced_winit = {git = "https://github.com/hecrj/iced", rev = "20177e423cd2bdc08f8060b31c379a6f764e3df6"}
 ui = { path = "../ui" }
 soc = { path = "../soc" }
 shared = {path = "../shared" }

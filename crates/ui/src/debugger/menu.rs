@@ -2,9 +2,7 @@ mod button;
 
 use crate::style::Theme;
 use button::Button;
-use iced_native::Length;
-use iced_wgpu::{Renderer, Row, Space};
-use iced_winit::Element;
+use iced::{Element, Length, Row, Space};
 use soc::Status;
 
 pub struct Menu {
@@ -42,20 +40,20 @@ impl Menu {
         };
     }
 
-    pub fn view(&mut self, theme: Theme) -> Element<MenuMsg, Renderer> {
-        let right: Element<MenuMsg, Renderer> = self
+    pub fn view(&mut self, theme: Theme) -> Element<MenuMsg> {
+        let right: Element<MenuMsg> = self
             .right
             .iter_mut()
             .fold(Row::new().spacing(10), |row, button| {
-                let element: Element<MenuMsg, Renderer> = button.view(theme);
+                let element: Element<MenuMsg> = button.view(theme);
                 row.push(element)
             })
             .into();
-        let left: Element<MenuMsg, Renderer> = self
+        let left: Element<MenuMsg> = self
             .left
             .iter_mut()
             .fold(Row::new().spacing(10), |row, button| {
-                let element: Element<MenuMsg, Renderer> = button.view(theme);
+                let element: Element<MenuMsg> = button.view(theme);
                 row.push(element)
             })
             .into();

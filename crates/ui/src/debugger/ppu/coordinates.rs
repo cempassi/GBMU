@@ -3,15 +3,13 @@ use super::View;
 use crate::debugger::widgets::Register;
 use crate::debugger::widgets::Text;
 use enum_iterator::IntoEnumIterator;
-use iced_graphics::Alignment;
-use iced_wgpu::{Column, Renderer, Row};
-use iced_winit::Element;
+use iced::{Alignment, Column, Element, Row};
 use itertools::Itertools;
 use ppu::Coordinates;
 use ppu::Field;
 
 impl View<PpuMsg> for Coordinates {
-    fn view(&self, _theme: crate::style::Theme) -> Element<PpuMsg, Renderer> {
+    fn view(&self, _theme: crate::style::Theme) -> Element<PpuMsg> {
         let title = Text::new("Lcd").medium_it(20);
         let mut coordinates = Column::new().align_items(Alignment::Center).push(title);
 

@@ -5,8 +5,7 @@ use crate::debugger::widgets::Text;
 use crate::style::Theme;
 use cpu::registers::{Bits16, Bits8, Flag};
 use enum_iterator::IntoEnumIterator;
-use iced_wgpu::{Column, Renderer};
-use iced_winit::{alignment::Alignment, Element};
+use iced::{alignment::Alignment, Column, Element};
 use itertools::Itertools;
 use registers::Registers;
 
@@ -16,7 +15,7 @@ pub trait View<T> {
     fn get_data(&self, registers: &cpu::Registers) -> String;
     fn get_name(&self) -> String;
 
-    fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<T, Renderer>;
+    fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<T>;
 }
 
 pub struct Cpu {
@@ -70,7 +69,7 @@ impl Cpu {
         }
     }
 
-    pub fn view(&mut self, theme: Theme) -> Element<CpuMsg, Renderer> {
+    pub fn view(&mut self, theme: Theme) -> Element<CpuMsg> {
         let title = Text::new("Cpu").medium_it(20);
         let cpu = Column::new().push(title).align_items(Alignment::Center);
         let registers = self.registers.iter().enumerate().fold(

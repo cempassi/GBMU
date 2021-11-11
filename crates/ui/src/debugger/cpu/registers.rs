@@ -1,8 +1,8 @@
 use crate::style::fonts;
 use crate::style::{Register, Style, Theme};
-use iced_wgpu::{Checkbox, Container, Renderer, Row, Text};
-use iced_winit::{
-    alignment::Alignment, alignment::Horizontal, alignment::Vertical, Element, Length, Space,
+use iced::{
+    alignment::{Alignment, Horizontal, Vertical},
+    Checkbox, Container, Element, Length, Row, Space, Text,
 };
 
 use super::View;
@@ -27,11 +27,7 @@ impl Registers {
         }
     }
 
-    fn view_register(
-        &self,
-        registers: &cpu::Registers,
-        theme: Theme,
-    ) -> Element<RegisterMsg, Renderer> {
+    fn view_register(&self, registers: &cpu::Registers, theme: Theme) -> Element<RegisterMsg> {
         let space = Space::new(Length::Units(10), Length::Units(5));
         match self {
             Registers::Splited(left, right) => Row::new()
@@ -53,7 +49,7 @@ impl Registers {
         }
     }
 
-    pub fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
+    pub fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<RegisterMsg> {
         let checkbox = Checkbox::new(self.is_merged(), "", |_| RegisterMsg::MergeToogle);
         let register = self.view_register(registers, theme);
         let space = Space::new(Length::Units(35), Length::Units(0));
@@ -126,7 +122,7 @@ impl View<RegisterMsg> for Bits8 {
         format!("{:?}", self)
     }
 
-    fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
+    fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<RegisterMsg> {
         let name = Text::new(self.get_name())
             .font(fonts::HASKLIG_BOLD)
             .size(20);
@@ -160,7 +156,7 @@ impl View<RegisterMsg> for Bits16 {
         format!("{:?}", self)
     }
 
-    fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<RegisterMsg, Renderer> {
+    fn view(&self, registers: &cpu::Registers, theme: Theme) -> Element<RegisterMsg> {
         let name = Text::new(self.get_name())
             .font(fonts::HASKLIG_BOLD)
             .size(20);

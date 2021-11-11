@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use super::Text;
-use iced_wgpu::Row;
+use iced::Row;
 
 pub struct Flag {
     text_size: u16,
