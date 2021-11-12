@@ -2,35 +2,34 @@ use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
-use crate::cycle::Cycle;
 use crate::Ppu;
+use crate::registers::Mode;
+
+const OAM_PERIOD: u16 = 80; // 77-83 cycles, 80 average
 
 #[allow(dead_code)]
 pub struct Oam {
-    cycle: Cycle,
+    ticks: u16,
     ppu: Ppu,
 }
 
 impl Oam {
     pub fn search(ppu: Ppu) -> Self {
-        let cycle = Cycle::Ppu(0);
-        Self { cycle, ppu }
+        let ticks = 0;
+        ppu.borrow_mut().registers.mode.update(Mode::Oam);
+        Self { ticks, ppu }
     }
 }
 
 impl Future for Oam {
-    type Output = u8;
+    type Output = u16;
 
     fn poll(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
-        match self.cycle {
-            Cycle::Finished => Poll::Ready(42),
-            Cycle::Ppu(ref mut ticks) => {
-                *ticks += 1;
-                if *ticks == 20 {
-                    self.cycle = Cycle::Finished;
-                }
-                Poll::Pending
-            }
+        self.ticks += 1;
+        if self.ticks == OAM_PERIOD {
+            Poll::Ready(self.ticks)
+        } else {
+            Poll::Pending
         }
     }
 }
