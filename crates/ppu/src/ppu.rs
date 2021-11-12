@@ -1,23 +1,21 @@
 use crate::colors::Color;
 use crate::fifo::Fifo;
-use crate::registers::Registers;
+use crate::registers::{Mode, Registers};
 use shared::Interrupts;
 use shared::{Error, Interrupt};
 
 pub const VRAM_START: u16 = 0x8000;
-pub const WIDTH: usize = 160;
-pub const HEIGHT: usize = 144;
+pub const FRAME_WIDTH: usize = 160;
+pub const FRAME_HEIGHT: usize = 144;
 
 #[derive(Debug)]
 pub struct Ppu {
     vram: Vec<u8>,
     interrupts: Interrupts,
     screen: Vec<Color>,
-    pub frame_ready: bool,
     pub vram_lock: bool,
     pub registers: Registers,
     pub(crate) fifo: Fifo,
-    pub(crate) x: usize,
 }
 
 impl AsRef<Vec<u8>> for Ppu {
@@ -37,18 +35,14 @@ impl From<Interrupts> for Ppu {
         let vram = vec![0; 8192];
         let registers = Registers::default();
         let fifo = Fifo::new();
-        let screen = vec![Color::White; WIDTH * HEIGHT];
-        let x = 0;
-        let frame_ready = true;
+        let screen = vec![Color::White; FRAME_WIDTH * FRAME_HEIGHT];
         Self {
-            frame_ready,
             vram_lock: false,
             vram,
             registers,
             interrupts,
             fifo,
             screen,
-            x,
         }
     }
 }
@@ -59,21 +53,14 @@ impl Ppu {
         Ok(self.vram[address])
     }
 
-    pub fn is_frame_ready(&mut self) -> bool {
-        if self.frame_ready {
-            self.frame_ready = false;
-            true
-        } else {
-            false
-        }
-    }
-
     pub fn render(&mut self, frame: &mut [u8]) {
-        println!("Outputing to screen");
-        for (index, pixel) in frame.chunks_exact_mut(4).enumerate() {
-            let to_display: [u8; 4] = self.screen[index].into();
+        println!("[PPU] Outputing to screen");
+        if self.registers().mode == Mode::Vblank {
+            for (index, pixel) in frame.chunks_exact_mut(4).enumerate() {
+                let to_display: [u8; 4] = self.screen[index].into();
 
-            pixel.copy_from_slice(&to_display);
+                pixel.copy_from_slice(&to_display);
+            }
         }
     }
 
@@ -96,10 +83,10 @@ impl Ppu {
     }
 
     pub fn set_registers(&mut self, address: u16, data: u8) -> Result<(), Error> {
-        println!(
-            "CPU is Writing to PPU Registers at {:#X}, data: {:#b}",
-            address, data
-        );
+        // println!(
+        //     "CPU is Writing to PPU Registers at {:#X}, data: {:#b}",
+        //     address, data
+        // );
         self.registers.set(address, data);
         Ok(())
     }
@@ -108,23 +95,14 @@ impl Ppu {
         self.interrupts.borrow_mut().request(Interrupt::Lcd);
     }
 
-    pub fn pop(&mut self) -> bool {
-        if let Some(pixel) = self.fifo.try_pop() {
-            let color = Color::from(pixel);
-            let offset = self.registers.coordinates.offset(self.x);
-            println!(
-                "[FIFO] Poped data. x: {}, offset: {}, len {}",
-                self.x,
-                offset,
-                self.fifo.len()
-            );
-            self.screen[offset] = color;
-            self.x += 1;
-            true
-        } else {
-            println!("Cannot write. Data in fifo: {}", self.fifo.len());
-            false
-        }
+    pub fn output(&mut self, x: usize, pixel: u8) {
+        let offset = self.registers.coordinates.offset(x);
+        // println!(
+        //     "[FIFO] Poped data. offset: {}, len {}",
+        //     offset,
+        //     self.fifo.len()
+        // );
+        self.screen[offset] = pixel.into();
     }
 
     /// Get a reference to the ppu's registers.

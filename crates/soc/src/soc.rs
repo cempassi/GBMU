@@ -44,11 +44,11 @@ impl TryFrom<&str> for SOC {
 
 impl SOC {
     pub fn get_ppu(&self) -> ppu::Ppu {
-        self.processor.ppu.clone()
+        self.processor.ppu()
     }
 
     pub fn get_cpu(&self) -> cpu::Cpu {
-        self.processor.cpu.clone()
+        self.processor.cpu()
     }
 
     pub fn get_memory(&self) -> memory::Memory {
@@ -59,19 +59,18 @@ impl SOC {
         self.status.clone()
     }
 
-    fn step(&mut self) {
-        self.status.borrow_mut().step()
-    }
-
     pub fn run(&mut self) -> Redraw {
-        if self.status.borrow().is_idle() {
+        let mut status = self.status.borrow_mut();
+        status.redraw.clear();
+        if status.is_idle() {
             return Redraw::Nope;
         }
-        while !self.status.borrow().is_idle() {
-            self.step();
-            let status = &mut self.processor.run();
-            self.status.borrow_mut().check_redraw(status)
+        while status.processing() {
+            status.step();
+            let finished = self.processor.run();
+            status.check_redraw(finished)
         }
-        self.status.borrow().redraw
+        println!("[SOC] Finished Run. Redraw: {:?}", status.redraw);
+        status.redraw
     }
 }

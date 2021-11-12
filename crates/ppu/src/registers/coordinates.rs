@@ -62,7 +62,7 @@ impl Coordinates {
     }
 
     pub fn offset(&self, x: usize) -> usize {
-        self.ly as usize * crate::ppu::WIDTH + x
+        self.ly as usize * crate::ppu::FRAME_WIDTH + x
     }
 
     pub fn get(&self, field: Field) -> u8 {

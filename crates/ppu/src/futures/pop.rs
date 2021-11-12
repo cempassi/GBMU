@@ -4,13 +4,10 @@ use std::task::{Context, Poll};
 
 use crate::Ppu;
 
-/// Writes the output of the fifo to the current frame buffer.
-/// The future is instant, but will poll until a Pop (and then a write)
-/// succeeded. The future is never ending, so the responsability to ending
-/// is elsewhere
+/// Pop pixels out of the fifo and add them to the current display buffer.
 pub struct Pop<'write> {
-    poped: u8,
-    ticks: u8,
+    poped: usize,
+    ticks: u16,
     ppu: &'write Ppu,
 }
 
@@ -23,15 +20,18 @@ impl<'write> Pop<'write> {
 }
 
 impl<'write> Future for Pop<'write> {
-    type Output = u8;
+    type Output = u16;
 
     fn poll(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
         let mut ppu = self.ppu.borrow_mut();
         self.ticks += 1;
-        if ppu.pop() {
+        if let Some(pixel) = ppu.fifo.try_pop() {
+            ppu.output(self.poped, pixel);
             self.poped += 1;
+            //println!("[FIFO] Popped: {}", self.poped);
         }
         if self.poped == 160 {
+            //println!("Exited from Pop");
             Poll::Ready(self.ticks)
         } else {
             Poll::Pending

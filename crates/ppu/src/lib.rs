@@ -1,6 +1,5 @@
 pub(crate) mod blanks;
 pub mod colors;
-pub(crate) mod cycle;
 pub(crate) mod fifo;
 pub(crate) mod futures;
 pub(crate) mod interface;

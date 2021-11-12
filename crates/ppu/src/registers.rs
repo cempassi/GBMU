@@ -153,7 +153,7 @@ impl Registers {
                 self.control.set(data);
                 if old_lcd && !self.control.lcd_enabled {
                     self.coordinates.set(Field::Ly, 0);
-                    self.mode = Mode::Hblank;
+                    self.mode = Mode::Hblank(456);
                     // Clear screen and reset clock
                 }
             }
@@ -174,16 +174,19 @@ impl Registers {
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Mode {
-    Hblank,
+    Hblank(u16),
     Vblank,
     Oam,
     Transfert,
 }
 
 impl Mode {
+    pub fn update(&mut self, mode: Self) {
+        *self = mode;
+    }
     fn get(&self) -> u8 {
         match self {
-            Mode::Hblank => 0,
+            Mode::Hblank(_) => 0,
             Mode::Vblank => 1,
             Mode::Oam => 2,
             Mode::Transfert => 3,
@@ -192,7 +195,7 @@ impl Mode {
 
     fn set(&mut self, byte: u8) {
         *self = match byte {
-            0 => Mode::Hblank,
+            0 => Mode::Hblank(456),
             1 => Mode::Vblank,
             2 => Mode::Oam,
             3 => Mode::Transfert,
@@ -203,6 +206,6 @@ impl Mode {
 
 impl Default for Mode {
     fn default() -> Self {
-        Mode::Hblank
+        Mode::Hblank(456)
     }
 }

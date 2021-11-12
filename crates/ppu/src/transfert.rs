@@ -3,7 +3,7 @@ use std::task::{Context, Poll};
 
 use futures::Future;
 
-use crate::futures::Pop;
+use crate::{futures::Pop, registers::Mode};
 use futures::pending;
 use shared::Error;
 
@@ -17,10 +17,11 @@ pub struct Pixel {
 
 impl Pixel {
     pub fn transfert(ppu: Ppu) -> Self {
+        ppu.borrow_mut().registers.mode.update(Mode::Transfert);
         Self { ppu }
     }
 
-    pub async fn start(self) -> Result<u8, Error> {
+    pub async fn start(self) -> Result<u16, Error> {
         // Remember: The fetcher works on a line basis
         // The future is created here, but the actual fetching is made
         // after
@@ -46,6 +47,7 @@ impl Pixel {
             }
             pending!();
         }
+        //println!("[FETCHER] fetcher ticks: {}", cycles);
         Ok(cycles)
     }
 }

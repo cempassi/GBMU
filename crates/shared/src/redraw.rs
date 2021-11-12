@@ -13,6 +13,14 @@ impl Default for Redraw {
 }
 
 impl Redraw {
+    pub fn ready(&self) -> bool {
+        !matches!(self, Redraw::Nope)
+    }
+
+    pub fn clear(&mut self) {
+        *self = Self::Nope;
+    }
+
     pub fn update(&mut self, status: Self) {
         *self = match (&self, status) {
             (Redraw::Nope, Redraw::Nope) => Redraw::Nope,

@@ -13,6 +13,10 @@ impl Mode {
     pub fn idle(&mut self) {
         *self = Self::Idle;
     }
+
+    pub fn second(&self) -> bool {
+        matches!(self, Self::Second(_))
+    }
 }
 
 impl Default for Mode {

@@ -4,9 +4,12 @@ use ppu::Ppu;
 use shared::{Finished, Output, Run};
 use std::task::{Context, Poll};
 
+enum Processor {
+    Ppu,
+    Cpu,
+}
+
 pub struct Runner {
-    pub cpu: Cpu,
-    pub ppu: Ppu,
     pub memory: Memory,
     tasks: Tasks,
 }
@@ -15,52 +18,63 @@ impl Runner {
     pub fn new(memory: Memory) -> Self {
         let ppu = memory.borrow().get_ppu();
         let cpu = Cpu::new(memory.clone());
-        let tasks = Tasks::new(cpu.clone().run(), ppu.clone().run());
-        Self {
-            ppu,
-            cpu,
-            memory,
-            tasks,
-        }
+        let tasks = Tasks::new(cpu, ppu);
+        Self { memory, tasks }
     }
 
     pub fn run(&mut self) -> Vec<Finished> {
         let waker = shared::waker::create();
         let mut context = Context::from_waker(&waker);
 
-        let cpu_status = self.tasks.run_cpu(self.cpu.clone(), &mut context);
-        let ppu_status = self.tasks.run_ppu(self.ppu.clone(), &mut context);
+        let cpu_status = self.tasks.run(Processor::Cpu, &mut context);
+        let ppu_status = self.tasks.run(Processor::Ppu, &mut context);
         vec![cpu_status, ppu_status]
+    }
+
+    pub fn cpu(&self) -> Cpu {
+        self.tasks.cpu.clone()
+    }
+
+    pub fn ppu(&self) -> Ppu {
+        self.tasks.ppu.clone()
     }
 }
 
 struct Tasks {
-    cpu: Output,
-    ppu: Output,
+    cpu: Cpu,
+    ppu: Ppu,
+    cpu_process: Output,
+    ppu_process: Output,
 }
 
 impl Tasks {
-    pub fn new(cpu: Output, ppu: Output) -> Self {
-        Self { cpu, ppu }
-    }
-
-    fn run_cpu(&mut self, processor: impl Run, context: &mut Context) -> Finished {
-        match self.cpu.as_mut().poll(context) {
-            Poll::Ready(status) => {
-                self.cpu = processor.run();
-                Finished::finish(status)
-            }
-            Poll::Pending => Finished::Nope,
+    pub fn new(cpu: Cpu, ppu: Ppu) -> Self {
+        let cpu_process = cpu.clone().run();
+        let ppu_process = ppu.clone().run();
+        Self {
+            cpu,
+            ppu,
+            cpu_process,
+            ppu_process,
         }
     }
 
-    fn run_ppu(&mut self, processor: impl Run, context: &mut Context) -> Finished {
-        match self.ppu.as_mut().poll(context) {
-            Poll::Ready(status) => {
-                self.ppu = processor.run();
-                Finished::finish(status)
-            }
-            Poll::Pending => Finished::Nope,
+    fn run(&mut self, processor: Processor, context: &mut Context) -> Finished {
+        match processor {
+            Processor::Ppu => match self.ppu_process.as_mut().poll(context) {
+                Poll::Ready(status) => {
+                    self.ppu_process = self.ppu.clone().run();
+                    Finished::finish(status)
+                }
+                Poll::Pending => Finished::Nope,
+            },
+            Processor::Cpu => match self.cpu_process.as_mut().poll(context) {
+                Poll::Ready(status) => {
+                    self.cpu_process = self.cpu.clone().run();
+                    Finished::finish(status)
+                }
+                Poll::Pending => Finished::Nope,
+            },
         }
     }
 }
