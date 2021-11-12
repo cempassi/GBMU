@@ -4,6 +4,7 @@ use iced::{button, Element};
 use super::MenuMsg;
 use crate::debugger::widgets::Text;
 use soc::Status;
+use soc::mode::Mode;
 
 pub struct Button {
     status: Status,
@@ -22,21 +23,22 @@ impl Button {
     }
 
     pub fn update(&self) {
+        let mut status = self.status.borrow_mut();
         match self.message {
             MenuMsg::Tick => {
-                self.status.borrow_mut().tick();
+                status.mode(Mode::Tick);
             }
             MenuMsg::Line => {
-                self.status.borrow_mut().line();
+                status.mode(Mode::Line);
             }
             MenuMsg::Frame => {
-                self.status.borrow_mut().frame();
+                status.mode(Mode::Frame);
             }
             MenuMsg::Instruction => {
-                self.status.borrow_mut().instruction();
+                status.mode(Mode::Instruction);
             }
             MenuMsg::Second => {
-                self.status.borrow_mut().second();
+                status.second();
             }
         }
     }
