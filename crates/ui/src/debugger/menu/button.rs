@@ -3,8 +3,8 @@ use iced::{button, Element};
 
 use super::MenuMsg;
 use crate::debugger::widgets::Text;
-use soc::Status;
 use soc::mode::Mode;
+use soc::Status;
 
 pub struct Button {
     status: Status,

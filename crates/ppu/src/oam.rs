@@ -2,8 +2,8 @@ use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
-use crate::Ppu;
 use crate::registers::Mode;
+use crate::Ppu;
 
 const OAM_PERIOD: u16 = 80; // 77-83 cycles, 80 average
 

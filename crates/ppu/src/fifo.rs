@@ -38,7 +38,7 @@ impl<'push, 'fetch> Fifo {
 
     pub fn try_pop(&mut self) -> Option<u8> {
         let len = self.queue.len();
-        if  len > 8 {
+        if len > 8 {
             // println!("[FIFO] Popped pixel from fifo: len {}", len);
             let pixel = self.queue.pop_front();
             match self.xscroll == 0 {

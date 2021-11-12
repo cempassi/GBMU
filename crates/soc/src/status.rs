@@ -123,11 +123,11 @@ impl Status {
 
 #[cfg(test)]
 mod test_status {
-    use super::Status;
-    use super::Mode;
     use super::Finished;
-    use super::Redraw;
     use super::Instant;
+    use super::Mode;
+    use super::Redraw;
+    use super::Status;
 
     #[test]
     fn test_status_after_tick() {
@@ -166,5 +166,4 @@ mod test_status {
 
         assert!(!status.processing());
     }
-
 }

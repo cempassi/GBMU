@@ -15,7 +15,7 @@ impl Mode {
     }
 
     pub fn second(&self) -> bool {
-       matches!(self, Self::Second(_))
+        matches!(self, Self::Second(_))
     }
 }
 

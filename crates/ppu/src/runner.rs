@@ -1,9 +1,9 @@
 use crate::blanks::Blank;
 use crate::oam::Oam;
 use crate::registers as lcd;
+use crate::registers::Mode;
 use crate::transfert::Pixel;
 use crate::Ppu;
-use crate::registers::Mode;
 use shared::{Error, Finished, Output, Run};
 
 use std::future::Future;
