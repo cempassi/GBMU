@@ -1,8 +1,9 @@
-use crate::blanks::{Blank, HBLANK, VBLANK};
+use crate::blanks::Blank;
 use crate::oam::Oam;
 use crate::registers as lcd;
 use crate::transfert::Pixel;
 use crate::Ppu;
+use crate::registers::Mode;
 use shared::{Error, Finished, Output, Run};
 
 use std::future::Future;
@@ -36,18 +37,16 @@ impl Run for Ppu {
 
 async fn run(ppu: Ppu) -> Result<Finished, Error> {
     if ppu.borrow_mut().registers.is_lower(lcd::Field::Ly, 144) {
-        ppu.borrow_mut().x = 0;
-        Oam::search(ppu.clone()).await;
-        let cycles = Pixel::transfert(ppu.clone()).start().await?;
-        println!("[FETCHER] fetcher ticks: {}", cycles);
-        Blank::new(HBLANK).await;
+        let mut ticks = Oam::search(ppu.clone()).await;
+        ticks += Pixel::transfert(ppu.clone()).start().await?;
+        ticks += Blank::new(ppu.clone(), Mode::Hblank(204)).await;
         ppu.borrow_mut().registers.increase(lcd::Field::Ly);
-        Ok(Finished::Line(42))
+        Ok(Finished::Line(ticks))
     } else {
         ppu.borrow().raise_vblank();
-        Blank::new(VBLANK).await;
+        ppu.borrow_mut().registers.mode.update(Mode::Vblank);
+        Blank::new(ppu.clone(), Mode::Vblank).await;
         ppu.borrow_mut().registers.clear(lcd::Field::Ly);
-        ppu.borrow_mut().frame_ready = true;
-        Ok(Finished::Frame(42))
+        Ok(Finished::Frame)
     }
 }
