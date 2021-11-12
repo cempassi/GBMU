@@ -19,6 +19,7 @@ impl DataVec {
         for i in 0..=7 {
             datavec.insert(0, data & (1 << i) != 0);
         }
+        //println!("Data vec: {:?}", datavec);
         DataVec(datavec)
     }
 }
@@ -26,9 +27,9 @@ impl DataVec {
 impl PixelData {
     pub async fn try_new(ppu: &'_ Ppu, address: u16) -> Result<Self, Error> {
         let (byte0, _) = Fetch::new(ppu, address).await?;
-        println!("[FETCHER] byte0 fetched");
+        //println!("[FETCHER] byte0 fetched");
         let (byte1, _) = Fetch::new(ppu, address + 1).await?;
-        println!("[FETCHER] byte1 fetched");
+        //println!("[FETCHER] byte1 fetched");
 
         Ok(Self { byte0, byte1 })
     }
@@ -99,20 +100,20 @@ impl Fetcher {
         // Many checks have to opperate here as the line Fetcher is complex
         // (Background, Window, Sprite)
         // Carefull implemenation
-        for i in 0..crate::ppu::WIDTH {
+        for i in 0..crate::ppu::FRAME_WIDTH {
             // First get the adress of the Tile id
             // This may be refactored to handle background or window id
-            println!("[FETCHER] Fetching tile id");
+            //println!("[FETCHER] Fetching tile id");
             self.line = self.ppu.borrow().registers.coordinates.line();
-            let x = self.ppu.borrow().registers.coordinates.x(i);
-            let column = x / 8;
-            let tile_map_index = (self.row as u16 * 32) + column as u16; //
+            //let x = self.ppu.borrow().registers.coordinates.x(i);
+            //let column = i / 8;
+            let tile_map_index = (self.row as u16 * 32) + i as u16; //
             let id_address = self.bg_area + tile_map_index;
             let (tile_id, ticks) = Fetch::new(&self.ppu, id_address).await?;
 
             cycles += ticks;
 
-            println!("[FETCHER] Processing tile address");
+            //println!("[FETCHER] Processing tile address");
             // Then we get the actual tile address
             let tile_address = self.tile_address(tile_id);
 
@@ -121,6 +122,7 @@ impl Fetcher {
             let ticks = self.ppu.push(data.get_pixels()).await;
             cycles += ticks;
         }
+        //println!("Exited from Fetcher");
         Ok(cycles)
     }
 }
