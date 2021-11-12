@@ -36,6 +36,19 @@ impl Windows {
                     emulator.process_event(event, flow);
                 }
                 Event::MainEventsCleared => {
+                    // Run Emulator here
+                    match soc.borrow_mut().run() {
+                        Redraw::Emulator => {
+                            emulator.request_redraw();
+                        }
+                        Redraw::Debugger => debugger.state.refresh(),
+                        Redraw::All => {
+                            println!("[WINDOW] Redrawing All");
+                            debugger.state.refresh();
+                            emulator.request_redraw();
+                        }
+                        Redraw::Nope => (),
+                    }
                     if !debugger.state.state.is_queue_empty() {
                         debugger.request_redraw();
                     }
@@ -52,16 +65,6 @@ impl Windows {
                 _ => (),
             };
 
-            // Run Emulator here
-            match soc.borrow_mut().run() {
-                Redraw::Emulator => emulator.request_redraw(),
-                Redraw::Debugger => debugger.state.refresh(),
-                Redraw::All => {
-                    debugger.state.refresh();
-                    emulator.request_redraw();
-                }
-                Redraw::Nope => (),
-            }
         })
     }
 }
