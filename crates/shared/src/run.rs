@@ -7,8 +7,8 @@ pub type Output = Pin<Box<dyn Future<Output = Result<Finished, Error>>>>;
 #[derive(Debug)]
 pub enum Finished {
     Cpu(u8),
-    Line(u8),
-    Frame(u8),
+    Line(u16),
+    Frame,
     Error(Error),
     Nope,
 }
@@ -18,7 +18,7 @@ impl fmt::Display for Finished {
         match self {
             Finished::Cpu(ticks) => write!(f, "Finished instruction. ticks: {}", *ticks),
             Finished::Line(ticks) => write!(f, "Finished line. ticks: {}", *ticks),
-            Finished::Frame(ticks) => write!(f, "Finished Frame. ticks: {}", *ticks),
+            Finished::Frame => write!(f, "Finished Frame."),
             Finished::Error(ticks) => write!(f, "Error: {}", *ticks),
             Finished::Nope => write!(f, "Processing"),
         }
