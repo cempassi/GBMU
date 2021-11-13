@@ -392,7 +392,7 @@ impl fmt::Display for Load {
 #[cfg(test)]
 mod test_instruction_load_reg_reg {
     use super::Load;
-    use crate::executor;
+    use shared::execute;
     use crate::registers::{Bits16, Bits8, Bus};
     use crate::{Access, Cpu};
 
@@ -400,7 +400,7 @@ mod test_instruction_load_reg_reg {
     fn test_load_l_from_h() {
         let cpu = Cpu::default();
         let instruction = Load::HL;
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
         assert_eq!(
             cpu.borrow().registers.get(Bits8::H),
             cpu.borrow().registers.get(Bits8::L)
@@ -411,7 +411,7 @@ mod test_instruction_load_reg_reg {
     fn test_load_b_from_hl() {
         let cpu = Cpu::default();
         let instruction = Load::BHL;
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
         assert_eq!(
             cpu.borrow().registers.get(Bits8::B),
             cpu.memory()
@@ -428,7 +428,7 @@ mod test_instruction_load_reg_reg {
         let byte = cpu.memory().borrow().get_u8(00).unwrap();
         assert_eq!(byte, 0x31);
         let future = ldr8b.exec(cpu.clone());
-        executor::execute(Box::pin(future));
+        execute(Box::pin(future)).unwrap();
         assert_eq!(byte, cpu.borrow().registers.get(Bits8::B));
     }
 
@@ -437,7 +437,7 @@ mod test_instruction_load_reg_reg {
         let cpu = Cpu::default();
         let instruction = Load::HLB;
         cpu.borrow_mut().registers.set(Bits16::HL, 0xc042);
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
         assert_eq!(
             cpu.borrow().registers.get(Bits8::B),
             cpu.memory()
@@ -457,7 +457,7 @@ mod test_instruction_load_reg_reg {
             .get_u8(cpu.borrow().registers.pc)
             .unwrap();
         assert_eq!(byte, 0x31);
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
         assert_eq!(
             byte,
             cpu.memory()

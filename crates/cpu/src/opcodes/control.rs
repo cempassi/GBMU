@@ -101,6 +101,7 @@ impl Decoder for Control {
 impl Control {
     async fn prefix_cb(cpu: Cpu) -> Result<u8, Error> {
         let (opcode, mut cycles) = Get::Next.get(cpu.clone()).await?;
+
         cycles += {
             if let Ok(operation) = Rotate::try_from_primitive(opcode) {
                 operation.decode(cpu).await?

@@ -167,7 +167,8 @@ impl fmt::Display for Jump {
 mod test_jumps {
     use super::Jump;
     use crate::registers::{Bits16, Bus, Flag};
-    use crate::{executor, Access, Cpu};
+    use crate::{Access, Cpu};
+    use shared::execute;
 
     #[test]
     fn test_jump_to_address_in_next_16bits() {
@@ -179,7 +180,7 @@ mod test_jumps {
         cpu.borrow_mut().registers.set(Bits16::PC, src);
         cpu.memory().borrow_mut().set_u16(0xc000, 0xc050).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.borrow_mut().registers.get(Bits16::PC);
         assert_eq!(result, expected);
@@ -195,7 +196,7 @@ mod test_jumps {
         cpu.borrow_mut().registers.set(Bits16::PC, src);
         cpu.borrow_mut().registers.set(Bits16::HL, 0xc050);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.borrow().registers.get(Bits16::PC);
         assert_eq!(result, expected);
@@ -213,7 +214,7 @@ mod test_jumps {
         cpu.borrow_mut().registers.set(Flag::C, true);
         cpu.memory().borrow_mut().set_u16(0xc000, 0xc050).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.borrow().registers.get(Bits16::PC);
         assert_eq!(result, expected);
@@ -231,7 +232,7 @@ mod test_jumps {
         cpu.borrow_mut().registers.set(Flag::Z, false);
         cpu.memory().borrow_mut().set_u16(0xc000, 0xc050).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.borrow().registers.get(Bits16::PC);
         assert_eq!(result, expected);
@@ -253,7 +254,7 @@ mod test_jumps {
             .set_u8(0xc000, origin as u8)
             .unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.borrow().registers.get(Bits16::PC);
         assert_eq!(result, expected);
@@ -274,7 +275,7 @@ mod test_jumps {
         cpu.borrow_mut().registers.set(Bits16::SP, stack);
         cpu.memory().borrow_mut().set_u16(0xc000, dst).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result_pc = cpu.borrow().registers.get(Bits16::PC);
         let result_stack = cpu.borrow().registers.get(Bits16::SP);
@@ -299,7 +300,7 @@ mod test_jumps {
         cpu.borrow_mut().registers.set(Bits16::SP, stack);
         cpu.memory().borrow_mut().set_u16(0xc000, dst).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result_pc = cpu.borrow().registers.get(Bits16::PC);
         let result_stack = cpu.borrow().registers.get(Bits16::SP);
@@ -323,7 +324,7 @@ mod test_jumps {
         cpu.borrow_mut().registers.set(Bits16::SP, stack);
         cpu.memory().borrow_mut().set_u16(0xc000, dst).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result_pc = cpu.borrow().registers.get(Bits16::PC);
         let result_stack = cpu.borrow().registers.get(Bits16::SP);
@@ -348,7 +349,7 @@ mod test_jumps {
         cpu.borrow_mut().registers.set(Bits16::SP, stack);
         cpu.memory().borrow_mut().set_u16(0xc000, dst).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result_pc = cpu.borrow().registers.get(Bits16::PC);
         let result_stack = cpu.borrow().registers.get(Bits16::SP);

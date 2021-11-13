@@ -164,7 +164,8 @@ impl fmt::Display for Shift {
 mod test_shift_left {
     use super::Shift;
     use crate::registers::{Bits16, Bits8, Bus, Flag};
-    use crate::{executor, Access, Cpu};
+    use crate::{Access, Cpu};
+    use shared::execute;
 
     #[test]
     fn test_shift_left_register_a() {
@@ -174,7 +175,7 @@ mod test_shift_left {
         let instruction = Shift::LA;
         cpu.borrow_mut().registers.set(Bits8::A, src);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.borrow().registers.get(Bits8::A);
         let carry = cpu.borrow().registers.get(Flag::C);
@@ -192,7 +193,7 @@ mod test_shift_left {
         cpu.borrow_mut().registers.set(Bits16::HL, hl);
         cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.memory().borrow_mut().get_u8(hl).unwrap();
         let carry = cpu.borrow().registers.get(Flag::C);
@@ -208,7 +209,7 @@ mod test_shift_left {
         let instruction = Shift::RAC;
         cpu.borrow_mut().registers.set(Bits8::C, src);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.borrow().registers.get(Bits8::C);
         let carry = cpu.borrow().registers.get(Flag::C);
@@ -226,7 +227,7 @@ mod test_shift_left {
         cpu.borrow_mut().registers.set(Bits16::HL, hl);
         cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.memory().borrow_mut().get_u8(hl).unwrap();
         let carry = cpu.borrow().registers.get(Flag::C);
@@ -242,7 +243,7 @@ mod test_shift_left {
         let instruction = Shift::SL;
         cpu.borrow_mut().registers.set(Bits8::L, src);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.borrow().registers.get(Bits8::L);
 

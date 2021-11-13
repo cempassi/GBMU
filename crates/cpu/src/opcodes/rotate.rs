@@ -181,7 +181,8 @@ impl fmt::Display for Rotate {
 mod test_rotate {
     use super::Rotate;
     use crate::registers::{Bits16, Bits8, Bus, Flag};
-    use crate::{executor, Access, Cpu};
+    use crate::{Access, Cpu};
+    use shared::execute;
 
     #[test]
     fn test_rotate_right_register_no_carry() {
@@ -191,7 +192,7 @@ mod test_rotate {
         let instruction = Rotate::RCA;
         cpu.borrow_mut().registers.set(Bits8::A, src);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.borrow().registers.get(Bits8::A);
         let carry = cpu.borrow().registers.get(Flag::C);
@@ -208,7 +209,7 @@ mod test_rotate {
         cpu.borrow_mut().registers.set(Flag::C, true);
         cpu.borrow_mut().registers.set(Bits8::A, src);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.borrow().registers.get(Bits8::A);
         let carry = cpu.borrow().registers.get(Flag::C);
@@ -226,7 +227,7 @@ mod test_rotate {
         cpu.borrow_mut().registers.set(Bits16::HL, hl);
         cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.memory().borrow_mut().get_u8(hl).unwrap();
         let carry = cpu.borrow().registers.get(Flag::C);
@@ -245,7 +246,7 @@ mod test_rotate {
         cpu.borrow_mut().registers.set(Flag::C, true);
         cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.memory().borrow_mut().get_u8(hl).unwrap();
         let carry = cpu.borrow().registers.get(Flag::C);
@@ -261,7 +262,7 @@ mod test_rotate {
         let instruction = Rotate::LCA;
         cpu.borrow_mut().registers.set(Bits8::A, src);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.borrow().registers.get(Bits8::A);
         let carry = cpu.borrow().registers.get(Flag::C);
@@ -277,7 +278,7 @@ mod test_rotate {
         let instruction = Rotate::LA;
         cpu.borrow_mut().registers.set(Bits8::A, src);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.borrow().registers.get(Bits8::A);
         let carry = cpu.borrow().registers.get(Flag::C);
@@ -295,7 +296,7 @@ mod test_rotate {
         cpu.borrow_mut().registers.set(Bits16::HL, hl);
         cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.memory().borrow_mut().get_u8(hl).unwrap();
         let carry = cpu.borrow().registers.get(Flag::C);
@@ -313,7 +314,7 @@ mod test_rotate {
         cpu.borrow_mut().registers.set(Bits16::HL, hl);
         cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.memory().borrow_mut().get_u8(hl).unwrap();
         let carry = cpu.borrow().registers.get(Flag::C);

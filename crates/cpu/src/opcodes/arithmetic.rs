@@ -249,7 +249,8 @@ impl fmt::Display for Arithmetic {
 mod test_arithmetic {
     use super::Arithmetic;
     use crate::registers::{Bits16, Bits8, Bus, Flag};
-    use crate::{executor, Access, Cpu};
+    use crate::{Access, Cpu};
+    use shared::execute::execute;
 
     #[test]
     fn test_add_next_byte_without_carry() {
@@ -259,7 +260,7 @@ mod test_arithmetic {
         cpu.borrow_mut().registers.set(Bits8::A, 0x4f);
         cpu.borrow_mut().registers.set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0x80);
         assert!(cpu.borrow_mut().registers.get(Flag::H));
@@ -274,7 +275,7 @@ mod test_arithmetic {
         cpu.borrow_mut().registers.set(Bits16::HL, 0xc008);
         cpu.borrow_mut().registers.set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
         assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0xf8);
     }
 
@@ -285,7 +286,7 @@ mod test_arithmetic {
 
         cpu.borrow_mut().registers.set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0x00);
         assert!(cpu.borrow_mut().registers.get(Flag::Z));
@@ -301,7 +302,7 @@ mod test_arithmetic {
         cpu.borrow_mut().registers.set(Flag::C, true);
         cpu.memory().borrow_mut().set_u8(0xc000, 0x2F).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0x7F);
     }
@@ -316,7 +317,7 @@ mod test_arithmetic {
         cpu.borrow_mut().registers.set(Flag::C, true);
         cpu.memory().borrow_mut().set_u8(0xc008, 0x2d).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0x58);
     }
@@ -330,7 +331,7 @@ mod test_arithmetic {
         cpu.borrow_mut().registers.set(Bits8::C, 0xAA);
         cpu.borrow_mut().registers.set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0xD6);
     }
@@ -345,7 +346,7 @@ mod test_arithmetic {
         cpu.borrow_mut().registers.set(Flag::C, true);
         cpu.memory().borrow_mut().set_u8(0xc000, 0x2F).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0x20);
     }
@@ -360,7 +361,7 @@ mod test_arithmetic {
         cpu.borrow_mut().registers.set(Bits16::HL, 0xc008);
         cpu.memory().borrow_mut().set_u8(0xc008, 0xaa).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0x4e);
     }
@@ -372,7 +373,7 @@ mod test_arithmetic {
 
         cpu.borrow_mut().registers.set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
         assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0x00);
         assert!(cpu.borrow_mut().registers.get(Flag::Z));
     }
@@ -387,7 +388,7 @@ mod test_arithmetic {
         cpu.borrow_mut().registers.set(Bits16::HL, 0xc008);
         cpu.memory().borrow_mut().set_u8(0xc008, 0xaa).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow().registers.get(Bits8::A), 0x4d);
     }
@@ -401,7 +402,7 @@ mod test_arithmetic {
         cpu.borrow_mut().registers.set(Bits8::L, 0xAB);
         cpu.borrow_mut().registers.set(Flag::C, true);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0x4C);
     }
