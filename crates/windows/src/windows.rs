@@ -43,7 +43,6 @@ impl Windows {
                         }
                         Redraw::Debugger => debugger.state.refresh(),
                         Redraw::All => {
-                            println!("[WINDOW] Redrawing All");
                             debugger.state.refresh();
                             emulator.request_redraw();
                         }
