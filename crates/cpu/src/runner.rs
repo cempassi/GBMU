@@ -63,7 +63,7 @@ async fn decode(cpu: Cpu, opcode: u8) -> Result<Decode, Error> {
             "Something went wrong(Decode in runner.rs), opcode: {}",
             opcode
         );
-        Err(Error::Unimplemented)
+        Err(Error::Unimplemented(opcode))
     }
 }
 

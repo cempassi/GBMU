@@ -159,7 +159,7 @@ impl TryFrom<Jump> for Disass<(u8, u8)> {
             Jump::ReturnC => Ok(((24, 8), Data::Bits16(0))),
             Jump::ReturnNZ => Ok(((24, 8), Data::Bits16(0))),
             Jump::ReturnNC => Ok(((20, 8), Data::Bits16(0))),
-            _ => Err(Error::Unimplemented),
+            _ => Err(Error::Unimplemented(0x42)),
         }?;
         let code: u8 = opcode.into();
         Ok(Self {
@@ -189,7 +189,7 @@ impl TryFrom<Jump> for Disass<u8> {
             Jump::Reset18 => Ok((16, Data::None)),
             Jump::Reset28 => Ok((16, Data::None)),
             Jump::Reset38 => Ok((16, Data::None)),
-            _ => Err(Error::Unimplemented),
+            _ => Err(Error::Unimplemented(0x42)),
         }?;
         let code: u8 = opcode.into();
         Ok(Self {
