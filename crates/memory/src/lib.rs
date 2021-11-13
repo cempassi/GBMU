@@ -11,11 +11,12 @@ pub(crate) mod mbc;
 pub mod memory;
 pub(crate) mod ppu;
 pub(crate) mod ram;
-pub(crate) mod state;
+pub mod state;
 
 pub use area::Area;
 pub use bus::MemoryBus;
 pub use futures::{Getter, Setter};
 pub use interface::{Bus, Memory, Rom};
-pub use mbc::{Cartridge, Mbc};
+pub use mbc::Cartridge;
 pub use r#async::Async;
+pub use state::State;
