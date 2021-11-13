@@ -12,6 +12,13 @@ impl Cpu {
             0: Rc::new(RefCell::new(super::cpu::Cpu::new(memory))),
         }
     }
+
+    pub fn no_bios(memory: Memory) -> Self {
+        println!("CPU created with no bios");
+        Self {
+            0: Rc::new(RefCell::new(super::cpu::Cpu::no_bios(memory))),
+        }
+    }
 }
 
 impl Deref for Cpu {

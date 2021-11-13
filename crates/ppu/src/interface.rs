@@ -28,6 +28,13 @@ impl Ppu {
             0: Rc::new(RefCell::new(super::ppu::Ppu::from(interrupts))),
         }
     }
+
+    pub fn no_bios(interrupts: Interrupts) -> Self {
+        println!("Ppu created with no bios");
+        Self {
+            0: Rc::new(RefCell::new(super::ppu::Ppu::no_bios(interrupts))),
+        }
+    }
 }
 
 pub trait Push<'push> {

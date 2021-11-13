@@ -179,7 +179,10 @@ impl Memory {
         let requested = interrupts.get_raisable();
 
         // Create memory spaces with fully-qualified syntax
-        let ppu = Ppu::new(requested);
+        let ppu = match state {
+            State::Bios => Ppu::new(requested),
+            State::Rom => Ppu::no_bios(requested),
+        };
 
         let io = IO::default();
 

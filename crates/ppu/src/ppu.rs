@@ -48,6 +48,13 @@ impl From<Interrupts> for Ppu {
 }
 
 impl Ppu {
+    pub fn no_bios(interrupts: Interrupts) -> Self {
+        let mut ppu = Self::from(interrupts);
+        ppu.set_registers(0xFF40, 0x91).unwrap();
+        ppu.set_registers(0xFF41, 0x02).unwrap();
+        ppu
+    }
+
     pub fn get_vram(&self, address: u16) -> Result<u8, Error> {
         let address: usize = (address - VRAM_START) as usize;
         Ok(self.vram[address])

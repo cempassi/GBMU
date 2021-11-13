@@ -42,4 +42,23 @@ impl Registers {
     pub fn update(&self, dst: &mut Self) {
         *dst = Self { ..*self };
     }
+
+    // Registers are set to these specific values after GB BIOS runs
+    pub fn no_bios() -> Self{
+        let mut registers = Self::default();
+        println!("I'm passing in nobios");
+        registers.set(Bits8::F, 0xB0);
+        Self {
+            a: 0x01,
+            b: 0x00,
+            c: 0x13,
+            d: 0x00,
+            e: 0xD8,
+            h: 0x01,
+            l: 0x4D,
+            sp: 0xFFFE,
+            pc: 0x0100,
+            ..registers
+        }
+    }
 }
