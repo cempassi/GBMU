@@ -121,6 +121,10 @@ impl Registers {
         self.coordinates.is_lower(field, data)
     }
 
+    pub fn tile_map_row_address(&self) -> u16 {
+        self.control.bg_area + self.coordinates.map_row_offset()
+    }
+
     pub fn get(&self, address: u16) -> u8 {
         match address {
             0xFF40 => self.control.get(),

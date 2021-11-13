@@ -14,11 +14,11 @@ impl<'push, 'fetch> Fifo {
         Self { queue, xscroll }
     }
 
-    pub fn try_push(&mut self, data: &[u8]) -> Result<(), Error> {
+    pub fn try_push(&mut self, data: &[u8; 8]) -> Result<(), Error> {
         let len = self.queue.len();
         if len <= 8 {
             // println!("[FETHCER] Pushed in the fifo: len {}", len);
-            for i in data {
+            for i in data.iter() {
                 self.queue.push_back(*i)
             }
             Ok(())
@@ -38,17 +38,18 @@ impl<'push, 'fetch> Fifo {
 
     pub fn try_pop(&mut self) -> Option<u8> {
         let len = self.queue.len();
+        println!("[FIFO] State: {:?}", self.queue);
         if len > 8 {
             // println!("[FIFO] Popped pixel from fifo: len {}", len);
-            let pixel = self.queue.pop_front();
-            match self.xscroll == 0 {
-                true => pixel,
-                false => {
-                    //println!("[FIFO] Scrolling, discarded pixel");
-                    self.xscroll -= 1;
-                    None
-                }
-            }
+            self.queue.pop_front()
+            // match self.xscroll == 0 {
+            //     true => pixel,
+            //     false => {
+            //         //println!("[FIFO] Scrolling, discarded pixel");
+            //         self.xscroll -= 1;
+            //         None
+            //     }
+            // }
         } else {
             //println!("[FIFO] Could not pop from fifo: len {}", len);
             None

@@ -27,9 +27,13 @@ impl<'fetch> Future for Fetch<'fetch> {
     fn poll(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
         if self.ticks == 2 {
             // Maybe implement check mode Here?
-            match self.ppu.borrow().get_vram(self.address) {
-                Ok(data) => Poll::Ready(Ok((data, self.ticks))),
-                Err(err) => Poll::Ready(Err(err)),
+            if self.ppu.borrow().vram_lock {
+                match self.ppu.borrow().get_vram(self.address) {
+                    Ok(data) => Poll::Ready(Ok((data, self.ticks))),
+                    Err(err) => Poll::Ready(Err(err)),
+                }
+            } else {
+                Poll::Ready(Ok((0xFF, 2)))
             }
         } else {
             self.ticks += 1;

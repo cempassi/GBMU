@@ -35,7 +35,7 @@ impl From<Interrupts> for Ppu {
         let vram = vec![0; 8192];
         let registers = Registers::default();
         let fifo = Fifo::new();
-        let screen = vec![Color::White; FRAME_WIDTH * FRAME_HEIGHT];
+        let screen = vec![Color::Black; FRAME_WIDTH * FRAME_HEIGHT];
         Self {
             vram_lock: false,
             vram,
@@ -61,14 +61,25 @@ impl Ppu {
     }
 
     pub fn render(&mut self, frame: &mut [u8]) {
-        println!("[PPU] Outputing to screen");
         if self.registers().mode == Mode::Vblank {
+            println!("[PPU] Outputing to screen");
             for (index, pixel) in frame.chunks_exact_mut(4).enumerate() {
                 let to_display: [u8; 4] = self.screen[index].into();
 
                 pixel.copy_from_slice(&to_display);
             }
         }
+    }
+
+    pub fn output(&mut self, x: usize, pixel: u8) {
+        let offset = self.registers.coordinates.offset(x);
+        println!("[PPU] position Offset: {}", offset);
+        // println!(
+        //     "[FIFO] Poped data. offset: {}, len {}",
+        //     offset,
+        //     self.fifo.len()
+        // );
+        self.screen[offset] = pixel.into();
     }
 
     pub fn update_registers(&self, registers: &mut Registers) {
@@ -100,16 +111,6 @@ impl Ppu {
 
     pub fn raise_vblank(&self) {
         self.interrupts.borrow_mut().request(Interrupt::Lcd);
-    }
-
-    pub fn output(&mut self, x: usize, pixel: u8) {
-        let offset = self.registers.coordinates.offset(x);
-        // println!(
-        //     "[FIFO] Poped data. offset: {}, len {}",
-        //     offset,
-        //     self.fifo.len()
-        // );
-        self.screen[offset] = pixel.into();
     }
 
     /// Get a reference to the ppu's registers.

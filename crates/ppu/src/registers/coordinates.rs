@@ -2,6 +2,7 @@ use enum_iterator::IntoEnumIterator;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use std::fmt;
 
+const MAP_ROW_LEN: u16 = 32;
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct Coordinates {
     yscroll: u8,
@@ -45,7 +46,7 @@ impl Coordinates {
         *dst = Self { ..*self };
     }
 
-    pub fn line(&self) -> usize {
+    pub fn tile_line(&self) -> usize {
         (self.ly % 8) as usize
     }
 
@@ -57,8 +58,8 @@ impl Coordinates {
         usize::from(self.xscroll).wrapping_add(x)
     }
 
-    pub fn row(&self) -> usize {
-        self.y() / 8
+    pub fn map_row_offset(&self) -> u16 {
+        (self.ly as u16 / 8) * MAP_ROW_LEN
     }
 
     pub fn offset(&self, x: usize) -> usize {
