@@ -36,7 +36,10 @@ impl Run for Ppu {
 }
 
 async fn run(ppu: Ppu) -> Result<Finished, Error> {
-    if ppu.borrow_mut().registers.is_lower(lcd::Field::Ly, 144) {
+    if !ppu.borrow().registers.control.lcd_enabled {
+        println!("[PPU] Ppu disabled");
+        Ok(Finished::Nope)
+    } else if ppu.borrow_mut().registers.is_lower(lcd::Field::Ly, 144) {
         let mut ticks = Oam::search(ppu.clone()).await;
         ticks += Pixel::transfert(ppu.clone()).start().await?;
         ticks += Blank::new(ppu.clone(), Mode::Hblank(204)).await;
