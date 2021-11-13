@@ -11,13 +11,13 @@ use crate::interrupts::Interrupts;
 use crate::io::IO;
 use crate::mbc::default::RomDefault;
 use crate::ram::Ram;
-use crate::state;
+use crate::state::{self, State};
 use ppu::Ppu;
 use shared::Error;
 
 #[derive(Debug)]
 pub struct Memory {
-    pub(crate) state: state::Rom,
+    pub(crate) state: state::State,
     pub(crate) bios: Bus,
     pub(crate) rom: Rom,
     pub(crate) wram: Bus,
@@ -33,7 +33,7 @@ impl Default for Memory {
         let raisable = interrupts.get_raisable();
         let ppu = Ppu::new(raisable);
         Memory {
-            state: state::Rom::Bios,
+            state: state::State::Bios,
             bios: Rc::new(RefCell::new(Box::new(Bios::new()))),
             wram: Rc::new(RefCell::new(Box::new(Ram::default()))),
             ppu,
@@ -48,10 +48,11 @@ impl Default for Memory {
 impl Memory {
     pub fn get_u8(&self, address: u16) -> Result<u8, Error> {
         match address {
-            consts::BIOS_MIN..=consts::BIOS_MAX if self.state == state::Rom::Bios => {
+            consts::BIOS_MIN..=consts::BIOS_MAX if self.state == state::State::Bios => {
                 self.bios.borrow().get(Area::Bios.relative(address))
             }
             consts::ROM_MIN..=consts::ROM_MAX => self.rom.borrow().get(Area::Rom.relative(address)),
+            consts::EXT_RAM_MIN..=consts::EXT_RAM_MAX => self.rom.borrow().get(address.into()),
             consts::VRAM_MIN..=consts::VRAM_MAX => self.ppu.borrow().get(address.into()),
             consts::WRAM_MIN..=consts::WRAM_MAX => {
                 self.wram.borrow().get(Area::Wram.relative(address))
@@ -84,6 +85,9 @@ impl Memory {
                 .wram
                 .borrow_mut()
                 .set(Area::Rom.relative(address), data),
+            consts::EXT_RAM_MIN..=consts::EXT_RAM_MAX => {
+                self.rom.borrow_mut().set(address.into(), data)
+            }
             consts::VRAM_MIN..=consts::VRAM_MAX => self.ppu.borrow_mut().set(address.into(), data),
             consts::IOREG_MIN..=consts::IOREM_MAX => self.set_io(address, data),
             consts::INTERRUPT_ENABLED => self.interrupts.registred.borrow().set(data),
@@ -152,7 +156,7 @@ impl Memory {
 }
 
 impl Memory {
-    pub fn new(mbc: Cartridge, data: Vec<u8>) -> Rc<RefCell<Self>> {
+    pub fn new(mbc: Cartridge, data: Vec<u8>, state: State) -> Rc<RefCell<Self>> {
         let rom: Rom = Rc::new(RefCell::new(match mbc {
             Cartridge::Mbc0 => Mbc0::new(data),
             Cartridge::Mbc1 => Mbc1::new(data),
@@ -162,7 +166,7 @@ impl Memory {
             _ => unimplemented!(),
         }));
         // Init state
-        let state = state::Rom::Bios;
+        let state = state;
 
         // Init Bios
         let bios: Box<dyn MemoryBus> = Box::new(Bios::new());
