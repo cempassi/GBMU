@@ -19,6 +19,15 @@ impl Cpu {
         }
     }
 
+    pub fn no_bios(memory: Memory) -> Self {
+        Self {
+            memory,
+            registers: Registers::no_bios(),
+            halt: false,
+            stop: false,
+        }
+    }
+
     pub fn get_memory(&self) -> Memory {
         self.memory.clone()
     }
