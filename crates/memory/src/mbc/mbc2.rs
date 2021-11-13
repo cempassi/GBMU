@@ -1,7 +1,5 @@
 use super::bus::MbcBus;
 use super::consts;
-use super::Mbc;
-use crate::MemoryBus;
 use shared::Error;
 use std::convert::AsRef;
 
@@ -30,22 +28,6 @@ impl AsRef<Vec<u8>> for Mbc2 {
 }
 
 impl MbcBus for Mbc2 {
-    fn set(&mut self, address: usize, data: u8) -> Result<(), Error> {
-        match address {
-            consts::MBC2_REG_START..=consts::MBC2_REG_END => self.mbc2_register(address, data),
-            consts::MBC_RAM_START..=consts::MBC2_ERAM_END => {
-                if self.ram_lock {
-                    let offset = self.get_ram_offset(address);
-                    self.data[address - offset] = data & 0xf
-                }
-            } // Else should be undefined behavior Or Err
-            _ => return Err(shared::Error::IllegalSet(address, data)),
-        };
-        Ok(())
-    }
-}
-
-impl MemoryBus for Mbc2 {
     fn get(&self, address: usize) -> Result<u8, Error> {
         match address {
             consts::MBC_BANK0_START..=consts::MBC_BANK0_END => Ok(self.data[address]),
@@ -66,12 +48,19 @@ impl MemoryBus for Mbc2 {
     }
 
     fn set(&mut self, address: usize, data: u8) -> Result<(), Error> {
-        let _ = <Self as MbcBus>::set(self, address, data);
+        match address {
+            consts::MBC2_REG_START..=consts::MBC2_REG_END => self.mbc2_register(address, data),
+            consts::MBC_RAM_START..=consts::MBC2_ERAM_END => {
+                if self.ram_lock {
+                    let offset = self.get_ram_offset(address);
+                    self.data[address - offset] = data & 0xf
+                }
+            } // Else should be undefined behavior Or Err
+            _ => return Err(shared::Error::IllegalSet(address, data)),
+        };
         Ok(())
     }
 }
-
-impl Mbc for Mbc2 {}
 
 impl Mbc2 {
     pub fn new(data: Vec<u8>) -> Box<Self> {
@@ -104,9 +93,8 @@ impl Mbc2 {
 
 #[cfg(test)]
 mod mbc2_test {
-    use super::Mbc2;
-    use super::MbcBus;
-    use super::MemoryBus;
+    use super::{MbcBus, Mbc2};
+
     const FILE: &[u8; 262144] = include_bytes!("../../../../roms/Mystic_Quest.gb");
 
     #[test]

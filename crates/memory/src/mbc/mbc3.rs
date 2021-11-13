@@ -1,7 +1,5 @@
 use super::bus::MbcBus;
 use super::consts;
-use super::Mbc;
-use crate::MemoryBus;
 use shared::Error;
 use std::convert::AsRef;
 
@@ -66,19 +64,6 @@ struct Mbc3Rtc {
 }
 
 impl MbcBus for Mbc3 {
-    fn set(&mut self, address: usize, data: u8) -> Result<(), Error> {
-        match address {
-            consts::MBC3_REG0_START..=consts::MBC3_REG0_END => self.update_ram_lock(data),
-            consts::MBC3_REG1_START..=consts::MBC3_REG1_END => self.update_rom_bank(data),
-            consts::MBC3_REG2_START..=consts::MBC3_REG2_END => self.update_ram_bank(data),
-            consts::MBC3_REG3_START..=consts::MBC3_REG3_END => self.latch_rtc_register(data),
-            consts::MBC3_REG4_START..=consts::MBC3_REG4_END => self.set_ram(address, data),
-            _ => Err(shared::Error::IllegalSet(address, data)),
-        }
-    }
-}
-
-impl MemoryBus for Mbc3 {
     fn get(&self, address: usize) -> Result<u8, Error> {
         match address {
             consts::MBC_BANK0_START..=consts::MBC_BANK0_END => Ok(self.data[address]),
@@ -92,12 +77,16 @@ impl MemoryBus for Mbc3 {
     }
 
     fn set(&mut self, address: usize, data: u8) -> Result<(), Error> {
-        let _ = <Self as MbcBus>::set(self, address, data);
-        Ok(())
+        match address {
+            consts::MBC3_REG0_START..=consts::MBC3_REG0_END => self.update_ram_lock(data),
+            consts::MBC3_REG1_START..=consts::MBC3_REG1_END => self.update_rom_bank(data),
+            consts::MBC3_REG2_START..=consts::MBC3_REG2_END => self.update_ram_bank(data),
+            consts::MBC3_REG3_START..=consts::MBC3_REG3_END => self.latch_rtc_register(data),
+            consts::MBC3_REG4_START..=consts::MBC3_REG4_END => self.set_ram(address, data),
+            _ => Err(shared::Error::IllegalSet(address, data)),
+        }
     }
 }
-
-impl Mbc for Mbc3 {}
 
 impl Mbc3 {
     pub fn new(data: Vec<u8>) -> Box<Self> {
@@ -263,8 +252,7 @@ impl Mbc3 {
 
 #[cfg(test)]
 mod mbc3_test {
-    use super::Mbc3;
-    use super::MemoryBus;
+    use super::{MbcBus, Mbc3};
 
     const FILE: &[u8; 2097152] = include_bytes!("../../../../roms/Pokemon - Version Argent.gbc");
 
