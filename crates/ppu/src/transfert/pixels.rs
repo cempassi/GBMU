@@ -96,6 +96,7 @@ mod test_tiles {
             0x66, 0x66,
         ];
         let mut p = ppu.borrow_mut();
+        p.vram_lock = true;
         for (index, data) in tile.iter().enumerate() {
             p.set_vram((0x8000 + index) as u16, *data).unwrap();
         }
