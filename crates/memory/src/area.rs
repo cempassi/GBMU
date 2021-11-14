@@ -7,8 +7,7 @@ pub enum Area {
     Vram,
     _ExtRam,
     Wram,
-    _EchoRam,
-    _Oam,
+    EchoRam,
     IOReg,
     Hram,
 }
@@ -21,8 +20,7 @@ impl Area {
             Area::Vram => address - consts::VRAM_MIN,
             Area::_ExtRam => address - consts::EXT_RAM_MIN,
             Area::Wram => address - consts::WRAM_MIN,
-            Area::_EchoRam => address - consts::ECHO_RAM_MIN,
-            Area::_Oam => address - consts::OAM_MIN,
+            Area::EchoRam => address - consts::ECHO_MIN,
             Area::IOReg => address - consts::IOREG_MIN,
             Area::Hram => address - consts::HRAM_MIN,
         };

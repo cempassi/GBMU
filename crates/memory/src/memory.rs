@@ -52,17 +52,21 @@ impl Memory {
                 self.bios.borrow().get(Area::Bios.relative(address))
             }
             consts::ROM_MIN..=consts::ROM_MAX => self.rom.borrow().get(Area::Rom.relative(address)),
-            consts::EXT_RAM_MIN..=consts::EXT_RAM_MAX => self.rom.borrow().get(address.into()),
             consts::VRAM_MIN..=consts::VRAM_MAX => self.ppu.borrow().get(address.into()),
             consts::WRAM_MIN..=consts::WRAM_MAX => {
                 self.wram.borrow().get(Area::Wram.relative(address))
             }
+            consts::ECHO_MIN..=consts::ECHO_MAX => {
+                self.wram.borrow().get(Area::EchoRam.relative(address))
+            }
+            consts::EXT_RAM_MIN..=consts::EXT_RAM_MAX => self.rom.borrow().get(address.into()),
+            consts::OAM_MIN..=consts::OAM_MAX => self.ppu.borrow_mut().get(address.into()),
+            consts::RESTRICTED_MIN..=consts::RESTRICTED_MAX => Ok(0x00),
             consts::IOREG_MIN..=consts::IOREM_MAX => self.get_io(address),
             consts::HRAM_MIN..=consts::HRAM_MAX => {
                 self.hram.borrow().get(Area::Hram.relative(address))
             }
             consts::INTERRUPT_ENABLED => self.interrupts.registred.borrow().get(),
-            _ => Err(Error::InvalidGet(address.into())),
         }
     }
 
@@ -77,25 +81,30 @@ impl Memory {
 
     pub fn set_u8(&mut self, address: u16, data: u8) -> Result<(), Error> {
         match address {
-            consts::WRAM_MIN..=consts::WRAM_MAX => self
-                .wram
-                .borrow_mut()
-                .set(Area::Wram.relative(address), data),
             consts::ROM_MIN..=consts::ROM_MAX => self
                 .wram
                 .borrow_mut()
                 .set(Area::Rom.relative(address), data),
+            consts::VRAM_MIN..=consts::VRAM_MAX => self.ppu.borrow_mut().set(address.into(), data),
             consts::EXT_RAM_MIN..=consts::EXT_RAM_MAX => {
                 self.rom.borrow_mut().set(address.into(), data)
             }
-            consts::VRAM_MIN..=consts::VRAM_MAX => self.ppu.borrow_mut().set(address.into(), data),
+            consts::WRAM_MIN..=consts::WRAM_MAX => self
+                .wram
+                .borrow_mut()
+                .set(Area::Wram.relative(address), data),
+            consts::ECHO_MIN..=consts::ECHO_MAX => self
+                .wram
+                .borrow_mut()
+                .set(Area::EchoRam.relative(address), data),
+            consts::OAM_MIN..=consts::OAM_MAX => self.ppu.borrow_mut().set(address.into(), data),
+            consts::RESTRICTED_MIN..=consts::RESTRICTED_MAX => Ok(()),
             consts::IOREG_MIN..=consts::IOREM_MAX => self.set_io(address, data),
-            consts::INTERRUPT_ENABLED => self.interrupts.registred.borrow().set(data),
             consts::HRAM_MIN..=consts::HRAM_MAX => self
                 .hram
                 .borrow_mut()
                 .set(Area::Hram.relative(address), data),
-            _ => Err(Error::InvalidSet(address.into(), data)),
+            consts::INTERRUPT_ENABLED => self.interrupts.registred.borrow().set(data),
         }
     }
 
@@ -139,10 +148,9 @@ impl Memory {
             Area::Rom => todo!(),
             Area::Vram | Area::_ExtRam => todo!(),
             Area::Wram => self.wram.clone(),
-            Area::_EchoRam => todo!(),
-            Area::_Oam => todo!(),
             Area::IOReg => todo!(),
             Area::Hram => todo!(),
+            Area::EchoRam => todo!(),
         }
     }
 
