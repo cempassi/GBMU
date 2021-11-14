@@ -34,12 +34,9 @@ impl TryFrom<&str> for SOC {
         let state = memory::state::State::Bios;
         let memory: memory::Memory = memory::memory::Memory::new(header.cartridge, rom, state);
         let processor = Runner::new(memory, state);
-        let runner = Status::default();
+        let status = Status::new(processor.cpu());
 
-        Ok(SOC {
-            processor,
-            status: runner,
-        })
+        Ok(SOC { processor, status })
     }
 }
 

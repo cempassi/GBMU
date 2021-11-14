@@ -7,6 +7,7 @@ pub enum Mode {
     Frame,
     Idle,
     Second(Instant),
+    Breakpoint(u16),
 }
 
 impl Mode {

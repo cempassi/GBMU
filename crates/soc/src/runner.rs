@@ -16,11 +16,10 @@ pub struct Runner {
 
 impl Runner {
     pub fn new(memory: Memory, state: memory::State) -> Self {
-
         let ppu = memory.borrow().get_ppu();
         let cpu = match state {
             memory::State::Bios => Cpu::new(memory.clone()),
-            memory::State::Rom =>  Cpu::no_bios(memory.clone()),
+            memory::State::Rom => Cpu::no_bios(memory.clone()),
         };
         let tasks = Tasks::new(cpu, ppu);
         Self { memory, tasks }
