@@ -106,7 +106,7 @@ pub enum Arithmetic {
     DecE = 0x1D,
     DecL = 0x2D,
     DecA = 0x3D,
-    DAA = 0x26,
+    DAA = 0x27,
     SCF = 0x37,
     CPL = 0x2F,
     CCF = 0x3F,
