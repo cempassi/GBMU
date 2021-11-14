@@ -39,17 +39,20 @@ async fn run(ppu: Ppu) -> Result<Finished, Error> {
     if !ppu.borrow().registers.control.lcd_enabled {
         println!("[PPU] Ppu disabled");
         Ok(Finished::Nope)
-    } else if ppu.borrow_mut().registers.is_lower(lcd::Field::Ly, 144) {
-        let mut ticks = Oam::search(ppu.clone()).await;
-        ticks += Pixel::transfert(ppu.clone()).start().await?;
-        ticks += Blank::new(ppu.clone(), Mode::Hblank(204)).await;
-        ppu.borrow_mut().registers.increase(lcd::Field::Ly);
-        Ok(Finished::Line(ticks))
-    } else {
+    } else if ppu.borrow_mut().registers.is_equal(lcd::Field::Ly, 144) {
         ppu.borrow().raise_vblank();
         ppu.borrow_mut().registers.mode.update(Mode::Vblank);
         Blank::new(ppu.clone(), Mode::Vblank).await;
         ppu.borrow_mut().registers.clear(lcd::Field::Ly);
+        println!("[PPU] Frame finished");
         Ok(Finished::Frame)
+    } else {
+        let mut ticks = Oam::search(ppu.clone()).await;
+        ticks += Pixel::transfert(ppu.clone()).start().await?;
+        ticks += Blank::new(ppu.clone(), Mode::Hblank(204)).await;
+        ppu.borrow_mut().registers.increase(lcd::Field::Ly);
+        let ly = ppu.borrow().registers.coordinates.get(lcd::Field::Ly);
+        println!("[PPU] ly: {}", ly);
+        Ok(Finished::Line(ticks))
     }
 }
