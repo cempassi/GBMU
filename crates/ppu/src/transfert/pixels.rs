@@ -167,7 +167,7 @@ mod test_tiles {
     #[test]
     fn test_get_tile_row_six_from_memory() {
         let ppu = setup_ppu(6);
-        let expected =[1, 2, 2, 3, 1, 2, 2, 3];
+        let expected = [1, 2, 2, 3, 1, 2, 2, 3];
         let row = execute::execute(Box::pin(Row::try_new(&ppu, 0))).unwrap();
         let result: Pixels = row.into();
 

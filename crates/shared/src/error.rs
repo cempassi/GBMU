@@ -29,7 +29,7 @@ impl fmt::Display for Error {
                 address, data
             ),
             Error::RamLock(data) => write!(f, "Ram Lock: data: {:#x}", data),
-            Error::Unimplemented(opcode) => write!(f, "Unimplemented. Opcode: {:#X}",opcode ),
+            Error::Unimplemented(opcode) => write!(f, "Unimplemented. Opcode: {:#X}", opcode),
             Error::InvalidInterupt(interrupt) => {
                 write!(f, "Invalid Interrupt. value: {}", interrupt)
             }

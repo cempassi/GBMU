@@ -93,7 +93,7 @@ impl Mbc2 {
 
 #[cfg(test)]
 mod mbc2_test {
-    use super::{MbcBus, Mbc2};
+    use super::{Mbc2, MbcBus};
 
     const FILE: &[u8; 262144] = include_bytes!("../../../../roms/Mystic_Quest.gb");
 

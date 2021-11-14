@@ -39,7 +39,7 @@ impl Pixel {
                 Poll::Ready(_) => {
                     let fetcher = Fetcher::new(self.ppu.clone()).fetch();
                     fetching = Box::pin(fetcher);
-                },
+                }
                 Poll::Pending => (),
             }
             match pop.as_mut().poll(&mut context) {

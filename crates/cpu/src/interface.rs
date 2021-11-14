@@ -3,7 +3,7 @@ use std::cell::RefCell;
 use std::ops::{Deref, DerefMut};
 use std::rc::Rc;
 
-#[derive(Default, Clone)]
+#[derive(Default, Debug, Clone)]
 pub struct Cpu(Rc<RefCell<super::cpu::Cpu>>);
 
 impl Cpu {

@@ -252,7 +252,7 @@ impl Mbc3 {
 
 #[cfg(test)]
 mod mbc3_test {
-    use super::{MbcBus, Mbc3};
+    use super::{Mbc3, MbcBus};
 
     const FILE: &[u8; 2097152] = include_bytes!("../../../../roms/Pokemon - Version Argent.gbc");
 

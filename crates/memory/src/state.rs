@@ -1,7 +1,7 @@
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum State {
     Bios,
-    Rom
+    Rom,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]

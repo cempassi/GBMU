@@ -392,9 +392,9 @@ impl fmt::Display for Load {
 #[cfg(test)]
 mod test_instruction_load_reg_reg {
     use super::Load;
-    use shared::execute;
     use crate::registers::{Bits16, Bits8, Bus};
     use crate::{Access, Cpu};
+    use shared::execute;
 
     #[test]
     fn test_load_l_from_h() {

@@ -25,12 +25,8 @@ impl Fetcher {
         p.fifo.scroll(xscroll);
 
         drop(p);
-        Self {
-            ppu,
-            map_row,
-        }
+        Self { ppu, map_row }
     }
-
 
     pub async fn fetch(self) -> Result<u8, Error> {
         let mut cycles = 0;
@@ -45,6 +41,7 @@ impl Fetcher {
             //println!("[FETCHER] Fetching tile id");
 
             let map_address = self.map_row + i as u16;
+            println!("[FETCHER] Map address: {:#X}", map_address);
             let (tile_id, ticks) = Fetch::new(&self.ppu, map_address).await?;
 
             cycles += ticks;

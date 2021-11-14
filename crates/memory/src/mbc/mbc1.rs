@@ -151,7 +151,7 @@ impl Mbc1 {
 
 #[cfg(test)]
 mod mbc1_test {
-    use super::{MbcBus, Mbc1};
+    use super::{Mbc1, MbcBus};
 
     const FILE: &[u8; 262144] = include_bytes!("../../../../roms/Metroid II - Return of Samus.gb");
 

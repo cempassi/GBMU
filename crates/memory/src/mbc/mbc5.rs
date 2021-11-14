@@ -123,7 +123,7 @@ impl Mbc5 {
 
 #[cfg(test)]
 mod mbc5_test {
-    use super::{MbcBus, Mbc5};
+    use super::{Mbc5, MbcBus};
 
     const FILE: &[u8; 1048576] = include_bytes!("../../../../roms/Pokemon_Rouge.gb");
 

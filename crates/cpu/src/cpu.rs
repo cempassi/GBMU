@@ -1,7 +1,7 @@
 use crate::registers::Registers;
 use memory::Memory;
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Cpu {
     memory: Memory,
     pub registers: Registers,
