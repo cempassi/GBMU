@@ -66,7 +66,7 @@ impl From<MenuMsg> for Message {
 
 impl UserInterface {
     pub fn refresh(&mut self) {
-        let _ = self.disassembler.update(DisassMsg::Reload);
+        let _ = self.disassembler.update(DisassMsg::Refresh);
         self.ppu.update(PpuMsg::Refresh);
         self.cpu.update(CpuMsg::Refresh)
     }
@@ -88,6 +88,9 @@ impl Program for UserInterface {
                 self.menu.update(message);
             }
             Message::Disassembler(message) => {
+                if let DisassMsg::SetBreakpoint(_, address) = message {
+                    self.menu.add_breakpoints(address);
+                }
                 let _ = self.disassembler.update(message);
             }
             Message::Ppu(message) => {

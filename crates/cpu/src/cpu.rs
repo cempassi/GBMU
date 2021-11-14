@@ -1,7 +1,7 @@
 use crate::registers::Registers;
 use memory::Memory;
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Cpu {
     memory: Memory,
     pub registers: Registers,
@@ -14,6 +14,15 @@ impl Cpu {
         Self {
             memory,
             registers: Registers::default(),
+            halt: false,
+            stop: false,
+        }
+    }
+
+    pub fn no_bios(memory: Memory) -> Self {
+        Self {
+            memory,
+            registers: Registers::no_bios(),
             halt: false,
             stop: false,
         }

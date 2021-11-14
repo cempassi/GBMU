@@ -1,4 +1,5 @@
 mod fetcher;
+mod pixels;
 use std::task::{Context, Poll};
 
 use futures::Future;
@@ -32,21 +33,24 @@ impl Pixel {
         let mut fetching = Box::pin(fetcher);
         let mut pop = Box::pin(Pop::new(&self.ppu));
 
-        let mut cycles = 0;
-        loop {
+        self.ppu.borrow_mut().vram_lock = true;
+        let cycles = loop {
             match fetching.as_mut().poll(&mut context) {
-                Poll::Ready(_) => break,
+                Poll::Ready(_) => {
+                    let fetcher = Fetcher::new(self.ppu.clone()).fetch();
+                    fetching = Box::pin(fetcher);
+                }
                 Poll::Pending => (),
             }
             match pop.as_mut().poll(&mut context) {
                 Poll::Ready(ticks) => {
-                    cycles = ticks;
-                    break;
+                    break ticks;
                 }
                 Poll::Pending => (),
             }
             pending!();
-        }
+        };
+        self.ppu.borrow_mut().vram_lock = false;
         //println!("[FETCHER] fetcher ticks: {}", cycles);
         Ok(cycles)
     }

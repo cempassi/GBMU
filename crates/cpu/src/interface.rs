@@ -3,13 +3,20 @@ use std::cell::RefCell;
 use std::ops::{Deref, DerefMut};
 use std::rc::Rc;
 
-#[derive(Default, Clone)]
+#[derive(Default, Debug, Clone)]
 pub struct Cpu(Rc<RefCell<super::cpu::Cpu>>);
 
 impl Cpu {
     pub fn new(memory: Memory) -> Self {
         Self {
             0: Rc::new(RefCell::new(super::cpu::Cpu::new(memory))),
+        }
+    }
+
+    pub fn no_bios(memory: Memory) -> Self {
+        println!("CPU created with no bios");
+        Self {
+            0: Rc::new(RefCell::new(super::cpu::Cpu::no_bios(memory))),
         }
     }
 }

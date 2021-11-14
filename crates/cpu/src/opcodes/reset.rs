@@ -240,7 +240,8 @@ impl fmt::Display for Reset {
 mod test_reset_bit {
     use super::Reset;
     use crate::registers::{Bits16, Bits8, Bus};
-    use crate::{executor, Access, Cpu};
+    use crate::{Access, Cpu};
+    use shared::execute;
 
     #[test]
     fn test_if_bit_6_in_register_b_is_reset() {
@@ -250,7 +251,7 @@ mod test_reset_bit {
         let instruction = Reset::BBit6;
         cpu.borrow_mut().registers.set(Bits8::B, src);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.borrow().registers.get(Bits8::B);
         assert_eq!(result, expected);
@@ -266,7 +267,7 @@ mod test_reset_bit {
         cpu.borrow_mut().registers.set(Bits16::HL, hl);
         cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.memory().borrow_mut().get_u8(hl).unwrap();
         assert_eq!(result, expected);

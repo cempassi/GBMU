@@ -255,7 +255,8 @@ impl fmt::Display for Logic {
 mod test_logic_opcodes {
     use super::Logic;
     use crate::registers::{Bits16, Bits8, Bus, Flag};
-    use crate::{executor, Access, Cpu};
+    use crate::{Access, Cpu};
+    use shared::execute;
 
     #[test]
     fn test_and_a_e() {
@@ -264,7 +265,7 @@ mod test_logic_opcodes {
         cpu.borrow_mut().registers.set(Bits8::A, 0x4f);
         cpu.borrow_mut().registers.set(Bits8::E, 0x0f);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow().registers.get(Bits8::A), 0x0f);
         assert!(cpu.borrow().registers.get(Flag::H));
@@ -275,7 +276,7 @@ mod test_logic_opcodes {
         let cpu = Cpu::default();
         let instruction = Logic::AndA8b;
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow().registers.get(Bits8::A), 0x00);
         assert!(cpu.borrow().registers.get(Flag::H));
@@ -288,7 +289,7 @@ mod test_logic_opcodes {
         cpu.borrow_mut().registers.set(Bits8::A, 0x4A);
         cpu.borrow_mut().registers.set(Bits8::B, 0xF2);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0xFA);
     }
@@ -302,7 +303,7 @@ mod test_logic_opcodes {
         cpu.borrow_mut().registers.set(Bits16::PC, 0xc000);
         cpu.memory().borrow_mut().set_u8(0xc000, 0xF2).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow().registers.get(Bits8::A), 0xFA);
     }
@@ -314,7 +315,7 @@ mod test_logic_opcodes {
         cpu.borrow_mut().registers.set(Bits8::A, 0x4A);
         cpu.borrow_mut().registers.set(Bits8::D, 0xF2);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0xB8);
     }
@@ -328,7 +329,7 @@ mod test_logic_opcodes {
         cpu.borrow_mut().registers.set(Bits16::HL, 0xc000);
         cpu.memory().borrow_mut().set_u8(0xc000, 0xF2).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow_mut().registers.get(Bits8::A), 0xB8);
     }
@@ -340,7 +341,7 @@ mod test_logic_opcodes {
         cpu.borrow_mut().registers.set(Bits8::A, 0x4A);
         cpu.borrow_mut().registers.set(Bits8::L, 0xF2);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow().registers.get(Bits8::A), 0x4A);
     }
@@ -354,7 +355,7 @@ mod test_logic_opcodes {
         cpu.borrow_mut().registers.set(Bits16::HL, 0xc000);
         cpu.memory().borrow_mut().set_u8(0xc000, 0xF2).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         assert_eq!(cpu.borrow().registers.get(Bits8::A), 0x4A);
     }

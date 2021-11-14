@@ -98,11 +98,11 @@ impl Emulator {
     pub fn request_redraw(&mut self) {
         self.state.update();
         self.window.request_redraw();
-        println!("[WINDOW][Emulator] Redraw requested");
+        //        println!("[WINDOW][Emulator] Redraw requested");
     }
 
     pub fn redraw(&mut self, control_flow: &mut ControlFlow) {
-        println!("[WINDOW][Emulator] Redrawing");
+        //       println!("[WINDOW][Emulator] Redrawing");
         let ppu = self.soc.borrow().get_ppu();
         let frame = self.pixels.get_frame();
         ppu.borrow_mut().render(frame);

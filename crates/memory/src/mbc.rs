@@ -9,7 +9,7 @@ pub(super) mod mbc3;
 pub(super) mod mbc5;
 //pub mod mode;
 
-pub use bus::{Mbc, MbcBus};
+pub use bus::MbcBus;
 pub use cartridge::Cartridge;
 pub use mbc0::Mbc0;
 pub use mbc1::Mbc1;

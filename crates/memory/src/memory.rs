@@ -11,13 +11,13 @@ use crate::interrupts::Interrupts;
 use crate::io::IO;
 use crate::mbc::default::RomDefault;
 use crate::ram::Ram;
-use crate::state;
+use crate::state::{self, State};
 use ppu::Ppu;
 use shared::Error;
 
 #[derive(Debug)]
 pub struct Memory {
-    pub(crate) state: state::Rom,
+    pub(crate) state: state::State,
     pub(crate) bios: Bus,
     pub(crate) rom: Rom,
     pub(crate) wram: Bus,
@@ -33,7 +33,7 @@ impl Default for Memory {
         let raisable = interrupts.get_raisable();
         let ppu = Ppu::new(raisable);
         Memory {
-            state: state::Rom::Bios,
+            state: state::State::Bios,
             bios: Rc::new(RefCell::new(Box::new(Bios::new()))),
             wram: Rc::new(RefCell::new(Box::new(Ram::default()))),
             ppu,
@@ -48,7 +48,7 @@ impl Default for Memory {
 impl Memory {
     pub fn get_u8(&self, address: u16) -> Result<u8, Error> {
         match address {
-            consts::BIOS_MIN..=consts::BIOS_MAX if self.state == state::Rom::Bios => {
+            consts::BIOS_MIN..=consts::BIOS_MAX if self.state == state::State::Bios => {
                 self.bios.borrow().get(Area::Bios.relative(address))
             }
             consts::ROM_MIN..=consts::ROM_MAX => self.rom.borrow().get(Area::Rom.relative(address)),
@@ -56,12 +56,17 @@ impl Memory {
             consts::WRAM_MIN..=consts::WRAM_MAX => {
                 self.wram.borrow().get(Area::Wram.relative(address))
             }
+            consts::ECHO_MIN..=consts::ECHO_MAX => {
+                self.wram.borrow().get(Area::EchoRam.relative(address))
+            }
+            consts::EXT_RAM_MIN..=consts::EXT_RAM_MAX => self.rom.borrow().get(address.into()),
+            consts::OAM_MIN..=consts::OAM_MAX => self.ppu.borrow_mut().get(address.into()),
+            consts::RESTRICTED_MIN..=consts::RESTRICTED_MAX => Ok(0x00),
             consts::IOREG_MIN..=consts::IOREM_MAX => self.get_io(address),
             consts::HRAM_MIN..=consts::HRAM_MAX => {
                 self.hram.borrow().get(Area::Hram.relative(address))
             }
             consts::INTERRUPT_ENABLED => self.interrupts.registred.borrow().get(),
-            _ => Err(Error::InvalidGet(address.into())),
         }
     }
 
@@ -76,22 +81,30 @@ impl Memory {
 
     pub fn set_u8(&mut self, address: u16, data: u8) -> Result<(), Error> {
         match address {
-            consts::WRAM_MIN..=consts::WRAM_MAX => self
-                .wram
-                .borrow_mut()
-                .set(Area::Wram.relative(address), data),
             consts::ROM_MIN..=consts::ROM_MAX => self
                 .wram
                 .borrow_mut()
                 .set(Area::Rom.relative(address), data),
             consts::VRAM_MIN..=consts::VRAM_MAX => self.ppu.borrow_mut().set(address.into(), data),
+            consts::EXT_RAM_MIN..=consts::EXT_RAM_MAX => {
+                self.rom.borrow_mut().set(address.into(), data)
+            }
+            consts::WRAM_MIN..=consts::WRAM_MAX => self
+                .wram
+                .borrow_mut()
+                .set(Area::Wram.relative(address), data),
+            consts::ECHO_MIN..=consts::ECHO_MAX => self
+                .wram
+                .borrow_mut()
+                .set(Area::EchoRam.relative(address), data),
+            consts::OAM_MIN..=consts::OAM_MAX => self.ppu.borrow_mut().set(address.into(), data),
+            consts::RESTRICTED_MIN..=consts::RESTRICTED_MAX => Ok(()),
             consts::IOREG_MIN..=consts::IOREM_MAX => self.set_io(address, data),
-            consts::INTERRUPT_ENABLED => self.interrupts.registred.borrow().set(data),
             consts::HRAM_MIN..=consts::HRAM_MAX => self
                 .hram
                 .borrow_mut()
                 .set(Area::Hram.relative(address), data),
-            _ => Err(Error::InvalidSet(address.into(), data)),
+            consts::INTERRUPT_ENABLED => self.interrupts.registred.borrow().set(data),
         }
     }
 
@@ -135,10 +148,9 @@ impl Memory {
             Area::Rom => todo!(),
             Area::Vram | Area::_ExtRam => todo!(),
             Area::Wram => self.wram.clone(),
-            Area::_EchoRam => todo!(),
-            Area::_Oam => todo!(),
             Area::IOReg => todo!(),
             Area::Hram => todo!(),
+            Area::EchoRam => todo!(),
         }
     }
 
@@ -152,7 +164,7 @@ impl Memory {
 }
 
 impl Memory {
-    pub fn new(mbc: Cartridge, data: Vec<u8>) -> Rc<RefCell<Self>> {
+    pub fn new(mbc: Cartridge, data: Vec<u8>, state: State) -> Rc<RefCell<Self>> {
         let rom: Rom = Rc::new(RefCell::new(match mbc {
             Cartridge::Mbc0 => Mbc0::new(data),
             Cartridge::Mbc1 => Mbc1::new(data),
@@ -162,7 +174,7 @@ impl Memory {
             _ => unimplemented!(),
         }));
         // Init state
-        let state = state::Rom::Bios;
+        let state = state;
 
         // Init Bios
         let bios: Box<dyn MemoryBus> = Box::new(Bios::new());
@@ -179,7 +191,10 @@ impl Memory {
         let requested = interrupts.get_raisable();
 
         // Create memory spaces with fully-qualified syntax
-        let ppu = Ppu::new(requested);
+        let ppu = match state {
+            State::Bios => Ppu::new(requested),
+            State::Rom => Ppu::no_bios(requested),
+        };
 
         let io = IO::default();
 
@@ -201,20 +216,6 @@ impl Memory {
 
 #[cfg(test)]
 mod test_memory {
-    #[test]
-    fn test_invalid_read() {
-        let memory = super::Memory::default();
-
-        assert!(memory.get_u8(0xfea1).is_err())
-    }
-
-    #[test]
-    fn test_invalid_write() {
-        let mut memory = super::Memory::default();
-
-        assert!(memory.set_u8(0xfea1, 42).is_err())
-    }
-
     #[test]
     fn test_read_wram() {
         let memory = super::Memory::default();

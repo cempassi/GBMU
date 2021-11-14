@@ -245,7 +245,8 @@ impl fmt::Display for Test {
 mod test_test_bit {
     use super::Test;
     use crate::registers::{Bits16, Bits8, Bus, Flag};
-    use crate::{executor, Access, Cpu};
+    use crate::{Access, Cpu};
+    use shared::execute;
 
     #[test]
     fn test_if_bit_6_in_register_b_is_not_zero() {
@@ -255,7 +256,7 @@ mod test_test_bit {
         let instruction = Test::BBit6;
         cpu.borrow_mut().registers.set(Bits8::B, src);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let is_zero = cpu.borrow().registers.get(Flag::Z);
         assert!(is_zero == expected);
@@ -267,7 +268,7 @@ mod test_test_bit {
         let cpu = Cpu::default();
         let instruction = Test::DBit4;
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let is_zero = cpu.borrow().registers.get(Flag::Z);
         assert!(is_zero == expected);
@@ -283,7 +284,7 @@ mod test_test_bit {
         cpu.borrow_mut().registers.set(Bits16::HL, hl);
         cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let is_zero = cpu.borrow().registers.get(Flag::Z);
         assert!(is_zero == expected);

@@ -240,7 +240,8 @@ impl fmt::Display for Bitset {
 mod test_set_bit {
     use super::Bitset;
     use crate::registers::{Bits16, Bits8, Bus};
-    use crate::{executor, Access, Cpu};
+    use crate::{Access, Cpu};
+    use shared::execute;
 
     #[test]
     fn test_if_bit_6_in_register_b_is_set() {
@@ -250,7 +251,7 @@ mod test_set_bit {
         let instruction = Bitset::BBit6;
         cpu.borrow_mut().registers.set(Bits8::B, src);
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.borrow_mut().registers.get(Bits8::B);
         assert_eq!(result, expected);
@@ -266,7 +267,7 @@ mod test_set_bit {
         cpu.borrow_mut().registers.set(Bits16::HL, hl);
         cpu.memory().borrow_mut().set_u8(hl, src).unwrap();
 
-        executor::execute(Box::pin(instruction.exec(cpu.clone())));
+        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
 
         let result = cpu.memory().borrow_mut().get_u8(hl).unwrap();
         assert_eq!(result, expected);

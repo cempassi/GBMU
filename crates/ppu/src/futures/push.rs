@@ -10,11 +10,11 @@ use crate::Ppu;
 pub struct Push<'push> {
     ticks: u8,
     ppu: &'push crate::Ppu,
-    data: Vec<u8>,
+    data: [u8; 8],
 }
 
 impl<'push, 'fetch> Push<'push> {
-    pub fn new(ppu: &'push Ppu, data: Vec<u8>) -> Self {
+    pub fn new(ppu: &'push Ppu, data: [u8; 8]) -> Self {
         Self {
             ticks: 0,
             ppu,

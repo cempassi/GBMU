@@ -31,14 +31,12 @@ impl TryFrom<&str> for SOC {
         let header = Header::try_from(raw_header).expect("Invalid data in raw_header");
         println!("Header: {:#?}", header);
 
-        let memory: memory::Memory = memory::memory::Memory::new(header.cartridge, rom);
-        let processor = Runner::new(memory);
-        let runner = Status::default();
+        let state = memory::state::State::Bios;
+        let memory: memory::Memory = memory::memory::Memory::new(header.cartridge, rom, state);
+        let processor = Runner::new(memory, state);
+        let status = Status::new(processor.cpu());
 
-        Ok(SOC {
-            processor,
-            status: runner,
-        })
+        Ok(SOC { processor, status })
     }
 }
 
