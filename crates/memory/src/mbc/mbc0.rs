@@ -52,11 +52,4 @@ mod test_nombc {
 
         assert_eq!(mbc0.get(0x10).unwrap(), 0);
     }
-
-    #[test]
-    fn test_write_read_nombc() {
-        let mut mbc0 = Mbc0::default();
-
-        assert!(<Mbc0 as MbcBus>::set(&mut mbc0, 0x42, 42).is_err());
-    }
 }

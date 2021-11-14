@@ -217,20 +217,6 @@ impl Memory {
 #[cfg(test)]
 mod test_memory {
     #[test]
-    fn test_invalid_read() {
-        let memory = super::Memory::default();
-
-        assert!(memory.get_u8(0xfea1).is_err())
-    }
-
-    #[test]
-    fn test_invalid_write() {
-        let mut memory = super::Memory::default();
-
-        assert!(memory.set_u8(0xfea1, 42).is_err())
-    }
-
-    #[test]
     fn test_read_wram() {
         let memory = super::Memory::default();
 
