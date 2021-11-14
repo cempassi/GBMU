@@ -1,5 +1,6 @@
 use super::disass::Disass;
 use crate::debugger::widgets::Cell;
+use iced::button;
 use iced::{Element, Row};
 use num_enum::TryFromPrimitive;
 
@@ -20,6 +21,8 @@ use memory::Memory;
 use shared::Error;
 
 pub struct Instruction {
+    breakpoint: button::State,
+    bp_status: bool,
     address: u16,
     disass: Cycles,
     pub is_jump: bool,
@@ -85,16 +88,30 @@ impl Instruction {
         };
         disass.set(memory, address)?;
         Ok(Self {
+            breakpoint: button::State::default(),
+            bp_status: false,
             address,
             disass,
             is_jump, // is_next,
         })
     }
 
+    pub fn bp_toogle(&mut self) {
+        self.bp_status = !self.bp_status;
+    }
+
     pub fn view(&mut self) -> Element<DisassMsg> {
         let address = format!("{:#04X}", self.address);
         let address = Cell::light(format!("{:^10}", address), 20);
-        Row::new().push(address).push(self.disass.view()).into()
+        let line = if self.bp_status {
+            Row::new().push(Cell::light("B".to_string(), 20))
+        } else {
+            Row::new().push(Cell::light(" ".to_string(), 20))
+        };
+        let line = line.push(address).push(self.disass.view());
+        button::Button::new(&mut self.breakpoint, line)
+            .on_press(DisassMsg::Breakpoint(self.address))
+            .into()
     }
 
     pub fn fetched(&self) -> u16 {

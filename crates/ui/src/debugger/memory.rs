@@ -1,5 +1,6 @@
 mod view;
 use iced::{Column, Element};
+use ppu::Ppu;
 
 use crate::debugger::widgets::memory::Hexdump;
 use crate::style::Theme;
@@ -9,7 +10,8 @@ use view::View;
 pub struct Memory {
     active_tab: usize,
     _bios: Hexdump<Bus>,
-    rom: Hexdump<Rom>,
+    _rom: Hexdump<Rom>,
+    vram: Hexdump<Ppu>,
 }
 
 #[derive(Debug, Clone)]
@@ -20,14 +22,17 @@ pub enum MemoryMsg {
 impl Memory {
     pub fn new(data: MemoryData) -> Self {
         let bios = data.borrow().get_area(memory::Area::Bios);
+        let ppu = data.borrow().get_ppu();
         let _bios = Hexdump::new("bios".to_string(), bios);
-        let rom = data.borrow().get_rom();
-        let rom = Hexdump::new("rom".to_string(), rom);
+        let _rom = data.borrow().get_rom();
+        let _rom = Hexdump::new("rom".to_string(), _rom);
+        let vram = Hexdump::new("ppu".to_string(), ppu);
         let active_tab = 0;
         Self {
             active_tab,
             _bios,
-            rom,
+            _rom,
+            vram,
         }
     }
 
@@ -38,7 +43,7 @@ impl Memory {
     }
 
     pub fn view(&mut self, theme: Theme) -> Element<MemoryMsg> {
-        Column::new().push(self.rom.view(theme)).into()
+        Column::new().push(self.vram.view(theme)).into()
     }
 
     /// Get a reference to the memory's bios.

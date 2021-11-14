@@ -21,7 +21,8 @@ pub struct Disassembler {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DisassMsg {
     Refresh,
-    Reload,
+    Breakpoint(u16),
+    SetBreakpoint(usize, u16),
 }
 
 impl Disassembler {
@@ -38,7 +39,7 @@ impl Disassembler {
             next,
             is_jump,
         };
-        let _ = disassembler.update(DisassMsg::Reload);
+        let _ = disassembler.update(DisassMsg::Refresh);
         disassembler
     }
 
@@ -47,7 +48,7 @@ impl Disassembler {
         if self.is_jump {
             self.is_jump = false;
             Ok(pc)
-        } else if message == DisassMsg::Reload {
+        } else if message == DisassMsg::Refresh {
             Ok(pc)
         } else if pc != self.next {
             Err(Error::NoUpdate)
@@ -57,26 +58,41 @@ impl Disassembler {
     }
 
     pub fn update(&mut self, message: DisassMsg) -> Result<(), Error> {
-        let mut pc = self.check_pc(message)?;
-        self.instructions.clear();
-        for id in 0..5 {
-            if let Ok(instruction) =
-                Instruction::try_new(pc, &self.cpu.borrow().get_memory(), false)
-            {
-                pc += instruction.fetched();
-                if id == 0 {
-                    //instruction.get_cycle();
-                    if instruction.is_jump {
-                        self.is_jump = true
+        match message {
+            DisassMsg::Refresh => {
+                println!("Refreshed!");
+                let mut pc = self.check_pc(message)?;
+                self.instructions.clear();
+                for id in 0..5 {
+                    if let Ok(instruction) =
+                        Instruction::try_new(pc, &self.cpu.borrow().get_memory(), false)
+                    {
+                        pc += instruction.fetched();
+                        if id == 0 {
+                            //instruction.get_cycle();
+                            if instruction.is_jump {
+                                self.is_jump = true
+                            };
+                            self.next = pc;
+                        }
+                        self.instructions.push(Some(instruction));
+                    } else {
+                        self.instructions.push(None);
                     };
-                    self.next = pc;
                 }
-                self.instructions.push(Some(instruction));
-            } else {
-                self.instructions.push(None);
-            };
+                Ok(())
+            }
+            DisassMsg::Breakpoint(_) => Ok(()),
+            DisassMsg::SetBreakpoint(index, _) => match self.instructions.get_mut(index as usize) {
+                Some(instruction) => {
+                    if let Some(instruction) = instruction {
+                        instruction.bp_toogle();
+                    };
+                    Ok(())
+                }
+                _ => Ok(()),
+            },
         }
-        Ok(())
     }
 
     pub fn view(&mut self) -> Element<DisassMsg> {
@@ -87,15 +103,25 @@ impl Disassembler {
             .width(Length::Shrink);
         let mut column = Column::new();
         column = column.push(self.header.view());
-        for instruction in &mut self.instructions {
-            match instruction {
-                Some(instruction) => column = column.push(instruction.view()),
+        let column = self.instructions.iter_mut().enumerate().fold(
+            column,
+            |column, (index, instruction)| match instruction {
+                Some(instruction) => {
+                    let element: Element<DisassMsg> = instruction.view();
+                    column.push(element.map(move |message| {
+                        if let DisassMsg::Breakpoint(address) = message {
+                            DisassMsg::SetBreakpoint(index, address)
+                        } else {
+                            message
+                        }
+                    }))
+                }
                 None => {
                     let unimplemented = Text::new("Unimplemented").light(20);
-                    column = column.push(unimplemented);
+                    column.push(unimplemented)
                 }
-            };
-        }
+            },
+        );
         disassembler.push(column).into()
     }
 }

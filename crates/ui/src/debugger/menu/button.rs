@@ -41,6 +41,7 @@ impl Button {
             MenuMsg::Second => {
                 status.second();
             }
+            MenuMsg::Breakpoint => {}
         }
     }
 
