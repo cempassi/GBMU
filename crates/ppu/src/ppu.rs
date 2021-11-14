@@ -5,12 +5,15 @@ use shared::Interrupts;
 use shared::{Error, Interrupt};
 
 pub const VRAM_START: u16 = 0x8000;
+pub const OAM_TABLE: usize = 0xA0;
+pub const OAM_START: u16 = 0xFE00;
 pub const FRAME_WIDTH: usize = 160;
 pub const FRAME_HEIGHT: usize = 144;
 
 #[derive(Debug)]
 pub struct Ppu {
     vram: Vec<u8>,
+    oam: Vec<u8>,
     interrupts: Interrupts,
     screen: Vec<Color>,
     pub vram_lock: bool,
@@ -36,9 +39,11 @@ impl From<Interrupts> for Ppu {
         let registers = Registers::default();
         let fifo = Fifo::new();
         let screen = vec![Color::Black; FRAME_WIDTH * FRAME_HEIGHT];
+        let oam = vec![0; OAM_TABLE];
         Self {
             vram_lock: false,
             vram,
+            oam,
             registers,
             interrupts,
             fifo,
@@ -58,6 +63,37 @@ impl Ppu {
     pub fn get_vram(&self, address: u16) -> Result<u8, Error> {
         let address: usize = (address - VRAM_START) as usize;
         Ok(self.vram[address])
+    }
+
+    pub fn get_oam(&self, address: u16) -> Result<u8, Error> {
+        let address: usize = (address - OAM_START) as usize;
+        Ok(self.oam[address])
+    }
+
+    pub fn set_vram(&mut self, address: u16, data: u8) -> Result<(), Error> {
+        let address: usize = (address - VRAM_START) as usize;
+        self.vram[address] = data;
+        Ok(())
+    }
+
+    pub fn set_oam(&mut self, address: u16, data: u8) -> Result<(), Error> {
+        let address: usize = (address - OAM_START) as usize;
+        println!("[PPU] setting oam. Address: {}", address);
+        self.oam[address] = data;
+        Ok(())
+    }
+
+    pub fn get_registers(&self, address: u16) -> Result<u8, Error> {
+        Ok(self.registers.get(address))
+    }
+
+    pub fn set_registers(&mut self, address: u16, data: u8) -> Result<(), Error> {
+        // println!(
+        //     "CPU is Writing to PPU Registers at {:#X}, data: {:#b}",
+        //     address, data
+        // );
+        self.registers.set(address, data);
+        Ok(())
     }
 
     pub fn render(&mut self, frame: &mut [u8]) {
@@ -85,28 +121,8 @@ impl Ppu {
     pub fn update_registers(&self, registers: &mut Registers) {
         registers.update(&self.registers)
     }
-
-    pub fn set_vram(&mut self, address: u16, data: u8) -> Result<(), Error> {
-        let address: usize = (address - VRAM_START) as usize;
-        self.vram[address] = data;
-        Ok(())
-    }
-
     pub fn reload_coordinates(&self, coordinates: &mut super::Coordinates) {
         self.registers.coordinates.update(coordinates)
-    }
-
-    pub fn get_registers(&self, address: u16) -> Result<u8, Error> {
-        Ok(self.registers.get(address))
-    }
-
-    pub fn set_registers(&mut self, address: u16, data: u8) -> Result<(), Error> {
-        // println!(
-        //     "CPU is Writing to PPU Registers at {:#X}, data: {:#b}",
-        //     address, data
-        // );
-        self.registers.set(address, data);
-        Ok(())
     }
 
     pub fn raise_vblank(&self) {
