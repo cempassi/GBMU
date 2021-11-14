@@ -32,6 +32,7 @@ impl Button {
                 status.mode(Mode::Line);
             }
             MenuMsg::Frame => {
+                println!("Mode Frame pressed");
                 status.mode(Mode::Frame);
             }
             MenuMsg::Instruction => {

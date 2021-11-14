@@ -31,7 +31,7 @@ impl TryFrom<&str> for SOC {
         let header = Header::try_from(raw_header).expect("Invalid data in raw_header");
         println!("Header: {:#?}", header);
 
-        let state = memory::state::State::Rom;
+        let state = memory::state::State::Bios;
         let memory: memory::Memory = memory::memory::Memory::new(header.cartridge, rom, state);
         let processor = Runner::new(memory, state);
         let runner = Status::default();

@@ -39,7 +39,7 @@ impl Fetcher {
         // Many checks have to opperate here as the line Fetcher is complex
         // (Background, Window, Sprite)
         // Carefull implemenation
-        for i in 0..=20 {
+        for i in 0..=21 {
             // First get the adress of the Tile id
             // This may be refactored to handle background or window id
             //println!("[FETCHER] Fetching tile id");
