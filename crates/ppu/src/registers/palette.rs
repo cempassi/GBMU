@@ -40,6 +40,16 @@ impl Monochrome {
         self.id1 = Color::from(id1);
         self.id0 = Color::from(id0);
     }
+
+    pub fn color(&self, id: u8) -> Color {
+        match id {
+            0 => self.id0,
+            1 => self.id1,
+            2 => self.id2,
+            3 => self.id3,
+            _ => unreachable!(),
+        }
+    }
 }
 
 #[cfg(test)]

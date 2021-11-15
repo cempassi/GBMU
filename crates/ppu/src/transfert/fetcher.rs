@@ -3,6 +3,7 @@ use super::pixels::Row;
 use crate::futures::Fetch;
 use crate::interface::Push;
 
+use crate::registers::coordinates::XRange;
 use crate::Ppu;
 use shared::Error;
 
@@ -12,20 +13,24 @@ use shared::Error;
 pub struct Fetcher {
     ppu: Ppu,
     map_row: u16,
+    x_range: XRange,
 }
 
 impl Fetcher {
     pub fn new(ppu: Ppu) -> Self {
         let mut p = ppu.borrow_mut();
         // New line, so x is 0;
-        let xscroll = p.registers.coordinates.xscroll();
         let map_row = p.registers.tile_map_row_address();
+        let x_range = p.registers.coordinates.x_range();
 
         p.fifo.clear();
-        p.fifo.scroll(xscroll);
 
         drop(p);
-        Self { ppu, map_row }
+        Self {
+            ppu,
+            map_row,
+            x_range,
+        }
     }
 
     pub async fn fetch(self) -> Result<u8, Error> {
@@ -35,12 +40,12 @@ impl Fetcher {
         // Many checks have to opperate here as the line Fetcher is complex
         // (Background, Window, Sprite)
         // Carefull implemenation
-        for i in 0..=21 {
+        for x in self.x_range {
             // First get the adress of the Tile id
             // This may be refactored to handle background or window id
             //println!("[FETCHER] Fetching tile id");
 
-            let map_address = self.map_row + i as u16;
+            let map_address = self.map_row + x as u16;
             println!("[FETCHER] Map address: {:#X}", map_address);
             let (tile_id, ticks) = Fetch::new(&self.ppu, map_address).await?;
 
