@@ -8,14 +8,21 @@ impl MemoryBus for Ppu {
         let address = address as u16;
         match address {
             consts::VRAM_MIN..=consts::VRAM_MAX => {
-                if self.vram_lock {
+                if !self.vram_lock {
                     println!("[CPU] Vram Locked");
                     Ok(0xFF)
                 } else {
                     self.get_vram(address)
                 }
             }
-            consts::OAM_MIN..=consts::OAM_MAX => self.get_oam(address),
+            consts::OAM_MIN..=consts::OAM_MAX => {
+                if !self.oam_lock {
+                    println!("[CPU] OAM Locked");
+                    Ok(0xFF)
+                } else {
+                    self.get_oam(address)
+                }
+            }
             consts::LCD_CONTROL..=consts::LY_COMPARE => self.get_registers(address),
             consts::YWINDOW | consts::XWINDOW | consts::BGP => self.get_registers(address),
             _ => unreachable!(),
@@ -26,14 +33,21 @@ impl MemoryBus for Ppu {
         let address = address as u16;
         match address {
             consts::VRAM_MIN..=consts::VRAM_MAX => {
-                if self.vram_lock {
+                if !self.vram_lock {
                     println!("[CPU] Vram Locked");
                     Ok(())
                 } else {
                     self.set_vram(address, data)
                 }
             }
-            consts::OAM_MIN..=consts::OAM_MAX => self.set_oam(address, data),
+            consts::OAM_MIN..=consts::OAM_MAX => {
+                if !self.oam_lock {
+                    println!("[CPU] Vram Locked");
+                    Ok(())
+                } else {
+                    self.set_oam(address, data)
+                }
+            }
             consts::LCD_CONTROL..=consts::LY_COMPARE => self.set_registers(address, data),
             consts::YWINDOW | consts::XWINDOW | consts::BGP => self.set_registers(address, data),
             _ => unreachable!(),
