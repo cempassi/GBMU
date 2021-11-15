@@ -9,7 +9,7 @@ pub struct Fifo {
 impl<'push, 'fetch> Fifo {
     pub fn new() -> Self {
         let queue = VecDeque::with_capacity(16);
-        Self { queue}
+        Self { queue }
     }
 
     pub fn try_push(&mut self, data: &[u8; 8]) -> Result<(), Error> {
@@ -25,7 +25,6 @@ impl<'push, 'fetch> Fifo {
             Err(Error::FifoNotReady)
         }
     }
-
 
     pub fn clear(&mut self) {
         self.queue.clear()
