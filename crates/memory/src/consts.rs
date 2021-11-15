@@ -1,3 +1,4 @@
+/// Memory Areas
 pub const BIOS_MIN: u16 = 0x0000;
 pub const BIOS_MAX: u16 = 0x00ff;
 pub const ROM_MIN: u16 = 0x000;
@@ -21,6 +22,7 @@ pub const RESTRICTED_MAX: u16 = 0xfeff;
 
 pub const HIGH_RAM_SIZE: usize = 127;
 
+/// Registers Addresses
 pub const INTERRUPT_FLAGS: u16 = 0xFF0F;
 pub const INTERRUPT_ENABLED: u16 = 0xFFFF;
 
@@ -28,3 +30,4 @@ pub const LCD_CONTROL: u16 = 0xFF40;
 pub const LY_COMPARE: u16 = 0xFF45;
 pub const YWINDOW: u16 = 0xFF4A;
 pub const XWINDOW: u16 = 0xFF4B;
+pub const BGP: u16 = 0xFF47;

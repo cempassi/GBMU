@@ -1,5 +1,6 @@
 mod control;
 mod coordinates;
+mod palette;
 
 use crate::debugger::widgets::{Register, Text};
 use crate::style::Theme;
@@ -70,10 +71,12 @@ impl View<PpuMsg> for Registers {
 
         let control = self.control.view(theme);
         let coordinates = self.coordinates.view(theme);
+        let bgp = self.bgp.view(theme);
         ppu.push(status)
             .push(control)
             .push(coordinates)
             .push(interupts)
+            .push(bgp)
             .into()
     }
 }

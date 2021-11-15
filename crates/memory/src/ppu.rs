@@ -17,7 +17,7 @@ impl MemoryBus for Ppu {
             }
             consts::OAM_MIN..=consts::OAM_MAX => self.get_oam(address),
             consts::LCD_CONTROL..=consts::LY_COMPARE => self.get_registers(address),
-            consts::YWINDOW | consts::XWINDOW => self.get_registers(address),
+            consts::YWINDOW | consts::XWINDOW | consts::BGP => self.get_registers(address),
             _ => unreachable!(),
         }
     }
@@ -35,7 +35,7 @@ impl MemoryBus for Ppu {
             }
             consts::OAM_MIN..=consts::OAM_MAX => self.set_oam(address, data),
             consts::LCD_CONTROL..=consts::LY_COMPARE => self.set_registers(address, data),
-            consts::YWINDOW | consts::XWINDOW => self.set_registers(address, data),
+            consts::YWINDOW | consts::XWINDOW | consts::BGP => self.set_registers(address, data),
             _ => unreachable!(),
         }
     }
