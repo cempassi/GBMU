@@ -28,7 +28,6 @@ impl<'write> Future for Pop<'write> {
         if let Some(pixel) = ppu.fifo.try_pop() {
             ppu.output(self.poped, pixel);
             self.poped += 1;
-            println!("[FIFO] Popped: {}", self.poped);
         }
         if self.poped == 160 {
             //println!("Exited from Pop");

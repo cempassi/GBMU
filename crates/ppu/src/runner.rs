@@ -2,9 +2,9 @@ use crate::blanks::Blank;
 use crate::oam::Oam;
 use crate::registers as lcd;
 use crate::registers::Mode;
-use crate::transfert::Pixel;
+use crate::transfert::Transfert;
 use crate::Ppu;
-use shared::{Error, Finished, Output, Run};
+use shared::{Error, Finished, Interrupt, Output, Run};
 
 use std::future::Future;
 use std::pin::Pin;
@@ -40,19 +40,20 @@ async fn run(ppu: Ppu) -> Result<Finished, Error> {
         println!("[PPU] Ppu disabled");
         Ok(Finished::Nope)
     } else if ppu.borrow_mut().registers.is_equal(lcd::Field::Ly, 144) {
-        ppu.borrow().raise_vblank();
+        ppu.borrow().raise_vblank(Interrupt::Vblank);
         ppu.borrow_mut().registers.mode.update(Mode::Vblank);
         Blank::new(ppu.clone(), Mode::Vblank).await;
         ppu.borrow_mut().registers.clear(lcd::Field::Ly);
         println!("[PPU] Frame finished");
         Ok(Finished::Frame)
     } else {
-        let mut ticks = Oam::search(ppu.clone()).await;
-        ticks += Pixel::transfert(ppu.clone()).start().await?;
-        ticks += Blank::new(ppu.clone(), Mode::Hblank(204)).await;
+        let mut cycles = Oam::search(ppu.clone()).await?;
+        println!("[PPU] oam cycles: {}", cycles);
+        cycles += Transfert::new(ppu.clone()).start().await?;
+        cycles += Blank::new(ppu.clone(), Mode::Hblank(204)).await;
         ppu.borrow_mut().registers.increase(lcd::Field::Ly);
         let ly = ppu.borrow().registers.coordinates.get(lcd::Field::Ly);
         println!("[PPU] ly: {}", ly);
-        Ok(Finished::Line(ticks))
+        Ok(Finished::Line(cycles))
     }
 }
