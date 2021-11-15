@@ -27,7 +27,7 @@ pub struct Attributes {
     palette: bool,
     x_flip: bool,
     y_flip: bool,
-    priority: bool
+    priority: bool,
 }
 
 impl Sprite {
