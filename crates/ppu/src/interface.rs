@@ -1,3 +1,4 @@
+use crate::transfert::Pixels;
 use shared::Interrupts;
 use std::cell::RefCell;
 use std::ops::{Deref, DerefMut};
@@ -38,11 +39,11 @@ impl Ppu {
 }
 
 pub trait Push<'push> {
-    fn push(&self, data: [u8; 8]) -> futures::Push;
+    fn push(&self, data: Pixels) -> futures::Push;
 }
 
 impl<'push> Push<'push> for Ppu {
-    fn push(&self, data: [u8; 8]) -> futures::Push {
+    fn push(&self, data: Pixels) -> futures::Push {
         futures::Push::new(self, data)
     }
 }

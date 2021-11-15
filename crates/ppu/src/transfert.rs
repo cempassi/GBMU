@@ -10,14 +10,15 @@ use shared::Error;
 
 use crate::Ppu;
 use fetcher::Fetcher;
+pub(crate) use pixels::{Pixel, Pixels};
 
 #[allow(dead_code)]
-pub struct Pixel {
+pub struct Transfert {
     ppu: Ppu,
 }
 
-impl Pixel {
-    pub fn transfert(ppu: Ppu) -> Self {
+impl Transfert {
+    pub fn new(ppu: Ppu) -> Self {
         ppu.borrow_mut().registers.mode.update(Mode::Transfert);
         Self { ppu }
     }

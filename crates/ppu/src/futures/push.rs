@@ -3,6 +3,7 @@ use std::{
     task::{Context, Poll},
 };
 
+use crate::transfert::Pixels;
 use futures::Future;
 
 use crate::Ppu;
@@ -10,11 +11,11 @@ use crate::Ppu;
 pub struct Push<'push> {
     ticks: u8,
     ppu: &'push crate::Ppu,
-    data: [u8; 8],
+    data: Pixels,
 }
 
 impl<'push, 'fetch> Push<'push> {
-    pub fn new(ppu: &'push Ppu, data: [u8; 8]) -> Self {
+    pub fn new(ppu: &'push Ppu, data: Pixels) -> Self {
         Self {
             ticks: 0,
             ppu,

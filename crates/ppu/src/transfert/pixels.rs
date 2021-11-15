@@ -12,9 +12,23 @@ pub struct Bits([bool; 8]);
 pub struct Row {
     byte0: u8,
     byte1: u8,
+    priority: bool,
 }
 
-type Pixels = [u8; 8];
+#[derive(Debug, Default, Copy, Clone, PartialEq)]
+pub struct Pixel {
+    color: u8,
+    priority: bool,
+}
+
+impl Pixel {
+    /// Get a reference to the pixel's color.
+    pub fn color(&self) -> u8 {
+        self.color
+    }
+}
+
+pub type Pixels = [Pixel; 8];
 
 impl Bits {
     pub fn new(data: u8) -> Self {
@@ -29,7 +43,7 @@ impl Bits {
 
 impl From<Row> for Pixels {
     fn from(row: Row) -> Self {
-        let mut pixels = [0; 8];
+        let mut pixels = [Pixel::default(); 8];
         let Bits(lower) = Bits::new(row.byte0);
         let Bits(higher) = Bits::new(row.byte1);
         let iterator = lower.iter().zip(higher.iter()).rev();
@@ -37,7 +51,11 @@ impl From<Row> for Pixels {
         for (i, (lower, higher)) in iterator.enumerate() {
             let higher = (*higher) as u8;
             let lower = (*lower) as u8;
-            pixels[i] = (higher << 1) + lower;
+            let color = (higher << 1) + lower;
+            pixels[i] = Pixel {
+                color,
+                priority: row.priority,
+            };
         }
         pixels
     }
@@ -61,15 +79,17 @@ impl Row {
         let p = ppu.borrow();
         let data_area = p.registers.control.data_area;
         let tile_line = p.registers.coordinates.tile_line();
+        let priority = p.registers.control.priority;
         let address = Self::row_address(tile_line, data_area, id);
-
         drop(p);
         let (byte0, _) = Fetch::new(ppu, address).await?;
-        //println!("[FETCHER] byte0 fetched");
         let (byte1, _) = Fetch::new(ppu, address + 1).await?;
-        //println!("[FETCHER] byte1 fetched");
 
-        Ok(Self { byte0, byte1 })
+        Ok(Self {
+            byte0,
+            byte1,
+            priority,
+        })
     }
 }
 
@@ -111,6 +131,7 @@ mod test_tiles {
         let expected = [0, 0, 0, 0, 0, 3, 0, 0];
         let row = execute::execute(Box::pin(Row::try_new(&ppu, 0))).unwrap();
         let result: Pixels = row.into();
+        let result: Vec<u8> = result.iter().map(|pixel| pixel.color()).collect();
 
         assert_eq!(result, expected);
     }
@@ -121,6 +142,7 @@ mod test_tiles {
         let expected = [0, 0, 0, 0, 0, 3, 0, 0];
         let row = execute::execute(Box::pin(Row::try_new(&ppu, 0))).unwrap();
         let result: Pixels = row.into();
+        let result: Vec<u8> = result.iter().map(|pixel| pixel.color()).collect();
 
         assert_eq!(result, expected);
     }
@@ -131,6 +153,7 @@ mod test_tiles {
         let expected = [0, 0, 0, 0, 3, 0, 3, 0];
         let row = execute::execute(Box::pin(Row::try_new(&ppu, 0))).unwrap();
         let result: Pixels = row.into();
+        let result: Vec<u8> = result.iter().map(|pixel| pixel.color()).collect();
 
         assert_eq!(result, expected);
     }
@@ -141,6 +164,7 @@ mod test_tiles {
         let expected = [0, 0, 0, 3, 0, 0, 3, 0];
         let row = execute::execute(Box::pin(Row::try_new(&ppu, 0))).unwrap();
         let result: Pixels = row.into();
+        let result: Vec<u8> = result.iter().map(|pixel| pixel.color()).collect();
 
         assert_eq!(result, expected);
     }
@@ -151,6 +175,7 @@ mod test_tiles {
         let expected = [0, 1, 1, 0, 0, 1, 1, 0];
         let row = execute::execute(Box::pin(Row::try_new(&ppu, 0))).unwrap();
         let result: Pixels = row.into();
+        let result: Vec<u8> = result.iter().map(|pixel| pixel.color()).collect();
 
         assert_eq!(result, expected);
     }
@@ -161,6 +186,7 @@ mod test_tiles {
         let expected = [1, 2, 2, 3, 1, 2, 2, 3];
         let row = execute::execute(Box::pin(Row::try_new(&ppu, 0))).unwrap();
         let result: Pixels = row.into();
+        let result: Vec<u8> = result.iter().map(|pixel| pixel.color()).collect();
 
         assert_eq!(result, expected);
     }
@@ -171,6 +197,7 @@ mod test_tiles {
         let expected = [1, 2, 2, 3, 1, 2, 2, 3];
         let row = execute::execute(Box::pin(Row::try_new(&ppu, 0))).unwrap();
         let result: Pixels = row.into();
+        let result: Vec<u8> = result.iter().map(|pixel| pixel.color()).collect();
 
         assert_eq!(result, expected);
     }
@@ -181,6 +208,7 @@ mod test_tiles {
         let expected = [0, 3, 3, 0, 0, 3, 3, 0];
         let row = execute::execute(Box::pin(Row::try_new(&ppu, 0))).unwrap();
         let result: Pixels = row.into();
+        let result: Vec<u8> = result.iter().map(|pixel| pixel.color()).collect();
 
         assert_eq!(result, expected);
     }
