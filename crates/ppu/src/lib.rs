@@ -8,6 +8,8 @@ pub mod ppu;
 pub mod registers;
 pub mod runner;
 pub(crate) mod transfert;
+pub(crate) mod sprite;
+pub(crate) mod consts;
 
 pub use crate::interface::Ppu;
 pub use crate::registers::{Coordinates, Field, Registers};
