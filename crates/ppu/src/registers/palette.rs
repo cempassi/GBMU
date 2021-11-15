@@ -55,7 +55,11 @@ mod test_tiles {
         palette.set(expected);
 
         let result = palette.get();
-        assert_eq!(result, expected, "result: {:#b}, expected: {:#b}, palette: {:?}", result, expected, palette);
+        assert_eq!(
+            result, expected,
+            "result: {:#b}, expected: {:#b}, palette: {:?}",
+            result, expected, palette
+        );
     }
 
     #[test]
@@ -66,7 +70,11 @@ mod test_tiles {
         palette.set(expected);
 
         let result = palette.get();
-        assert_eq!(result, expected, "result: {:#b}, expected: {:#b}, palette: {:?}", result, expected, palette);
+        assert_eq!(
+            result, expected,
+            "result: {:#b}, expected: {:#b}, palette: {:?}",
+            result, expected, palette
+        );
     }
 }
 // //

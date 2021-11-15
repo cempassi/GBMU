@@ -147,9 +147,7 @@ impl Registers {
                 let field = Field::try_from_primitive(address).unwrap();
                 self.coordinates.get(field)
             }
-            0xFF47 => {
-                self.bgp.get()
-            }
+            0xFF47 => self.bgp.get(),
             _ => unreachable!(),
         }
     }

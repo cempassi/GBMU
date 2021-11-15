@@ -56,25 +56,3 @@ impl Bios {
         Bios { data }
     }
 }
-
-#[cfg(test)]
-mod test_bios {
-    //use super::Bios;
-
-    // #[test]
-    // fn test_read_wram() {
-    //     let wram = Bios::default();
-
-    //     assert_eq!(wram.get(0x10), 0);
-    // }
-
-    // #[test]
-    // fn test_write_read_wram() {
-    //     let mut wram = Wram::default();
-
-    //     wram.set(0x42, 42);
-    //     let read = wram.get(0x42);
-
-    //     assert_eq!(read, 42);
-    // }
-}
