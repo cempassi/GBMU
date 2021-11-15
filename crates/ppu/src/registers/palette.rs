@@ -47,7 +47,7 @@ impl Monochrome {
             1 => self.id1,
             2 => self.id2,
             3 => self.id3,
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 }

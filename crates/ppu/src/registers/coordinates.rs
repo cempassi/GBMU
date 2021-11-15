@@ -82,12 +82,12 @@ impl Coordinates {
         self.ly.wrapping_add(self.yscroll) as usize
     }
 
-    pub fn x(&self, x: usize) -> usize {
-        usize::from(self.xscroll).wrapping_add(x)
+    pub fn tile_line(&self) -> usize {
+        (self.y() % 8) as usize
     }
 
     pub fn map_row_offset(&self) -> u16 {
-        (self.ly as u16 / 8) * MAP_ROW_LEN
+        (self.y() as u16 / 8) * MAP_ROW_LEN
     }
 
     pub fn offset(&self, x: usize) -> usize {
