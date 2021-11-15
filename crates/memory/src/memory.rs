@@ -73,7 +73,9 @@ impl Memory {
     fn get_io(&self, address: u16) -> Result<u8, Error> {
         match address {
             consts::LCD_CONTROL..=consts::LY_COMPARE => self.ppu.borrow_mut().get(address.into()),
-            consts::YWINDOW | consts::XWINDOW => self.ppu.borrow_mut().get(address.into()),
+            consts::YWINDOW | consts::XWINDOW | consts::BGP => {
+                self.ppu.borrow_mut().get(address.into())
+            }
             consts::INTERRUPT_FLAGS => self.interrupts.requested.borrow().get(),
             _ => Ok(self.io.get(address)),
         }
@@ -113,7 +115,9 @@ impl Memory {
             consts::LCD_CONTROL..=consts::LY_COMPARE => {
                 self.ppu.borrow_mut().set(address.into(), data)
             }
-            consts::YWINDOW | consts::XWINDOW => self.ppu.borrow_mut().set(address.into(), data),
+            consts::YWINDOW | consts::XWINDOW | consts::BGP => {
+                self.ppu.borrow_mut().set(address.into(), data)
+            }
             consts::INTERRUPT_FLAGS => self.interrupts.requested.borrow().set(data),
             _ => {
                 self.io.set(address, data);
