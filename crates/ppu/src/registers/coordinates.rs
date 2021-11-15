@@ -13,6 +13,34 @@ pub struct Coordinates {
     xwindow: u8,
 }
 
+// The structure that holds the wrapped iterator and the current state.
+pub struct XRange {
+    count: u8,
+    current: u8,
+}
+
+impl Iterator for XRange {
+    type Item = u8;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.count {
+            0 => None,
+            _ => {
+                let item = self.current;
+                self.count -= 1;
+                self.current = self.current.wrapping_add(1);
+                Some(item)
+            }
+        }
+    }
+}
+
+impl XRange {
+    pub fn new(current: u8) -> Self {
+        Self { count: 20, current }
+    }
+}
+
 #[repr(u16)]
 #[derive(Debug, TryFromPrimitive, IntoPrimitive, IntoEnumIterator, PartialEq, Eq, Clone, Copy)]
 pub enum Field {
@@ -46,8 +74,8 @@ impl Coordinates {
         *dst = Self { ..*self };
     }
 
-    pub fn tile_line(&self) -> usize {
-        (self.ly % 8) as usize
+    pub fn x_range(&self) -> XRange {
+        XRange::new(self.xscroll)
     }
 
     pub fn y(&self) -> usize {
