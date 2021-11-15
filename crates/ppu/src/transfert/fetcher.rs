@@ -43,21 +43,23 @@ impl Fetcher {
         // (Background, Window, Sprites)
         // Carefull implemenation
         for x in self.x_range {
+            // Checks if window we have to draw the window
             if self.ppu.borrow().registers.window_start(x) {
                 self.ppu.borrow_mut().fifo.clear();
                 self.map_row = self.ppu.borrow().registers().window_map_row_address();
             }
+            // Checks if we have to draw a sprite
+            if self.ppu.borrow().fifo.is_sprite(x) {
+                println!("[FETCHER] Sprite found. index: {}", x);
+                continue;
+            }
             // First get the adress of the Tile id
             // This may be refactored to handle background or window id
-            //println!("[FETCHER] Fetching tile id");
-
             let map_address = self.map_row + x as u16;
-            println!("[FETCHER] Map address: {:#X}", map_address);
             let (tile_id, ticks) = Fetch::new(&self.ppu, map_address).await?;
 
             cycles += ticks;
 
-            //println!("[FETCHER] Processing tile address");
             // Then we get the address of a row of pixels in that tile
 
             let row = Row::try_new(&self.ppu, tile_id).await?;

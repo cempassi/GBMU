@@ -1,35 +1,32 @@
-use std::future::Future;
-use std::pin::Pin;
-use std::task::{Context, Poll};
+use shared::Error;
 
 use crate::registers::Mode;
+use crate::sprite::Sprite;
 use crate::Ppu;
 
-const OAM_PERIOD: u16 = 80; // 77-83 cycles, 80 average
+use crate::consts;
 
-#[allow(dead_code)]
-pub struct Oam {
-    ticks: u16,
-    ppu: Ppu,
-}
+pub struct Oam {}
 
 impl Oam {
-    pub fn search(ppu: Ppu) -> Self {
-        let ticks = 0;
+    pub async fn search(ppu: Ppu) -> Result<u16, Error> {
         ppu.borrow_mut().registers.mode.update(Mode::Oam);
-        Self { ticks, ppu }
-    }
-}
-
-impl Future for Oam {
-    type Output = u16;
-
-    fn poll(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
-        self.ticks += 1;
-        if self.ticks == OAM_PERIOD {
-            Poll::Ready(self.ticks)
-        } else {
-            Poll::Pending
+        ppu.borrow_mut().oam_lock = true;
+        let mut address = consts::OAM_START;
+        let mut cycles = 0;
+        let mut sprites = 0;
+        while address < consts::OAM_END && sprites <= 9 {
+            let (sprite, cycle) = Sprite::try_new(&ppu, address).await?;
+            let size = ppu.borrow().registers.control.sprite_size;
+            let y = ppu.borrow().registers.coordinates.y();
+            if sprite.is_line(y as u8, size) {
+                ppu.borrow_mut().fifo.push_sprite(sprite);
+                sprites += 1;
+            }
+            address += 4;
+            cycles += cycle as u16;
         }
+        ppu.borrow_mut().oam_lock = false;
+        Ok(cycles)
     }
 }
