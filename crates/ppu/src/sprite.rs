@@ -38,8 +38,8 @@ impl Sprite {
         let (attributes, attributes_cycles) = Fetch::new(ppu, address + 3).await?;
         let attributes: Attributes = Attributes::from_bytes([attributes]);
         let sprite = Self {
-            y,
-            x,
+            y: y - 16,
+            x: x - 8,
             index,
             attributes,
         };
