@@ -3,13 +3,15 @@ use std::collections::VecDeque;
 
 #[derive(Debug)]
 pub struct Fifo {
+    discard: u8,
     queue: VecDeque<u8>,
 }
 
 impl<'push, 'fetch> Fifo {
     pub fn new() -> Self {
+        let discard = 0;
         let queue = VecDeque::with_capacity(16);
-        Self { queue }
+        Self { queue, discard }
     }
 
     pub fn try_push(&mut self, data: &[u8; 8]) -> Result<(), Error> {
@@ -26,6 +28,10 @@ impl<'push, 'fetch> Fifo {
         }
     }
 
+    pub fn discard(&mut self, discard: u8) {
+        self.discard = discard;
+    }
+
     pub fn clear(&mut self) {
         self.queue.clear()
     }
@@ -34,8 +40,18 @@ impl<'push, 'fetch> Fifo {
         let len = self.queue.len();
         println!("[FIFO] State: {:?}", self.queue);
         if len > 8 {
-            self.queue.pop_front()
+            // println!("[FIFO] Popped pixel from fifo: len {}", len);
+            let pixel = self.queue.pop_front();
+            match self.discard == 0 {
+                true => pixel,
+                false => {
+                    //println!("[FIFO] Scrolling, discarded pixel");
+                    self.discard -= 1;
+                    None
+                }
+            }
         } else {
+            //println!("[FIFO] Could not pop from fifo: len {}", len);
             None
         }
     }

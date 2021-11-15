@@ -75,7 +75,11 @@ impl Coordinates {
     }
 
     pub fn x_range(&self) -> XRange {
-        XRange::new(self.xscroll)
+        XRange::new(self.xscroll / 8)
+    }
+
+    pub fn x_discard(&self) -> u8 {
+        self.xscroll % 8
     }
 
     pub fn y(&self) -> usize {

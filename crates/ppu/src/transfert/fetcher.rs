@@ -22,8 +22,10 @@ impl Fetcher {
         // New line, so x is 0;
         let map_row = p.registers.tile_map_row_address();
         let x_range = p.registers.coordinates.x_range();
+        let x_discard = p.registers.coordinates.x_discard();
 
         p.fifo.clear();
+        p.fifo.discard(x_discard);
 
         drop(p);
         Self {
