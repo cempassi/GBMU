@@ -76,9 +76,9 @@ pub struct Registers {
 
     //Lcd Coordinates
     pub coordinates: Coordinates,
-    pub bgp: palette::Monochrome,
-    // objp0: palette::Monochrome,
-    // objp1: palette::Monochrome,
+    pub background_p: palette::Monochrome,
+    pub sprite_p0: palette::Monochrome,
+    pub sprite_p1: palette::Monochrome,
     // bcps: palette::Index,
     // bcpd: palette::Data,
     // ocps: palette::Index,
@@ -155,7 +155,9 @@ impl Registers {
                 let field = Field::try_from_primitive(address).unwrap();
                 self.coordinates.get(field)
             }
-            0xFF47 => self.bgp.get(),
+            0xFF47 => self.background_p.get(),
+            0xFF48 => self.sprite_p0.get(),
+            0xFF49 => self.sprite_p1.get(),
             _ => unreachable!(),
         }
     }
@@ -182,7 +184,13 @@ impl Registers {
                 self.coordinates.set(field, data);
             }
             0xFF47 => {
-                self.bgp.set(data);
+                self.background_p.set(data);
+            }
+            0xFF48 => {
+                self.sprite_p0.set(data);
+            }
+            0xFF49 => {
+                self.sprite_p1.set(data);
             }
             _ => unreachable!(),
         }
