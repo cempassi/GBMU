@@ -9,13 +9,13 @@ pub struct Coordinates {
     xscroll: u8,
     ly: u8,
     lycompare: u8,
-    ywindow: u8,
-    xwindow: u8,
+    pub ywindow: u8,
+    pub xwindow: u8,
 }
 
 // The structure that holds the wrapped iterator and the current state.
 pub struct XRange {
-    count: u8,
+    pub count: u8,
     current: u8,
 }
 
@@ -88,6 +88,10 @@ impl Coordinates {
 
     pub fn tile_line(&self) -> usize {
         (self.y() % 8) as usize
+    }
+
+    pub fn in_window(&self, x: u8) -> bool {
+        self.y() >= self.ywindow as usize && x == self.xwindow.wrapping_sub(7)
     }
 
     pub fn map_row_offset(&self) -> u16 {

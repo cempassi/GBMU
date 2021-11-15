@@ -112,6 +112,10 @@ impl Registers {
         self.check_ly();
     }
 
+    pub fn window_start(&self, x: u8) -> bool {
+        self.control.window_enabled && self.coordinates.in_window(x)
+    }
+
     pub fn is_equal(&mut self, field: Field, data: u8) -> bool {
         self.check_ly();
         self.coordinates.is_equal(field, data)
@@ -122,8 +126,12 @@ impl Registers {
         self.coordinates.is_lower(field, data)
     }
 
-    pub fn tile_map_row_address(&self) -> u16 {
+    pub fn bg_map_row_address(&self) -> u16 {
         self.control.bg_area + self.coordinates.map_row_offset()
+    }
+
+    pub fn window_map_row_address(&self) -> u16 {
+        self.control.window_area + self.coordinates.map_row_offset()
     }
 
     pub fn get(&self, address: u16) -> u8 {

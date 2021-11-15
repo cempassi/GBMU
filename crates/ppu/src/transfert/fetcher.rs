@@ -20,7 +20,7 @@ impl Fetcher {
     pub fn new(ppu: Ppu) -> Self {
         let mut p = ppu.borrow_mut();
         // New line, so x is 0;
-        let map_row = p.registers.tile_map_row_address();
+        let map_row = p.registers.bg_map_row_address();
         let x_range = p.registers.coordinates.x_range();
         let x_discard = p.registers.coordinates.x_discard();
 
@@ -35,14 +35,18 @@ impl Fetcher {
         }
     }
 
-    pub async fn fetch(self) -> Result<u8, Error> {
+    pub async fn fetch(mut self) -> Result<u8, Error> {
         let mut cycles = 0;
 
         // This loop fetches every pixels in a line.
         // Many checks have to opperate here as the line Fetcher is complex
-        // (Background, Window, Sprite)
+        // (Background, Window, Sprites)
         // Carefull implemenation
         for x in self.x_range {
+            if self.ppu.borrow().registers.window_start(x) {
+                self.ppu.borrow_mut().fifo.clear();
+                self.map_row = self.ppu.borrow().registers().window_map_row_address();
+            }
             // First get the adress of the Tile id
             // This may be refactored to handle background or window id
             //println!("[FETCHER] Fetching tile id");
