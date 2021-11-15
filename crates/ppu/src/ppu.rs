@@ -109,13 +109,14 @@ impl Ppu {
 
     pub fn output(&mut self, x: usize, pixel: u8) {
         let offset = self.registers.coordinates.offset(x);
+        let color = self.registers.bgp.color(pixel);
         println!("[PPU] position Offset: {}", offset);
         // println!(
         //     "[FIFO] Poped data. offset: {}, len {}",
         //     offset,
         //     self.fifo.len()
         // );
-        self.screen[offset] = pixel.into();
+        self.screen[offset] = color;
     }
 
     pub fn update_registers(&self, registers: &mut Registers) {
