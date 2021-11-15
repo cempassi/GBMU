@@ -69,14 +69,28 @@ impl View<PpuMsg> for Registers {
         let line = Row::new().push(oam).push(ly_lyc);
         let interupts = interupts.push(line);
 
+        let title = Text::new("Background Palette").medium_it(20);
+        let background_p = Column::new().align_items(Alignment::Center).push(title);
+        let background_p = background_p.push(self.background_p.view(theme));
+
+        let title = Text::new("Sprite 0 Palette").medium_it(20);
+        let sprite_p0 = Column::new().align_items(Alignment::Center).push(title);
+        let sprite_p0 = sprite_p0.push(self.sprite_p0.view(theme));
+
+        let title = Text::new("Sprite 1 Palette").medium_it(20);
+        let sprite_p1 = Column::new().align_items(Alignment::Center).push(title);
+        let sprite_p1 = sprite_p1.push(self.sprite_p1.view(theme));
+
         let control = self.control.view(theme);
         let coordinates = self.coordinates.view(theme);
-        let bgp = self.bgp.view(theme);
+
         ppu.push(status)
             .push(control)
             .push(coordinates)
             .push(interupts)
-            .push(bgp)
+            .push(background_p)
+            .push(sprite_p0)
+            .push(sprite_p1)
             .into()
     }
 }
