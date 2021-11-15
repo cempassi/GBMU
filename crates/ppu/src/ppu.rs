@@ -1,14 +1,10 @@
 use crate::colors::Color;
+use crate::consts;
 use crate::fifo::Fifo;
 use crate::registers::{Mode, Registers};
+use crate::transfert::Pixel;
 use shared::Interrupts;
 use shared::{Error, Interrupt};
-
-pub const VRAM_START: u16 = 0x8000;
-pub const OAM_TABLE: usize = 0xA0;
-pub const OAM_START: u16 = 0xFE00;
-pub const FRAME_WIDTH: usize = 160;
-pub const FRAME_HEIGHT: usize = 144;
 
 #[derive(Debug)]
 pub struct Ppu {
@@ -17,6 +13,7 @@ pub struct Ppu {
     interrupts: Interrupts,
     screen: Vec<Color>,
     pub vram_lock: bool,
+    pub oam_lock: bool,
     pub registers: Registers,
     pub(crate) fifo: Fifo,
 }
@@ -38,10 +35,11 @@ impl From<Interrupts> for Ppu {
         let vram = vec![0; 8192];
         let registers = Registers::default();
         let fifo = Fifo::new();
-        let screen = vec![Color::Black; FRAME_WIDTH * FRAME_HEIGHT];
-        let oam = vec![0; OAM_TABLE];
+        let screen = vec![Color::Black; consts::FRAME_WIDTH * consts::FRAME_HEIGHT];
+        let oam = vec![0; consts::OAM_TABLE];
         Self {
             vram_lock: false,
+            oam_lock: false,
             vram,
             oam,
             registers,
@@ -61,26 +59,46 @@ impl Ppu {
     }
 
     pub fn get_vram(&self, address: u16) -> Result<u8, Error> {
-        let address: usize = (address - VRAM_START) as usize;
-        Ok(self.vram[address])
+        if self.vram_lock {
+            let address: usize = (address - consts::VRAM_START) as usize;
+            Ok(self.vram[address])
+        } else {
+            println!("[PPU] VRAM Locked");
+            Ok(0xFF)
+        }
     }
 
     pub fn get_oam(&self, address: u16) -> Result<u8, Error> {
-        let address: usize = (address - OAM_START) as usize;
-        Ok(self.oam[address])
+        if self.oam_lock {
+            let address: usize = (address - consts::OAM_START) as usize;
+            Ok(self.oam[address])
+        } else {
+            println!("[PPU] OAM Locked");
+            Ok(0xFF)
+        }
     }
 
     pub fn set_vram(&mut self, address: u16, data: u8) -> Result<(), Error> {
-        let address: usize = (address - VRAM_START) as usize;
-        self.vram[address] = data;
-        Ok(())
+        if self.vram_lock {
+            let address: usize = (address - consts::VRAM_START) as usize;
+            self.vram[address] = data;
+            Ok(())
+        } else {
+            println!("[PPU] VRAM Locked");
+            Ok(())
+        }
     }
 
     pub fn set_oam(&mut self, address: u16, data: u8) -> Result<(), Error> {
-        let address: usize = (address - OAM_START) as usize;
-        println!("[PPU] setting oam. Address: {}", address);
-        self.oam[address] = data;
-        Ok(())
+        if self.oam_lock {
+            let address: usize = (address - consts::OAM_START) as usize;
+            println!("[PPU] setting oam. Address: {}", address);
+            self.oam[address] = data;
+            Ok(())
+        } else {
+            println!("[PPU] OAM Locked");
+            Ok(())
+        }
     }
 
     pub fn get_registers(&self, address: u16) -> Result<u8, Error> {
@@ -107,10 +125,9 @@ impl Ppu {
         }
     }
 
-    pub fn output(&mut self, x: usize, pixel: u8) {
+    pub fn output(&mut self, x: usize, pixel: Pixel) {
         let offset = self.registers.coordinates.offset(x);
-        let color = self.registers.bgp.color(pixel);
-        println!("[PPU] position Offset: {}", offset);
+        let color = self.registers.background_p.color(pixel.color());
         // println!(
         //     "[FIFO] Poped data. offset: {}, len {}",
         //     offset,
@@ -126,8 +143,8 @@ impl Ppu {
         self.registers.coordinates.update(coordinates)
     }
 
-    pub fn raise_vblank(&self) {
-        self.interrupts.borrow_mut().request(Interrupt::Lcd);
+    pub fn raise_vblank(&self, interrupt: Interrupt) {
+        self.interrupts.borrow_mut().request(interrupt);
     }
 
     /// Get a reference to the ppu's registers.

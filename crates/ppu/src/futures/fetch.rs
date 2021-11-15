@@ -2,7 +2,7 @@ use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
-use crate::Ppu;
+use crate::{consts, Ppu};
 use shared::Error;
 
 pub struct Fetch<'fetch> {
@@ -26,18 +26,20 @@ impl<'fetch> Future for Fetch<'fetch> {
 
     fn poll(mut self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
         if self.ticks == 2 {
-            // Maybe implement check mode Here?
-            if self.ppu.borrow().vram_lock {
-                match self.ppu.borrow().get_vram(self.address) {
+            match self.ppu.borrow().get_vram(self.address) {
+                Ok(data) => Poll::Ready(Ok((data, self.ticks))),
+                Err(err) => Poll::Ready(Err(err)),
+            }
+        } else {
+            self.ticks += 1;
+            if matches!(self.address, consts::OAM_START..=consts::OAM_END) {
+                match self.ppu.borrow().get_oam(self.address) {
                     Ok(data) => Poll::Ready(Ok((data, self.ticks))),
                     Err(err) => Poll::Ready(Err(err)),
                 }
             } else {
-                Poll::Ready(Ok((0xFF, 2)))
+                Poll::Pending
             }
-        } else {
-            self.ticks += 1;
-            Poll::Pending
         }
     }
 }
