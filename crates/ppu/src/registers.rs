@@ -7,6 +7,7 @@ use num_enum::TryFromPrimitive;
 mod palette;
 
 pub use control::Control;
+pub use palette::Monochrome;
 
 // /// 1 LCD Control Register
 // ///
@@ -75,7 +76,7 @@ pub struct Registers {
 
     //Lcd Coordinates
     pub coordinates: Coordinates,
-    // bgp: palette::Monochrome,
+    pub bgp: palette::Monochrome,
     // objp0: palette::Monochrome,
     // objp1: palette::Monochrome,
     // bcps: palette::Index,
@@ -146,6 +147,9 @@ impl Registers {
                 let field = Field::try_from_primitive(address).unwrap();
                 self.coordinates.get(field)
             }
+            0xFF47 => {
+                self.bgp.get()
+            }
             _ => unreachable!(),
         }
     }
@@ -170,6 +174,9 @@ impl Registers {
             0xFF42..=0xFF45 | 0xFF4A | 0xFF4B => {
                 let field = Field::try_from_primitive(address).unwrap();
                 self.coordinates.set(field, data);
+            }
+            0xFF47 => {
+                self.bgp.set(data);
             }
             _ => unreachable!(),
         }
