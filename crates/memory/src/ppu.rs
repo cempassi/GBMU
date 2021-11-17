@@ -8,10 +8,11 @@ impl MemoryBus for Ppu {
         let address = address as u16;
         match address {
             consts::VRAM_MIN..=consts::VRAM_MAX => {
-                if !self.vram_lock {
+                if self.vram_lock {
                     println!("[CPU] Vram Locked");
                     Ok(0xFF)
                 } else {
+                    println!("[CPU] VRAM Get");
                     self.get_vram(address)
                 }
             }
@@ -33,10 +34,11 @@ impl MemoryBus for Ppu {
         let address = address as u16;
         match address {
             consts::VRAM_MIN..=consts::VRAM_MAX => {
-                if !self.vram_lock {
+                if self.vram_lock {
                     println!("[CPU] Vram Locked");
                     Ok(())
                 } else {
+                    println!("[CPU] VRAM Set");
                     self.set_vram(address, data)
                 }
             }

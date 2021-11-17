@@ -59,34 +59,19 @@ impl Ppu {
     }
 
     pub fn get_vram(&self, address: u16) -> Result<u8, Error> {
-        if self.vram_lock {
             let address: usize = (address - consts::VRAM_START) as usize;
             Ok(self.vram[address])
-        } else {
-            println!("[PPU] VRAM Locked");
-            Ok(0xFF)
-        }
     }
 
     pub fn get_oam(&self, address: u16) -> Result<u8, Error> {
-        if self.oam_lock {
             let address: usize = (address - consts::OAM_START) as usize;
             Ok(self.oam[address])
-        } else {
-            println!("[PPU] OAM Locked");
-            Ok(0xFF)
-        }
     }
 
     pub fn set_vram(&mut self, address: u16, data: u8) -> Result<(), Error> {
-        if self.vram_lock {
             let address: usize = (address - consts::VRAM_START) as usize;
             self.vram[address] = data;
             Ok(())
-        } else {
-            println!("[PPU] VRAM Locked");
-            Ok(())
-        }
     }
 
     pub fn set_oam(&mut self, address: u16, data: u8) -> Result<(), Error> {
