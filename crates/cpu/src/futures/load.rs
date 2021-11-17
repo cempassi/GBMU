@@ -61,6 +61,7 @@ pub async fn reg_from(cpu: Cpu, dst: Bits8, src: Bits16) -> Result<u8, Error> {
     cpu.borrow_mut().registers.set(dst, data);
     Ok(cycles)
 }
+
 /// SP instructions take an extra 4 clocks to execute
 pub async fn push(cpu: Cpu, area: Bits16) -> Result<u8, Error> {
     let data = cpu.borrow().registers.get(area);
@@ -70,7 +71,6 @@ pub async fn push(cpu: Cpu, area: Bits16) -> Result<u8, Error> {
     Ok(cycles + delay)
 }
 
-/// SP instructions take an extra 4 clocks to execute
 pub async fn pop(cpu: Cpu, area: Bits16) -> Result<u8, Error> {
     //let (_, delay) = cpu.memory().clone().get::<u8>(0xc00).await?;
     let (data, cycles): (u16, u8) = Get::BitsAt(Bits16::SP).get(cpu.clone()).await?;

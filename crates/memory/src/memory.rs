@@ -153,7 +153,7 @@ impl Memory {
             Area::Vram | Area::_ExtRam => todo!(),
             Area::Wram => self.wram.clone(),
             Area::IOReg => todo!(),
-            Area::Hram => todo!(),
+            Area::Hram => self.hram.clone(),
             Area::EchoRam => todo!(),
         }
     }
