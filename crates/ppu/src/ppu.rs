@@ -128,7 +128,7 @@ impl Ppu {
         self.registers.coordinates.update(coordinates)
     }
 
-    pub fn raise_vblank(&self, interrupt: Interrupt) {
+    pub fn raise_interrupt(&self, interrupt: Interrupt) {
         self.interrupts.borrow_mut().request(interrupt);
     }
 

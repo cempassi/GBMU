@@ -118,6 +118,10 @@ impl Memory {
             consts::YWINDOW | consts::XWINDOW | consts::BGP => {
                 self.ppu.borrow_mut().set(address.into(), data)
             }
+            consts::DISABLE_ROM => {
+                self.state = State::Rom;
+                Ok(())
+            }
             consts::INTERRUPT_FLAGS => self.interrupts.requested.borrow().set(data),
             _ => {
                 self.io.set(address, data);

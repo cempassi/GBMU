@@ -2,7 +2,7 @@ use crate::{Access, Cpu};
 use shared::{Error, Finished, Output, Run};
 
 use crate::futures::Set;
-use crate::registers::{Bits16, IncDec};
+use crate::registers::{Bits16, Bus, IncDec};
 
 use crate::opcodes::decode::{Decode, Decoder};
 use crate::opcodes::Arithmetic;
@@ -37,8 +37,8 @@ pub async fn interrupt_handler(cpu: Cpu) -> Result<Finished, Error> {
     cpu.borrow_mut().registers.decrease(Bits16::SP, 2);
     let pc = cpu.borrow().registers.pc;
 
-    cpu.borrow_mut().registers.pc = address;
-    let cycles = Set::Bits16At(Bits16::SP, pc).run(cpu).await?;
+    let cycles = Set::Bits16At(Bits16::SP, pc).run(cpu.clone()).await?;
+    cpu.borrow_mut().registers.set(Bits16::PC, address);
 
     Ok(Finished::Cpu(cycles))
 }

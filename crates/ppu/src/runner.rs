@@ -40,17 +40,27 @@ async fn run(ppu: Ppu) -> Result<Finished, Error> {
         println!("[PPU] Ppu disabled");
         Ok(Finished::Nope)
     } else if ppu.borrow_mut().registers.is_equal(lcd::Field::Ly, 144) {
-        ppu.borrow().raise_vblank(Interrupt::Vblank);
+        // Vblank
+        ppu.borrow_mut().registers.vblank_interupt = true;
+        ppu.borrow().raise_interrupt(Interrupt::Vblank);
         ppu.borrow_mut().registers.mode.update(Mode::Vblank);
         Blank::new(ppu.clone(), Mode::Vblank).await;
         ppu.borrow_mut().registers.clear(lcd::Field::Ly);
         println!("[PPU] Frame finished");
         Ok(Finished::Frame)
     } else {
+        // Oam Search
         let mut cycles = Oam::search(ppu.clone()).await?;
         println!("[PPU] oam cycles: {}", cycles);
+
+        // Pixel transfert
         cycles += Transfert::new(ppu.clone()).start().await?;
+
+        // Hblank
+        ppu.borrow_mut().registers.hblank_interupt = true;
+        ppu.borrow().raise_interrupt(Interrupt::Lcd);
         cycles += Blank::new(ppu.clone(), Mode::Hblank(204)).await;
+
         ppu.borrow_mut().registers.increase(lcd::Field::Ly);
         let ly = ppu.borrow().registers.coordinates.get(lcd::Field::Ly);
         println!("[PPU] ly: {}", ly);

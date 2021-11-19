@@ -1,4 +1,5 @@
 use shared::Error;
+use shared::Interrupt;
 
 use crate::registers::Mode;
 use crate::sprite::Sprite;
@@ -10,6 +11,8 @@ pub struct Oam {}
 
 impl Oam {
     pub async fn search(ppu: Ppu) -> Result<u16, Error> {
+        ppu.borrow_mut().registers.oam_interupt = true;
+        ppu.borrow().raise_interrupt(Interrupt::Lcd);
         ppu.borrow_mut().registers.mode.update(Mode::Oam);
         ppu.borrow_mut().oam_lock = true;
         let mut address = consts::OAM_START;

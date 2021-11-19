@@ -21,6 +21,7 @@ pub const RESTRICTED_MIN: u16 = 0xFEA0;
 pub const RESTRICTED_MAX: u16 = 0xFEFF;
 
 pub const HIGH_RAM_SIZE: usize = 127;
+pub const DISABLE_ROM: u16 = 0xFF50;
 
 /// Registers Addresses
 pub const INTERRUPT_FLAGS: u16 = 0xFF0F;
