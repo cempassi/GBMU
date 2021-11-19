@@ -12,7 +12,6 @@ use shared::Error;
 /// Index: Index of the tile to read
 pub struct Fetcher {
     ppu: Ppu,
-    map_row: u16,
     x_range: XRange,
 }
 
@@ -20,7 +19,6 @@ impl Fetcher {
     pub fn new(ppu: Ppu) -> Self {
         let mut p = ppu.borrow_mut();
         // New line, so x is 0;
-        let map_row = p.registers.bg_map_row_address();
         let x_range = p.registers.coordinates.x_range();
         let x_discard = p.registers.coordinates.x_discard();
 
@@ -28,14 +26,12 @@ impl Fetcher {
         p.fifo.discard(x_discard);
 
         drop(p);
-        Self {
-            ppu,
-            map_row,
-            x_range,
-        }
+        Self { ppu, x_range }
     }
 
-    pub async fn fetch(mut self) -> Result<u8, Error> {
+    //async fn fetch_sprite(&self)
+
+    pub async fn fetch(self) -> Result<u8, Error> {
         let mut cycles = 0;
 
         // This loop fetches every pixels in a line.
@@ -46,7 +42,6 @@ impl Fetcher {
             // Checks if window we have to draw the window
             if self.ppu.borrow().registers.window_start(x) {
                 self.ppu.borrow_mut().fifo.clear();
-                self.map_row = self.ppu.borrow().registers().window_map_row_address();
             }
             // Checks if we have to draw a sprite
             if self.ppu.borrow().fifo.is_sprite(x) {
@@ -55,7 +50,8 @@ impl Fetcher {
             }
             // First get the adress of the Tile id
             // This may be refactored to handle background or window id
-            let map_address = self.map_row + x as u16;
+            let map_address = self.ppu.borrow().registers.map_address(x);
+            println!("[FETCHER] map addres: {:#X}", map_address);
             let (tile_id, ticks) = Fetch::new(&self.ppu, map_address).await?;
 
             cycles += ticks;

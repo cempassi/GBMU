@@ -44,7 +44,6 @@ impl Sprite {
             attributes,
         };
         let cycles = x_cycles + attributes_cycles;
-        println!("[OAM] cycles: {}", cycles);
         Ok((sprite, cycles))
     }
 

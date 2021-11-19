@@ -2,7 +2,7 @@ pub mod area;
 pub mod r#async;
 pub(crate) mod bios;
 mod bus;
-pub(crate) mod consts;
+pub mod consts;
 pub mod futures;
 pub mod interface;
 pub(crate) mod interrupts;

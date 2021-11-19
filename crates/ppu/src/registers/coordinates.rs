@@ -8,7 +8,7 @@ const MAP_ROW_LEN: u16 = 32;
 pub struct Coordinates {
     yscroll: u8,
     xscroll: u8,
-    ly: u8,
+    pub ly: u8,
     lycompare: u8,
     pub ywindow: u8,
     pub xwindow: u8,
@@ -75,6 +75,10 @@ impl Coordinates {
         *dst = Self { ..*self };
     }
 
+    pub fn x(&self, x: u8) -> u8 {
+        self.xscroll + x
+    }
+
     pub fn x_range(&self) -> XRange {
         XRange::new(self.xscroll / 8)
     }
@@ -83,20 +87,24 @@ impl Coordinates {
         self.xscroll % 8
     }
 
-    pub fn y(&self) -> usize {
-        self.ly.wrapping_add(self.yscroll) as usize
+    pub fn y_background(&self) -> u8 {
+        self.ly.wrapping_add(self.yscroll)
     }
 
-    pub fn tile_line(&self) -> usize {
-        (self.y() % 8) as usize
+    pub fn y_window(&self) -> u8 {
+        self.ly.wrapping_sub(self.ywindow)
     }
 
     pub fn in_window(&self, x: u8) -> bool {
-        self.y() >= self.ywindow as usize && x == self.xwindow.wrapping_sub(7)
+        self.ly >= self.ywindow  && x >= self.xwindow
     }
 
-    pub fn map_row_offset(&self) -> u16 {
-        (self.y() as u16 / 8) * MAP_ROW_LEN
+    pub fn window_start(&self, x: u8) -> bool {
+        self.ly >= self.ywindow  && self.x(x) == self.xwindow
+    }
+
+    pub fn map_row_offset(&self, y: u8) -> u16 {
+        (y as u16 / 8) * MAP_ROW_LEN
     }
 
     pub fn offset(&self, x: usize) -> usize {

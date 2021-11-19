@@ -76,6 +76,8 @@ pub struct Registers {
 
     //Lcd Coordinates
     pub coordinates: Coordinates,
+
+    // Color Palettes
     pub background_p: palette::Monochrome,
     pub sprite_p0: palette::Monochrome,
     pub sprite_p1: palette::Monochrome,
@@ -113,7 +115,7 @@ impl Registers {
     }
 
     pub fn window_start(&self, x: u8) -> bool {
-        self.control.window_enabled && self.coordinates.in_window(x)
+        self.control.window_enabled && self.coordinates.window_start(x)
     }
 
     pub fn is_equal(&mut self, field: Field, data: u8) -> bool {
@@ -126,12 +128,28 @@ impl Registers {
         self.coordinates.is_lower(field, data)
     }
 
-    pub fn bg_map_row_address(&self) -> u16 {
-        self.control.bg_area + self.coordinates.map_row_offset()
+    pub fn tile_line(&self) -> usize {
+        let y = if self.control.window_enabled {
+            println!("[PPU] window tile line");
+            self.coordinates.y_window()
+        } else {
+            println!("[PPU] background tile line");
+            self.coordinates.y_background()
+        };
+        println!("[PPU] Tile line: {}", y % 8);
+        (y % 8) as usize
     }
 
-    pub fn window_map_row_address(&self) -> u16 {
-        self.control.window_area + self.coordinates.map_row_offset()
+    pub fn map_address(&self, x: u8) -> u16 {
+        if self.control.window_enabled && self.coordinates.in_window(x) {
+            println!("[PPU] window tile map address");
+            let y = self.coordinates.y_window();
+            self.control.window_area + self.coordinates.map_row_offset(y) + x as u16
+        } else {
+            println!("[PPU] BG tile map address");
+            let y = self.coordinates.y_background();
+            self.control.bg_area + self.coordinates.map_row_offset(y) + x as u16
+        }
     }
 
     pub fn get(&self, address: u16) -> u8 {

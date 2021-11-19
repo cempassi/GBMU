@@ -18,8 +18,8 @@ impl Oam {
         while address < consts::OAM_END && sprites <= 9 {
             let (sprite, cycle) = Sprite::try_new(&ppu, address).await?;
             let size = ppu.borrow().registers.control.sprite_size;
-            let y = ppu.borrow().registers.coordinates.y();
-            if sprite.is_line(y as u8, size) {
+            let ly = ppu.borrow().registers.coordinates.ly;
+            if sprite.is_line(ly, size) {
                 ppu.borrow_mut().fifo.push_sprite(sprite);
                 sprites += 1;
             }

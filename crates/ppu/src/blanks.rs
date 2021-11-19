@@ -8,6 +8,7 @@ use std::task::{Context, Poll};
 const VBLANK: u16 = 4560; // 4,560 cycles for vblank
 
 pub struct Blank {
+    ppu: Ppu,
     mode: Mode,
     ticks: u16,
 }
@@ -26,6 +27,13 @@ impl Future for Blank {
                 }
             }
             Mode::Vblank => {
+                if self.ticks % 456 == 0 {
+                    self.ppu
+                        .borrow_mut()
+                        .registers
+                        .coordinates
+                        .increase(crate::Field::Ly);
+                }
                 if self.ticks == VBLANK {
                     Poll::Ready(self.ticks)
                 } else {
@@ -41,6 +49,6 @@ impl Blank {
     pub fn new(ppu: Ppu, mode: Mode) -> Self {
         let ticks = 0;
         ppu.borrow_mut().registers.mode.update(mode);
-        Self { ticks, mode }
+        Self { ppu, ticks, mode }
     }
 }

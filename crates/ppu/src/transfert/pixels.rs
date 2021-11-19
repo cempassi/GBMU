@@ -78,7 +78,7 @@ impl Row {
     pub async fn try_new(ppu: &'_ Ppu, id: u8) -> Result<Self, Error> {
         let p = ppu.borrow();
         let data_area = p.registers.control.data_area;
-        let tile_line = p.registers.coordinates.tile_line();
+        let tile_line = p.registers.tile_line();
         let priority = p.registers.control.priority;
         let address = Self::row_address(tile_line, data_area, id);
         drop(p);

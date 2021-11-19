@@ -17,7 +17,7 @@ impl MemoryBus for Ppu {
                 }
             }
             consts::OAM_MIN..=consts::OAM_MAX => {
-                if !self.oam_lock {
+                if self.oam_lock {
                     println!("[CPU] OAM Locked");
                     Ok(0xFF)
                 } else {
@@ -43,7 +43,7 @@ impl MemoryBus for Ppu {
                 }
             }
             consts::OAM_MIN..=consts::OAM_MAX => {
-                if !self.oam_lock {
+                if self.oam_lock {
                     println!("[CPU] Vram Locked");
                     Ok(())
                 } else {

@@ -8,13 +8,15 @@ const TEXT_SIZE: u16 = 20;
 pub struct Hexdump<T> {
     name: String,
     state: scrollable::State,
-    data: T,
+    start: usize,
+    data: T
 }
 
 impl<T> Hexdump<T> {
-    pub fn new(name: String, data: T) -> Self {
+    pub fn new(name: String, start: u16, data: T) -> Self {
         let state = scrollable::State::default();
-        Self { name, state, data }
+        let start = start as usize;
+        Self { name, state, start, data }
     }
 
     pub fn title(&self) -> iced_wgpu::Text {
@@ -30,11 +32,14 @@ impl<T> Hexdump<T> {
         let addresses = Text::new(" ".repeat(8)).bold(TEXT_SIZE);
 
         // Vector data layout
-        let byte_header = " ".to_string() + &"FF ".repeat(16);
+        let mut byte_header = String::new();
+        for x in 0..=15 {
+            byte_header += &format!(" x{:X}", x);
+        }
         let bytes = Text::new(&byte_header).bold(TEXT_SIZE);
 
         // Ascii representation layout
-        let ascii_template = "0123456789ABCDEF".to_string();
+        let ascii_template = " 0123456789ABCDEF".to_string();
         let ascii = Text::new(&ascii_template).bold(TEXT_SIZE);
 
         let title = Row::new().push(addresses).push(bytes).push(ascii);
@@ -54,7 +59,7 @@ impl<T> Hexdump<T> {
                     _ => ascii_str.push(AsciiChar::Dot),
                 }
             }
-            let line = format!("{:#08X}", i * 0x10) + &byte_str + &ascii_str.to_string();
+            let line = format!("{:#08X}", self.start + i * 0x10) + &byte_str + &ascii_str.to_string();
             row = row.push(Text::new(line).light(TEXT_SIZE));
             hexdump = hexdump.push(row);
         }
