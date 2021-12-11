@@ -1,6 +1,7 @@
 /// Audio Processing Unit
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct Apu {
     data: Vec<u8>,
 }

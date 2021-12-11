@@ -10,8 +10,8 @@ use view::View;
 pub struct Memory {
     active_tab: usize,
     _bios: Hexdump<Bus>,
-    _rom: Hexdump<Rom>,
-    vram: Hexdump<Ppu>,
+    rom: Hexdump<Rom>,
+    _vram: Hexdump<Ppu>,
 }
 
 #[derive(Debug, Clone)]
@@ -25,14 +25,14 @@ impl Memory {
         let ppu = data.borrow().get_ppu();
         let _bios = Hexdump::new("bios".to_string(), bios);
         let _rom = data.borrow().get_rom();
-        let _rom = Hexdump::new("rom".to_string(), _rom);
-        let vram = Hexdump::new("ppu".to_string(), ppu);
+        let rom = Hexdump::new("rom".to_string(), _rom);
+        let _vram = Hexdump::new("ppu".to_string(), ppu);
         let active_tab = 0;
         Self {
             active_tab,
             _bios,
-            _rom,
-            vram,
+            rom,
+            _vram,
         }
     }
 
@@ -43,7 +43,7 @@ impl Memory {
     }
 
     pub fn view(&mut self, theme: Theme) -> Element<MemoryMsg> {
-        Column::new().push(self.vram.view(theme)).into()
+        Column::new().push(self.rom.view(theme)).into()
     }
 
     /// Get a reference to the memory's bios.

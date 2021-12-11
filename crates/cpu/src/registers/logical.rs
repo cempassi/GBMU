@@ -13,7 +13,9 @@ impl Logical<Bits8> for Registers {
         let data = self.get(Bits8::A) & self.get(src);
         self.set(Bits8::A, data);
         self.set(Flag::Z, data == 0);
+        self.set(Flag::N, false);
         self.set(Flag::H, true);
+        self.set(Flag::C, false);
         0
     }
 
@@ -21,7 +23,9 @@ impl Logical<Bits8> for Registers {
         let data = self.get(Bits8::A) | self.get(src);
         self.set(Bits8::A, data);
         self.set(Flag::Z, data == 0);
-        self.set(Flag::H, true);
+        self.set(Flag::N, false);
+        self.set(Flag::H, false);
+        self.set(Flag::C, false);
         0
     }
 
@@ -29,7 +33,9 @@ impl Logical<Bits8> for Registers {
         let data = self.get(Bits8::A) ^ self.get(src);
         self.set(Bits8::A, data);
         self.set(Flag::Z, data == 0);
-        self.set(Flag::H, true);
+        self.set(Flag::N, false);
+        self.set(Flag::H, false);
+        self.set(Flag::C, false);
         0
     }
 
@@ -37,6 +43,7 @@ impl Logical<Bits8> for Registers {
         let data = self.get(Bits8::A);
         self.sub(self.get(src), false);
         self.set(Bits8::A, data);
+        self.set(Flag::N, true);
         0
     }
 }
@@ -46,7 +53,9 @@ impl Logical<u8> for Registers {
         let data = self.get(Bits8::A) & src;
         self.set(Bits8::A, data);
         self.set(Flag::Z, data == 0);
+        self.set(Flag::N, false);
         self.set(Flag::H, true);
+        self.set(Flag::C, false);
         0
     }
 
@@ -54,7 +63,9 @@ impl Logical<u8> for Registers {
         let data = self.get(Bits8::A) | src;
         self.set(Bits8::A, data);
         self.set(Flag::Z, data == 0);
-        self.set(Flag::H, true);
+        self.set(Flag::N, false);
+        self.set(Flag::H, false);
+        self.set(Flag::C, false);
         0
     }
 
@@ -62,7 +73,9 @@ impl Logical<u8> for Registers {
         let data = self.get(Bits8::A) ^ src;
         self.set(Bits8::A, data);
         self.set(Flag::Z, data == 0);
-        self.set(Flag::H, true);
+        self.set(Flag::N, false);
+        self.set(Flag::H, false);
+        self.set(Flag::C, false);
         0
     }
 
@@ -70,6 +83,7 @@ impl Logical<u8> for Registers {
         let data = self.get(Bits8::A);
         self.sub(src, false);
         self.set(Bits8::A, data);
+        self.set(Flag::N, true);
         0
     }
 }

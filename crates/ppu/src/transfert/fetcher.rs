@@ -46,7 +46,7 @@ impl Fetcher {
             //println!("[FETCHER] Fetching tile id");
 
             let map_address = self.map_row + x as u16;
-            println!("[FETCHER] Map address: {:#X}", map_address);
+            //println!("[FETCHER] Map address: {:#X}", map_address);
             let (tile_id, ticks) = Fetch::new(&self.ppu, map_address).await?;
 
             cycles += ticks;

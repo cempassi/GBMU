@@ -162,7 +162,8 @@ impl Mbc3 {
         if self.latch {
             if data == 0x1 {
                 self.latch();
-                std::time::Duration::from_millis(4);
+                // This is commentend, ask Guillaume
+                //std::time::Duration::from_millis(4);
             }
             self.latch = false;
         } else if data == 0 {

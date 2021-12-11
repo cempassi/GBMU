@@ -6,10 +6,8 @@ use std::fs;
 use crate::header::Header;
 use memory;
 
-const ROM_START: usize = 0x150;
 const HEADER_START: usize = 0x100;
-const HEADER_LEN: usize = 0x50;
-const HEAD_LEN: usize = 0x100;
+const HEADER_END: usize = 0x150;
 
 /// The SOC is the GBMU async executor
 pub struct SOC {
@@ -21,12 +19,8 @@ impl TryFrom<&str> for SOC {
     type Error = std::io::Error;
 
     fn try_from(path: &str) -> Result<Self, Self::Error> {
-        let mut head = fs::read(path)?;
-        let rom = head.split_off(ROM_START);
-        let raw_header = head.split_off(HEADER_START);
-
-        assert_eq!(head.len(), HEAD_LEN);
-        assert_eq!(raw_header.len(), HEADER_LEN);
+        let rom = fs::read(path)?;
+        let raw_header = rom[HEADER_START..HEADER_END].to_vec();
 
         let header = Header::try_from(raw_header).expect("Invalid data in raw_header");
         println!("Header: {:#?}", header);
