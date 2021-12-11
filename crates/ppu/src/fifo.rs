@@ -32,7 +32,7 @@ impl<'push, 'fetch> Fifo {
 
     pub fn try_pop(&mut self) -> Option<u8> {
         let len = self.queue.len();
-        println!("[FIFO] State: {:?}", self.queue);
+        //println!("[FIFO] State: {:?}", self.queue);
         if len > 8 {
             self.queue.pop_front()
         } else {

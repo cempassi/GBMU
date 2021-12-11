@@ -78,7 +78,7 @@ impl Ppu {
 
     pub fn set_oam(&mut self, address: u16, data: u8) -> Result<(), Error> {
         let address: usize = (address - OAM_START) as usize;
-        println!("[PPU] setting oam. Address: {}", address);
+        //println!("[PPU] setting oam. Address: {}", address);
         self.oam[address] = data;
         Ok(())
     }
@@ -110,7 +110,7 @@ impl Ppu {
     pub fn output(&mut self, x: usize, pixel: u8) {
         let offset = self.registers.coordinates.offset(x);
         let color = self.registers.bgp.color(pixel);
-        println!("[PPU] position Offset: {}", offset);
+        //println!("[PPU] position Offset: {}", offset);
         // println!(
         //     "[FIFO] Poped data. offset: {}, len {}",
         //     offset,

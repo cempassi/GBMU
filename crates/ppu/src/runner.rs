@@ -37,7 +37,7 @@ impl Run for Ppu {
 
 async fn run(ppu: Ppu) -> Result<Finished, Error> {
     if !ppu.borrow().registers.control.lcd_enabled {
-        println!("[PPU] Ppu disabled");
+        //println!("[PPU] Ppu disabled");
         Ok(Finished::Nope)
     } else if ppu.borrow_mut().registers.is_equal(lcd::Field::Ly, 144) {
         ppu.borrow().raise_vblank();
@@ -51,8 +51,8 @@ async fn run(ppu: Ppu) -> Result<Finished, Error> {
         ticks += Pixel::transfert(ppu.clone()).start().await?;
         ticks += Blank::new(ppu.clone(), Mode::Hblank(204)).await;
         ppu.borrow_mut().registers.increase(lcd::Field::Ly);
-        let ly = ppu.borrow().registers.coordinates.get(lcd::Field::Ly);
-        println!("[PPU] ly: {}", ly);
+        //let ly = ppu.borrow().registers.coordinates.get(lcd::Field::Ly);
+        //println!("[PPU] ly: {}", ly);
         Ok(Finished::Line(ticks))
     }
 }
