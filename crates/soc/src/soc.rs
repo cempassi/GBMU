@@ -1,5 +1,5 @@
 use crate::runner::Runner;
-use crate::Status;
+use crate::System;
 use shared::Redraw;
 use std::fs;
 
@@ -11,7 +11,7 @@ const HEADER_END: usize = 0x150;
 
 /// The SOC is the GBMU async executor
 pub struct SOC {
-    status: Status,
+    status: System,
     processor: Runner,
 }
 
@@ -28,7 +28,7 @@ impl TryFrom<&str> for SOC {
         let state = memory::state::State::Bios;
         let memory: memory::Memory = memory::memory::Memory::new(header.cartridge, rom, state);
         let processor = Runner::new(memory, state);
-        let status = Status::new(processor.cpu());
+        let status = System::new(processor.cpu());
 
         Ok(SOC { processor, status })
     }
@@ -47,7 +47,7 @@ impl SOC {
         self.processor.memory.clone()
     }
 
-    pub fn get_status(&self) -> Status {
+    pub fn get_status(&self) -> System {
         self.status.clone()
     }
 

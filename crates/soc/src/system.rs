@@ -5,7 +5,7 @@ use std::time::Instant;
 /// The status struct controls the different execution modes of the soc.
 /// The code here is really critical.
 #[derive(Debug, Default)]
-pub struct Status {
+pub struct System {
     cpu: cpu::Cpu,
     mode: Mode,
     pub redraw: Redraw,
@@ -16,7 +16,7 @@ pub struct Status {
     frames: u64,
 }
 
-impl Status {
+impl System {
     pub fn new(cpu: cpu::Cpu) -> Self {
         Self {
             cpu,
@@ -52,6 +52,11 @@ impl Status {
                     self.frames += 1;
                     println!("[SOC] Finished frame {} (seconds)", self.frames);
                     self.redraw.update(Redraw::Emulator);
+                }
+                (Finished::Frame, Mode::Run(_)) => {
+                    self.frames += 1;
+                    println!("[SOC] Finished frame {} (seconds)", self.frames);
+                    self.redraw.update(Redraw::All);
                 }
                 (Finished::Frame, Mode::Frame) => {
                     self.mode.idle();
@@ -109,7 +114,10 @@ impl Status {
     // !! Carefull !!: This function is extremely important as it decides
     // if the soc should stop making progress. Carefull logic is needed.
     pub fn processing(&mut self) -> bool {
-        !(self.is_breakpoint() || self.mode.second() && self.redraw.ready() || self.is_idle())
+        !(self.is_breakpoint()
+            || self.mode.second() && self.redraw.ready()
+            || self.mode.run() && self.redraw.ready()
+            || self.is_idle())
     }
 
     pub fn step(&mut self) {
@@ -153,6 +161,10 @@ impl Status {
     pub fn second(&mut self) {
         self.mode = Mode::Second(Instant::now());
     }
+
+    pub fn run(&mut self) {
+        self.mode = Mode::Run(Instant::now());
+    }
 }
 
 #[cfg(test)]
@@ -161,13 +173,13 @@ mod test_status {
     use super::Instant;
     use super::Mode;
     use super::Redraw;
-    use super::Status;
+    use super::System;
 
     #[test]
     fn test_status_after_tick() {
-        let mut status = Status {
+        let mut status = System {
             mode: Mode::Tick,
-            ..Status::default()
+            ..System::default()
         };
 
         let finished = vec![Finished::Nope, Finished::Nope];
@@ -179,9 +191,9 @@ mod test_status {
 
     #[test]
     fn test_processing_after_tick_returns_false() {
-        let mut status = Status {
+        let mut status = System {
             mode: Mode::Tick,
-            ..Status::default()
+            ..System::default()
         };
 
         let finished = vec![Finished::Nope, Finished::Nope];
@@ -192,10 +204,10 @@ mod test_status {
 
     #[test]
     fn test_frame_ready_in_second_stops_processing() {
-        let mut status = Status {
+        let mut status = System {
             mode: Mode::Second(Instant::now()),
             redraw: Redraw::Emulator,
-            ..Status::default()
+            ..System::default()
         };
 
         assert!(!status.processing());
