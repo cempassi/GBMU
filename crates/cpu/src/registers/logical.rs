@@ -1,4 +1,4 @@
-use super::{Arithmetic, Bits8, Bus, Flag};
+use super::{Bits8, Bus, Carry, Flag};
 use crate::registers::Registers;
 
 pub trait Logical<T> {
@@ -40,9 +40,10 @@ impl Logical<Bits8> for Registers {
     }
 
     fn compare(&mut self, src: Bits8) -> u8 {
-        let data = self.get(Bits8::A);
-        self.sub(self.get(src), false);
-        self.set(Bits8::A, data);
+        let data: u8 = self.get(src);
+        let carry: u8 = self.f.is_carried(false);
+        let a = self.get(Bits8::A);
+        let _ = self.f.checked_sub(a, data + carry);
         self.set(Flag::N, true);
         0
     }
@@ -80,9 +81,9 @@ impl Logical<u8> for Registers {
     }
 
     fn compare(&mut self, src: u8) -> u8 {
-        let data = self.get(Bits8::A);
-        self.sub(src, false);
-        self.set(Bits8::A, data);
+        let carry: u8 = self.f.is_carried(false);
+        let a = self.get(Bits8::A);
+        let _ = self.f.checked_sub(a, src + carry);
         self.set(Flag::N, true);
         0
     }
