@@ -7,6 +7,7 @@ pub enum Mode {
     Frame,
     Idle,
     Second(Instant),
+    Run(Instant),
     Breakpoint(u16),
 }
 
@@ -17,6 +18,10 @@ impl Mode {
 
     pub fn second(&self) -> bool {
         matches!(self, Self::Second(_))
+    }
+
+    pub fn run(&self) -> bool {
+        matches!(self, Self::Run(_))
     }
 }
 
