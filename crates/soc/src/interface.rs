@@ -5,25 +5,25 @@ use std::rc::Rc;
 pub type SOC = Rc<RefCell<crate::soc::SOC>>;
 
 #[derive(Default, Debug, Clone)]
-pub struct Status(Rc<RefCell<crate::status::Status>>);
+pub struct System(Rc<RefCell<crate::system::System>>);
 
-impl Status {
+impl System {
     pub fn new(cpu: cpu::Cpu) -> Self {
         Self {
-            0: Rc::new(RefCell::new(crate::status::Status::new(cpu))),
+            0: Rc::new(RefCell::new(crate::system::System::new(cpu))),
         }
     }
 }
 
-impl Deref for Status {
-    type Target = Rc<RefCell<crate::status::Status>>;
+impl Deref for System {
+    type Target = Rc<RefCell<crate::system::System>>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-impl DerefMut for Status {
+impl DerefMut for System {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }

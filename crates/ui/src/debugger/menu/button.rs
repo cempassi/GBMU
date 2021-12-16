@@ -4,16 +4,16 @@ use iced::{button, Element};
 use super::MenuMsg;
 use crate::debugger::widgets::Text;
 use soc::mode::Mode;
-use soc::Status;
+use soc::System;
 
 pub struct Button {
-    status: Status,
+    status: System,
     message: MenuMsg,
     state: button::State,
 }
 
 impl Button {
-    pub fn new(status: Status, message: MenuMsg) -> Self {
+    pub fn new(status: System, message: MenuMsg) -> Self {
         let state = button::State::default();
         Self {
             status,
@@ -40,6 +40,9 @@ impl Button {
             }
             MenuMsg::Second => {
                 status.second();
+            }
+            MenuMsg::Run => {
+                status.run();
             }
             MenuMsg::Breakpoint => {}
         }

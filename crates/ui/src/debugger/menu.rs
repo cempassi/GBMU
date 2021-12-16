@@ -6,13 +6,13 @@ use crate::style::Theme;
 use button::Button;
 use iced::{Element, Length, Row, Space};
 use itertools::Itertools;
-use soc::{mode::Mode, Status};
+use soc::{mode::Mode, System};
 
 pub struct Menu {
     right: Vec<Button>,
     left: Vec<Button>,
     breakpoints: VecDeque<u16>,
-    status: Status,
+    status: System,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -22,22 +22,24 @@ pub enum MenuMsg {
     Frame,
     Instruction,
     Second,
+    Run,
     Breakpoint,
 }
 
 impl Menu {
-    pub fn new(status: Status) -> Self {
+    pub fn new(status: System) -> Self {
         let tick = Button::new(status.clone(), MenuMsg::Tick);
         let instruction = Button::new(status.clone(), MenuMsg::Instruction);
         let line = Button::new(status.clone(), MenuMsg::Line);
         let frame = Button::new(status.clone(), MenuMsg::Frame);
         let second = Button::new(status.clone(), MenuMsg::Second);
+        let run = Button::new(status.clone(), MenuMsg::Run);
         let breakpoint = Button::new(status.clone(), MenuMsg::Breakpoint);
         let breakpoints = VecDeque::new();
 
         Self {
             left: vec![],
-            right: vec![breakpoint, second, frame, line, instruction, tick],
+            right: vec![breakpoint, run, second, frame, line, instruction, tick],
             breakpoints,
             status,
         }
