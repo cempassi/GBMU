@@ -31,3 +31,9 @@ pub const LY_COMPARE: u16 = 0xFF45;
 pub const YWINDOW: u16 = 0xFF4A;
 pub const XWINDOW: u16 = 0xFF4B;
 pub const BGP: u16 = 0xFF47;
+
+// Timer
+pub const DIV: u16 = 0xFF04;
+pub const TIMA: u16 = 0xFF05;
+pub const TMA: u16 = 0xFF06;
+pub const TAC: u16 = 0xFF07;
