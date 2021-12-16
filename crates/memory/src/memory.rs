@@ -83,7 +83,6 @@ impl Memory {
         }
     }
 
-
     pub fn set_u8(&mut self, address: u16, data: u8) -> Result<(), Error> {
         match address {
             consts::ROM_MIN..=consts::ROM_MAX => self

@@ -29,6 +29,7 @@ impl Runner {
         let waker = shared::waker::create();
         let mut context = Context::from_waker(&waker);
 
+        self.memory.borrow_mut().clock_tick();
         let cpu_status = self.tasks.run(Processor::Cpu, &mut context);
         let ppu_status = self.tasks.run(Processor::Ppu, &mut context);
         vec![cpu_status, ppu_status]

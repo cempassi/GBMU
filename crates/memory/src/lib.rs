@@ -11,8 +11,8 @@ pub(crate) mod mbc;
 pub mod memory;
 pub(crate) mod ppu;
 pub(crate) mod ram;
-pub(crate) mod timer;
 pub mod state;
+pub(crate) mod timer;
 
 pub use area::Area;
 pub use bus::MemoryBus;
