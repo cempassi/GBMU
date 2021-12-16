@@ -31,14 +31,16 @@ impl Default for Memory {
     fn default() -> Self {
         let interrupts = Interrupts::default();
         let raisable = interrupts.get_raisable();
+        let io = IO::new(raisable.clone());
         let ppu = Ppu::new(raisable);
+
         Memory {
             state: state::State::Bios,
             bios: Rc::new(RefCell::new(Box::new(Bios::new()))),
             wram: Rc::new(RefCell::new(Box::new(Ram::default()))),
             ppu,
             rom: Rom::default(),
-            io: IO::default(),
+            io,
             hram: Rc::new(RefCell::new(Box::new(Ram::new(127)))),
             interrupts,
         }
@@ -80,6 +82,7 @@ impl Memory {
             _ => Ok(self.io.get(address)),
         }
     }
+
 
     pub fn set_u8(&mut self, address: u16, data: u8) -> Result<(), Error> {
         match address {
@@ -165,6 +168,10 @@ impl Memory {
     pub fn get_rom(&self) -> Rom {
         self.rom.clone()
     }
+
+    pub fn clock_tick(&mut self) {
+        self.io.tick()
+    }
 }
 
 impl Memory {
@@ -194,13 +201,14 @@ impl Memory {
         // Get Requested memory spaces shared between componnents
         let requested = interrupts.get_raisable();
 
+        // Create io registers (Timer)
+        let io = IO::new(requested.clone());
+
         // Create memory spaces with fully-qualified syntax
         let ppu = match state {
             State::Bios => Ppu::new(requested),
             State::Rom => Ppu::no_bios(requested),
         };
-
-        let io = IO::default();
 
         // Init Hram
         let hram: Box<dyn MemoryBus> = Box::new(Ram::new(consts::HIGH_RAM_SIZE));
