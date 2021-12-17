@@ -23,7 +23,7 @@ impl Run for Cpu {
 }
 
 pub async fn interrupt_handler(cpu: Cpu) -> Result<Finished, Error> {
-    println!("Interrupt Execution");
+    // println!("Interrupt Execution");
     let requested = cpu.memory().borrow_mut().get_requested()?;
     cpu.borrow_mut().halt = false;
     cpu.borrow_mut().stop = false;
@@ -76,12 +76,12 @@ pub async fn run(cpu: Cpu) -> Result<Finished, Error> {
     }
     cpu.memory().borrow_mut().check_interrupts();
     let (opcode, cycles) = Get::Next.get(cpu.clone()).await?;
-    //println!("New Cpu Execution, Opcode: {:#X}", opcode);
+    // println!("New Cpu Execution, Opcode: {:#X}", opcode);
     if cpu.borrow().stop {
         println!("Cpu is stoped, Opcode: {:#X}", opcode);
     }
     if cpu.borrow().halt {
-        println!("Cpu is halted, Opcode: {:#X}", opcode);
+        //println!("Cpu is halted, Opcode: {:#X}", opcode);
     }
 
     let execute = decode(cpu, opcode).await?;

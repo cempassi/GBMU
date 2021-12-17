@@ -98,7 +98,7 @@ impl Ppu {
 
     pub fn render(&mut self, frame: &mut [u8]) {
         if self.registers().mode == Mode::Vblank {
-            println!("[PPU] Outputing to screen");
+            //println!("[PPU] Outputing to screen");
             for (index, pixel) in frame.chunks_exact_mut(4).enumerate() {
                 let to_display: [u8; 4] = self.screen[index].into();
 

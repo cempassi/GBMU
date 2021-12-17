@@ -62,7 +62,7 @@ impl SOC {
             let finished = self.processor.run();
             status.check_redraw(finished)
         }
-        println!("[SOC] Finished Run. Redraw: {:?}", status.redraw);
+        //println!("[SOC] Finished Run. Redraw: {:?}", status.redraw);
         status.redraw
     }
 }
