@@ -60,7 +60,7 @@ impl Disassembler {
     pub fn update(&mut self, message: DisassMsg) -> Result<(), Error> {
         match message {
             DisassMsg::Refresh => {
-                println!("Refreshed!");
+                //println!("Refreshed!");
                 let mut pc = self.check_pc(message)?;
                 self.instructions.clear();
                 for id in 0..5 {

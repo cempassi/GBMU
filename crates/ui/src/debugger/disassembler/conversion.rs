@@ -29,6 +29,7 @@ impl From<Arithmetic16b> for Disass<u8> {
             Arithmetic16b::AddDE => (8, Data::None),
             Arithmetic16b::AddHL => (8, Data::None),
             Arithmetic16b::AddSP => (8, Data::None),
+            Arithmetic16b::AddSPr8 => (16, Data::Bits8(0)),
         };
 
         let code: u8 = opcode.into();

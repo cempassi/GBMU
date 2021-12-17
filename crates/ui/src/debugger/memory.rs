@@ -43,7 +43,7 @@ impl Memory {
     }
 
     pub fn view(&mut self, theme: Theme) -> Element<MemoryMsg> {
-        Column::new().push(self.rom.view(theme)).into()
+        Column::new().push(self._bios.view(theme)).into()
     }
 
     /// Get a reference to the memory's bios.
