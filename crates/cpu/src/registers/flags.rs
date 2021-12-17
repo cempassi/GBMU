@@ -27,8 +27,22 @@ impl Flags {
         }
     }
 
+    pub fn get_all(&self) -> u8 {
+        ((self.z() as u8) << 7)
+            | ((self.n() as u8) << 6)
+            | ((self.h() as u8) << 5)
+            | ((self.c() as u8) << 4)
+    }
+
+    pub fn set_all(&mut self, data: u8) {
+        self.set_z((data & 0b1000_0000) != 0);
+        self.set_n((data & 0b0100_0000) != 0);
+        self.set_h((data & 0b0010_0000) != 0);
+        self.set_c((data & 0b0001_0000) != 0);
+    }
+
     pub fn add_h_check(&self, data: u8) -> u8 {
-        if self.h() || (data & 0xf) > 9 {
+        if self.h() || (data & 0x0f) > 0x09 {
             6
         } else {
             0
@@ -38,7 +52,7 @@ impl Flags {
     pub fn add_c_check(&mut self, data: u8) -> u8 {
         if self.c() || data > 0x99 {
             self.set_c(true);
-            6
+            0x60
         } else {
             0
         }
@@ -54,7 +68,7 @@ impl Flags {
 
     pub fn sub_c_check(&mut self) -> u8 {
         if self.c() {
-            6
+            0x60
         } else {
             0
         }
@@ -66,77 +80,40 @@ impl Flags {
 }
 
 pub trait Carry<T> {
-    fn is_half_carry(&mut self, a: T, b: T);
-    fn is_half_borrow(&mut self, a: T, b: T);
-    fn checked_add(&mut self, a: T, b: T) -> T;
-    fn checked_sub(&mut self, a: T, b: T) -> T;
+    fn checked_add(&mut self, a: T, data: T, carry: T) -> T;
+    fn checked_sub(&mut self, a: T, data: T, carry: T) -> T;
 }
 
 impl Carry<u8> for Flags {
-    fn is_half_carry(&mut self, a: u8, b: u8) {
-        let a = u16::from(a);
-        let b = u16::from(b);
-        let sum = a + b;
-        let check_half = (a ^ b ^ sum) & 0x10 == 0x10;
-        self.set_h(check_half);
-    }
-
-    fn is_half_borrow(&mut self, a: u8, b: u8) {
-        let a = i16::from(a);
-        let b = i16::from(b);
-        let sub = a - b;
-        let check_half = (a ^ (-b) ^ sub) & 0x10 == 0x10;
-        self.set_h(check_half);
-    }
-
-    fn checked_add(&mut self, a: u8, b: u8) -> u8 {
-        let (data, check) = a.overflowing_add(b);
-        self.is_half_carry(a, b);
-        self.set_c(check);
+    fn checked_add(&mut self, a: u8, data: u8, carry: u8) -> u8 {
+        let add = a.wrapping_add(data).wrapping_add(carry);
+        self.set_c((a as u16) + (data as u16) + (carry as u16) > 0xFF);
+        self.set_h((a & 0xF) + (data & 0xF) + carry > 0xF);
+        self.set_n(false);
         self.set_z(data == 0);
-        data
+        add
     }
 
-    fn checked_sub(&mut self, a: u8, b: u8) -> u8 {
-        let (data, check) = a.overflowing_sub(b);
-        self.is_half_borrow(a, b);
-        self.set_c(check);
-        self.set_z(data == 0);
-        data
+    fn checked_sub(&mut self, a: u8, data: u8, carry: u8) -> u8 {
+        let sub = a.wrapping_sub(data).wrapping_sub(carry);
+        self.set_h((a & 0x0F) < (data & 0x0F) + carry);
+        self.set_c((a as u16) < (data as u16) + (carry as u16));
+        self.set_n(true);
+        self.set_z(sub == 0);
+        sub
     }
 }
 
 impl Carry<u16> for Flags {
-    fn is_half_carry(&mut self, a: u16, b: u16) {
-        let a = u32::from(a);
-        let b = u32::from(b);
-        let sum = a + b;
-        let check_half = (a ^ b ^ sum) & 0x1000 == 0x1000;
-        self.set_h(check_half);
+    fn checked_add(&mut self, hl: u16, data: u16, _carry: u16) -> u16 {
+        let add = hl.wrapping_add(data);
+        self.set_h((hl & 0x07FF) + (data & 0x07FF) > 0x07FF);
+        self.set_c(hl > 0xFFFF - data);
+        add
     }
 
-    fn is_half_borrow(&mut self, a: u16, b: u16) {
-        let a = i32::from(a);
-        let b = i32::from(b);
-        let sub = a - b;
-        let check_half = (a ^ (-b) ^ sub) & 0x1000 == 0x1000;
-        self.set_h(check_half);
-    }
-
-    fn checked_add(&mut self, a: u16, b: u16) -> u16 {
-        let (data, check) = a.overflowing_add(b);
-        self.is_half_carry(a, b);
-        self.set_c(check);
-        self.set_z(data == 0);
-        data
-    }
-
-    fn checked_sub(&mut self, a: u16, b: u16) -> u16 {
-        let (data, check) = a.overflowing_sub(b);
-        self.is_half_borrow(a, b);
-        self.set_c(check);
-        self.set_z(data == 0);
-        data
+    fn checked_sub(&mut self, _a: u16, _data: u16, _carry: u16) -> u16 {
+        0
     }
 }
 
