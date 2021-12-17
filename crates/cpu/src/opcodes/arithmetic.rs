@@ -121,20 +121,20 @@ impl Decoder for Arithmetic {
 impl Arithmetic {
     pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         let cycles = match self {
-            Arithmetic::AAA => cpu.borrow_mut().registers.add(Bits8::A, false),
             Arithmetic::AAB => cpu.borrow_mut().registers.add(Bits8::B, false),
             Arithmetic::AAC => cpu.borrow_mut().registers.add(Bits8::C, false),
             Arithmetic::AAD => cpu.borrow_mut().registers.add(Bits8::D, false),
             Arithmetic::AAE => cpu.borrow_mut().registers.add(Bits8::E, false),
             Arithmetic::AAH => cpu.borrow_mut().registers.add(Bits8::H, false),
             Arithmetic::AAL => cpu.borrow_mut().registers.add(Bits8::L, false),
-            Arithmetic::AAcA => cpu.borrow_mut().registers.add(Bits8::A, true),
+            Arithmetic::AAA => cpu.borrow_mut().registers.add(Bits8::A, false),
             Arithmetic::AAcB => cpu.borrow_mut().registers.add(Bits8::B, true),
             Arithmetic::AAcC => cpu.borrow_mut().registers.add(Bits8::C, true),
             Arithmetic::AAcD => cpu.borrow_mut().registers.add(Bits8::D, true),
             Arithmetic::AAcE => cpu.borrow_mut().registers.add(Bits8::E, true),
             Arithmetic::AAcH => cpu.borrow_mut().registers.add(Bits8::H, true),
             Arithmetic::AAcL => cpu.borrow_mut().registers.add(Bits8::L, true),
+            Arithmetic::AAcA => cpu.borrow_mut().registers.add(Bits8::A, true),
             Arithmetic::SAB => cpu.borrow_mut().registers.sub(Bits8::B, false),
             Arithmetic::SAC => cpu.borrow_mut().registers.sub(Bits8::C, false),
             Arithmetic::SAD => cpu.borrow_mut().registers.sub(Bits8::D, false),

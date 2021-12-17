@@ -7,7 +7,7 @@ pub struct Cpu {
     pub registers: Registers,
     pub(crate) halt: bool,
     pub(crate) stop: bool,
-    debug: String
+    debug: String,
 }
 
 impl Cpu {
