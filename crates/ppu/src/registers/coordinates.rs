@@ -37,7 +37,7 @@ impl Iterator for XRange {
 
 impl XRange {
     pub fn new(current: u8) -> Self {
-        Self { count: 20, current }
+        Self { count: 22, current }
     }
 }
 
