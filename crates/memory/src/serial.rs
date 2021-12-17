@@ -3,7 +3,7 @@ use crate::consts;
 #[derive(Debug, Default)]
 pub struct Serial {
     data: u8,
-    control: u8
+    control: u8,
 }
 
 impl Serial {

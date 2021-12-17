@@ -11,6 +11,7 @@ pub(crate) mod mbc;
 pub mod memory;
 pub(crate) mod ppu;
 pub(crate) mod ram;
+pub(crate) mod serial;
 pub mod state;
 pub(crate) mod timer;
 
@@ -20,5 +21,6 @@ pub use futures::{Getter, Setter};
 pub use interface::{Bus, Memory, Rom};
 pub use mbc::Cartridge;
 pub use r#async::Async;
+pub use serial::Serial;
 pub use state::State;
 pub use timer::Timer;

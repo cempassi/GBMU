@@ -171,6 +171,16 @@ impl Memory {
     pub fn clock_tick(&mut self) {
         self.io.tick()
     }
+
+    pub fn get_debug(&mut self) -> Option<char> {
+        if self.io.get(consts::SERIAL_CONTROL) == 0x81 {
+            let data = self.io.get(consts::SERIAL_DATA);
+            self.io.set(consts::SERIAL_CONTROL, 0);
+            char::from_u32(data as u32)
+        } else {
+            None
+        }
+    }
 }
 
 impl Memory {

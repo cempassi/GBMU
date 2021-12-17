@@ -75,9 +75,13 @@ impl Tasks {
             Processor::Cpu => match self.cpu_process.as_mut().poll(context) {
                 Poll::Ready(status) => {
                     self.cpu_process = self.cpu.clone().run();
+                    self.cpu.borrow_mut().print_debug();
                     Finished::finish(status)
                 }
-                Poll::Pending => Finished::Nope,
+                Poll::Pending => {
+                    self.cpu.borrow_mut().print_debug();
+                    Finished::Nope
+                }
             },
         }
     }
