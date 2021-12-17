@@ -1,5 +1,5 @@
 use super::decode::{Decode, Decoder};
-use crate::futures::{AsyncGet, Get};
+use crate::futures::{AsyncGet, Get, Set};
 use crate::registers::{Arithmetic, Bits16, IncDec};
 use crate::Cpu;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
@@ -50,6 +50,7 @@ pub enum Arithmetic16b {
     AddDE = 0x19,
     AddHL = 0x29,
     AddSP = 0x39,
+    AddSPr8 = 0xE8,
 }
 
 impl Decoder for Arithmetic16b {
@@ -72,6 +73,7 @@ impl Arithmetic16b {
             Arithmetic16b::AddDE => cpu.borrow_mut().registers.add(Bits16::DE, false),
             Arithmetic16b::AddHL => cpu.borrow_mut().registers.add(Bits16::HL, false),
             Arithmetic16b::AddSP => cpu.borrow_mut().registers.add(Bits16::SP, false),
+            Arithmetic16b::AddSPr8 => Set::AddSPr8.run(cpu.clone()).await?,
         };
         let (_, delay): (u8, u8) = Get::Nop.get(cpu).await?;
         Ok(cycles + delay)
@@ -93,6 +95,7 @@ impl fmt::Display for Arithmetic16b {
             Arithmetic16b::AddDE => write!(f, "Add HL DE"),
             Arithmetic16b::AddHL => write!(f, "Add HL HL"),
             Arithmetic16b::AddSP => write!(f, "Add HL SP"),
+            Arithmetic16b::AddSPr8 => write!(f, "Add HL SP, r8"),
         }
     }
 }

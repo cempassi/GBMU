@@ -1,5 +1,5 @@
 use super::{AsyncGet, Get, Set};
-use crate::registers::{Bits16, Bits8, Bus, IncDec};
+use crate::registers::{Bits16, Bits8, Bus, Flag, IncDec};
 use crate::{Access, Cpu};
 use memory::Async;
 use shared::Error;
@@ -70,12 +70,11 @@ pub async fn push(cpu: Cpu, area: Bits16) -> Result<u8, Error> {
     Ok(cycles + delay)
 }
 
-/// SP instructions take an extra 4 clocks to execute
 pub async fn pop(cpu: Cpu, area: Bits16) -> Result<u8, Error> {
     //let (_, delay) = cpu.memory().clone().get::<u8>(0xc00).await?;
     let (data, cycles): (u16, u8) = Get::BitsAt(Bits16::SP).get(cpu.clone()).await?;
-    cpu.borrow_mut().registers.set(area, data);
     cpu.borrow_mut().registers.increase(Bits16::SP, 2);
+    cpu.borrow_mut().registers.set(area, data);
     Ok(cycles)
 }
 
@@ -94,9 +93,23 @@ pub async fn io_next(cpu: Cpu) -> Result<u8, Error> {
 }
 
 pub async fn hl_sp(cpu: Cpu) -> Result<u8, Error> {
-    let (mut data, cycles) = Get::Next.get(cpu.clone()).await?;
-    data += cpu.borrow().registers.get(Bits16::SP);
-    cpu.borrow_mut().registers.set(Bits16::HL, data);
+    let sp = cpu.borrow().registers.get(Bits16::SP);
+
+    let (data, cycles): (u8, u8) = Get::Next.get(cpu.clone()).await?;
+    let data = data as i8 as i16 as u16;
+
+    cpu.borrow_mut().registers.set(Flag::N, false);
+    cpu.borrow_mut().registers.set(Flag::Z, false);
+    cpu.borrow_mut()
+        .registers
+        .set(Flag::H, (sp & 0x000F) + (data & 0x000F) > 0x000F);
+    cpu.borrow_mut()
+        .registers
+        .set(Flag::C, (sp & 0x00FF) + (data & 0x00FF) > 0x00FF);
+
+    cpu.borrow_mut()
+        .registers
+        .set(Bits16::HL, sp.wrapping_add(data));
     Ok(cycles)
 }
 

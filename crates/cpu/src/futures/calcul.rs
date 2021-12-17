@@ -1,5 +1,5 @@
 use super::{AsyncGet, Get, Set};
-use crate::registers::{Arithmetic, Bits16, IncDec, Logical as L};
+use crate::registers::{Arithmetic, Bits16, Bus, Flag, IncDec, Logical as L};
 use crate::Cpu;
 use crate::Registers;
 use shared::Error;
@@ -47,4 +47,22 @@ pub(crate) async fn hl(cpu: Cpu, operation: Operation) -> Result<u8, Error> {
 pub(crate) async fn next(cpu: Cpu, operation: Operation) -> Result<u8, Error> {
     let (data, cycles) = Get::Next.get(cpu.clone()).await?;
     Ok(calculate(&mut cpu.borrow_mut().registers, data, operation) + cycles)
+}
+
+pub async fn add_sp_signed(cpu: Cpu) -> Result<u8, Error> {
+    let sp = cpu.borrow().registers.get(Bits16::SP);
+    let (data, cycles): (u8, u8) = Get::Next.get(cpu.clone()).await?;
+    let data = data as i8 as i16 as u16;
+    cpu.borrow_mut().registers.set(Flag::N, false);
+    cpu.borrow_mut().registers.set(Flag::Z, false);
+    cpu.borrow_mut()
+        .registers
+        .set(Flag::H, (sp & 0x000F) + (data & 0x000F) > 0x000F);
+    cpu.borrow_mut()
+        .registers
+        .set(Flag::C, (sp & 0x00FF) + (data & 0x00FF) > 0x00FF);
+    cpu.borrow_mut()
+        .registers
+        .set(Bits16::SP, sp.wrapping_add(data));
+    Ok(cycles)
 }
