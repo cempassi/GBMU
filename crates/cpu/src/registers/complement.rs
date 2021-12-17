@@ -11,14 +11,15 @@ impl Complement for Registers {
     fn daa(&mut self) -> u8 {
         let mut data = self.get(Bits8::A);
         if !self.get(Flag::N) {
-            data += self.f.add_h_check(data);
-            data += self.f.add_c_check(data);
+            data = data.wrapping_add(self.f.add_h_check(data));
+            data = data.wrapping_add(self.f.add_c_check(data));
         } else {
-            data -= self.f.sub_h_check();
-            data -= self.f.sub_c_check();
+            data = data.wrapping_sub(self.f.sub_c_check());
+            data = data.wrapping_sub(self.f.sub_h_check());
         }
-        self.set(Flag::Z, data == 0);
         self.set(Bits8::A, data);
+        self.set(Flag::Z, data == 0);
+        self.set(Flag::H, false);
         0
     }
 
