@@ -7,12 +7,14 @@ pub struct Cpu {
     pub registers: Registers,
     pub(crate) halt: bool,
     pub(crate) stop: bool,
+    debug: String
 }
 
 impl Cpu {
     pub fn new(memory: Memory) -> Self {
         Self {
             memory,
+            debug: String::new(),
             registers: Registers::default(),
             halt: false,
             stop: false,
@@ -22,6 +24,7 @@ impl Cpu {
     pub fn no_bios(memory: Memory) -> Self {
         Self {
             memory,
+            debug: String::new(),
             registers: Registers::no_bios(),
             halt: false,
             stop: false,
@@ -34,5 +37,12 @@ impl Cpu {
 
     pub fn interrupt_enabled(&self) -> bool {
         self.memory.borrow().is_enabled().is_ok()
+    }
+
+    pub fn print_debug(&mut self) {
+        if let Some(character) = self.memory.borrow_mut().get_debug() {
+            self.debug.push(character);
+            println!("[DBG] {}", self.debug);
+        }
     }
 }
