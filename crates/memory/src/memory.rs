@@ -85,10 +85,9 @@ impl Memory {
 
     pub fn set_u8(&mut self, address: u16, data: u8) -> Result<(), Error> {
         match address {
-            consts::ROM_MIN..=consts::ROM_MAX => self
-                .wram
-                .borrow_mut()
-                .set(Area::Rom.relative(address), data),
+            consts::ROM_MIN..=consts::ROM_MAX => {
+                self.rom.borrow_mut().set(Area::Rom.relative(address), data)
+            }
             consts::VRAM_MIN..=consts::VRAM_MAX => self.ppu.borrow_mut().set(address.into(), data),
             consts::EXT_RAM_MIN..=consts::EXT_RAM_MAX => {
                 self.rom.borrow_mut().set(address.into(), data)
