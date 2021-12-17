@@ -1,4 +1,4 @@
-use super::{Bits8, Bus, Carry, Flag};
+use super::{Arithmetic, Bits8, Bus, Flag};
 use crate::registers::Registers;
 
 pub trait Logical<T> {
@@ -12,16 +12,18 @@ impl Logical<Bits8> for Registers {
     fn and(&mut self, src: Bits8) -> u8 {
         let data = self.get(Bits8::A) & self.get(src);
         self.set(Bits8::A, data);
+
         self.set(Flag::Z, data == 0);
-        self.set(Flag::N, false);
         self.set(Flag::H, true);
         self.set(Flag::C, false);
+        self.set(Flag::N, false);
         0
     }
 
     fn or(&mut self, src: Bits8) -> u8 {
         let data = self.get(Bits8::A) | self.get(src);
         self.set(Bits8::A, data);
+
         self.set(Flag::Z, data == 0);
         self.set(Flag::N, false);
         self.set(Flag::H, false);
@@ -32,6 +34,7 @@ impl Logical<Bits8> for Registers {
     fn xor(&mut self, src: Bits8) -> u8 {
         let data = self.get(Bits8::A) ^ self.get(src);
         self.set(Bits8::A, data);
+
         self.set(Flag::Z, data == 0);
         self.set(Flag::N, false);
         self.set(Flag::H, false);
@@ -40,11 +43,9 @@ impl Logical<Bits8> for Registers {
     }
 
     fn compare(&mut self, src: Bits8) -> u8 {
-        let data: u8 = self.get(src);
-        let carry: u8 = self.f.is_carried(false);
         let a = self.get(Bits8::A);
-        let _ = self.f.checked_sub(a, data + carry);
-        self.set(Flag::N, true);
+        self.sub(src, false);
+        self.set(Bits8::A, a);
         0
     }
 }
@@ -54,9 +55,9 @@ impl Logical<u8> for Registers {
         let data = self.get(Bits8::A) & src;
         self.set(Bits8::A, data);
         self.set(Flag::Z, data == 0);
-        self.set(Flag::N, false);
         self.set(Flag::H, true);
         self.set(Flag::C, false);
+        self.set(Flag::N, false);
         0
     }
 
@@ -81,10 +82,9 @@ impl Logical<u8> for Registers {
     }
 
     fn compare(&mut self, src: u8) -> u8 {
-        let carry: u8 = self.f.is_carried(false);
         let a = self.get(Bits8::A);
-        let _ = self.f.checked_sub(a, src + carry);
-        self.set(Flag::N, true);
+        self.sub(src, false);
+        self.set(Bits8::A, a);
         0
     }
 }
