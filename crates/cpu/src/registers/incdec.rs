@@ -9,11 +9,11 @@ pub trait IncDec<T, U> {
 impl IncDec<Bits8, u8> for Registers {
     fn increase(&mut self, area: Bits8, n: u8) -> u8 {
         let data = self.get(area);
-        let data = data.wrapping_add(n);
-        self.set(Flag::Z, data == 0);
-        self.set(Flag::H, (data & 0x0F) + 1 > 0x0F);
+        let inc = data.wrapping_add(n);
+        self.set(Flag::Z, inc == 0);
+        self.set(Flag::H, (data & 0xF) + 1 > 0xF);
         self.set(Flag::N, false);
-        self.set(area, data);
+        self.set(area, inc);
         0
     }
 
@@ -21,7 +21,7 @@ impl IncDec<Bits8, u8> for Registers {
         let data = self.get(area);
         let dec = data.wrapping_sub(n);
         self.set(Flag::Z, dec == 0);
-        self.set(Flag::H, (data & 0x0F) == 0);
+        self.set(Flag::H, ((data - 1) & 0x0F) == 0);
         self.set(Flag::N, true);
         self.set(area, dec);
         0
@@ -30,11 +30,11 @@ impl IncDec<Bits8, u8> for Registers {
 
 impl IncDec<u8, u8> for Registers {
     fn increase(&mut self, data: u8, n: u8) -> u8 {
-        let data = data.wrapping_add(n);
-        self.set(Flag::Z, data == 0);
-        self.set(Flag::H, (data & 0x0F) + 1 > 0x0F);
+        let inc = data.wrapping_add(n);
+        self.set(Flag::Z, inc == 0);
+        self.set(Flag::H, (data & 0xF) + 1 > 0xF);
         self.set(Flag::N, false);
-        data
+        inc
     }
 
     fn decrease(&mut self, data: u8, n: u8) -> u8 {

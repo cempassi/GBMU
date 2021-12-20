@@ -34,9 +34,16 @@ fn calculate(registers: &mut Registers, data: u8, operation: Operation) -> u8 {
 }
 
 pub(crate) async fn hl(cpu: Cpu, operation: Operation) -> Result<u8, Error> {
-    let (data, mut cycles) = Get::BitsAt(Bits16::HL).get(cpu.clone()).await?;
-    if operation == Operation::Increase || operation == Operation::Decrease {
-        let data = calculate(&mut cpu.borrow_mut().registers, data, operation);
+    let (data, mut cycles): (u8, u8) = Get::BitsAt(Bits16::HL).get(cpu.clone()).await?;
+    if operation == Operation::Increase {
+        let data = data.wrapping_add(1);
+        let data = cpu.borrow_mut().registers.increase(data, 1);
+        cycles += Set::Bits8At(Bits16::HL, data).run(cpu).await?;
+        Ok(cycles)
+    } else if operation == Operation::Decrease {
+        let data = data.wrapping_sub(1);
+
+        let data = cpu.borrow_mut().registers.decrease(data, 1);
         cycles += Set::Bits8At(Bits16::HL, data).run(cpu).await?;
         Ok(cycles)
     } else {
