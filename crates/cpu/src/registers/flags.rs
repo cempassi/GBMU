@@ -87,10 +87,11 @@ pub trait Carry<T> {
 impl Carry<u8> for Flags {
     fn checked_add(&mut self, a: u8, data: u8, carry: u8) -> u8 {
         let add = a.wrapping_add(data).wrapping_add(carry);
+
         self.set_c((a as u16) + (data as u16) + (carry as u16) > 0xFF);
         self.set_h((a & 0xF) + (data & 0xF) + carry > 0xF);
         self.set_n(false);
-        self.set_z(data == 0);
+        self.set_z(add == 0);
         add
     }
 

@@ -25,8 +25,8 @@ fn calculate(registers: &mut Registers, data: u8, operation: Operation) -> u8 {
         Operation::Xor => registers.xor(data),
         Operation::Compare => registers.compare(data),
         Operation::AddCarry => registers.add(data, true),
-        Operation::SubCarry => registers.sub(data, true),
         Operation::AddNoCarry => registers.add(data, false),
+        Operation::SubCarry => registers.sub(data, true),
         Operation::SubNoCarry => registers.sub(data, false),
         Operation::Increase => registers.increase(data, 1),
         Operation::Decrease => registers.decrease(data, 1),
@@ -45,7 +45,7 @@ pub(crate) async fn hl(cpu: Cpu, operation: Operation) -> Result<u8, Error> {
 }
 
 pub(crate) async fn next(cpu: Cpu, operation: Operation) -> Result<u8, Error> {
-    let (data, cycles) = Get::Next.get(cpu.clone()).await?;
+    let (data, cycles): (u8, u8) = Get::Next.get(cpu.clone()).await?;
     Ok(calculate(&mut cpu.borrow_mut().registers, data, operation) + cycles)
 }
 
