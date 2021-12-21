@@ -12,11 +12,11 @@ pub mod interface {
 #[bitfield]
 #[derive(Debug, Default, Clone, Copy)]
 pub struct Interrupts {
-    vblank: bool,
-    lcd: bool,
-    timer: bool,
-    serial: bool,
-    joypad: bool,
+    pub vblank: bool,
+    pub lcd: bool,
+    pub timer: bool,
+    pub serial: bool,
+    pub joypad: bool,
     #[skip]
     _unused: B3,
 }
@@ -33,6 +33,16 @@ impl Interrupts {
     pub fn set(&self, data: u8) -> Result<(), Error> {
         self.into_bytes()[0] = data;
         Ok(())
+    }
+
+    pub fn status(&self, interrupt: Interrupt) -> bool {
+        match interrupt {
+            Interrupt::Vblank => self.vblank(),
+            Interrupt::Lcd => self.lcd(),
+            Interrupt::Timer => self.timer(),
+            Interrupt::Serial => self.serial(),
+            Interrupt::Joypad => self.joypad(),
+        }
     }
 
     pub fn processed(&mut self, interrupt: Interrupt) {

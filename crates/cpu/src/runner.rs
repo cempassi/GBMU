@@ -23,24 +23,23 @@ impl Run for Cpu {
 }
 
 pub async fn interrupt_handler(cpu: Cpu) -> Result<Finished, Error> {
-    // println!("Interrupt Execution");
-    let requested = cpu.memory().borrow_mut().get_requested()?;
-    cpu.borrow_mut().halt = false;
-    cpu.borrow_mut().stop = false;
+    let address = cpu.memory().borrow_mut().get_interrupt_address();
 
-    cpu.memory().borrow().is_enabled()?;
-
-    cpu.memory().borrow_mut().disable_interrupts();
-
-    let address = cpu.memory().borrow_mut().get_interrupt_address(requested)?;
-
-    cpu.borrow_mut().registers.decrease(Bits16::SP, 2);
-    let pc = cpu.borrow().registers.pc;
-
-    cpu.borrow_mut().registers.pc = address;
-    let cycles = Set::Bits16At(Bits16::SP, pc).run(cpu).await?;
-
-    Ok(Finished::Cpu(cycles))
+    if let Some(address) = address {
+        println!("Interrupt Execution, address: {:#X}", address);
+        cpu.borrow_mut().halt = false;
+        cpu.borrow_mut().stop = false;
+        cpu.borrow_mut().registers.decrease(Bits16::SP, 2);
+        cpu.memory().borrow_mut().disable_interrupts();
+        let pc = cpu.borrow().registers.pc;
+        cpu.borrow_mut().registers.pc = address;
+        let cycles = Set::Bits16At(Bits16::SP, pc).run(cpu).await?;
+        Ok(Finished::Cpu(cycles))
+    } else {
+        println!("No interrupts to handle");
+        cpu.memory().borrow_mut().disable_interrupts();
+        Ok(Finished::Cpu(0))
+    }
 }
 
 async fn decode(cpu: Cpu, opcode: u8) -> Result<Decode, Error> {
@@ -68,22 +67,27 @@ async fn decode(cpu: Cpu, opcode: u8) -> Result<Decode, Error> {
 }
 
 pub async fn run(cpu: Cpu) -> Result<Finished, Error> {
-    if cpu.borrow().interrupt_enabled() {
-        match interrupt_handler(cpu.clone()).await {
-            Err(Error::DisabledInterrupts) => (),
-            result => return result,
-        };
-    }
-    cpu.memory().borrow_mut().check_interrupts();
-    let (opcode, cycles) = Get::Next.get(cpu.clone()).await?;
-    // println!("New Cpu Execution, Opcode: {:#X}", opcode);
-    if cpu.borrow().stop {
-        println!("Cpu is stoped, Opcode: {:#X}", opcode);
-    }
-    if cpu.borrow().halt {
-        //println!("Cpu is halted, Opcode: {:#X}", opcode);
-    }
+    let cycles = if !cpu.borrow().halt && !cpu.borrow().stop {
+        if cpu.borrow().interrupt_enabled() {
+            match interrupt_handler(cpu.clone()).await {
+                Err(Error::DisabledInterrupts) => Ok(Finished::Cpu(1)),
+                result => result,
+            }
+        } else {
+            let (opcode, cycles) = Get::Next.get(cpu.clone()).await?;
+            // println!("New Cpu Execution, Opcode: {:#X}", opcode);
 
-    let execute = decode(cpu, opcode).await?;
-    Ok(Finished::Cpu(execute.await? + cycles))
+            let execute = decode(cpu.clone(), opcode).await?;
+            Ok(Finished::Cpu(execute.await? + cycles))
+        }
+    } else {
+        println!("Halted!");
+        if cpu.memory().borrow().is_requested() {
+            cpu.borrow_mut().halt = false;
+        }
+        Ok(Finished::Cpu(1))
+    };
+
+    cpu.memory().borrow_mut().check_interrupts();
+    cycles
 }

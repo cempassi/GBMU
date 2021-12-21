@@ -73,9 +73,8 @@ impl Jump {
 }
 
 async fn res(cpu: Cpu, reset: Reset) -> Result<u8, Error> {
-    let (_, mut cycles): (u8, u8) = Get::Next.get(cpu.clone()).await?;
+    let cycles = Set::Push(Bits16::PC).run(cpu.clone()).await?;
     cpu.borrow_mut().registers.set(Bits16::PC, reset.dst());
-    cycles += Set::Push(Bits16::PC).run(cpu).await?;
     Ok(cycles)
 }
 

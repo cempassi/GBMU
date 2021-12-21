@@ -1,6 +1,4 @@
 use super::memory::Memory;
-use num_enum::TryFromPrimitive;
-use shared::interrupts::Interrupt;
 use shared::Error;
 use shared::Interrupts as Registered;
 
@@ -19,12 +17,7 @@ pub struct Interrupts {
 
 impl Interrupts {
     pub fn enable(&mut self) {
-        if !self.is_interrupted {
-            self.is_interrupted = true;
-        } else {
-            self.is_interrupted = false;
-            self.enabled = true;
-        }
+        self.is_interrupted = true;
     }
 
     pub fn is_enabled(&self) -> bool {
@@ -33,8 +26,13 @@ impl Interrupts {
 
     pub fn check(&mut self) {
         if self.is_interrupted {
-            self.enable()
+            self.enabled = true;
+            self.is_interrupted = false;
         }
+    }
+
+    pub fn is_requested(&self) -> bool {
+        self.requested.borrow().check(0xFF) != 0
     }
 
     pub fn requested(&self) -> u8 {
@@ -51,20 +49,35 @@ impl Interrupts {
         self.requested.clone()
     }
 
-    pub fn processed(&mut self, interrupt: Interrupt) {
-        self.requested.borrow_mut().processed(interrupt);
+    pub fn get_address(&mut self) -> Option<u16> {
+        let registered = self.registred.borrow_mut();
+        let mut requested = self.requested.borrow_mut();
+
+        if registered.vblank() && requested.vblank() {
+            requested.set_vblank(false);
+            Some(0x40)
+        } else if registered.lcd() && requested.lcd() {
+            requested.set_lcd(false);
+            Some(0x48)
+        } else if registered.timer() && requested.timer() {
+            requested.set_timer(false);
+            Some(0x50)
+        } else if registered.serial() && requested.serial() {
+            requested.set_serial(false);
+            Some(0x58)
+        } else if registered.joypad() && requested.joypad() {
+            requested.set_joypad(false);
+            Some(0x60)
+        } else {
+            None
+        }
     }
 }
 
 impl Memory {
-    pub fn get_interrupt_address(&mut self, requested: u32) -> Result<u16, Error> {
-        if let Ok(interrupt) = Interrupt::try_from_primitive(requested) {
-            self.interrupts.processed(interrupt);
-            let address = 0x0040 | ((requested as u16) << 3);
-            Ok(address as u16)
-        } else {
-            Err(Error::InvalidInterupt(requested))
-        }
+    pub fn get_interrupt_address(&mut self) -> Option<u16> {
+        self.interrupts.get_address()
+
     }
 
     pub fn enable_interrupts(&mut self) -> u8 {
@@ -79,6 +92,10 @@ impl Memory {
         } else {
             Err(Error::DisabledInterrupts)
         }
+    }
+
+    pub fn is_requested(&self) -> bool {
+        self.interrupts.is_requested()
     }
 
     pub fn disable_interrupts(&mut self) -> u8 {
