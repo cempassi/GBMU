@@ -159,10 +159,10 @@ impl Decoder for Logic {
 impl Logic {
     pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         let cycles = match self {
-            Logic::RLA => cpu.borrow_mut().registers.left_carry(Bits8::A),
-            Logic::RLCA => cpu.borrow_mut().registers.left_nocarry(Bits8::A),
-            Logic::RRA => cpu.borrow_mut().registers.right_carry(Bits8::A),
-            Logic::RRCA => cpu.borrow_mut().registers.right_nocarry(Bits8::A),
+            Logic::RLA => cpu.borrow_mut().registers.rotate_left(Bits8::A, true, false),
+            Logic::RLCA => cpu.borrow_mut().registers.rotate_left(Bits8::A, false, false),
+            Logic::RRA => cpu.borrow_mut().registers.rotate_right(Bits8::A, true, false),
+            Logic::RRCA => cpu.borrow_mut().registers.rotate_right(Bits8::A, false, false),
             Logic::AndAA => cpu.borrow_mut().registers.and(Bits8::A),
             Logic::AndAB => cpu.borrow_mut().registers.and(Bits8::B),
             Logic::AndAC => cpu.borrow_mut().registers.and(Bits8::C),

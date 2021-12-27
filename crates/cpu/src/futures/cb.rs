@@ -23,10 +23,10 @@ pub enum Operation {
 
 fn calculate(registers: &mut Registers, data: u8, operation: Operation) -> u8 {
     match operation {
-        Operation::RLCarry => registers.left_carry(data),
-        Operation::RLNOCarry => registers.left_nocarry(data),
-        Operation::RRCarry => registers.right_carry(data),
-        Operation::RRNoCarry => registers.right_nocarry(data),
+        Operation::RLCarry => registers.rotate_left(data, true, true),
+        Operation::RLNOCarry => registers.rotate_left(data, false, true),
+        Operation::RRCarry => registers.rotate_right(data, true, true),
+        Operation::RRNoCarry => registers.rotate_right(data, false, true),
         Operation::SLeft => registers.shift_left(data),
         Operation::Swap => registers.swap(data),
         Operation::SRArithmetic => registers.shift_arithmetic(data),
