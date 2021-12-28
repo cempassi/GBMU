@@ -31,7 +31,7 @@ impl IO {
     pub fn get(&self, address: u16) -> u8 {
         match address {
             consts::SERIAL_DATA | consts::SERIAL_CONTROL => self.serial.get(address),
-            consts::DIV..=consts::TIMA => self.timer.get(address),
+            consts::DIV..=consts::TAC => self.timer.get(address),
             _ => {
                 let address = Area::IOReg.relative(address);
                 self.temp[address]
@@ -42,7 +42,7 @@ impl IO {
     pub fn set(&mut self, address: u16, data: u8) {
         match address {
             consts::SERIAL_DATA | consts::SERIAL_CONTROL => self.serial.set(address, data),
-            consts::DIV..=consts::TIMA => self.timer.set(address, data),
+            consts::DIV..=consts::TAC => self.timer.set(address, data),
             _ => {
                 let address = Area::IOReg.relative(address);
                 self.temp[address] = data;
