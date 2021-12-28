@@ -68,7 +68,7 @@ impl Memory {
             consts::HRAM_MIN..=consts::HRAM_MAX => {
                 self.hram.borrow().get(Area::Hram.relative(address))
             }
-            consts::INTERRUPT_ENABLED => self.interrupts.registred.borrow().get(),
+            consts::INTERRUPT_ENABLED => self.interrupts.get_enabled(),
         }
     }
 
@@ -78,7 +78,7 @@ impl Memory {
             consts::YWINDOW | consts::XWINDOW | consts::BGP => {
                 self.ppu.borrow_mut().get(address.into())
             }
-            consts::INTERRUPT_FLAGS => self.interrupts.requested.borrow().get(),
+            consts::INTERRUPT_FLAGS => self.interrupts.get_requested(),
             _ => Ok(self.io.get(address)),
         }
     }
@@ -107,7 +107,7 @@ impl Memory {
                 .hram
                 .borrow_mut()
                 .set(Area::Hram.relative(address), data),
-            consts::INTERRUPT_ENABLED => self.interrupts.registred.borrow().set(data),
+            consts::INTERRUPT_ENABLED => self.interrupts.set_enabled(data),
         }
     }
 
@@ -119,7 +119,7 @@ impl Memory {
             consts::YWINDOW | consts::XWINDOW | consts::BGP => {
                 self.ppu.borrow_mut().set(address.into(), data)
             }
-            consts::INTERRUPT_FLAGS => self.interrupts.requested.borrow().set(data),
+            consts::INTERRUPT_FLAGS => self.interrupts.set_requested(data),
             _ => {
                 self.io.set(address, data);
                 Ok(())
@@ -231,6 +231,45 @@ impl Memory {
             hram,
             interrupts,
         }))
+    }
+}
+
+// Interrupt interface
+impl Memory {
+    pub fn master_enabled(&self) -> bool {
+        self.interrupts.master_enabled()
+    }
+
+    pub fn set_master_enabled(&mut self) {
+        self.interrupts.set_master_enabled();
+    }
+
+    pub fn disable_master_enabled(&mut self) -> u8 {
+        self.interrupts.disable_master_enabled();
+        0
+    }
+
+    pub fn set_is_interrupted(&mut self) -> u8 {
+        self.interrupts.set_is_interrupted();
+        0
+    }
+
+    pub fn disable_is_interruped(&mut self) -> u8 {
+        self.interrupts.disabled_is_interrupted();
+        0
+    }
+
+    pub fn get_interrupt_address(&mut self) -> Option<u16> {
+        self.interrupts.get_address()
+    }
+
+    pub fn is_requested(&self) -> bool {
+        self.interrupts.is_requested()
+    }
+
+    /// Check if EI instruction was called, set interrupt if it was
+    pub fn check_is_interrupted(&mut self) {
+        self.interrupts.check()
     }
 }
 

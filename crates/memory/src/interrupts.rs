@@ -1,5 +1,5 @@
-use super::memory::Memory;
 use shared::Error;
+use shared::Interrupt;
 use shared::Interrupts as Registered;
 
 /// enabled: Master interupt flag
@@ -10,24 +10,34 @@ use shared::Interrupts as Registered;
 #[derive(Debug, Default)]
 pub struct Interrupts {
     is_interrupted: bool,
-    enabled: bool,
-    pub(crate) registred: Registered,
-    pub(crate) requested: Registered,
+    master_enabled: bool,
+    enabled: Registered,
+    requested: Registered,
 }
 
 impl Interrupts {
-    pub fn enable(&mut self) {
+    pub fn set_is_interrupted(&mut self) {
         self.is_interrupted = true;
     }
 
-    pub fn is_enabled(&self) -> bool {
-        self.enabled
+    pub fn disabled_is_interrupted(&mut self) {
+        self.is_interrupted = false;
+    }
+
+    pub fn disable_master_enabled(&mut self) {
+        self.master_enabled = false;
+    }
+
+    pub fn set_master_enabled(&mut self) {
+        self.master_enabled = true;
+    }
+    pub fn master_enabled(&self) -> bool {
+        self.master_enabled
     }
 
     pub fn check(&mut self) {
         if self.is_interrupted {
-            self.enabled = true;
-            self.is_interrupted = false;
+            self.master_enabled = true;
         }
     }
 
@@ -35,84 +45,50 @@ impl Interrupts {
         self.requested.borrow().check(0xFF) != 0
     }
 
-    pub fn requested(&self) -> u8 {
-        let requested = self.requested.borrow().get().unwrap();
-
-        self.registred.borrow().check(requested)
-    }
-
-    pub fn disable(&mut self) {
-        self.enabled = false;
-    }
-
     pub fn get_raisable(&self) -> Registered {
         self.requested.clone()
     }
 
-    pub fn get_address(&mut self) -> Option<u16> {
-        let registered = self.registred.borrow_mut();
-        let mut requested = self.requested.borrow_mut();
+    pub fn set_enabled(&mut self, data: u8) -> Result<(), Error> {
+        println!("[MEM] Interrupt enabled");
+        self.enabled.borrow_mut().set(data)
+    }
 
-        if registered.vblank() && requested.vblank() {
-            requested.set_vblank(false);
+    pub fn get_enabled(&self) -> Result<u8, Error> {
+        self.enabled.borrow().get()
+    }
+
+    pub fn set_requested(&mut self, data: u8) -> Result<(), Error> {
+        println!("[MEM] Interrupt flag");
+        self.requested.borrow_mut().set(data)
+    }
+
+    pub fn get_requested(&self) -> Result<u8, Error> {
+        self.requested.borrow().get()
+    }
+
+    fn get_status(&self, interrupt: Interrupt) -> bool {
+        self.requested.borrow().status(interrupt) && self.enabled.borrow().status(interrupt)
+    }
+
+    pub fn get_address(&mut self) -> Option<u16> {
+        if self.get_status(Interrupt::VBlank) {
+            self.requested.borrow_mut().processed(Interrupt::VBlank);
             Some(0x40)
-        } else if registered.lcd() && requested.lcd() {
-            requested.set_lcd(false);
+        } else if self.get_status(Interrupt::Lcd) {
+            self.requested.borrow_mut().processed(Interrupt::Lcd);
             Some(0x48)
-        } else if registered.timer() && requested.timer() {
-            requested.set_timer(false);
+        } else if self.get_status(Interrupt::Timer) {
+            self.requested.borrow_mut().processed(Interrupt::Timer);
             Some(0x50)
-        } else if registered.serial() && requested.serial() {
-            requested.set_serial(false);
+        } else if self.get_status(Interrupt::Serial) {
+            self.requested.borrow_mut().processed(Interrupt::Serial);
             Some(0x58)
-        } else if registered.joypad() && requested.joypad() {
-            requested.set_joypad(false);
+        } else if self.get_status(Interrupt::Joypad) {
+            self.requested.borrow_mut().processed(Interrupt::Joypad);
             Some(0x60)
         } else {
             None
         }
-    }
-}
-
-impl Memory {
-    pub fn get_interrupt_address(&mut self) -> Option<u16> {
-        self.interrupts.get_address()
-
-    }
-
-    pub fn enable_interrupts(&mut self) -> u8 {
-        self.interrupts.enable();
-        0
-    }
-
-    pub fn get_requested(&self) -> Result<u32, Error> {
-        let requested = self.interrupts.requested();
-        if requested != 0 {
-            Ok(requested.trailing_zeros())
-        } else {
-            Err(Error::DisabledInterrupts)
-        }
-    }
-
-    pub fn is_requested(&self) -> bool {
-        self.interrupts.is_requested()
-    }
-
-    pub fn disable_interrupts(&mut self) -> u8 {
-        self.interrupts.disable();
-        0
-    }
-
-    pub fn is_enabled(&self) -> Result<(), Error> {
-        if self.interrupts.is_enabled() {
-            Ok(())
-        } else {
-            Err(Error::DisabledInterrupts)
-        }
-    }
-
-    /// Check if EI instruction was called, set interrupt if it was
-    pub fn check_interrupts(&mut self) {
-        self.interrupts.check()
     }
 }

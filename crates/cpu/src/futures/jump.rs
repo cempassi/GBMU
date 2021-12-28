@@ -84,7 +84,7 @@ async fn ret(cpu: Cpu) -> Result<u8, Error> {
 }
 
 async fn ret_interrupt(cpu: Cpu) -> Result<u8, Error> {
-    cpu.memory().borrow_mut().enable_interrupts();
+    cpu.memory().borrow_mut().set_is_interrupted();
     ret(cpu).await
 }
 

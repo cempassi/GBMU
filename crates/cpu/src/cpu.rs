@@ -35,8 +35,8 @@ impl Cpu {
         self.memory.clone()
     }
 
-    pub fn interrupt_enabled(&self) -> bool {
-        self.memory.borrow().is_enabled().is_ok()
+    pub fn master_enabled(&self) -> bool {
+        self.memory.borrow().master_enabled()
     }
 
     pub fn print_debug(&mut self) {
