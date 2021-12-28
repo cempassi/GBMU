@@ -108,27 +108,90 @@ impl Rotate {
             Rotate::LE => cpu.borrow_mut().registers.rotate_left(Bits8::E, true, true),
             Rotate::LH => cpu.borrow_mut().registers.rotate_left(Bits8::H, true, true),
             Rotate::LL => cpu.borrow_mut().registers.rotate_left(Bits8::L, true, true),
-            Rotate::LCA => cpu.borrow_mut().registers.rotate_left(Bits8::A, false, true),
-            Rotate::LCB => cpu.borrow_mut().registers.rotate_left(Bits8::B, false, true),
-            Rotate::LCC => cpu.borrow_mut().registers.rotate_left(Bits8::C, false, true),
-            Rotate::LCD => cpu.borrow_mut().registers.rotate_left(Bits8::D, false, true),
-            Rotate::LCE => cpu.borrow_mut().registers.rotate_left(Bits8::E, false, true),
-            Rotate::LCH => cpu.borrow_mut().registers.rotate_left(Bits8::H, false, true),
-            Rotate::LCL => cpu.borrow_mut().registers.rotate_left(Bits8::L, false, true),
-            Rotate::RA => cpu.borrow_mut().registers.rotate_right(Bits8::A, true, true),
-            Rotate::RB => cpu.borrow_mut().registers.rotate_right(Bits8::B, true, true),
-            Rotate::RC => cpu.borrow_mut().registers.rotate_right(Bits8::C, true, true),
-            Rotate::RD => cpu.borrow_mut().registers.rotate_right(Bits8::D, true, true),
-            Rotate::RE => cpu.borrow_mut().registers.rotate_right(Bits8::E, true, true),
-            Rotate::RH => cpu.borrow_mut().registers.rotate_right(Bits8::H, true, true),
-            Rotate::RL => cpu.borrow_mut().registers.rotate_right(Bits8::L, true, true),
-            Rotate::RCA => cpu.borrow_mut().registers.rotate_right(Bits8::A, false, true),
-            Rotate::RCB => cpu.borrow_mut().registers.rotate_right(Bits8::B, false, true),
-            Rotate::RCC => cpu.borrow_mut().registers.rotate_right(Bits8::C, false, true),
-            Rotate::RCD => cpu.borrow_mut().registers.rotate_right(Bits8::D, false, true),
-            Rotate::RCE => cpu.borrow_mut().registers.rotate_right(Bits8::E, false, true),
-            Rotate::RCH => cpu.borrow_mut().registers.rotate_right(Bits8::H, false, true),
-            Rotate::RCL => cpu.borrow_mut().registers.rotate_right(Bits8::L, false, true),
+            Rotate::LCA => cpu
+                .borrow_mut()
+                .registers
+                .rotate_left(Bits8::A, false, true),
+            Rotate::LCB => cpu
+                .borrow_mut()
+                .registers
+                .rotate_left(Bits8::B, false, true),
+            Rotate::LCC => cpu
+                .borrow_mut()
+                .registers
+                .rotate_left(Bits8::C, false, true),
+            Rotate::LCD => cpu
+                .borrow_mut()
+                .registers
+                .rotate_left(Bits8::D, false, true),
+            Rotate::LCE => cpu
+                .borrow_mut()
+                .registers
+                .rotate_left(Bits8::E, false, true),
+            Rotate::LCH => cpu
+                .borrow_mut()
+                .registers
+                .rotate_left(Bits8::H, false, true),
+            Rotate::LCL => cpu
+                .borrow_mut()
+                .registers
+                .rotate_left(Bits8::L, false, true),
+            Rotate::RA => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::A, true, true),
+            Rotate::RB => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::B, true, true),
+            Rotate::RC => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::C, true, true),
+            Rotate::RD => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::D, true, true),
+            Rotate::RE => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::E, true, true),
+            Rotate::RH => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::H, true, true),
+            Rotate::RL => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::L, true, true),
+            Rotate::RCA => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::A, false, true),
+            Rotate::RCB => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::B, false, true),
+            Rotate::RCC => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::C, false, true),
+            Rotate::RCD => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::D, false, true),
+            Rotate::RCE => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::E, false, true),
+            Rotate::RCH => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::H, false, true),
+            Rotate::RCL => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::L, false, true),
             Rotate::LHL => Set::CbHL(CbOperation::RLCarry).run(cpu).await?,
             Rotate::LCHL => Set::CbHL(CbOperation::RLNOCarry).run(cpu).await?,
             Rotate::RHL => Set::CbHL(CbOperation::RRCarry).run(cpu).await?,
