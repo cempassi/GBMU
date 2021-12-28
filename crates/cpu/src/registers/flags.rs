@@ -41,39 +41,6 @@ impl Flags {
         self.set_c((data & 0b0001_0000) != 0);
     }
 
-    pub fn add_h_check(&self, data: u8) -> u8 {
-        if self.h() || (data & 0x0f) > 0x09 {
-            6
-        } else {
-            0
-        }
-    }
-
-    pub fn add_c_check(&mut self, data: u8) -> u8 {
-        if self.c() || data > 0x99 {
-            self.set_c(true);
-            0x60
-        } else {
-            0
-        }
-    }
-
-    pub fn sub_h_check(&self) -> u8 {
-        if self.h() {
-            6
-        } else {
-            0
-        }
-    }
-
-    pub fn sub_c_check(&mut self) -> u8 {
-        if self.c() {
-            0x60
-        } else {
-            0
-        }
-    }
-
     pub fn complement_c(&mut self) {
         self.set_c(!self.c());
     }
@@ -97,6 +64,7 @@ impl Carry<u8> for Flags {
 
     fn checked_sub(&mut self, a: u8, data: u8, carry: u8) -> u8 {
         let sub = a.wrapping_sub(data).wrapping_sub(carry);
+
         self.set_h((a & 0x0F) < (data & 0x0F) + carry);
         self.set_c((a as u16) < (data as u16) + (carry as u16));
         self.set_n(true);
