@@ -111,8 +111,9 @@ mod test_registers {
     fn test_valid_write_read_af_register() {
         let mut registers = Registers::default();
 
-        registers.set(Bits16::AF, 0xFFFF);
+        registers.set(Bits16::AF, 0xFFF0);
         let value = registers.get(Bits16::AF);
-        assert_eq!(value, 0xFFFF);
+        println!("Result: {:#X}", value);
+        assert_eq!(value, 0xFFF0);
     }
 }

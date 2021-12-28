@@ -11,34 +11,37 @@ pub trait Logical<T> {
 impl Logical<Bits8> for Registers {
     fn and(&mut self, src: Bits8) -> u8 {
         let data = self.get(Bits8::A) & self.get(src);
-        self.set(Bits8::A, data);
 
         self.set(Flag::Z, data == 0);
         self.set(Flag::H, true);
         self.set(Flag::C, false);
         self.set(Flag::N, false);
+
+        self.set(Bits8::A, data);
         0
     }
 
     fn or(&mut self, src: Bits8) -> u8 {
         let data = self.get(Bits8::A) | self.get(src);
-        self.set(Bits8::A, data);
 
         self.set(Flag::Z, data == 0);
         self.set(Flag::N, false);
         self.set(Flag::H, false);
         self.set(Flag::C, false);
+
+        self.set(Bits8::A, data);
         0
     }
 
     fn xor(&mut self, src: Bits8) -> u8 {
         let data = self.get(Bits8::A) ^ self.get(src);
-        self.set(Bits8::A, data);
 
         self.set(Flag::Z, data == 0);
         self.set(Flag::N, false);
         self.set(Flag::H, false);
         self.set(Flag::C, false);
+
+        self.set(Bits8::A, data);
         0
     }
 
@@ -53,31 +56,35 @@ impl Logical<Bits8> for Registers {
 impl Logical<u8> for Registers {
     fn and(&mut self, src: u8) -> u8 {
         let data = self.get(Bits8::A) & src;
-        self.set(Bits8::A, data);
+
         self.set(Flag::Z, data == 0);
         self.set(Flag::H, true);
         self.set(Flag::C, false);
         self.set(Flag::N, false);
+
+        self.set(Bits8::A, data);
         0
     }
 
     fn or(&mut self, src: u8) -> u8 {
         let data = self.get(Bits8::A) | src;
-        self.set(Bits8::A, data);
         self.set(Flag::Z, data == 0);
         self.set(Flag::N, false);
         self.set(Flag::H, false);
         self.set(Flag::C, false);
+
+        self.set(Bits8::A, data);
         0
     }
 
     fn xor(&mut self, src: u8) -> u8 {
         let data = self.get(Bits8::A) ^ src;
-        self.set(Bits8::A, data);
         self.set(Flag::Z, data == 0);
         self.set(Flag::N, false);
         self.set(Flag::H, false);
         self.set(Flag::C, false);
+
+        self.set(Bits8::A, data);
         0
     }
 

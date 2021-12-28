@@ -31,6 +31,7 @@ impl IncDec<Bits8, u8> for Registers {
 impl IncDec<u8, u8> for Registers {
     fn increase(&mut self, data: u8, n: u8) -> u8 {
         let inc = data.wrapping_add(n);
+
         self.set(Flag::Z, inc == 0);
         self.set(Flag::H, (data & 0xF) + 1 > 0xF);
         self.set(Flag::N, false);

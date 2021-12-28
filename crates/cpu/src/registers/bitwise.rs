@@ -11,7 +11,7 @@ pub trait Bitwise<T> {
 impl Bitwise<Bits8> for Registers {
     fn test(&mut self, area: Bits8, bit: u8) -> u8 {
         let byte = self.get(area);
-        let test = byte & (1 << (bit as u32)) == 0;
+        let test = ((bit as u8) & !byte) != 0;
         self.set(Flag::Z, test);
         self.set(Flag::N, false);
         self.set(Flag::H, true);
@@ -19,36 +19,32 @@ impl Bitwise<Bits8> for Registers {
     }
 
     fn reset(&mut self, area: Bits8, bit: u8) -> u8 {
-        let mut byte = self.get(area);
-        byte &= !bit;
-        self.set(area, byte);
+        let byte = self.get(area);
+        self.set(area, byte & !bit);
         0
     }
 
     fn bitset(&mut self, area: Bits8, bit: u8) -> u8 {
-        let mut byte = self.get(area);
-        byte |= bit;
-        self.set(area, byte);
+        let byte = self.get(area);
+        self.set(area, byte | bit);
         0
     }
 }
 
 impl Bitwise<u8> for Registers {
     fn test(&mut self, byte: u8, bit: u8) -> u8 {
-        let test = byte & (1 << (bit as u32)) == 0;
+        let test = ((bit as u8) & !byte) != 0;
         self.set(Flag::Z, test);
         self.set(Flag::N, false);
         self.set(Flag::H, true);
         0
     }
 
-    fn reset(&mut self, mut byte: u8, bit: u8) -> u8 {
-        byte &= !bit;
-        byte
+    fn reset(&mut self, byte: u8, bit: u8) -> u8 {
+        byte & !bit
     }
 
-    fn bitset(&mut self, mut byte: u8, bit: u8) -> u8 {
-        byte |= bit;
-        byte
+    fn bitset(&mut self, byte: u8, bit: u8) -> u8 {
+        byte | bit
     }
 }
