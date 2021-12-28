@@ -1,3 +1,4 @@
+#![allow(dead_code, unused_attributes, unused_imports)]
 use super::{Bus, Flag};
 use modular_bitfield::{bitfield, specifiers::B4};
 

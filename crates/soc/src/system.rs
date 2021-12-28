@@ -36,7 +36,7 @@ impl System {
     pub fn check_redraw(&mut self, status: Vec<Finished>) {
         for status in status {
             match (status, self.mode) {
-                (Finished::Error(error), _) => {
+                (Finished::Error(_error), _) => {
                     self.mode.idle();
                     self.redraw.update(Redraw::All);
                     //println!("[SOC] Error in check redraw: {}", error);

@@ -129,7 +129,7 @@ mod test_load_register_u16 {
         let instruction = Load16b::LoadBC;
         cpu.borrow_mut().registers.set(Bits16::PC, 0xc000);
         cpu.memory().borrow_mut().set_u16(0xc000, 0x4242).unwrap();
-        execute(Box::pin(instruction.exec(cpu.clone())));
+        let _ = execute(Box::pin(instruction.exec(cpu.clone())));
         assert_eq!(cpu.borrow().registers.get(Bits16::BC), 0x4242);
     }
 
@@ -141,7 +141,7 @@ mod test_load_register_u16 {
         cpu.memory().borrow_mut().set_u16(0xc000, 0xc002).unwrap();
         cpu.borrow_mut().registers.set(Bits16::SP, 0x4242);
 
-        execute(Box::pin(instruction.exec(cpu.clone())));
+        let _ = execute(Box::pin(instruction.exec(cpu.clone())));
 
         let result = cpu.memory().borrow_mut().get_u16(0xc002).unwrap();
         assert_eq!(cpu.borrow().registers.get(Bits16::SP), result);
@@ -153,7 +153,7 @@ mod test_load_register_u16 {
         let instruction = Load16b::PopHL;
         cpu.borrow_mut().registers.set(Bits16::SP, 0xc000);
         cpu.memory().borrow_mut().set_u16(0xc000, 0x4242).unwrap();
-        execute(Box::pin(instruction.exec(cpu.clone())));
+        let _ = execute(Box::pin(instruction.exec(cpu.clone())));
         assert_eq!(cpu.borrow().registers.get(Bits16::HL), 0x4242);
         assert_eq!(cpu.borrow().registers.get(Bits16::SP), 0xc000 + 2);
     }
@@ -164,7 +164,7 @@ mod test_load_register_u16 {
         let instruction = Load16b::PushHL;
         cpu.borrow_mut().registers.set(Bits16::SP, 0xc002);
         cpu.borrow_mut().registers.set(Bits16::HL, 0x4242);
-        execute(Box::pin(instruction.exec(cpu.clone())));
+        let _ = execute(Box::pin(instruction.exec(cpu.clone())));
         assert_eq!(cpu.memory().borrow().get_u16(0xc000).unwrap(), 0x4242);
         assert_eq!(cpu.borrow().registers.get(Bits16::SP), 0xc000);
     }

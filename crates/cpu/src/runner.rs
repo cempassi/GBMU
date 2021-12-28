@@ -23,13 +23,26 @@ impl Run for Cpu {
 }
 
 pub async fn interrupt_handler(cpu: Cpu) -> Result<u8, Error> {
+    if !cpu.memory().borrow().master_enabled() && !cpu.borrow().halt {
+        return Ok(0);
+    }
+
+    if !cpu.memory().borrow().is_triggerred() {
+        return Ok(0);
+    }
+
+    cpu.borrow_mut().halt = false;
+    cpu.borrow_mut().stop = false;
+    if !cpu.memory().borrow().master_enabled(){
+        return Ok(0);
+    }
+
+    cpu.memory().borrow_mut().disable_master_enabled();
+
     let address = cpu.memory().borrow_mut().get_interrupt_address();
 
     if let Some(address) = address {
         println!("Interrupt Execution, address: {:#X}", address);
-        cpu.borrow_mut().halt = false;
-        cpu.borrow_mut().stop = false;
-        cpu.memory().borrow_mut().disable_master_enabled();
 
         let pc = cpu.borrow().registers.pc;
         cpu.borrow_mut().registers.pc = address;
@@ -68,28 +81,24 @@ async fn decode(cpu: Cpu, opcode: u8) -> Result<Decode, Error> {
 }
 
 pub async fn run(cpu: Cpu) -> Result<Finished, Error> {
-    let cycles = if !cpu.borrow().halt && !cpu.borrow().stop {
+    cpu.memory().borrow_mut().control_interrupts();
+
+    match interrupt_handler(cpu.clone()).await? {
+        0 => {}
+        n => return Ok(Finished::Cpu(n)),
+    };
+
+    if !cpu.borrow().halt && !cpu.borrow().stop {
         let (opcode, cycles) = Get::Next.get(cpu.clone()).await?;
         // println!("New Cpu Execution, Opcode: {:#X}", opcode);
 
         let execute = decode(cpu.clone(), opcode).await?;
-        execute.await? + cycles
+        Ok(Finished::Cpu(execute.await? + cycles))
     } else {
         println!("Halted!");
         if cpu.memory().borrow().is_requested() {
             cpu.borrow_mut().halt = false;
         }
-        1
-    };
-
-    let interrupt_cycle = if cpu.borrow().master_enabled() {
-        cpu.memory().borrow_mut().disable_is_interruped();
-        interrupt_handler(cpu.clone()).await?
-    } else {
-        0
-    };
-
-    cpu.memory().borrow_mut().check_is_interrupted();
-
-    Ok(Finished::Cpu(cycles + interrupt_cycle))
+        Ok(Finished::Cpu(1))
+    }
 }

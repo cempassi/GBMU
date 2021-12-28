@@ -254,6 +254,11 @@ impl Memory {
         0
     }
 
+    pub fn set_is_dissabled(&mut self) -> u8 {
+        self.interrupts.set_is_dissabled();
+        0
+    }
+
     pub fn disable_is_interruped(&mut self) -> u8 {
         self.interrupts.disabled_is_interrupted();
         0
@@ -267,9 +272,14 @@ impl Memory {
         self.interrupts.is_requested()
     }
 
+    pub fn is_triggerred(&self) -> bool {
+        self.interrupts.is_triggered()
+    }
+
     /// Check if EI instruction was called, set interrupt if it was
-    pub fn check_is_interrupted(&mut self) {
-        self.interrupts.check()
+    pub fn control_interrupts(&mut self) {
+        self.interrupts.is_interrupted_control();
+        self.interrupts.is_disabled_control();
     }
 }
 

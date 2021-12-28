@@ -16,7 +16,6 @@ pub struct Interrupts {
 
 impl Interrupts {
     pub fn get(&self) -> Result<u8, Error> {
-        println!("Interrupts get >> interrupt: {:#b}", self.data);
         Ok(self.data)
     }
 
@@ -26,10 +25,6 @@ impl Interrupts {
 
     pub fn set(&mut self, data: u8) -> Result<(), Error> {
         self.data = data;
-        println!(
-            "Interrupts after set >> data: {:#b}, stored: {:#b}",
-            data, self.data
-        );
         Ok(())
     }
 
@@ -49,9 +44,9 @@ impl Interrupts {
 #[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 pub enum Interrupt {
-    VBlank = 0b00000001,
-    Lcd = 0b00000010,
-    Timer = 0b00000100,
-    Serial = 0b00001000,
-    Joypad = 0b00010000,
+    VBlank = 0b0000_0001,
+    Lcd = 0b0000_0010,
+    Timer = 0b0000_0100,
+    Serial = 0b0000_1000,
+    Joypad = 0b0001_0000,
 }
