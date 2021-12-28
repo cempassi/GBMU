@@ -18,16 +18,15 @@ use std::fmt;
 ///  C - Set if carry from bit 7.
 /// Opcodes:
 /// Instruction Parameters Opcode Cycles | Instruction Parameters Opcode Cycles
-/// ADD         A,A        0x87   4        ADD         A,E        0x83   4
-/// ADD         A,B        0x80   4        ADD         A,H        0x84   4
-/// ADD         A,C        0x81   4        ADD         A,L        0x85   4
-/// ADD         A,D        0x82   4        ADD         A,(HL)     0x86   8
-/// ADD         A,8b       0xc6   8
-/// ADC         A,A        0x8f   4        ADC         A,E        0x8b   4
-/// ADC         A,B        0x88   4        ADC         A,H        0x8c   4
-/// ADC         A,C        0x89   4        ADC         A,L        0x8d   4
-/// ADC         A,D        0x8a   4        ADC         A,(HL)     0x8e   8
-/// ADC         A,8b       0xce   8
+/// ADD         A,A        0x87   4        ADC         A,A        0x8F   4
+/// ADD         A,B        0x80   4        ADC         A,B        0x88   4
+/// ADD         A,C        0x81   4        ADC         A,C        0x89   4
+/// ADD         A,D        0x82   4        ADC         A,D        0x8A   4
+/// ADD         A,8b       0xC6   8        ADC         A,8b       0xCE   8
+/// ADD         A,E        0x83   4        ADC         A,E        0x8B   4
+/// ADD         A,H        0x84   4        ADC         A,H        0x8C   4
+/// ADD         A,L        0x85   4        ADC         A,L        0x8D   4
+/// ADD         A,(HL)     0x86   8        ADC         A,(HL)     0x8E   8
 
 /// [SUB | SBC] n
 /// Description:
@@ -49,29 +48,30 @@ use std::fmt;
 ///  SUB        A,H          0x94   4        SBC         A,H        0x9C   4
 ///  SUB        A,L          0x95   4        SBC         A,L        0x9D   4
 ///  SUB        A,(HL)       0x96   8        SBC         A,(HL)     0x9E   8
-///  SUB        A,8b         0xd6   8        SBC         A,8b       0xDE     ?
+///  SUB        A,8b         0xD6   8        SBC         A,8b       0xDE     ?
 #[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Arithmetic {
-    AAA = 0x8F,
-    AAB = 0x88,
-    AAC = 0x89,
-    AAD = 0x8A,
-    AAE = 0x8B,
-    AAH = 0x8C,
-    AAL = 0x8D,
-    AAHL = 0x8E,
+    AAA = 0x87,
+    AAB = 0x80,
+    AAC = 0x81,
+    AAD = 0x82,
     AA8b = 0xC6,
-    AAcA = 0x87,
-    AAcB = 0x80,
-    AAcC = 0x81,
-    AAcD = 0x82,
-    AAcE = 0x83,
-    AAcH = 0x84,
-    AAcL = 0x85,
-    AAcHL = 0x86,
+    AAE = 0x83,
+    AAH = 0x84,
+    AAL = 0x85,
+    AAHL = 0x86,
+    AAcA = 0x8F,
+    AAcB = 0x88,
+    AAcC = 0x89,
+    AAcD = 0x8A,
     AAc8b = 0xCE,
+    AAcE = 0x8B,
+    AAcH = 0x8C,
+    AAcL = 0x8D,
+    AAcHL = 0x8E,
+    SAA = 0x97,
     SAB = 0x90,
     SAC = 0x91,
     SAD = 0x92,
@@ -79,7 +79,8 @@ pub enum Arithmetic {
     SAH = 0x94,
     SAL = 0x95,
     SAHL = 0x96,
-    SAA = 0x97,
+    SA8b = 0xD6,
+    SAcA = 0x9F,
     SAcB = 0x98,
     SAcC = 0x99,
     SAcD = 0x9A,
@@ -87,8 +88,6 @@ pub enum Arithmetic {
     SAcH = 0x9C,
     SAcL = 0x9D,
     SAcHL = 0x9E,
-    SAcA = 0x9F,
-    SA8b = 0xD6,
     SAc8b = 0xDE,
     IncB = 0x04,
     IncD = 0x14,
@@ -121,27 +120,33 @@ impl Decoder for Arithmetic {
 impl Arithmetic {
     pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         let cycles = match self {
+            Arithmetic::AAA => cpu.borrow_mut().registers.add(Bits8::A, false),
             Arithmetic::AAB => cpu.borrow_mut().registers.add(Bits8::B, false),
             Arithmetic::AAC => cpu.borrow_mut().registers.add(Bits8::C, false),
             Arithmetic::AAD => cpu.borrow_mut().registers.add(Bits8::D, false),
             Arithmetic::AAE => cpu.borrow_mut().registers.add(Bits8::E, false),
             Arithmetic::AAH => cpu.borrow_mut().registers.add(Bits8::H, false),
             Arithmetic::AAL => cpu.borrow_mut().registers.add(Bits8::L, false),
-            Arithmetic::AAA => cpu.borrow_mut().registers.add(Bits8::A, false),
+            Arithmetic::AA8b => Set::CalculNext(Operation::AddNoCarry).run(cpu).await?,
+            Arithmetic::AAHL => Set::CalculHL(Operation::AddNoCarry).run(cpu).await?,
+            Arithmetic::AAcA => cpu.borrow_mut().registers.add(Bits8::A, true),
             Arithmetic::AAcB => cpu.borrow_mut().registers.add(Bits8::B, true),
             Arithmetic::AAcC => cpu.borrow_mut().registers.add(Bits8::C, true),
             Arithmetic::AAcD => cpu.borrow_mut().registers.add(Bits8::D, true),
             Arithmetic::AAcE => cpu.borrow_mut().registers.add(Bits8::E, true),
             Arithmetic::AAcH => cpu.borrow_mut().registers.add(Bits8::H, true),
             Arithmetic::AAcL => cpu.borrow_mut().registers.add(Bits8::L, true),
-            Arithmetic::AAcA => cpu.borrow_mut().registers.add(Bits8::A, true),
+            Arithmetic::AAc8b => Set::CalculNext(Operation::AddCarry).run(cpu).await?,
+            Arithmetic::AAcHL => Set::CalculHL(Operation::AddCarry).run(cpu).await?,
+            Arithmetic::SAA => cpu.borrow_mut().registers.sub(Bits8::A, false),
             Arithmetic::SAB => cpu.borrow_mut().registers.sub(Bits8::B, false),
             Arithmetic::SAC => cpu.borrow_mut().registers.sub(Bits8::C, false),
             Arithmetic::SAD => cpu.borrow_mut().registers.sub(Bits8::D, false),
             Arithmetic::SAE => cpu.borrow_mut().registers.sub(Bits8::E, false),
             Arithmetic::SAH => cpu.borrow_mut().registers.sub(Bits8::H, false),
             Arithmetic::SAL => cpu.borrow_mut().registers.sub(Bits8::L, false),
-            Arithmetic::SAA => cpu.borrow_mut().registers.sub(Bits8::A, false),
+            Arithmetic::SA8b => Set::CalculNext(Operation::SubNoCarry).run(cpu).await?,
+            Arithmetic::SAHL => Set::CalculHL(Operation::SubNoCarry).run(cpu).await?,
             Arithmetic::SAcB => cpu.borrow_mut().registers.sub(Bits8::B, true),
             Arithmetic::SAcC => cpu.borrow_mut().registers.sub(Bits8::C, true),
             Arithmetic::SAcD => cpu.borrow_mut().registers.sub(Bits8::D, true),
@@ -149,14 +154,8 @@ impl Arithmetic {
             Arithmetic::SAcH => cpu.borrow_mut().registers.sub(Bits8::H, true),
             Arithmetic::SAcL => cpu.borrow_mut().registers.sub(Bits8::L, true),
             Arithmetic::SAcA => cpu.borrow_mut().registers.sub(Bits8::A, true),
-            Arithmetic::AAc8b => Set::CalculNext(Operation::AddCarry).run(cpu).await?,
-            Arithmetic::AA8b => Set::CalculNext(Operation::AddNoCarry).run(cpu).await?,
-            Arithmetic::AAHL => Set::CalculHL(Operation::AddNoCarry).run(cpu).await?,
-            Arithmetic::AAcHL => Set::CalculHL(Operation::AddCarry).run(cpu).await?,
-            Arithmetic::SAHL => Set::CalculHL(Operation::SubNoCarry).run(cpu).await?,
             Arithmetic::SAcHL => Set::CalculHL(Operation::SubCarry).run(cpu).await?,
             Arithmetic::SAc8b => Set::CalculNext(Operation::SubCarry).run(cpu).await?,
-            Arithmetic::SA8b => Set::CalculNext(Operation::SubNoCarry).run(cpu).await?,
             Arithmetic::IncB => cpu.borrow_mut().registers.increase(Bits8::B, 1),
             Arithmetic::IncD => cpu.borrow_mut().registers.increase(Bits8::D, 1),
             Arithmetic::IncH => cpu.borrow_mut().registers.increase(Bits8::H, 1),
