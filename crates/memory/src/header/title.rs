@@ -36,3 +36,16 @@ impl TryFrom<[u8; TITLE_LEN]> for Title {
         }
     }
 }
+
+impl Title {
+    pub fn get(&self) -> String {
+        match self {
+            Title::Basic(title) => title.clone(),
+            Title::Advanced {
+                title,
+                manufacturer: _,
+                cgb: _,
+            } => title.clone(),
+        }
+    }
+}
