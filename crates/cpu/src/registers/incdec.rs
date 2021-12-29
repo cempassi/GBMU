@@ -21,7 +21,7 @@ impl IncDec<Bits8, u8> for Registers {
         let data = self.get(area);
         let dec = data.wrapping_sub(n);
         self.set(Flag::Z, dec == 0);
-        self.set(Flag::H, ((data - 1) & 0x0F) == 0);
+        self.set(Flag::H, (data & 0x0F) == 0);
         self.set(Flag::N, true);
         self.set(area, dec);
         0

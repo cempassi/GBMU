@@ -112,7 +112,7 @@ impl Jump {
             Jump::ZNN => Async::AbsoluteCheck(Flag::Z).jump(cpu).await?,
             Jump::CNN => Async::AbsoluteCheck(Flag::C).jump(cpu).await?,
             Jump::ZR8b => Async::RelativeCheck(Flag::Z).jump(cpu).await?,
-            Jump::CR8b => Async::RelativeCheck(Flag::Z).jump(cpu).await?,
+            Jump::CR8b => Async::RelativeCheck(Flag::C).jump(cpu).await?,
             Jump::ReturnInterrupt => Async::ReturnInterrupt.jump(cpu).await?,
             Jump::Reset00 => Async::Reset(Reset::H00).jump(cpu).await?,
             Jump::Reset10 => Async::Reset(Reset::H10).jump(cpu).await?,

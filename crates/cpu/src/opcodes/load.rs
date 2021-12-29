@@ -285,7 +285,7 @@ impl Load {
             Load::AHL => Set::LoadHL(Bits8::A).run(cpu).await?,
             Load::BCA => Set::RegisterAt(Bits16::BC, Bits8::A).run(cpu).await?,
             Load::DEA => Set::RegisterAt(Bits16::DE, Bits8::A).run(cpu).await?,
-            Load::ABC => Set::LoadRegisterFrom(Bits8::A, Bits16::DE).run(cpu).await?,
+            Load::ABC => Set::LoadRegisterFrom(Bits8::A, Bits16::BC).run(cpu).await?,
             Load::ADE => Set::LoadRegisterFrom(Bits8::A, Bits16::DE).run(cpu).await?,
             Load::ToIOC => Set::IOC.run(cpu).await?,
             Load::IOC => Set::LoadIOC.run(cpu).await?,
