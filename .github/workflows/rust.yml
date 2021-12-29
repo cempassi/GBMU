@@ -41,7 +41,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Get dependencies
-        run: make
+        run: make ci
 
       - name: Check format
         run: make format

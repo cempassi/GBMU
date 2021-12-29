@@ -1,11 +1,5 @@
 use super::{Bits16, Bus, Flag, Registers};
 
-pub(crate) trait Absolute<T> {
-    fn absolute(&mut self, address: T) -> u8;
-    fn absolute_check(&mut self, adress: T, flag: Flag) -> bool;
-    fn absolute_not(&mut self, adress: T, flag: Flag) -> bool;
-}
-
 pub trait Relative {
     fn relative(&mut self, offset: i8) -> u8;
     fn relative_check(&mut self, offset: i8, flag: Flag) -> bool;
@@ -41,6 +35,12 @@ impl Relative for Registers {
             false
         }
     }
+}
+
+pub(crate) trait Absolute<T> {
+    fn absolute(&mut self, address: T) -> u8;
+    fn absolute_check(&mut self, adress: T, flag: Flag) -> bool;
+    fn absolute_not(&mut self, adress: T, flag: Flag) -> bool;
 }
 
 impl Absolute<u16> for Registers {

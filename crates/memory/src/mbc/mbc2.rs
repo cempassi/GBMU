@@ -1,4 +1,4 @@
-use super::bus::MbcBus;
+use super::bus::Mbc;
 use super::consts;
 use shared::Error;
 use std::convert::AsRef;
@@ -27,7 +27,7 @@ impl AsRef<Vec<u8>> for Mbc2 {
     }
 }
 
-impl MbcBus for Mbc2 {
+impl Mbc for Mbc2 {
     fn get(&self, address: usize) -> Result<u8, Error> {
         match address {
             consts::MBC_BANK0_START..=consts::MBC_BANK0_END => Ok(self.data[address]),
@@ -93,7 +93,7 @@ impl Mbc2 {
 
 #[cfg(test)]
 mod mbc2_test {
-    use super::{Mbc2, MbcBus};
+    use super::{Mbc2, Mbc};
 
     const FILE: &[u8; 262144] = include_bytes!("../../../../roms/Mystic_Quest.gb");
 
@@ -117,15 +117,15 @@ mod mbc2_test {
         let rom_file = FILE.to_vec();
         let mut mbc = Mbc2::new(rom_file);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x0a).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x00ff, 0x0a).unwrap();
         assert!(mbc.ram_lock);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x0000a0e0, 0xeb).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x0000a0e0, 0xeb).unwrap();
 
         let data = mbc.get(0x0000a0e0);
         assert_eq!(data.unwrap(), 0x0b);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x00).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x00ff, 0x00).unwrap();
         assert!(!mbc.ram_lock);
     }
 
@@ -134,7 +134,7 @@ mod mbc2_test {
         let rom_file = FILE.to_vec(); // MBC2 + RAM + BATTERY
         let mut mbc = Mbc2::new(rom_file);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x0a).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x00ff, 0x0a).unwrap();
         assert!(mbc.ram_lock);
     }
 
@@ -143,10 +143,10 @@ mod mbc2_test {
         let rom_file = FILE.to_vec(); // MBC2 + RAM + BATTERY
         let mut mbc = Mbc2::new(rom_file);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x0a).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x00ff, 0x0a).unwrap();
         assert!(mbc.ram_lock);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x00fb, 0x03).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x00fb, 0x03).unwrap();
         assert!(!mbc.ram_lock)
     }
 
@@ -155,7 +155,7 @@ mod mbc2_test {
         let rom_file = FILE.to_vec(); // MBC2 + RAM + BATTERY
         let mut mbc = Mbc2::new(rom_file);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x2152, 0x00).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x2152, 0x00).unwrap();
         assert_eq!(mbc.rom_bank, 0x01);
     }
 
@@ -164,7 +164,7 @@ mod mbc2_test {
         let rom_file = FILE.to_vec(); // MBC2 + RAM + BATTERY
         let mut mbc = Mbc2::new(rom_file);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x3f52, 0x1a).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x3f52, 0x1a).unwrap();
         assert_eq!(mbc.rom_bank, 0x0a);
     }
 
@@ -173,7 +173,7 @@ mod mbc2_test {
         let rom_file = FILE.to_vec(); // MBC2 + RAM + BATTERY
         let mut mbc = Mbc2::new(rom_file);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x2fff, 0xff).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x2fff, 0xff).unwrap();
         assert_eq!(mbc.rom_bank, 0x0f);
     }
 
@@ -182,15 +182,15 @@ mod mbc2_test {
         let rom_file = FILE.to_vec(); // MBC2 + RAM + BATTERY
         let mut mbc = Mbc2::new(rom_file);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x00f5, 0x0a).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x00f5, 0x0a).unwrap();
         assert!(mbc.ram_lock);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x0000a130, 0xca).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x0000a130, 0xca).unwrap();
 
         let data = mbc.get(0x0000a130);
         assert_eq!(data.unwrap(), 0x0a);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x00).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x00ff, 0x00).unwrap();
         assert!(!mbc.ram_lock);
     }
 
@@ -199,13 +199,13 @@ mod mbc2_test {
         let rom_file = FILE.to_vec(); // MBC2 + RAM + BATTERY
         let mut mbc = Mbc2::new(rom_file);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x00f5, 0x0a).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x00f5, 0x0a).unwrap();
         assert!(mbc.ram_lock);
 
         let data = mbc.get(0x0000a630);
         assert_eq!(data.unwrap(), 0x0E);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x00).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x00ff, 0x00).unwrap();
         assert!(!mbc.ram_lock);
     }
 
@@ -214,13 +214,13 @@ mod mbc2_test {
         let rom_file = FILE.to_vec(); // MBC2 + RAM + BATTERY
         let mut mbc = Mbc2::new(rom_file);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x00f5, 0x0a).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x00f5, 0x0a).unwrap();
         assert!(mbc.ram_lock);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x1f4b, 0x0d).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x1f4b, 0x0d).unwrap();
         assert_eq!(mbc.rom_bank, 13);
 
-        <Mbc2 as MbcBus>::set(&mut mbc, 0x00ff, 0x00).unwrap();
+        <Mbc2 as Mbc>::set(&mut mbc, 0x00ff, 0x00).unwrap();
         assert!(!mbc.ram_lock);
     }
 }

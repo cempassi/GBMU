@@ -6,17 +6,17 @@ use shared::Error;
 
 const IO_REG: u16 = 0xFF00;
 
-pub async fn hl_sub(cpu: Cpu) -> Result<u8, Error> {
-    let data = cpu.borrow().registers.get(Bits8::A);
-    let cycles = Set::Bits8At(Bits16::HL, data).run(cpu.clone()).await?;
-    cpu.borrow_mut().registers.decrease(Bits16::HL, 1);
-    Ok(cycles)
-}
-
 pub async fn hl_add(cpu: Cpu) -> Result<u8, Error> {
     let data = cpu.borrow().registers.get(Bits8::A);
     let cycles = Set::Bits8At(Bits16::HL, data).run(cpu.clone()).await?;
     cpu.borrow_mut().registers.increase(Bits16::HL, 1);
+    Ok(cycles)
+}
+
+pub async fn hl_sub(cpu: Cpu) -> Result<u8, Error> {
+    let data = cpu.borrow().registers.get(Bits8::A);
+    let cycles = Set::Bits8At(Bits16::HL, data).run(cpu.clone()).await?;
+    cpu.borrow_mut().registers.decrease(Bits16::HL, 1);
     Ok(cycles)
 }
 

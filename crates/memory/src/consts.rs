@@ -1,7 +1,7 @@
 /// Memory Areas
 pub const BIOS_MIN: u16 = 0x0000;
 pub const BIOS_MAX: u16 = 0x00ff;
-pub const ROM_MIN: u16 = 0x000;
+pub const ROM_MIN: u16 = 0x0000;
 pub const ROM_MAX: u16 = 0x7fff;
 pub const VRAM_MIN: u16 = 0x8000;
 pub const VRAM_MAX: u16 = 0x9fff;
@@ -31,3 +31,13 @@ pub const LY_COMPARE: u16 = 0xFF45;
 pub const YWINDOW: u16 = 0xFF4A;
 pub const XWINDOW: u16 = 0xFF4B;
 pub const BGP: u16 = 0xFF47;
+
+// Timer
+pub const DIV: u16 = 0xFF04;
+pub const TIMA: u16 = 0xFF05;
+pub const TMA: u16 = 0xFF06;
+pub const TAC: u16 = 0xFF07;
+
+// Serial
+pub const SERIAL_DATA: u16 = 0xFF01;
+pub const SERIAL_CONTROL: u16 = 0xFF02;

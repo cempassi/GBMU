@@ -1,4 +1,4 @@
-use super::{Bits16, Bits8, Bus, Carry, Flag, Registers};
+use super::{Bits16, Bits8, Bus, Flag, Registers};
 
 pub trait IncDec<T, U> {
     fn increase(&mut self, _: T, n: U) -> u8;
@@ -9,40 +9,41 @@ pub trait IncDec<T, U> {
 impl IncDec<Bits8, u8> for Registers {
     fn increase(&mut self, area: Bits8, n: u8) -> u8 {
         let data = self.get(area);
-        self.f.is_half_carry(data, 1);
-        let data = data.wrapping_add(n);
-        self.set(area, data);
+        let inc = data.wrapping_add(n);
+        self.set(Flag::Z, inc == 0);
+        self.set(Flag::H, (data & 0xF) + 1 > 0xF);
         self.set(Flag::N, false);
-        self.set(Flag::Z, data == 0);
+        self.set(area, inc);
         0
     }
 
     fn decrease(&mut self, area: Bits8, n: u8) -> u8 {
         let data = self.get(area);
-        self.f.is_half_borrow(data, 1);
-        let data = data.wrapping_sub(n);
-        self.set(area, data);
+        let dec = data.wrapping_sub(n);
+        self.set(Flag::Z, dec == 0);
+        self.set(Flag::H, (data & 0x0F) == 0);
         self.set(Flag::N, true);
-        self.set(Flag::Z, data == 0);
+        self.set(area, dec);
         0
     }
 }
 
 impl IncDec<u8, u8> for Registers {
     fn increase(&mut self, data: u8, n: u8) -> u8 {
-        self.f.is_half_carry(data, 1);
-        let data = data.wrapping_add(n);
+        let inc = data.wrapping_add(n);
+
+        self.set(Flag::Z, inc == 0);
+        self.set(Flag::H, (data & 0xF) + 1 > 0xF);
         self.set(Flag::N, false);
-        self.set(Flag::Z, data == 0);
-        data
+        inc
     }
 
     fn decrease(&mut self, data: u8, n: u8) -> u8 {
-        self.f.is_half_borrow(data, 1);
-        let data = data.wrapping_sub(n);
+        let dec = data.wrapping_sub(n);
+        self.set(Flag::Z, dec == 0);
+        self.set(Flag::H, (data & 0x0F) == 0);
         self.set(Flag::N, true);
-        self.set(Flag::Z, data == 0);
-        data
+        dec
     }
 }
 

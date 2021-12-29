@@ -204,7 +204,7 @@ mod test_shift_left {
     #[test]
     fn test_shift_right_arithmetic_register_c() {
         let src = 0b1000_1001;
-        let expected = 0b1000_0100;
+        let expected = 0b1100_0100;
         let cpu = Cpu::default();
         let instruction = Shift::RAC;
         cpu.borrow_mut().registers.set(Bits8::C, src);
@@ -213,6 +213,7 @@ mod test_shift_left {
 
         let result = cpu.borrow().registers.get(Bits8::C);
         let carry = cpu.borrow().registers.get(Flag::C);
+        println!("expected: {:08b}, result: {:08b}", expected, result);
         assert_eq!(result, expected);
         assert!(carry);
     }

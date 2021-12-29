@@ -1,4 +1,4 @@
-use super::bus::MbcBus;
+use super::bus::Mbc;
 use super::consts;
 use shared::Error;
 use std::convert::AsRef;
@@ -28,7 +28,7 @@ impl AsRef<Vec<u8>> for Mbc5 {
     }
 }
 
-impl MbcBus for Mbc5 {
+impl Mbc for Mbc5 {
     fn get(&self, address: usize) -> Result<u8, Error> {
         match address {
             consts::MBC_BANK0_START..=consts::MBC_BANK0_END => Ok(self.data[address]),
@@ -123,7 +123,7 @@ impl Mbc5 {
 
 #[cfg(test)]
 mod mbc5_test {
-    use super::{Mbc5, MbcBus};
+    use super::{Mbc5, Mbc};
 
     const FILE: &[u8; 1048576] = include_bytes!("../../../../roms/Pokemon_Rouge.gb");
 

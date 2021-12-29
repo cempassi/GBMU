@@ -24,7 +24,9 @@ ROMS := $(ROMS_PATH)/$(_ROMS)
 
 all: requirements clean
 
-requirements: roms fonts $(BIOS)
+ci: roms fonts $(BIOS)
+
+requirements: roms blarg fonts $(BIOS)
 
 ### Fonts ###
 
@@ -59,6 +61,9 @@ roms: roms.zip
 
 roms.zip:
 	curl -L $(ROMS_URL) > $@
+
+blarg:
+	git clone git@github.com:retrio/gb-test-roms.git ./ressources/test_roms
 
 ### utils ###
 

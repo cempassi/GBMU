@@ -1,4 +1,4 @@
-use super::bus::MbcBus;
+use super::bus::Mbc;
 use super::consts;
 use shared::Error;
 use std::convert::AsRef;
@@ -63,7 +63,7 @@ struct Mbc3Rtc {
     epoch: u64,
 }
 
-impl MbcBus for Mbc3 {
+impl Mbc for Mbc3 {
     fn get(&self, address: usize) -> Result<u8, Error> {
         match address {
             consts::MBC_BANK0_START..=consts::MBC_BANK0_END => Ok(self.data[address]),
@@ -253,7 +253,7 @@ impl Mbc3 {
 
 #[cfg(test)]
 mod mbc3_test {
-    use super::{Mbc3, MbcBus};
+    use super::{Mbc3, Mbc};
 
     const FILE: &[u8; 2097152] = include_bytes!("../../../../roms/Pokemon - Version Argent.gbc");
 

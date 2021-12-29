@@ -159,10 +159,22 @@ impl Decoder for Logic {
 impl Logic {
     pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         let cycles = match self {
-            Logic::RLA => cpu.borrow_mut().registers.left_carry(Bits8::A),
-            Logic::RLCA => cpu.borrow_mut().registers.left_nocarry(Bits8::A),
-            Logic::RRA => cpu.borrow_mut().registers.right_carry(Bits8::A),
-            Logic::RRCA => cpu.borrow_mut().registers.right_nocarry(Bits8::A),
+            Logic::RLA => cpu
+                .borrow_mut()
+                .registers
+                .rotate_left(Bits8::A, true, false),
+            Logic::RLCA => cpu
+                .borrow_mut()
+                .registers
+                .rotate_left(Bits8::A, false, false),
+            Logic::RRA => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::A, true, false),
+            Logic::RRCA => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::A, false, false),
             Logic::AndAA => cpu.borrow_mut().registers.and(Bits8::A),
             Logic::AndAB => cpu.borrow_mut().registers.and(Bits8::B),
             Logic::AndAC => cpu.borrow_mut().registers.and(Bits8::C),
@@ -170,6 +182,8 @@ impl Logic {
             Logic::AndAE => cpu.borrow_mut().registers.and(Bits8::E),
             Logic::AndAH => cpu.borrow_mut().registers.and(Bits8::H),
             Logic::AndAL => cpu.borrow_mut().registers.and(Bits8::L),
+            Logic::AndAHL => Set::CalculHL(Operation::And).run(cpu).await?,
+            Logic::AndA8b => Set::CalculNext(Operation::And).run(cpu).await?,
             Logic::OrAB => cpu.borrow_mut().registers.or(Bits8::B),
             Logic::OrAC => cpu.borrow_mut().registers.or(Bits8::C),
             Logic::OrAD => cpu.borrow_mut().registers.or(Bits8::D),
@@ -177,6 +191,8 @@ impl Logic {
             Logic::OrAH => cpu.borrow_mut().registers.or(Bits8::H),
             Logic::OrAL => cpu.borrow_mut().registers.or(Bits8::L),
             Logic::OrAA => cpu.borrow_mut().registers.or(Bits8::A),
+            Logic::OrAHL => Set::CalculHL(Operation::Or).run(cpu).await?,
+            Logic::OrA8b => Set::CalculNext(Operation::Or).run(cpu).await?,
             Logic::XorAA => cpu.borrow_mut().registers.xor(Bits8::A),
             Logic::XorAB => cpu.borrow_mut().registers.xor(Bits8::B),
             Logic::XorAC => cpu.borrow_mut().registers.xor(Bits8::C),
@@ -184,6 +200,8 @@ impl Logic {
             Logic::XorAE => cpu.borrow_mut().registers.xor(Bits8::E),
             Logic::XorAH => cpu.borrow_mut().registers.xor(Bits8::H),
             Logic::XorAL => cpu.borrow_mut().registers.xor(Bits8::L),
+            Logic::XorAHL => Set::CalculHL(Operation::Xor).run(cpu).await?,
+            Logic::XorA8b => Set::CalculNext(Operation::Xor).run(cpu).await?,
             Logic::CmpAA => cpu.borrow_mut().registers.compare(Bits8::A),
             Logic::CmpAB => cpu.borrow_mut().registers.compare(Bits8::B),
             Logic::CmpAC => cpu.borrow_mut().registers.compare(Bits8::C),
@@ -191,12 +209,6 @@ impl Logic {
             Logic::CmpAE => cpu.borrow_mut().registers.compare(Bits8::E),
             Logic::CmpAH => cpu.borrow_mut().registers.compare(Bits8::H),
             Logic::CmpAL => cpu.borrow_mut().registers.compare(Bits8::L),
-            Logic::AndAHL => Set::CalculHL(Operation::And).run(cpu).await?,
-            Logic::AndA8b => Set::CalculNext(Operation::And).run(cpu).await?,
-            Logic::OrAHL => Set::CalculHL(Operation::Or).run(cpu).await?,
-            Logic::OrA8b => Set::CalculNext(Operation::Or).run(cpu).await?,
-            Logic::XorAHL => Set::CalculHL(Operation::Xor).run(cpu).await?,
-            Logic::XorA8b => Set::CalculNext(Operation::Xor).run(cpu).await?,
             Logic::CmpAHL => Set::CalculHL(Operation::Compare).run(cpu).await?,
             Logic::CmpA8b => Set::CalculNext(Operation::Compare).run(cpu).await?,
         };

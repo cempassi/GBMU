@@ -44,7 +44,7 @@ async fn run(ppu: Ppu) -> Result<Finished, Error> {
         ppu.borrow_mut().registers.mode.update(Mode::Vblank);
         Blank::new(ppu.clone(), Mode::Vblank).await;
         ppu.borrow_mut().registers.clear(lcd::Field::Ly);
-        println!("[PPU] Frame finished");
+        //println!("[PPU] Frame finished");
         Ok(Finished::Frame)
     } else {
         let mut ticks = Oam::search(ppu.clone()).await;

@@ -36,64 +36,64 @@ impl System {
     pub fn check_redraw(&mut self, status: Vec<Finished>) {
         for status in status {
             match (status, self.mode) {
-                (Finished::Error(error), _) => {
+                (Finished::Error(_error), _) => {
                     self.mode.idle();
                     self.redraw.update(Redraw::All);
-                    println!("[SOC] Error in check redraw: {}", error);
+                    //println!("[SOC] Error in check redraw: {}", error);
                 }
                 (Finished::Frame, Mode::Tick) => {
                     self.frames += 1;
                     self.mode.idle();
                     self.reset_count();
-                    println!("[SOC] Finished a frame {} (tick)", self.frames);
+                    //println!("[SOC] Finished a frame {} (tick)", self.frames);
                     self.redraw.update(Redraw::All);
                 }
                 (Finished::Frame, Mode::Second(_)) => {
                     self.frames += 1;
-                    println!("[SOC] Finished frame {} (seconds)", self.frames);
+                    //println!("[SOC] Finished frame {} (seconds)", self.frames);
                     self.redraw.update(Redraw::Emulator);
                 }
                 (Finished::Frame, Mode::Run(_)) => {
                     self.frames += 1;
-                    println!("[SOC] Finished frame {} (seconds)", self.frames);
+                    //println!("[SOC] Finished frame {} (seconds)", self.frames);
                     self.redraw.update(Redraw::All);
                 }
                 (Finished::Frame, Mode::Frame) => {
                     self.mode.idle();
                     self.reset_count();
                     self.frames += 1;
-                    println!("[SOC] Finished frame {} (frame)", self.frames);
+                    //println!("[SOC] Finished frame {} (frame)", self.frames);
                     self.redraw.update(Redraw::All);
                 }
                 (Finished::Frame, _) => {
                     self.reset_count();
                     self.frames += 1;
-                    println!("[SOC] Finished frame {} (frame)", self.frames);
-                    println!("[SOC] Reseting frame count");
+                    //println!("[SOC] Finished frame {} (frame)", self.frames);
+                    //println!("[SOC] Reseting frame count");
                     self.redraw.update(Redraw::All);
                 }
                 (_, Mode::Tick) => {
-                    println!("[SOC] Tick finished");
+                    //println!("[SOC] Tick finished");
                     self.mode.idle();
                     self.redraw.update(Redraw::Debugger);
                 }
                 (_, Mode::Second(time)) if time.elapsed().as_secs() > 1 => {
-                    println!(
-                        "[SOC] Timed mode finished in {} sec",
-                        time.elapsed().as_secs()
-                    );
+                    // println!(
+                    //     "[SOC] Timed mode finished in {} sec",
+                    //     time.elapsed().as_secs()
+                    // );
                     self.frames = 0;
                     self.mode.idle();
                     self.redraw.update(Redraw::Debugger);
                 }
                 (Finished::Cpu(cycles), Mode::Instruction) => {
-                    println!("[SOC] Instruction finished");
+                    //println!("[SOC] Instruction finished");
                     self.mode.idle();
                     self.last_cpu_cycle = cycles;
                     self.redraw.update(Redraw::Debugger);
                 }
                 (Finished::Line(cycles), Mode::Line) => {
-                    println!("[SOC] Line finished");
+                    //println!("[SOC] Line finished");
                     self.mode.idle();
                     self.add_line();
                     self.last_line_cycle = cycles;

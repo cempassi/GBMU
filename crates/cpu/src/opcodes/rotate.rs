@@ -101,34 +101,97 @@ impl Decoder for Rotate {
 impl Rotate {
     pub async fn exec(self, cpu: Cpu) -> Result<u8, Error> {
         let cycles = match self {
-            Rotate::LA => cpu.borrow_mut().registers.left_carry(Bits8::A),
-            Rotate::LB => cpu.borrow_mut().registers.left_carry(Bits8::B),
-            Rotate::LC => cpu.borrow_mut().registers.left_carry(Bits8::C),
-            Rotate::LD => cpu.borrow_mut().registers.left_carry(Bits8::D),
-            Rotate::LE => cpu.borrow_mut().registers.left_carry(Bits8::E),
-            Rotate::LH => cpu.borrow_mut().registers.left_carry(Bits8::H),
-            Rotate::LL => cpu.borrow_mut().registers.left_carry(Bits8::L),
-            Rotate::LCA => cpu.borrow_mut().registers.left_nocarry(Bits8::A),
-            Rotate::LCB => cpu.borrow_mut().registers.left_nocarry(Bits8::B),
-            Rotate::LCC => cpu.borrow_mut().registers.left_nocarry(Bits8::C),
-            Rotate::LCD => cpu.borrow_mut().registers.left_nocarry(Bits8::D),
-            Rotate::LCE => cpu.borrow_mut().registers.left_nocarry(Bits8::E),
-            Rotate::LCH => cpu.borrow_mut().registers.left_nocarry(Bits8::H),
-            Rotate::LCL => cpu.borrow_mut().registers.left_nocarry(Bits8::L),
-            Rotate::RA => cpu.borrow_mut().registers.right_carry(Bits8::A),
-            Rotate::RB => cpu.borrow_mut().registers.right_carry(Bits8::B),
-            Rotate::RC => cpu.borrow_mut().registers.right_carry(Bits8::C),
-            Rotate::RD => cpu.borrow_mut().registers.right_carry(Bits8::D),
-            Rotate::RE => cpu.borrow_mut().registers.right_carry(Bits8::E),
-            Rotate::RH => cpu.borrow_mut().registers.right_carry(Bits8::H),
-            Rotate::RL => cpu.borrow_mut().registers.right_carry(Bits8::L),
-            Rotate::RCA => cpu.borrow_mut().registers.right_nocarry(Bits8::A),
-            Rotate::RCB => cpu.borrow_mut().registers.right_nocarry(Bits8::B),
-            Rotate::RCC => cpu.borrow_mut().registers.right_nocarry(Bits8::C),
-            Rotate::RCD => cpu.borrow_mut().registers.right_nocarry(Bits8::D),
-            Rotate::RCE => cpu.borrow_mut().registers.right_nocarry(Bits8::E),
-            Rotate::RCH => cpu.borrow_mut().registers.right_nocarry(Bits8::H),
-            Rotate::RCL => cpu.borrow_mut().registers.right_nocarry(Bits8::L),
+            Rotate::LA => cpu.borrow_mut().registers.rotate_left(Bits8::A, true, true),
+            Rotate::LB => cpu.borrow_mut().registers.rotate_left(Bits8::B, true, true),
+            Rotate::LC => cpu.borrow_mut().registers.rotate_left(Bits8::C, true, true),
+            Rotate::LD => cpu.borrow_mut().registers.rotate_left(Bits8::D, true, true),
+            Rotate::LE => cpu.borrow_mut().registers.rotate_left(Bits8::E, true, true),
+            Rotate::LH => cpu.borrow_mut().registers.rotate_left(Bits8::H, true, true),
+            Rotate::LL => cpu.borrow_mut().registers.rotate_left(Bits8::L, true, true),
+            Rotate::LCA => cpu
+                .borrow_mut()
+                .registers
+                .rotate_left(Bits8::A, false, true),
+            Rotate::LCB => cpu
+                .borrow_mut()
+                .registers
+                .rotate_left(Bits8::B, false, true),
+            Rotate::LCC => cpu
+                .borrow_mut()
+                .registers
+                .rotate_left(Bits8::C, false, true),
+            Rotate::LCD => cpu
+                .borrow_mut()
+                .registers
+                .rotate_left(Bits8::D, false, true),
+            Rotate::LCE => cpu
+                .borrow_mut()
+                .registers
+                .rotate_left(Bits8::E, false, true),
+            Rotate::LCH => cpu
+                .borrow_mut()
+                .registers
+                .rotate_left(Bits8::H, false, true),
+            Rotate::LCL => cpu
+                .borrow_mut()
+                .registers
+                .rotate_left(Bits8::L, false, true),
+            Rotate::RA => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::A, true, true),
+            Rotate::RB => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::B, true, true),
+            Rotate::RC => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::C, true, true),
+            Rotate::RD => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::D, true, true),
+            Rotate::RE => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::E, true, true),
+            Rotate::RH => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::H, true, true),
+            Rotate::RL => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::L, true, true),
+            Rotate::RCA => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::A, false, true),
+            Rotate::RCB => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::B, false, true),
+            Rotate::RCC => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::C, false, true),
+            Rotate::RCD => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::D, false, true),
+            Rotate::RCE => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::E, false, true),
+            Rotate::RCH => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::H, false, true),
+            Rotate::RCL => cpu
+                .borrow_mut()
+                .registers
+                .rotate_right(Bits8::L, false, true),
             Rotate::LHL => Set::CbHL(CbOperation::RLCarry).run(cpu).await?,
             Rotate::LCHL => Set::CbHL(CbOperation::RLNOCarry).run(cpu).await?,
             Rotate::RHL => Set::CbHL(CbOperation::RRCarry).run(cpu).await?,

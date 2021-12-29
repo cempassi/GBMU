@@ -25,3 +25,15 @@ pub enum Ram {
     KByte128 = 0x04,
     KByte64 = 0x05,
 }
+
+impl Ram {
+    pub fn get_size(&self) -> usize {
+        match self {
+            Ram::NoRam => 0,
+            Ram::KByte8 => 0x800,
+            Ram::KByte32 => 0x2000,
+            Ram::KByte128 => 0x8000,
+            Ram::KByte64 => 0x20000,
+        }
+    }
+}

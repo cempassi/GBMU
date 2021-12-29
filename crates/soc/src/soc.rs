@@ -3,8 +3,8 @@ use crate::System;
 use shared::Redraw;
 use std::fs;
 
-use crate::header::Header;
 use memory;
+use memory::header::Header;
 
 const HEADER_START: usize = 0x100;
 const HEADER_END: usize = 0x150;
@@ -26,7 +26,7 @@ impl TryFrom<&str> for SOC {
         println!("Header: {:#?}", header);
 
         let state = memory::state::State::Bios;
-        let memory: memory::Memory = memory::memory::Memory::new(header.cartridge, rom, state);
+        let memory: memory::Memory = memory::memory::Memory::new(header, rom, state);
         let processor = Runner::new(memory, state);
         let status = System::new(processor.cpu());
 
@@ -62,7 +62,7 @@ impl SOC {
             let finished = self.processor.run();
             status.check_redraw(finished)
         }
-        println!("[SOC] Finished Run. Redraw: {:?}", status.redraw);
+        //println!("[SOC] Finished Run. Redraw: {:?}", status.redraw);
         status.redraw
     }
 }

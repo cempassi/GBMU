@@ -1,5 +1,5 @@
 use crate::bus::MemoryBus;
-use crate::mbc::MbcBus as Mbc;
+use crate::mbc::Mbc;
 use crate::memory;
 use std::cell::RefCell;
 use std::rc::Rc;

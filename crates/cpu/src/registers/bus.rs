@@ -1,4 +1,4 @@
-use crate::registers::{Bits16, Bits8, Flag, Flags, Registers};
+use crate::registers::{Bits16, Bits8, Flag, Registers};
 use std::fmt::Debug;
 
 pub trait Bus<T, O>: Debug {
@@ -11,7 +11,7 @@ impl Bus<Bits8, u8> for Registers {
     fn get(&self, area: Bits8) -> u8 {
         match area {
             Bits8::A => self.a,
-            Bits8::F => self.f.into_bytes()[0],
+            Bits8::F => self.f.get_all(),
             Bits8::B => self.b,
             Bits8::C => self.c,
             Bits8::D => self.d,
@@ -24,7 +24,7 @@ impl Bus<Bits8, u8> for Registers {
     fn set(&mut self, area: Bits8, data: u8) {
         match area {
             Bits8::A => self.a = data,
-            Bits8::F => self.f = Flags::from_bytes([data]),
+            Bits8::F => self.f.set_all(data),
             Bits8::B => self.b = data,
             Bits8::C => self.c = data,
             Bits8::D => self.d = data,
@@ -40,10 +40,10 @@ impl Bus<Bits16, u16> for Registers {
         match area {
             Bits16::SP => self.sp,
             Bits16::PC => self.pc,
-            Bits16::AF => (self.a as u16) << 8 | self.f.into_bytes()[0] as u16,
-            Bits16::BC => (self.b as u16) << 8 | self.c as u16,
-            Bits16::DE => (self.d as u16) << 8 | self.e as u16,
-            Bits16::HL => (self.h as u16) << 8 | self.l as u16,
+            Bits16::AF => ((self.a as u16) << 8) | self.f.get_all() as u16,
+            Bits16::BC => ((self.b as u16) << 8) | self.c as u16,
+            Bits16::DE => ((self.d as u16) << 8) | self.e as u16,
+            Bits16::HL => ((self.h as u16) << 8) | self.l as u16,
         }
     }
 
@@ -51,7 +51,7 @@ impl Bus<Bits16, u16> for Registers {
         match area {
             Bits16::AF => {
                 self.a = (data >> 8) as u8;
-                self.f = Flags::from_bytes([data as u8]);
+                self.f.set_all(data as u8);
             }
             Bits16::SP => {
                 self.sp = data;
@@ -61,15 +61,15 @@ impl Bus<Bits16, u16> for Registers {
             }
             Bits16::BC => {
                 self.b = (data >> 8) as u8;
-                self.c = data as u8;
+                self.c = (data & 0x00FF) as u8;
             }
             Bits16::DE => {
                 self.d = (data >> 8) as u8;
-                self.e = data as u8;
+                self.e = (data & 0x00FF) as u8;
             }
             Bits16::HL => {
                 self.h = (data >> 8) as u8;
-                self.l = data as u8;
+                self.l = (data & 0xFF) as u8;
             }
         }
     }
@@ -111,8 +111,9 @@ mod test_registers {
     fn test_valid_write_read_af_register() {
         let mut registers = Registers::default();
 
-        registers.set(Bits16::AF, 0xFFFF);
+        registers.set(Bits16::AF, 0xFFF0);
         let value = registers.get(Bits16::AF);
-        assert_eq!(value, 0xFFFF);
+        println!("Result: {:#X}", value);
+        assert_eq!(value, 0xFFF0);
     }
 }

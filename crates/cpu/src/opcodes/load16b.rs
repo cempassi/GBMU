@@ -49,14 +49,14 @@ use super::decode::{Decode, Decoder};
 #[derive(Eq, PartialEq, TryFromPrimitive, IntoPrimitive, Clone, Copy)]
 #[repr(u8)]
 pub enum Load16b {
-    PushAF = 0xf5,
-    PushBC = 0xc5,
-    PushDE = 0xd5,
-    PushHL = 0xe5,
-    PopAF = 0xf1,
-    PopBC = 0xc1,
-    PopDE = 0xd1,
-    PopHL = 0xe1,
+    PushAF = 0xF5,
+    PushBC = 0xC5,
+    PushDE = 0xD5,
+    PushHL = 0xE5,
+    PopAF = 0xF1,
+    PopBC = 0xC1,
+    PopDE = 0xD1,
+    PopHL = 0xE1,
     LoadBC = 0x01,
     LoadDE = 0x11,
     LoadHL = 0x21,
@@ -129,7 +129,7 @@ mod test_load_register_u16 {
         let instruction = Load16b::LoadBC;
         cpu.borrow_mut().registers.set(Bits16::PC, 0xc000);
         cpu.memory().borrow_mut().set_u16(0xc000, 0x4242).unwrap();
-        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
+        let _ = execute(Box::pin(instruction.exec(cpu.clone())));
         assert_eq!(cpu.borrow().registers.get(Bits16::BC), 0x4242);
     }
 
@@ -141,7 +141,7 @@ mod test_load_register_u16 {
         cpu.memory().borrow_mut().set_u16(0xc000, 0xc002).unwrap();
         cpu.borrow_mut().registers.set(Bits16::SP, 0x4242);
 
-        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
+        let _ = execute(Box::pin(instruction.exec(cpu.clone())));
 
         let result = cpu.memory().borrow_mut().get_u16(0xc002).unwrap();
         assert_eq!(cpu.borrow().registers.get(Bits16::SP), result);
@@ -153,7 +153,7 @@ mod test_load_register_u16 {
         let instruction = Load16b::PopHL;
         cpu.borrow_mut().registers.set(Bits16::SP, 0xc000);
         cpu.memory().borrow_mut().set_u16(0xc000, 0x4242).unwrap();
-        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
+        let _ = execute(Box::pin(instruction.exec(cpu.clone())));
         assert_eq!(cpu.borrow().registers.get(Bits16::HL), 0x4242);
         assert_eq!(cpu.borrow().registers.get(Bits16::SP), 0xc000 + 2);
     }
@@ -164,7 +164,7 @@ mod test_load_register_u16 {
         let instruction = Load16b::PushHL;
         cpu.borrow_mut().registers.set(Bits16::SP, 0xc002);
         cpu.borrow_mut().registers.set(Bits16::HL, 0x4242);
-        execute(Box::pin(instruction.exec(cpu.clone()))).unwrap();
+        let _ = execute(Box::pin(instruction.exec(cpu.clone())));
         assert_eq!(cpu.memory().borrow().get_u16(0xc000).unwrap(), 0x4242);
         assert_eq!(cpu.borrow().registers.get(Bits16::SP), 0xc000);
     }
