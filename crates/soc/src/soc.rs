@@ -3,8 +3,8 @@ use crate::System;
 use shared::Redraw;
 use std::fs;
 
-use crate::header::Header;
 use memory;
+use memory::header::Header;
 
 const HEADER_START: usize = 0x100;
 const HEADER_END: usize = 0x150;
@@ -25,8 +25,8 @@ impl TryFrom<&str> for SOC {
         let header = Header::try_from(raw_header).expect("Invalid data in raw_header");
         println!("Header: {:#?}", header);
 
-        let state = memory::state::State::Rom;
-        let memory: memory::Memory = memory::memory::Memory::new(header.cartridge, rom, state);
+        let state = memory::state::State::Bios;
+        let memory: memory::Memory = memory::memory::Memory::new(header, rom, state);
         let processor = Runner::new(memory, state);
         let status = System::new(processor.cpu());
 
