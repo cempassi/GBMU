@@ -33,7 +33,7 @@ pub async fn interrupt_handler(cpu: Cpu) -> Result<u8, Error> {
 
     cpu.borrow_mut().halt = false;
     cpu.borrow_mut().stop = false;
-    if !cpu.memory().borrow().master_enabled(){
+    if !cpu.memory().borrow().master_enabled() {
         return Ok(0);
     }
 

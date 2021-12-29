@@ -67,12 +67,12 @@ impl Jump {
             Jump::ReturnCheck(flag) => Box::pin(ret_check(cpu, flag)),
             Jump::ReturnNot(flag) => Box::pin(ret_not(cpu, flag)),
             Jump::ReturnInterrupt => Box::pin(ret_interrupt(cpu)),
-            Jump::Reset(reset) => Box::pin(res(cpu, reset)),
+            Jump::Reset(r) => Box::pin(reset(cpu, r)),
         }
     }
 }
 
-async fn res(cpu: Cpu, reset: Reset) -> Result<u8, Error> {
+async fn reset(cpu: Cpu, reset: Reset) -> Result<u8, Error> {
     let cycles = Set::Push(Bits16::PC).run(cpu.clone()).await?;
     cpu.borrow_mut().registers.set(Bits16::PC, reset.dst());
     Ok(cycles)
@@ -84,8 +84,8 @@ async fn ret(cpu: Cpu) -> Result<u8, Error> {
 }
 
 async fn ret_interrupt(cpu: Cpu) -> Result<u8, Error> {
-    cpu.memory().borrow_mut().set_is_interrupted();
-    ret(cpu).await
+    cpu.memory().borrow_mut().set_is_interrupted(1);
+    Ok(Set::Pop(Bits16::PC).run(cpu).await?)
 }
 
 async fn ret_check(cpu: Cpu, flag: Flag) -> Result<u8, Error> {

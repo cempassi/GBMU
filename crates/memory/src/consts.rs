@@ -1,7 +1,7 @@
 /// Memory Areas
 pub const BIOS_MIN: u16 = 0x0000;
 pub const BIOS_MAX: u16 = 0x00ff;
-pub const ROM_MIN: u16 = 0x000;
+pub const ROM_MIN: u16 = 0x0000;
 pub const ROM_MAX: u16 = 0x7fff;
 pub const VRAM_MIN: u16 = 0x8000;
 pub const VRAM_MAX: u16 = 0x9fff;

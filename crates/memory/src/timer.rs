@@ -47,7 +47,6 @@ impl Timer {
                 self.internal_count -= self.step;
             }
         }
-
     }
 
     pub fn get(&self, address: u16) -> u8 {
@@ -84,9 +83,9 @@ impl Timer {
                     1 => 16,
                     2 => 64,
                     3 => 256,
-                    _ => 1024
+                    _ => 1024,
                 };
-            },
+            }
             _ => unreachable!(),
         }
     }

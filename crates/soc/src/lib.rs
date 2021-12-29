@@ -1,4 +1,3 @@
-mod header;
 pub mod interface;
 pub mod mode;
 pub(crate) mod runner;
