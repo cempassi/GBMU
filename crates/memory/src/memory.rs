@@ -1,17 +1,18 @@
 use std::cell::RefCell;
+use std::path;
 use std::rc::Rc;
 
-use super::mbc::{Cartridge, Mbc0, Mbc1, Mbc2, Mbc3, Mbc5};
+use super::mbc::{Cartridge, Mbc0, Mbc1}; // Mbc2, Mbc3, Mbc5};
 use crate::area::Area;
 use crate::bios::Bios;
 use crate::bus::MemoryBus;
-use crate::consts;
 use crate::interface::{Bus, Rom};
 use crate::interrupts::Interrupts;
 use crate::io::IO;
 use crate::mbc::default::RomDefault;
 use crate::ram::Ram;
 use crate::state::{self, State};
+use crate::{consts, Header};
 use ppu::Ppu;
 use shared::Error;
 
@@ -53,7 +54,9 @@ impl Memory {
             consts::BIOS_MIN..=consts::BIOS_MAX if self.state == state::State::Bios => {
                 self.bios.borrow().get(Area::Bios.relative(address))
             }
-            consts::ROM_MIN..=consts::ROM_MAX => self.rom.borrow().get(Area::Rom.relative(address)),
+            consts::ROM_MIN..=consts::ROM_MAX => {
+                self.rom.borrow().get_rom(Area::Rom.relative(address))
+            }
             consts::VRAM_MIN..=consts::VRAM_MAX => self.ppu.borrow().get(address.into()),
             consts::WRAM_MIN..=consts::WRAM_MAX => {
                 self.wram.borrow().get(Area::Wram.relative(address))
@@ -61,7 +64,7 @@ impl Memory {
             consts::ECHO_MIN..=consts::ECHO_MAX => {
                 self.wram.borrow().get(Area::EchoRam.relative(address))
             }
-            consts::EXT_RAM_MIN..=consts::EXT_RAM_MAX => self.rom.borrow().get(address.into()),
+            consts::EXT_RAM_MIN..=consts::EXT_RAM_MAX => self.rom.borrow().get_ram(address.into()),
             consts::OAM_MIN..=consts::OAM_MAX => self.ppu.borrow_mut().get(address.into()),
             consts::RESTRICTED_MIN..=consts::RESTRICTED_MAX => Ok(0x00),
             consts::IOREG_MIN..=consts::IOREM_MAX => self.get_io(address),
@@ -85,12 +88,13 @@ impl Memory {
 
     pub fn set_u8(&mut self, address: u16, data: u8) -> Result<(), Error> {
         match address {
-            consts::ROM_MIN..=consts::ROM_MAX => {
-                self.rom.borrow_mut().set(Area::Rom.relative(address), data)
-            }
+            consts::ROM_MIN..=consts::ROM_MAX => self
+                .rom
+                .borrow_mut()
+                .set_rom(Area::Rom.relative(address), data),
             consts::VRAM_MIN..=consts::VRAM_MAX => self.ppu.borrow_mut().set(address.into(), data),
             consts::EXT_RAM_MIN..=consts::EXT_RAM_MAX => {
-                self.rom.borrow_mut().set(address.into(), data)
+                self.rom.borrow_mut().set_ram(address.into(), data)
             }
             consts::WRAM_MIN..=consts::WRAM_MAX => self
                 .wram
@@ -129,8 +133,8 @@ impl Memory {
 
     pub fn get_u16(&self, address: u16) -> Result<u16, Error> {
         match self.get_u8(address) {
-            Ok(left) => match self.get_u8(address + 1) {
-                Ok(right) => Ok((right as u16) << 8 | left as u16),
+            Ok(high) => match self.get_u8(address + 1) {
+                Ok(low) => Ok(high as u16 | (low as u16) << 8),
                 Err(error) => Err(error),
             },
             Err(error) => Err(error),
@@ -138,7 +142,7 @@ impl Memory {
     }
 
     pub fn set_u16(&mut self, address: u16, data: u16) -> Result<(), Error> {
-        match self.set_u8(address, data as u8) {
+        match self.set_u8(address, (data & 0xFF) as u8) {
             Ok(_) => match self.set_u8(address + 1, (data >> 8) as u8) {
                 Ok(_) => Ok(()),
                 Err(error) => Err(error),
@@ -172,10 +176,13 @@ impl Memory {
     }
 
     pub fn get_debug(&mut self) -> Option<char> {
+        use std::io::Write;
         if self.io.get(consts::SERIAL_CONTROL) == 0x81 {
             let data = self.io.get(consts::SERIAL_DATA);
             self.io.set(consts::SERIAL_CONTROL, 0);
-            char::from_u32(data as u32)
+            print!("{}", data as char);
+            let _ = ::std::io::stdout().flush();
+            None
         } else {
             None
         }
@@ -183,13 +190,14 @@ impl Memory {
 }
 
 impl Memory {
-    pub fn new(mbc: Cartridge, data: Vec<u8>, state: State) -> Rc<RefCell<Self>> {
-        let rom: Rom = Rc::new(RefCell::new(match mbc {
+    pub fn new(header: Header, data: Vec<u8>, state: State) -> Rc<RefCell<Self>> {
+        let savepath = path::PathBuf::from(format!("/tmp/{}", header.title.get()));
+        let rom: Rom = Rc::new(RefCell::new(match header.cartridge {
             Cartridge::Mbc0 => Mbc0::new(data),
-            Cartridge::Mbc1 => Mbc1::new(data),
-            Cartridge::Mbc2 | Cartridge::Mbc2Battery => Mbc2::new(data),
-            Cartridge::Mbc3 => Mbc3::new(data),
-            Cartridge::Mbc5 => Mbc5::new(data),
+            Cartridge::Mbc1 => Mbc1::new(header, data, savepath),
+            //Cartridge::Mbc2 | Cartridge::Mbc2Battery => Mbc2::new(data),
+            //Cartridge::Mbc3 => Mbc3::new(data),
+            //Cartridge::Mbc5 => Mbc5::new(data),
             _ => unimplemented!(),
         }));
         // Init state
@@ -249,8 +257,8 @@ impl Memory {
         0
     }
 
-    pub fn set_is_interrupted(&mut self) -> u8 {
-        self.interrupts.set_is_interrupted();
+    pub fn set_is_interrupted(&mut self, delay: u8) -> u8 {
+        self.interrupts.set_is_interrupted(delay);
         0
     }
 

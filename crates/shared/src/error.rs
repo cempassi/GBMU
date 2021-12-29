@@ -11,6 +11,7 @@ pub enum Error {
     FifoNotReady,
     RamLock(usize),
     Unimplemented(u8),
+    FailedRamLoad,
 }
 
 impl fmt::Display for Error {
@@ -35,6 +36,7 @@ impl fmt::Display for Error {
             }
             Error::DisabledInterrupts => write!(f, "Disabled interrupts"),
             Error::FifoNotReady => write!(f, "Fifo Not Ready"),
+            Error::FailedRamLoad => write!(f, "Could not open save file"),
         }
     }
 }

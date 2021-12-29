@@ -1,4 +1,4 @@
-use super::bus::MbcBus;
+use super::bus::Mbc;
 use super::consts;
 use shared::Error;
 use std::convert::AsRef;
@@ -22,15 +22,23 @@ impl AsRef<Vec<u8>> for Mbc0 {
     }
 }
 
-impl MbcBus for Mbc0 {
-    fn get(&self, address: usize) -> Result<u8, Error> {
+impl Mbc for Mbc0 {
+    fn get_rom(&self, address: usize) -> Result<u8, Error> {
         match address as u16 {
             crate::consts::ROM_MIN..=crate::consts::ROM_MAX => Ok(self.data[address]),
             _ => Ok(0xFF),
         }
     }
 
-    fn set(&mut self, _address: usize, _data: u8) -> Result<(), Error> {
+    fn set_rom(&mut self, _address: usize, _data: u8) -> Result<(), Error> {
+        Ok(())
+    }
+
+    fn get_ram(&self, _: usize) -> Result<u8, Error> {
+        Ok(0)
+    }
+
+    fn set_ram(&mut self, _: usize, _: u8) -> Result<(), Error> {
         Ok(())
     }
 }
@@ -43,13 +51,13 @@ impl Mbc0 {
 
 #[cfg(test)]
 mod test_nombc {
+    use super::Mbc;
     use super::Mbc0;
-    use super::MbcBus;
 
     #[test]
     fn test_read_nombc() {
         let mbc0 = Mbc0::default();
 
-        assert_eq!(mbc0.get(0x10).unwrap(), 0);
+        assert_eq!(mbc0.get_rom(0x10).unwrap(), 0);
     }
 }
