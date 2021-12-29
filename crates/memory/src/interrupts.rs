@@ -18,8 +18,8 @@ pub struct Interrupts {
 
 impl Interrupts {
     // is_interrupted functions
-    pub fn set_is_interrupted(&mut self) {
-        self.is_interrupted = 2;
+    pub fn set_is_interrupted(&mut self, delay: u8) {
+        self.is_interrupted = delay;
     }
 
     pub fn disabled_is_interrupted(&mut self) {
@@ -65,7 +65,6 @@ impl Interrupts {
     pub fn disable_master_enabled(&mut self) {
         self.master_enabled = false;
     }
-
 
     pub fn is_requested(&self) -> bool {
         self.requested.borrow().check(0xFF) != 0
@@ -133,7 +132,10 @@ mod test_interrupts {
         let mut interrupts = Interrupts::default();
         assert!(!interrupts.master_enabled());
 
-        interrupts.set_is_interrupted();
+        interrupts.set_is_interrupted(2);
+        assert!(!interrupts.master_enabled());
+
+        interrupts.is_interrupted_control();
         assert!(!interrupts.master_enabled());
 
         interrupts.is_interrupted_control();

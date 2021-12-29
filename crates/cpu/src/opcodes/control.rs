@@ -132,7 +132,7 @@ impl Control {
                 cpu.borrow_mut().halt = true;
                 0
             }
-            Control::EI => cpu.memory().borrow_mut().set_is_interrupted(),
+            Control::EI => cpu.memory().borrow_mut().set_is_interrupted(2),
             Control::DI => cpu.memory().borrow_mut().set_is_dissabled(),
         };
         Ok(cycles)
