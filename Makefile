@@ -24,6 +24,8 @@ ROMS := $(ROMS_PATH)/$(_ROMS)
 
 all: requirements clean
 
+ci: roms fonts $(BIOS)
+
 requirements: roms blarg fonts $(BIOS)
 
 ### Fonts ###
