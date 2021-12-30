@@ -30,21 +30,21 @@ impl Timer {
     pub fn tick(&mut self) {
         self.internal_divider += 1;
 
-        if self.internal_divider >= 256 {
+        if self.internal_divider == 256 {
             self.div = self.div.wrapping_add(1);
-            self.internal_divider -= 256;
+            self.internal_divider = 0;
         }
 
         if self.enabled {
             self.internal_count += 1;
 
-            if self.internal_count >= self.step {
+            if self.internal_count == self.step {
                 self.tima = self.tima.wrapping_add(1);
                 if self.tima == 0 {
                     self.tima = self.tma;
                     self.interrupts.borrow_mut().request(Interrupt::Timer);
                 }
-                self.internal_count -= self.step;
+                self.internal_count = 0;
             }
         }
     }
