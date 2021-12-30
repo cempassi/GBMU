@@ -33,10 +33,14 @@ impl AsRef<Registers> for Ppu {
     }
 }
 
-impl From<Interrupts> for Ppu {
-    fn from(interrupts: Interrupts) -> Self {
+impl Ppu {
+    pub fn new(interrupts: Interrupts, bios: bool) -> Self {
         let vram = vec![0; 8192];
-        let registers = Registers::default();
+
+        let registers = match bios {
+            true => Registers::default(),
+            false => Registers::new(),
+        };
         let fifo = Fifo::new();
         let screen = vec![Color::Black; FRAME_WIDTH * FRAME_HEIGHT];
         let oam = vec![0; OAM_TABLE];
@@ -49,15 +53,6 @@ impl From<Interrupts> for Ppu {
             fifo,
             screen,
         }
-    }
-}
-
-impl Ppu {
-    pub fn no_bios(interrupts: Interrupts) -> Self {
-        let mut ppu = Self::from(interrupts);
-        ppu.set_registers(0xFF40, 0x91).unwrap();
-        ppu.set_registers(0xFF41, 0x02).unwrap();
-        ppu
     }
 
     pub fn get_vram(&self, address: u16) -> Result<u8, Error> {
@@ -126,7 +121,28 @@ impl Ppu {
         self.registers.coordinates.update(coordinates)
     }
 
+    pub fn raise_ly_lyc(&self) {
+        if self.registers().lyc_ly_interupt && self.registers().lyc_ly {
+            self.raise_lcd();
+        }
+    }
+
+    pub fn raise_hblank(&self) {
+        self.raise_lcd();
+        if self.registers().hblank_interupt {}
+    }
+
+    pub fn raise_oam(&self) {
+        self.raise_lcd();
+        if self.registers().oam_interupt {}
+    }
+
     pub fn raise_vblank(&self) {
+        self.interrupts.borrow_mut().request(Interrupt::VBlank);
+        if self.registers().vblank_interupt {}
+    }
+
+    pub fn raise_lcd(&self) {
         self.interrupts.borrow_mut().request(Interrupt::Lcd);
     }
 

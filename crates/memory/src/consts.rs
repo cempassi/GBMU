@@ -20,11 +20,12 @@ pub const HRAM_MAX: u16 = 0xfffe;
 pub const RESTRICTED_MIN: u16 = 0xfea0;
 pub const RESTRICTED_MAX: u16 = 0xfeff;
 
+pub const BIOS_DISABLE: u16 = 0xFF50;
+
 pub const HIGH_RAM_SIZE: usize = 127;
 
-/// Registers Addresses
-pub const INTERRUPT_FLAGS: u16 = 0xFF0F;
-pub const INTERRUPT_ENABLED: u16 = 0xFFFF;
+pub const DMA_TRANSFERT: u16 = 0xFF46;
+pub const DMA_LEN: usize = 0xA0;
 
 pub const LCD_CONTROL: u16 = 0xFF40;
 pub const LY_COMPARE: u16 = 0xFF45;
@@ -41,3 +42,10 @@ pub const TAC: u16 = 0xFF07;
 // Serial
 pub const SERIAL_DATA: u16 = 0xFF01;
 pub const SERIAL_CONTROL: u16 = 0xFF02;
+
+// Joypad
+pub const JOYPAD: u16 = 0xFF00;
+
+/// Registers Addresses
+pub const INTERRUPT_FLAGS: u16 = 0xFF0F;
+pub const INTERRUPT_ENABLED: u16 = 0xFFFF;

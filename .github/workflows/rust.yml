@@ -55,5 +55,5 @@ jobs:
       - name: Run tests
         uses: actions-rs/cargo@v1
         with:
-          command: build
+          command: test
           args: --verbose --workspace

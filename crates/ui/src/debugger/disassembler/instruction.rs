@@ -120,20 +120,6 @@ impl Instruction {
             Cycles::Conditionnal(disass) => disass.fetched(),
         }
     }
-
-    // pub fn get_cycle(&self) {
-    //     match &self.disass {
-    //         Cycles::Absolute(disass) => {
-    //             println!("Cycle of next instruction: {}", disass.cycles);
-    //         }
-    //         Cycles::Conditionnal(disass) => {
-    //             println!(
-    //                 "Cycle of next instruction: {} or {}",
-    //                 disass.cycles.0, disass.cycles.1
-    //             );
-    //         }
-    //     }
-    // }
 }
 
 enum Cycles {

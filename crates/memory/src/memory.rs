@@ -12,7 +12,7 @@ use crate::io::IO;
 use crate::mbc::default::RomDefault;
 use crate::ram::Ram;
 use crate::state::{self, State};
-use crate::{consts, Header};
+use crate::{consts::*, Header};
 use ppu::Ppu;
 use shared::Error;
 
@@ -33,7 +33,7 @@ impl Default for Memory {
         let interrupts = Interrupts::default();
         let raisable = interrupts.get_raisable();
         let io = IO::new(raisable.clone());
-        let ppu = Ppu::new(raisable);
+        let ppu = Ppu::new(raisable, true);
 
         Memory {
             state: state::State::Bios,
@@ -51,83 +51,70 @@ impl Default for Memory {
 impl Memory {
     pub fn get_u8(&self, address: u16) -> Result<u8, Error> {
         match address {
-            consts::BIOS_MIN..=consts::BIOS_MAX if self.state == state::State::Bios => {
+            BIOS_MIN..=BIOS_MAX if self.state == state::State::Bios => {
                 self.bios.borrow().get(Area::Bios.relative(address))
             }
-            consts::ROM_MIN..=consts::ROM_MAX => {
-                self.rom.borrow().get_rom(Area::Rom.relative(address))
-            }
-            consts::VRAM_MIN..=consts::VRAM_MAX => self.ppu.borrow().get(address.into()),
-            consts::WRAM_MIN..=consts::WRAM_MAX => {
-                self.wram.borrow().get(Area::Wram.relative(address))
-            }
-            consts::ECHO_MIN..=consts::ECHO_MAX => {
-                self.wram.borrow().get(Area::EchoRam.relative(address))
-            }
-            consts::EXT_RAM_MIN..=consts::EXT_RAM_MAX => self.rom.borrow().get_ram(address.into()),
-            consts::OAM_MIN..=consts::OAM_MAX => self.ppu.borrow_mut().get(address.into()),
-            consts::RESTRICTED_MIN..=consts::RESTRICTED_MAX => Ok(0x00),
-            consts::IOREG_MIN..=consts::IOREM_MAX => self.get_io(address),
-            consts::HRAM_MIN..=consts::HRAM_MAX => {
-                self.hram.borrow().get(Area::Hram.relative(address))
-            }
-            consts::INTERRUPT_ENABLED => self.interrupts.get_enabled(),
+            ROM_MIN..=ROM_MAX => self.rom.borrow().get_rom(Area::Rom.relative(address)),
+            VRAM_MIN..=VRAM_MAX => self.ppu.borrow().get(address.into()),
+            WRAM_MIN..=WRAM_MAX => self.wram.borrow().get(Area::Wram.relative(address)),
+            ECHO_MIN..=ECHO_MAX => self.wram.borrow().get(Area::EchoRam.relative(address)),
+            EXT_RAM_MIN..=EXT_RAM_MAX => self.rom.borrow().get_ram(address.into()),
+            OAM_MIN..=OAM_MAX => self.ppu.borrow_mut().get(address.into()),
+            RESTRICTED_MIN..=RESTRICTED_MAX => Ok(0x00),
+            IOREG_MIN..=IOREM_MAX => self.get_io(address),
+            HRAM_MIN..=HRAM_MAX => self.hram.borrow().get(Area::Hram.relative(address)),
+            INTERRUPT_ENABLED => self.interrupts.get_enabled(),
         }
     }
 
     fn get_io(&self, address: u16) -> Result<u8, Error> {
         match address {
-            consts::LCD_CONTROL..=consts::LY_COMPARE => self.ppu.borrow_mut().get(address.into()),
-            consts::YWINDOW | consts::XWINDOW | consts::BGP => {
-                self.ppu.borrow_mut().get(address.into())
-            }
-            consts::INTERRUPT_FLAGS => self.interrupts.get_requested(),
+            LCD_CONTROL..=LY_COMPARE => self.ppu.borrow_mut().get(address.into()),
+            YWINDOW | XWINDOW | BGP => self.ppu.borrow_mut().get(address.into()),
+            INTERRUPT_FLAGS => self.interrupts.get_requested(),
             _ => Ok(self.io.get(address)),
         }
     }
 
     pub fn set_u8(&mut self, address: u16, data: u8) -> Result<(), Error> {
         match address {
-            consts::ROM_MIN..=consts::ROM_MAX => self
+            BIOS_MIN..=BIOS_MAX if self.state == state::State::Bios => self
+                .bios
+                .borrow_mut()
+                .set(Area::Bios.relative(address), data),
+            ROM_MIN..=ROM_MAX => self
                 .rom
                 .borrow_mut()
                 .set_rom(Area::Rom.relative(address), data),
-            consts::VRAM_MIN..=consts::VRAM_MAX => self.ppu.borrow_mut().set(address.into(), data),
-            consts::EXT_RAM_MIN..=consts::EXT_RAM_MAX => {
-                self.rom.borrow_mut().set_ram(address.into(), data)
-            }
-            consts::WRAM_MIN..=consts::WRAM_MAX => self
+            VRAM_MIN..=VRAM_MAX => self.ppu.borrow_mut().set(address.into(), data),
+            EXT_RAM_MIN..=EXT_RAM_MAX => self.rom.borrow_mut().set_ram(address.into(), data),
+            WRAM_MIN..=WRAM_MAX => self
                 .wram
                 .borrow_mut()
                 .set(Area::Wram.relative(address), data),
-            consts::ECHO_MIN..=consts::ECHO_MAX => self
+            ECHO_MIN..=ECHO_MAX => self
                 .wram
                 .borrow_mut()
                 .set(Area::EchoRam.relative(address), data),
-            consts::OAM_MIN..=consts::OAM_MAX => self.ppu.borrow_mut().set(address.into(), data),
-            consts::RESTRICTED_MIN..=consts::RESTRICTED_MAX => Ok(()),
-            consts::IOREG_MIN..=consts::IOREM_MAX => self.set_io(address, data),
-            consts::HRAM_MIN..=consts::HRAM_MAX => self
+            OAM_MIN..=OAM_MAX => self.ppu.borrow_mut().set(address.into(), data),
+            RESTRICTED_MIN..=RESTRICTED_MAX => Ok(()),
+            IOREG_MIN..=IOREM_MAX => self.set_io(address, data),
+            HRAM_MIN..=HRAM_MAX => self
                 .hram
                 .borrow_mut()
                 .set(Area::Hram.relative(address), data),
-            consts::INTERRUPT_ENABLED => self.interrupts.set_enabled(data),
+            INTERRUPT_ENABLED => self.interrupts.set_enabled(data),
         }
     }
 
     fn set_io(&mut self, address: u16, data: u8) -> Result<(), Error> {
         match address {
-            consts::LCD_CONTROL..=consts::LY_COMPARE => {
-                self.ppu.borrow_mut().set(address.into(), data)
-            }
-            consts::YWINDOW | consts::XWINDOW | consts::BGP => {
-                self.ppu.borrow_mut().set(address.into(), data)
-            }
-            consts::INTERRUPT_FLAGS => self.interrupts.set_requested(data),
-            _ => {
-                self.io.set(address, data);
-                Ok(())
-            }
+            BIOS_DISABLE => self.state.disable_bios(),
+            DMA_TRANSFERT => self.dma_transfert(data),
+            LCD_CONTROL..=LY_COMPARE => self.ppu.borrow_mut().set(address.into(), data),
+            YWINDOW | XWINDOW | BGP => self.ppu.borrow_mut().set(address.into(), data),
+            INTERRUPT_FLAGS => self.interrupts.set_requested(data),
+            _ => self.io.set(address, data),
         }
     }
 
@@ -175,11 +162,20 @@ impl Memory {
         self.io.tick()
     }
 
+    fn dma_transfert(&mut self, data: u8) -> Result<(), Error> {
+        let start = (data as u16) << 8;
+        for i in 0..DMA_LEN {
+            let byte = self.get_u8(start + i as u16)?;
+            let _ = self.set_u8(OAM_MIN + i as u16, byte);
+        }
+        Ok(())
+    }
+
     pub fn get_debug(&mut self) -> Option<char> {
         use std::io::Write;
-        if self.io.get(consts::SERIAL_CONTROL) == 0x81 {
-            let data = self.io.get(consts::SERIAL_DATA);
-            self.io.set(consts::SERIAL_CONTROL, 0);
+        if self.io.get(SERIAL_CONTROL) == 0x81 {
+            let data = self.io.get(SERIAL_DATA);
+            let _ = self.io.set(SERIAL_CONTROL, 0);
             print!("{}", data as char);
             let _ = ::std::io::stdout().flush();
             None
@@ -222,14 +218,14 @@ impl Memory {
 
         // Create memory spaces with fully-qualified syntax
         let ppu = match state {
-            State::Bios => Ppu::new(requested),
-            State::Rom => Ppu::no_bios(requested),
+            State::Bios => Ppu::new(requested, true),
+            State::Rom => Ppu::new(requested, false),
         };
 
         // Init Hram
-        let hram: Box<dyn MemoryBus> = Box::new(Ram::new(consts::HIGH_RAM_SIZE));
+        let hram: Box<dyn MemoryBus> = Box::new(Ram::new(HIGH_RAM_SIZE));
         let hram = Rc::new(RefCell::new(hram));
-        Rc::new(RefCell::new(Self {
+        let init = Self {
             state,
             bios,
             rom,
@@ -238,7 +234,8 @@ impl Memory {
             io,
             hram,
             interrupts,
-        }))
+        };
+        Rc::new(RefCell::new(init))
     }
 }
 

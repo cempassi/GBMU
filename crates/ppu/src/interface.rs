@@ -23,16 +23,9 @@ impl DerefMut for Ppu {
 }
 
 impl Ppu {
-    pub fn new(interrupts: Interrupts) -> Self {
+    pub fn new(interrupts: Interrupts, bios: bool) -> Self {
         Self {
-            0: Rc::new(RefCell::new(super::ppu::Ppu::from(interrupts))),
-        }
-    }
-
-    pub fn no_bios(interrupts: Interrupts) -> Self {
-        println!("Ppu created with no bios");
-        Self {
-            0: Rc::new(RefCell::new(super::ppu::Ppu::no_bios(interrupts))),
+            0: Rc::new(RefCell::new(super::ppu::Ppu::new(interrupts, bios))),
         }
     }
 }
