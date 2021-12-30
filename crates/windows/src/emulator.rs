@@ -1,6 +1,8 @@
 use iced_wgpu::wgpu::util::StagingBelt;
 use soc::SOC;
 
+use gilrs::Gilrs;
+use winit_input_helper::WinitInputHelper;
 use pixels::SurfaceTexture;
 
 use iced_winit::{
@@ -28,11 +30,15 @@ pub struct Emulator {
     pub format_pool: LocalPool,
     pub pixels: Pixels,
     pub soc: SOC,
+    pub input: WinitInputHelper,
+    pub gilrs: Gilrs
 }
 
 impl Emulator {
     pub fn new(event_loop: &EventLoop<()>, soc: SOC) -> Self {
         let title = "GBMU";
+        let input = WinitInputHelper::new();
+        let gilrs = Gilrs::new().unwrap();
         let window = {
             let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
             WindowBuilder::new()
@@ -68,6 +74,8 @@ impl Emulator {
             format_pool,
             pixels,
             soc,
+            gilrs,
+            input
         }
     }
 

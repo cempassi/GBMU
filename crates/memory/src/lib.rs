@@ -15,8 +15,10 @@ pub(crate) mod ram;
 pub(crate) mod serial;
 pub mod state;
 pub(crate) mod timer;
+pub mod joypad;
 
 pub use area::Area;
+pub use joypad::{JoypadKey, Joypad};
 pub use bus::MemoryBus;
 pub use futures::{Getter, Setter};
 pub use header::Header;

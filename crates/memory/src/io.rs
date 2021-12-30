@@ -1,12 +1,12 @@
 use crate::{consts, Area};
-use crate::{Serial, Timer};
+use crate::{Serial, Timer, Joypad};
 use apu::Apu;
-use shared::Interrupts;
+use shared::{Error, Interrupts};
 
 #[derive(Debug)]
 pub struct IO {
     _apu: Apu,
-    _joypad: u8,
+    joypad: Joypad,
     timer: Timer,
     serial: Serial,
     temp: Vec<u8>,
@@ -15,13 +15,13 @@ pub struct IO {
 impl IO {
     pub fn new(interrupts: Interrupts) -> Self {
         let _apu = Apu::default();
-        let _joypad = 0;
+        let joypad = Joypad::new(interrupts.clone());
         let temp = vec![0; 0xF7];
         let timer = Timer::new(interrupts);
         let serial = Serial::default();
         Self {
             _apu,
-            _joypad,
+            joypad,
             timer,
             serial,
             temp,
@@ -30,6 +30,7 @@ impl IO {
 
     pub fn get(&self, address: u16) -> u8 {
         match address {
+            consts::JOYPAD => self.joypad.get(),
             consts::SERIAL_DATA | consts::SERIAL_CONTROL => self.serial.get(address),
             consts::DIV..=consts::TAC => self.timer.get(address),
             _ => {
@@ -39,15 +40,17 @@ impl IO {
         }
     }
 
-    pub fn set(&mut self, address: u16, data: u8) {
+    pub fn set(&mut self, address: u16, data: u8) -> Result<(), Error> {
         match address {
+            consts::JOYPAD => self.joypad.set(data),
             consts::SERIAL_DATA | consts::SERIAL_CONTROL => self.serial.set(address, data),
             consts::DIV..=consts::TAC => self.timer.set(address, data),
             _ => {
                 let address = Area::IOReg.relative(address);
                 self.temp[address] = data;
             }
-        }
+        };
+        Ok(())
     }
 
     pub fn tick(&mut self) {
