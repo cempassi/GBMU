@@ -54,15 +54,6 @@ impl Ppu {
             screen,
         }
     }
-}
-
-impl Ppu {
-    pub fn no_bios(interrupts: Interrupts) -> Self {
-        let mut ppu = Self::from(interrupts);
-        ppu.set_registers(0xFF40, 0x91).unwrap();
-        ppu.set_registers(0xFF41, 0x02).unwrap();
-        ppu
-    }
 
     pub fn get_vram(&self, address: u16) -> Result<u8, Error> {
         let address: usize = (address - VRAM_START) as usize;
@@ -130,9 +121,34 @@ impl Ppu {
         self.registers.coordinates.update(coordinates)
     }
 
+    pub fn raise_ly_lyc(&self) {
+        if self.registers().lyc_ly_interupt && self.registers().lyc_ly {
+            self.raise_lcd();
+        }
+    }
+
+    pub fn raise_hblank(&self) {
+            self.raise_lcd();
+        if self.registers().hblank_interupt {
+        }
+    }
+
+    pub fn raise_oam(&self) {
+            self.raise_lcd();
+        if self.registers().oam_interupt {
+        }
+    }
+
     pub fn raise_vblank(&self) {
+            self.interrupts.borrow_mut().request(Interrupt::VBlank);
+        if self.registers().vblank_interupt{
+        }
+    }
+
+    pub fn raise_lcd(&self) {
         self.interrupts.borrow_mut().request(Interrupt::Lcd);
     }
+
 
     /// Get a reference to the ppu's registers.
     pub fn registers(&self) -> &Registers {
