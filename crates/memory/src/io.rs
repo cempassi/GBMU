@@ -1,5 +1,5 @@
 use crate::{consts, Area};
-use crate::{Serial, Timer, Joypad};
+use crate::{Joypad, Serial, Timer};
 use apu::Apu;
 use shared::{Error, Interrupts};
 

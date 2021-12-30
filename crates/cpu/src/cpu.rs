@@ -13,7 +13,7 @@ impl Cpu {
     pub fn new(memory: Memory, bios: bool) -> Self {
         let registers = match bios {
             true => Registers::default(),
-            false =>  Registers::new(),
+            false => Registers::new(),
         };
         Self {
             memory,

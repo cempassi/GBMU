@@ -2,8 +2,8 @@ use iced_wgpu::wgpu::util::StagingBelt;
 use soc::SOC;
 
 use gilrs::Gilrs;
-use winit_input_helper::WinitInputHelper;
 use pixels::SurfaceTexture;
+use winit_input_helper::WinitInputHelper;
 
 use iced_winit::{
     conversion::{mouse_interaction, window_event},
@@ -31,7 +31,7 @@ pub struct Emulator {
     pub pixels: Pixels,
     pub soc: SOC,
     pub input: WinitInputHelper,
-    pub gilrs: Gilrs
+    pub gilrs: Gilrs,
 }
 
 impl Emulator {
@@ -75,7 +75,7 @@ impl Emulator {
             pixels,
             soc,
             gilrs,
-            input
+            input,
         }
     }
 

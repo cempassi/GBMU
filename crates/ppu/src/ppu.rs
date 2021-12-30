@@ -39,7 +39,7 @@ impl Ppu {
 
         let registers = match bios {
             true => Registers::default(),
-            false => Registers::new()
+            false => Registers::new(),
         };
         let fifo = Fifo::new();
         let screen = vec![Color::Black; FRAME_WIDTH * FRAME_HEIGHT];
@@ -128,27 +128,23 @@ impl Ppu {
     }
 
     pub fn raise_hblank(&self) {
-            self.raise_lcd();
-        if self.registers().hblank_interupt {
-        }
+        self.raise_lcd();
+        if self.registers().hblank_interupt {}
     }
 
     pub fn raise_oam(&self) {
-            self.raise_lcd();
-        if self.registers().oam_interupt {
-        }
+        self.raise_lcd();
+        if self.registers().oam_interupt {}
     }
 
     pub fn raise_vblank(&self) {
-            self.interrupts.borrow_mut().request(Interrupt::VBlank);
-        if self.registers().vblank_interupt{
-        }
+        self.interrupts.borrow_mut().request(Interrupt::VBlank);
+        if self.registers().vblank_interupt {}
     }
 
     pub fn raise_lcd(&self) {
         self.interrupts.borrow_mut().request(Interrupt::Lcd);
     }
-
 
     /// Get a reference to the ppu's registers.
     pub fn registers(&self) -> &Registers {
