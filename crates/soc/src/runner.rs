@@ -18,8 +18,8 @@ impl Runner {
     pub fn new(memory: Memory, state: memory::State) -> Self {
         let ppu = memory.borrow().get_ppu();
         let cpu = match state {
-            memory::State::Bios => Cpu::new(memory.clone()),
-            memory::State::Rom => Cpu::no_bios(memory.clone()),
+            memory::State::Bios => Cpu::new(memory.clone(), true),
+            memory::State::Rom => Cpu::new(memory.clone(), false),
         };
         let tasks = Tasks::new(cpu, ppu);
         Self { memory, tasks }

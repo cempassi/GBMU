@@ -44,9 +44,8 @@ impl Registers {
     }
 
     // Registers are set to these specific values after GB BIOS runs
-    pub fn no_bios() -> Self {
+    pub fn new() -> Self {
         let mut registers = Self::default();
-        println!("I'm passing in nobios");
         registers.set(Bits8::F, 0xB0);
         Self {
             a: 0x01,

@@ -7,16 +7,9 @@ use std::rc::Rc;
 pub struct Cpu(Rc<RefCell<super::cpu::Cpu>>);
 
 impl Cpu {
-    pub fn new(memory: Memory) -> Self {
+    pub fn new(memory: Memory, bios: bool) -> Self {
         Self {
-            0: Rc::new(RefCell::new(super::cpu::Cpu::new(memory))),
-        }
-    }
-
-    pub fn no_bios(memory: Memory) -> Self {
-        println!("CPU created with no bios");
-        Self {
-            0: Rc::new(RefCell::new(super::cpu::Cpu::no_bios(memory))),
+            0: Rc::new(RefCell::new(super::cpu::Cpu::new(memory, bios))),
         }
     }
 }

@@ -10,19 +10,14 @@ pub struct Cpu {
 }
 
 impl Cpu {
-    pub fn new(memory: Memory) -> Self {
+    pub fn new(memory: Memory, bios: bool) -> Self {
+        let registers = match bios {
+            true => Registers::default(),
+            false =>  Registers::new(),
+        };
         Self {
             memory,
-            registers: Registers::default(),
-            halt: false,
-            stop: false,
-        }
-    }
-
-    pub fn no_bios(memory: Memory) -> Self {
-        Self {
-            memory,
-            registers: Registers::no_bios(),
+            registers,
             halt: false,
             stop: false,
         }

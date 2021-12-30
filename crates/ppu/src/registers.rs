@@ -94,6 +94,16 @@ pub struct Registers {
 }
 
 impl Registers {
+    // later init with CGB Specific values
+    pub fn new() -> Self {
+        let mut init = Self::default();
+        init.set(0xFF40, 0x91);
+        init.set(0xFF41, 0x85);
+        init.set(0xFF47, 0xFC);
+
+        init
+    }
+
     fn check_ly(&mut self) {
         self.lyc_ly = self.coordinates.ly_compare();
     }

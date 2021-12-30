@@ -33,10 +33,14 @@ impl AsRef<Registers> for Ppu {
     }
 }
 
-impl From<Interrupts> for Ppu {
-    fn from(interrupts: Interrupts) -> Self {
+impl Ppu {
+    pub fn new(interrupts: Interrupts, bios: bool) -> Self {
         let vram = vec![0; 8192];
-        let registers = Registers::default();
+
+        let registers = match bios {
+            true => Registers::default(),
+            false => Registers::new()
+        };
         let fifo = Fifo::new();
         let screen = vec![Color::Black; FRAME_WIDTH * FRAME_HEIGHT];
         let oam = vec![0; OAM_TABLE];

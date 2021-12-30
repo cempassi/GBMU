@@ -90,7 +90,7 @@ mod test_tiles {
     /// [0, 3, 3, 0, 0, 3, 3, 0]);
     fn setup_ppu(ly: u8) -> Ppu {
         let interrupts = Interrupts::default();
-        let ppu = Ppu::new(interrupts);
+        let ppu = Ppu::new(interrupts, true);
         let tile = vec![
             0x04, 0x04, 0x04, 0x04, 0x0a, 0x0a, 0x12, 0x12, 0x66, 0x00, 0x99, 0x77, 0x99, 0x77,
             0x66, 0x66,
