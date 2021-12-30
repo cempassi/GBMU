@@ -24,11 +24,9 @@ impl AsRef<Vec<u8>> for Bios {
 
 impl MemoryBus for Bios {
     fn set(&mut self, address: usize, data: u8) -> Result<(), Error> {
-        if let Some(index) = self.data.get_mut(address) {
-            *index = data;
-            Ok(())
-        } else {
-            Err(Error::InvalidSet(address, data))
+        match self.data.get_mut(address) {
+            Some(_) => Ok(()),
+            None => Err(Error::InvalidSet(address, data)),
         }
     }
 
