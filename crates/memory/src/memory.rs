@@ -117,17 +117,12 @@ impl Memory {
 
     fn set_io(&mut self, address: u16, data: u8) -> Result<(), Error> {
         match address {
-            consts::LCD_CONTROL..=consts::LY_COMPARE => {
-                self.ppu.borrow_mut().set(address.into(), data)
-            }
-            consts::YWINDOW | consts::XWINDOW | consts::BGP => {
-                self.ppu.borrow_mut().set(address.into(), data)
-            }
-            consts::INTERRUPT_FLAGS => self.interrupts.set_requested(data),
-            _ => {
-                self.io.set(address, data);
-                Ok(())
-            }
+            BIOS_DISABLE => self.state.disable_bios(),
+            DMA_TRANSFERT => self.dma_transfert(data),
+            LCD_CONTROL..=LY_COMPARE => self.ppu.borrow_mut().set(address.into(), data),
+            YWINDOW | XWINDOW | BGP => self.ppu.borrow_mut().set(address.into(), data),
+            INTERRUPT_FLAGS => self.interrupts.set_requested(data),
+            _ => self.io.set(address, data),
         }
     }
 
@@ -173,6 +168,15 @@ impl Memory {
 
     pub fn clock_tick(&mut self) {
         self.io.tick()
+    }
+
+    fn dma_transfert(&mut self, data: u8) -> Result<(), Error> {
+        let start = (data as u16) << 8;
+        for i in 0..DMA_LEN {
+            let byte = self.get_u8(start + i as u16)?;
+            let _ = self.set_u8(OAM_MIN + i as u16, byte);
+        }
+        Ok(())
     }
 
     pub fn get_debug(&mut self) -> Option<char> {
