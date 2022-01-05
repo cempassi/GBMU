@@ -1,5 +1,7 @@
 use super::state::Cycle;
 use crate::Memory;
+use ppu::Ppu;
+use shared::Interrupts;
 use shared::Error;
 use std::future::Future;
 use std::marker::PhantomData;
@@ -9,6 +11,8 @@ use std::task::{Context, Poll};
 pub struct Getter<T> {
     cycle: Cycle,
     memory: Memory,
+    interrupts: Interrupts,
+    ppu: Ppu,
     address: u16,
     output: PhantomData<T>,
 }
@@ -17,9 +21,13 @@ impl<T> Getter<T> {
     pub fn new(memory: Memory, address: u16) -> Self {
         let cycle = Cycle::Cpu(0);
         let output = PhantomData;
+        let interrupts = memory.borrow().interrupts.get_raisable();
+        let ppu = memory.borrow().get_ppu();
         Self {
             memory,
             address,
+            interrupts,
+            ppu,
             cycle,
             output,
         }
@@ -40,6 +48,7 @@ impl Future for Getter<u8> {
                 if *ticks == 4 {
                     self.cycle = Cycle::Finished;
                 }
+                //self.ppu.borrow_mut().step(&self.interrupts);
                 Poll::Pending
             }
         }
@@ -60,6 +69,7 @@ impl Future for Getter<u16> {
                 if *ticks == 8 {
                     self.cycle = Cycle::Finished;
                 }
+                //self.ppu.borrow_mut().step(&self.interrupts);
                 Poll::Pending
             }
         }
@@ -68,6 +78,8 @@ impl Future for Getter<u16> {
 
 pub struct Setter<T> {
     memory: Memory,
+    ppu: Ppu,
+    interrupts: Interrupts,
     cycle: Cycle,
     address: u16,
     data: T,
@@ -76,8 +88,12 @@ pub struct Setter<T> {
 impl<T> Setter<T> {
     pub fn new(memory: Memory, address: u16, data: T) -> Self {
         let cycle = Cycle::Cpu(0);
+        let interrupts = memory.borrow().interrupts.get_raisable();
+        let ppu = memory.borrow().get_ppu();
         Self {
             cycle,
+            ppu,
+            interrupts,
             memory,
             address,
             data,
@@ -103,6 +119,7 @@ impl Future for Setter<u8> {
                 if *ticks == 3 {
                     self.cycle = Cycle::Finished;
                 }
+                //self.ppu.borrow_mut().step(&self.interrupts);
                 Poll::Pending
             }
         }
@@ -127,6 +144,7 @@ impl Future for Setter<u16> {
                 if *ticks == 7 {
                     self.cycle = Cycle::Finished;
                 }
+                //self.ppu.borrow_mut().step(&self.interrupts);
                 Poll::Pending
             }
         }

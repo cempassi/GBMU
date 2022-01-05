@@ -38,13 +38,13 @@ impl Timer {
         if self.enabled {
             self.internal_count += 1;
 
-            if self.internal_count == self.step {
+            while self.internal_count >= self.step {
                 self.tima = self.tima.wrapping_add(1);
                 if self.tima == 0 {
                     self.tima = self.tma;
                     self.interrupts.borrow_mut().request(Interrupt::Timer);
                 }
-                self.internal_count = 0;
+                self.internal_count -= self.step;
             }
         }
     }

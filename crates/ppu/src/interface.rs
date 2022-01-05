@@ -1,11 +1,8 @@
-use shared::Interrupts;
 use std::cell::RefCell;
 use std::ops::{Deref, DerefMut};
 use std::rc::Rc;
 
-use crate::futures;
-
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct Ppu(Rc<RefCell<super::ppu::Ppu>>);
 
 impl Deref for Ppu {
@@ -23,19 +20,9 @@ impl DerefMut for Ppu {
 }
 
 impl Ppu {
-    pub fn new(interrupts: Interrupts, bios: bool) -> Self {
+    pub fn new() -> Self {
         Self {
-            0: Rc::new(RefCell::new(super::ppu::Ppu::new(interrupts, bios))),
+            0: Rc::new(RefCell::new(super::ppu::Ppu::new())),
         }
-    }
-}
-
-pub trait Push<'push> {
-    fn push(&self, data: [u8; 8]) -> futures::Push;
-}
-
-impl<'push> Push<'push> for Ppu {
-    fn push(&self, data: [u8; 8]) -> futures::Push {
-        futures::Push::new(self, data)
     }
 }

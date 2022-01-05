@@ -1,47 +1,134 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Color {
-    White,
-    LightGray,
-    DarkGray,
-    Black,
+/// The colors that can be displayed by the DMG.
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+pub enum Shade {
+    White = 0,
+    LightGray = 1,
+    DarkGray = 2,
+    Black = 3,
 }
 
-impl Default for Color {
-    fn default() -> Self {
-        Color::Black
-    }
-}
+impl Shade {
+    /// Returns an RGBA slice that represents the color of a `Shade`.
+    pub fn as_rgba(&self) -> &[u8] {
+        use self::Shade::*;
 
-impl From<Color> for [u8; 4] {
-    fn from(color: Color) -> [u8; 4] {
-        match color {
-            Color::White => [0x9B, 0xBC, 0x0f, 0xFF],
-            Color::LightGray => [0x8B, 0xAC, 0x0F, 0xFF],
-            Color::DarkGray => [0x30, 0x62, 0x30, 0xFF],
-            Color::Black => [0x0F, 0x38, 0x0F, 0xFF],
+        // This uses the GameBoy Pocket palette.
+        // TODO: Support more palettes.
+        match *self {
+            White => &[0xFF, 0xFF, 0xFF, 0xFF],
+            LightGray => &[0xA9, 0xA9, 0xA9, 0xFF],
+            DarkGray => &[0x54, 0x54, 0x54, 0xFF],
+            Black => &[0x00, 0x00, 0x00, 0xFF],
         }
     }
 }
 
-impl From<u8> for Color {
-    fn from(color: u8) -> Self {
-        match color {
-            0 => Color::White,
-            1 => Color::LightGray,
-            2 => Color::DarkGray,
-            3 => Color::Black,
-            _ => Color::Black,
+impl Default for Shade {
+    fn default() -> Shade {
+        Shade::White
+    }
+}
+
+impl From<u8> for Shade {
+    fn from(val: u8) -> Shade {
+        use self::Shade::*;
+
+        match val {
+            0 => White,
+            1 => LightGray,
+            2 => DarkGray,
+            3 => Black,
+            _ => panic!("only 0-3 correspond to valid shades"),
         }
     }
 }
 
-impl From<Color> for u8 {
-    fn from(color: Color) -> Self {
-        match color {
-            Color::White => 0,
-            Color::LightGray => 1,
-            Color::DarkGray => 2,
-            Color::Black => 3,
+/// Maps background and window tile colors to shades.
+///
+/// This struct can be thought of as a map from color number to shade, where the color numbers
+/// are those used by the Background and Window tiles.
+#[derive(Debug, Default, PartialEq, Eq)]
+pub struct BackgroundPalette([Shade; 4]);
+
+impl BackgroundPalette {
+    pub fn new(shades: [Shade; 4]) -> Self {
+        BackgroundPalette(shades)
+    }
+
+    pub fn get(&self, index: u8) -> Shade {
+        self.0[index as usize]
+    }
+
+    pub fn as_byte(&self) -> u8 {
+        shades_to_register(&self.0)
+    }
+}
+
+impl From<u8> for BackgroundPalette {
+    fn from(byte: u8) -> Self {
+        BackgroundPalette(shades_from_register(byte))
+    }
+}
+
+impl Into<u8> for BackgroundPalette {
+    fn into(self) -> u8 {
+        shades_to_register(&self.0)
+    }
+}
+
+/// Maps sprite colors to shades.
+///
+/// This struct can be thought of as a map from color number to shade, where the color numbers
+/// are those used by the sprite tiles. Note that color 0 is always transparent for sprites.
+#[derive(Debug, Default, PartialEq, Eq)]
+pub struct SpritePalette([Shade; 4]);
+
+impl SpritePalette {
+    pub fn new(shades: [Shade; 4]) -> Self {
+        SpritePalette(shades)
+    }
+
+    pub fn get(&self, index: u8) -> Option<Shade> {
+        match index {
+            0 => None,
+            _ => Some(self.0[index as usize]),
         }
     }
+
+    pub fn as_byte(&self) -> u8 {
+        shades_to_register(&self.0)
+    }
+}
+
+impl From<u8> for SpritePalette {
+    fn from(byte: u8) -> Self {
+        SpritePalette(shades_from_register(byte))
+    }
+}
+
+impl Into<u8> for SpritePalette {
+    fn into(self) -> u8 {
+        shades_to_register(&self.0)
+    }
+}
+
+fn shades_from_register(reg: u8) -> [Shade; 4] {
+    let mut shades = [Shade::default(); 4];
+
+    for (i, shade) in shades.iter_mut().enumerate() {
+        let number = (reg >> (i * 2)) & 0b11;
+        *shade = number.into();
+    }
+
+    shades
+}
+
+fn shades_to_register(shades: &[Shade]) -> u8 {
+    let mut register = 0;
+
+    for (i, shade) in shades.iter().enumerate() {
+        register |= (*shade as u8) << (i * 2);
+    }
+
+    register
 }

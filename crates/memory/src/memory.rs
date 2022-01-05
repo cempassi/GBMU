@@ -33,7 +33,7 @@ impl Default for Memory {
         let interrupts = Interrupts::default();
         let raisable = interrupts.get_raisable();
         let io = IO::new(raisable.clone());
-        let ppu = Ppu::new(raisable, true);
+        let ppu = Ppu::new();
 
         Memory {
             state: state::State::Bios,
@@ -190,7 +190,9 @@ impl Memory {
         let savepath = path::PathBuf::from(format!("/tmp/{}", header.title.get()));
         let rom: Rom = Rc::new(RefCell::new(match header.cartridge {
             Cartridge::Mbc0 => Mbc0::new(data),
-            Cartridge::Mbc1 => Mbc1::new(header, data, savepath),
+            Cartridge::Mbc1 | Cartridge::Mbc1Ram | Cartridge::Mbc1RamBattery => {
+                Mbc1::new(header, data, savepath)
+            }
             //Cartridge::Mbc2 | Cartridge::Mbc2Battery => Mbc2::new(data),
             //Cartridge::Mbc3 => Mbc3::new(data),
             //Cartridge::Mbc5 => Mbc5::new(data),
@@ -218,8 +220,8 @@ impl Memory {
 
         // Create memory spaces with fully-qualified syntax
         let ppu = match state {
-            State::Bios => Ppu::new(requested, true),
-            State::Rom => Ppu::new(requested, false),
+            State::Bios => Ppu::new(),
+            State::Rom => Ppu::new(),
         };
 
         // Init Hram

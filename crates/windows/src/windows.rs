@@ -14,14 +14,6 @@ impl Windows {
         let soc = SOC::try_init(name).unwrap();
         let event_loop = EventLoop::new();
 
-        // Fix draw on top of fullscreen issue on macos
-        #[cfg(target_os = "macos")]
-        unsafe {
-            use cocoa::appkit::{NSApp, NSApplication, NSApplicationActivationPolicy::*};
-            let ns_app = NSApp();
-            ns_app.setActivationPolicy_(NSApplicationActivationPolicyRegular);
-        }
-
         let instance = Instance::new(iced_wgpu::wgpu::Backends::PRIMARY);
         let mut debugger = debugger::Debugger::new(&event_loop, &instance, soc.clone());
         let mut emulator = emulator::Emulator::new(&event_loop, soc.clone());

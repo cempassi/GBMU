@@ -70,6 +70,10 @@ impl Coordinates {
         self.ly == self.lycompare
     }
 
+    pub fn check_window(&self, x: u8) -> bool {
+        x >= self.xwindow && self.ly >= self.ywindow
+    }
+
     pub fn update(&self, dst: &mut Self) {
         *dst = Self { ..*self };
     }
@@ -163,5 +167,22 @@ impl Coordinates {
     /// Get a reference to the coordinates's xscroll.
     pub fn xscroll(&self) -> u8 {
         self.xscroll
+    }
+
+    /// Get a reference to the coordinates's ly.
+    pub fn ly(&self) -> u8 {
+        self.ly
+    }
+
+    pub(crate) fn xwindow(&self) -> u8 {
+        self.xwindow
+    }
+
+    pub(crate) fn ywindow(&self) -> u8 {
+        self.ywindow
+    }
+
+    pub(crate) fn yscroll(&self) -> u8 {
+        self.yscroll
     }
 }

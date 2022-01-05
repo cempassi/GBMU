@@ -21,9 +21,9 @@ pub struct UserInterface {
 impl From<SOC> for UserInterface {
     fn from(soc: SOC) -> UserInterface {
         let runner = soc.borrow().get_status();
-        let ppu = soc.borrow().get_ppu();
         let cpu = soc.borrow().get_cpu();
         let memory = cpu.borrow().get_memory();
+        let ppu = memory.borrow().get_ppu();
         let mut ui = Self {
             theme: Theme::default(),
             cpu: Cpu::new(cpu.clone()),

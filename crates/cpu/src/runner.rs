@@ -88,6 +88,7 @@ pub async fn run(cpu: Cpu) -> Result<Finished, Error> {
         n => return Ok(Finished::Cpu(n)),
     };
 
+    println!("Passing in cpu run");
     if !cpu.borrow().halt && !cpu.borrow().stop {
         let (opcode, cycles) = Get::Next.get(cpu.clone()).await?;
         // println!("New Cpu Execution, Opcode: {:#X}", opcode);

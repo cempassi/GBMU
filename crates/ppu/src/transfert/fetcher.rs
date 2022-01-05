@@ -32,35 +32,58 @@ impl Fetcher {
             x_range,
         }
     }
+    fn render_tiles(&mut self) {
+        /// Width or height of a tile, in pixels.
+        const TILE_SIZE: u16 = 8;
 
-    pub async fn fetch(self) -> Result<u8, Error> {
-        let mut cycles = 0;
+        /// Width of the tile map, in bytes.
+        const TILE_MAP_WIDTH: u16 = 32;
 
-        // This loop fetches every pixels in a line.
-        // Many checks have to opperate here as the line Fetcher is complex
-        // (Background, Window, Sprite)
-        // Carefull implemenation
-        for x in self.x_range {
-            // First get the adress of the Tile id
-            // This may be refactored to handle background or window id
-            //println!("[FETCHER] Fetching tile id");
+        debug_assert!(self.line <= 143, "scanline out of range");
 
-            let map_address = self.map_row + x as u16;
-            //println!("[FETCHER] Map address: {:#X}", map_address);
-            let (tile_id, ticks) = Fetch::new(&self.ppu, map_address).await?;
+        // Draw the line.
+        for screen_x in 0..SCREEN_WIDTH as u8 {
+            let screen_y = self.line;
 
-            cycles += ticks;
+            let use_window = self.control.window_enabled
+                && screen_y >= self.window.y
+                && screen_x >= self.window.x;
 
-            //println!("[FETCHER] Processing tile address");
-            // Then we get the address of a row of pixels in that tile
+            let (tile_y, tile_x) = if use_window {
+                let y = screen_y.wrapping_sub(self.window.y);
+                let x = screen_x.wrapping_sub(self.window.x);
+                (u16::from(y), x)
+            } else {
+                let y = screen_y.wrapping_add(self.bg_scroll.y);
+                let x = screen_x.wrapping_add(self.bg_scroll.x);
+                (u16::from(y), x)
+            };
 
-            let row = Row::try_new(&self.ppu, tile_id).await?;
-            // Finaly we convert that Row into a vector of pixels, and push
-            // thoes in the ppu queue
-            let ticks = self.ppu.push(row.into()).await;
-            cycles += ticks;
+            // Get the address of the tile in memory.
+            let tile_id_address = {
+                let tile_map_row = tile_y / TILE_SIZE;
+                let tile_map_col = u16::from(tile_x) / TILE_SIZE;
+
+                let tile_start_address: u16 = if use_window {
+                    self.control.window_map_start.into()
+                } else {
+                    self.control.bg_map_start.into()
+                };
+
+                tile_start_address + tile_map_row * TILE_MAP_WIDTH + tile_map_col
+            };
+
+            let tile_id = self.read_byte(tile_id_address);
+            let tile_address = self.tile_data_address(tile_id);
+
+            // Find the correct vertical position within the tile. Multiply by two because each
+            // row of the tile takes two bytes.
+            let tile_line = (tile_y % TILE_SIZE) * 2;
+
+            let shade_number =
+                Self::shade_number(self.read_word(tile_address + tile_line as u16), tile_x % 8);
+
+            self.pixels[(screen_y, screen_x)] = self.bg_palette.get(shade_number);
         }
-        //println!("Exited from Fetcher");
-        Ok(cycles)
     }
 }
