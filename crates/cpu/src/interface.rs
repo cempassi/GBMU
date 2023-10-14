@@ -8,9 +8,7 @@ pub struct Cpu(Rc<RefCell<super::cpu::Cpu>>);
 
 impl Cpu {
     pub fn new(memory: Memory, bios: bool) -> Self {
-        Self {
-            0: Rc::new(RefCell::new(super::cpu::Cpu::new(memory, bios))),
-        }
+        Self(Rc::new(RefCell::new(super::cpu::Cpu::new(memory, bios))))
     }
 }
 

@@ -9,9 +9,7 @@ pub struct System(Rc<RefCell<crate::system::System>>);
 
 impl System {
     pub fn new(cpu: cpu::Cpu) -> Self {
-        Self {
-            0: Rc::new(RefCell::new(crate::system::System::new(cpu))),
-        }
+        Self(Rc::new(RefCell::new(crate::system::System::new(cpu))))
     }
 }
 
