@@ -6,7 +6,7 @@ pub struct Fifo {
     queue: VecDeque<u8>,
 }
 
-impl<'push, 'fetch> Fifo {
+impl Fifo {
     pub fn new() -> Self {
         let queue = VecDeque::with_capacity(16);
         Self { queue }
