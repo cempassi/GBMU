@@ -83,7 +83,7 @@ impl Disassembler {
                 Ok(())
             }
             DisassMsg::Breakpoint(_) => Ok(()),
-            DisassMsg::SetBreakpoint(index, _) => match self.instructions.get_mut(index as usize) {
+            DisassMsg::SetBreakpoint(index, _) => match self.instructions.get_mut(index) {
                 Some(instruction) => {
                     if let Some(instruction) = instruction {
                         instruction.bp_toogle();

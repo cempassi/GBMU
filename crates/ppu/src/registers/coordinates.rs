@@ -83,7 +83,7 @@ impl Coordinates {
     }
 
     pub fn tile_line(&self) -> usize {
-        (self.y() % 8) as usize
+        self.y() % 8
     }
 
     pub fn map_row_offset(&self) -> u16 {
