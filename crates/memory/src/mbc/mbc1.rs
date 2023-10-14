@@ -27,7 +27,7 @@ impl Drop for Mbc1 {
         match self.savepath {
             None => {}
             Some(ref path) => {
-                let _ = fs::File::create(path).and_then(|mut f| f.write_all(&*self.ram));
+                let _ = fs::File::create(path).and_then(|mut f| f.write_all(&self.ram));
             }
         };
     }
