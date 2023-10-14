@@ -12,9 +12,9 @@ authors = [
 pixels = "0.7.0"
 ascii = "1.0.0"
 pretty-hex = "0.2.1"
-enum-iterator = "0.7.0"
-num_enum = "0.5.3"
-itertools = "0.10.1"
+enum-iterator = "1.4.1"
+num_enum = "0.7.0"
+itertools = "0.11.0"
 iced_graphics = {git = "https://github.com/hecrj/iced", rev = "20177e423cd2bdc08f8060b31c379a6f764e3df6"}
 iced_native = {git = "https://github.com/hecrj/iced", rev = "20177e423cd2bdc08f8060b31c379a6f764e3df6"}
 iced_wgpu = {git = "https://github.com/hecrj/iced", rev = "20177e423cd2bdc08f8060b31c379a6f764e3df6"}

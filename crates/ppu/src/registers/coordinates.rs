@@ -1,4 +1,4 @@
-use enum_iterator::IntoEnumIterator;
+use enum_iterator::Sequence;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use std::fmt;
 
@@ -42,7 +42,7 @@ impl XRange {
 }
 
 #[repr(u16)]
-#[derive(Debug, TryFromPrimitive, IntoPrimitive, IntoEnumIterator, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, TryFromPrimitive, IntoPrimitive, PartialEq, Eq, Clone, Copy, Sequence)]
 pub enum Field {
     Ly = 0xFF44,
     LyCmp = 0xFF45,

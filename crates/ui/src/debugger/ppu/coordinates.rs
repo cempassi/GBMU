@@ -2,7 +2,7 @@ use super::PpuMsg;
 use super::View;
 use crate::debugger::widgets::Register;
 use crate::debugger::widgets::Text;
-use enum_iterator::IntoEnumIterator;
+use enum_iterator::all;
 use iced::{Alignment, Column, Element, Row};
 use itertools::Itertools;
 use ppu::Coordinates;
@@ -13,7 +13,7 @@ impl View<PpuMsg> for Coordinates {
         let title = Text::new("Lcd").medium_it(20);
         let mut coordinates = Column::new().align_items(Alignment::Center).push(title);
 
-        for (left, right) in Field::into_enum_iter().tuples() {
+        for (left, right) in  all::<Field>().collect::<Vec<_>>().into_iter().tuples::<(_, _)>()   {
             let row = Row::new();
 
             let name = format!("{}", left);

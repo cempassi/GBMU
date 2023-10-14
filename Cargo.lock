@@ -145,7 +145,7 @@ checksum = "8e215f8c2f9f79cb53c8335e687ffd07d5bfcb6fe5fc80723762d0be46e7cc54"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.81",
 ]
 
 [[package]]
@@ -412,7 +412,7 @@ dependencies = [
  "enum-iterator",
  "memory",
  "modular-bitfield",
- "num_enum",
+ "num_enum 0.7.0",
  "rand",
  "shared",
 ]
@@ -517,7 +517,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "strsim",
- "syn",
+ "syn 1.0.81",
 ]
 
 [[package]]
@@ -528,7 +528,7 @@ checksum = "d9b5a2f4ac4969822c62224815d069952656cadc7084fdca9751e6d959189b72"
 dependencies = [
  "darling_core",
  "quote",
- "syn",
+ "syn 1.0.81",
 ]
 
 [[package]]
@@ -539,7 +539,7 @@ checksum = "fcc3dd5e9e9c0b295d6e1e4d811fb6f157d5ffd784b8d202fc62eac8035a770b"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.81",
 ]
 
 [[package]]
@@ -655,22 +655,22 @@ checksum = "e78d4f1cc4ae33bbfc157ed5d5a5ef3bc29227303d595861deb238fcec4e9457"
 
 [[package]]
 name = "enum-iterator"
-version = "0.7.0"
+version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4eeac5c5edb79e4e39fe8439ef35207780a11f69c52cbe424ce3dfad4cb78de6"
+checksum = "7add3873b5dd076766ee79c8e406ad1a472c385476b9e38849f8eec24f1be689"
 dependencies = [
  "enum-iterator-derive",
 ]
 
 [[package]]
 name = "enum-iterator-derive"
-version = "0.7.0"
+version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c134c37760b27a871ba422106eedbb8247da973a09e82558bf26d619c882b159"
+checksum = "eecf8589574ce9b895052fa12d69af7a233f99e6107f5cb8dd1044f2a17bfdcb"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -844,7 +844,7 @@ dependencies = [
  "proc-macro-hack",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.81",
 ]
 
 [[package]]
@@ -1262,9 +1262,9 @@ dependencies = [
 
 [[package]]
 name = "itertools"
-version = "0.10.1"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69ddb889f9d0d08a67338271fa9b62996bc788c7796a5c18cf057420aaed5eaf"
+checksum = "b1c173a5686ce8bfa551b3563d0c2170bf24ca44da99c7ca4bfdab5418c3fe57"
 dependencies = [
  "either",
 ]
@@ -1443,7 +1443,7 @@ name = "memory"
 version = "0.1.0"
 dependencies = [
  "apu",
- "num_enum",
+ "num_enum 0.5.4",
  "ppu",
  "shared",
 ]
@@ -1520,7 +1520,7 @@ checksum = "5a7d5f7076603ebc68de2dc6a650ec331a062a13abaa346975be747bbfa4b789"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.81",
 ]
 
 [[package]]
@@ -1555,7 +1555,7 @@ checksum = "8794322172319b972f528bf90c6b467be0079f1fa82780ffb431088e741a73ab"
 dependencies = [
  "jni-sys",
  "ndk-sys",
- "num_enum",
+ "num_enum 0.5.4",
  "thiserror",
 ]
 
@@ -1583,7 +1583,7 @@ dependencies = [
  "proc-macro-crate 0.1.5",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.81",
 ]
 
 [[package]]
@@ -1676,7 +1676,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f9bd055fb730c4f8f4f57d45d35cd6b3f0980535b056dc7ff119cee6a66ed6f"
 dependencies = [
  "derivative",
- "num_enum_derive",
+ "num_enum_derive 0.5.4",
+]
+
+[[package]]
+name = "num_enum"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "70bf6736f74634d299d00086f02986875b3c2d924781a6a2cb6c201e73da0ceb"
+dependencies = [
+ "num_enum_derive 0.7.0",
 ]
 
 [[package]]
@@ -1688,7 +1697,19 @@ dependencies = [
  "proc-macro-crate 1.1.0",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.81",
+]
+
+[[package]]
+name = "num_enum_derive"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "56ea360eafe1022f7cc56cd7b869ed57330fb2453d0c7831d99b74c65d2f5597"
+dependencies = [
+ "proc-macro-crate 1.1.0",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.38",
 ]
 
 [[package]]
@@ -1867,7 +1888,7 @@ dependencies = [
  "enum-iterator",
  "futures",
  "modular-bitfield",
- "num_enum",
+ "num_enum 0.7.0",
  "shared",
 ]
 
@@ -1882,6 +1903,12 @@ name = "pretty-hex"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bc5c99d529f0d30937f6f4b8a86d988047327bb88d04d2c4afc356de74722131"
+
+[[package]]
+name = "pretty-hex"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c6fa0831dd7cc608c38a5e323422a0077678fa5744aa2be4ad91c4ece8eec8d5"
 
 [[package]]
 name = "proc-macro-crate"
@@ -1916,11 +1943,11 @@ checksum = "bc881b2c22681370c6a780e47af9840ef841837bc98118431d4e1868bd0c1086"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.32"
+version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba508cc11742c0dc5c1659771673afbab7a0efab23aa17e854cbab0837ed0b43"
+checksum = "134c189feb4956b20f6f547d2cf727d4c0fe06722b20a0eec87ed445a97f92da"
 dependencies = [
- "unicode-xid",
+ "unicode-ident",
 ]
 
 [[package]]
@@ -1931,9 +1958,9 @@ checksum = "9926767b8b8244d7b6b64546585121d193c3d0b4856ccd656b7bfa9deb91ab6a"
 
 [[package]]
 name = "quote"
-version = "1.0.10"
+version = "1.0.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "38bc8cc6a5f2e3655e0899c1b848643b2562f853f114bfec7be120678e3ace05"
+checksum = "5267fca4496028628a95160fc423a33e8b2e6af8a5302579e322e4b520293cae"
 dependencies = [
  "proc-macro2",
 ]
@@ -2171,7 +2198,7 @@ checksum = "ecc0db5cb2556c0e558887d9bbdcf6ac4471e83ff66cf696e5419024d1606276"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.81",
 ]
 
 [[package]]
@@ -2217,7 +2244,7 @@ name = "shared"
 version = "0.1.0"
 dependencies = [
  "modular-bitfield",
- "num_enum",
+ "num_enum 0.5.4",
 ]
 
 [[package]]
@@ -2296,9 +2323,9 @@ dependencies = [
  "cpu",
  "futures",
  "memory",
- "num_enum",
+ "num_enum 0.7.0",
  "ppu",
- "pretty-hex",
+ "pretty-hex 0.3.0",
  "shared",
 ]
 
@@ -2344,7 +2371,7 @@ dependencies = [
  "quote",
  "serde",
  "serde_derive",
- "syn",
+ "syn 1.0.81",
 ]
 
 [[package]]
@@ -2360,7 +2387,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sha1",
- "syn",
+ "syn 1.0.81",
 ]
 
 [[package]]
@@ -2399,6 +2426,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "syn"
+version = "2.0.38"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e96b79aaa137db8f61e26363a0c9b47d8b4ec75da28b7d1d614c2303e232408b"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "unicode-ident",
+]
+
+[[package]]
 name = "termcolor"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2424,7 +2462,7 @@ checksum = "aa32fd3f627f367fe16f893e2597ae3c05020f8bba2666a4e6ea73d377e5714b"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.81",
 ]
 
 [[package]]
@@ -2494,10 +2532,10 @@ dependencies = [
  "iced_winit",
  "itertools",
  "memory",
- "num_enum",
+ "num_enum 0.7.0",
  "pixels",
  "ppu",
- "pretty-hex",
+ "pretty-hex 0.2.1",
  "shared",
  "soc",
 ]
@@ -2516,6 +2554,12 @@ name = "unicode-bidi"
 version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1a01404663e3db436ed2746d9fefef640d868edae3cceb81c3b8d5732fda678f"
+
+[[package]]
+name = "unicode-ident"
+version = "1.0.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
 
 [[package]]
 name = "unicode-normalization"
@@ -2612,7 +2656,7 @@ dependencies = [
  "log",
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.81",
  "wasm-bindgen-shared",
 ]
 
@@ -2646,7 +2690,7 @@ checksum = "7803e0eea25835f8abdc585cd3021b3deb11543c6fe226dcd30b228857c5c5ab"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn",
+ "syn 1.0.81",
  "wasm-bindgen-backend",
  "wasm-bindgen-shared",
 ]

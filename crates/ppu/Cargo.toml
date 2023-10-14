@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 futures = "0.3.17"
-num_enum = "0.5.3"
-enum-iterator = "0.7.0"
+num_enum = "0.7.0"
+enum-iterator = "1.4.1"
 modular-bitfield = "0.11.2"
 shared = { path = "../shared" }
