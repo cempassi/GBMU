@@ -85,7 +85,7 @@ async fn ret(cpu: Cpu) -> Result<u8, Error> {
 
 async fn ret_interrupt(cpu: Cpu) -> Result<u8, Error> {
     cpu.memory().borrow_mut().set_is_interrupted(1);
-    Ok(Set::Pop(Bits16::PC).run(cpu).await?)
+    Set::Pop(Bits16::PC).run(cpu).await
 }
 
 async fn ret_check(cpu: Cpu, flag: Flag) -> Result<u8, Error> {
