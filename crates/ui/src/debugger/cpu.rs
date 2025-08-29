@@ -4,7 +4,7 @@ mod registers;
 use crate::debugger::widgets::Text;
 use crate::style::Theme;
 use cpu::registers::{Bits16, Bits8, Flag};
-use enum_iterator::IntoEnumIterator;
+use enum_iterator::all;
 use iced::{alignment::Alignment, Column, Element};
 use itertools::Itertools;
 use registers::Registers;
@@ -36,7 +36,7 @@ impl Cpu {
         let mut data = cpu::Registers::default();
         let mut registers = Vec::new();
         cpu.borrow().registers.update(&mut data);
-        for (left, right) in Bits8::into_enum_iter().tuples() {
+        for (left, right) in all::<Bits8>().collect::<Vec<_>>().into_iter().tuples::<(_, _)>()  {
             if left == Bits8::H {
                 registers.push(Registers::Merged(Bits16::HL));
             } else {
@@ -44,7 +44,7 @@ impl Cpu {
             }
         }
         let mut flags = Vec::new();
-        for flag in Flag::into_enum_iter() {
+        for flag in all::<Flag>().collect::<Vec<_>>() {
             flags.push(flag);
         }
         let flags = Flags::new(flags);

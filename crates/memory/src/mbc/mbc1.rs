@@ -27,7 +27,7 @@ impl Drop for Mbc1 {
         match self.savepath {
             None => {}
             Some(ref path) => {
-                let _ = fs::File::create(path).and_then(|mut f| f.write_all(&*self.ram));
+                let _ = fs::File::create(path).and_then(|mut f| f.write_all(&self.ram));
             }
         };
     }
@@ -36,9 +36,9 @@ impl Drop for Mbc1 {
 impl Mbc for Mbc1 {
     fn get_rom(&self, address: usize) -> Result<u8, Error> {
         let index = if address < 0x4000 {
-            address as usize
+            address
         } else {
-            (self.rombank * 0x4000) | ((address as usize) & 0x3FFF)
+            (self.rombank * 0x4000) | (address & 0x3FFF)
         };
         Ok(*self.rom.get(index).unwrap_or(&0))
     }
@@ -75,7 +75,7 @@ impl Mbc for Mbc1 {
             return Ok(0);
         }
         let rambank = if self.ram_mode { self.rambank } else { 0 };
-        Ok(self.ram[(rambank * 0x2000) | ((address & 0x1FFF) as usize)])
+        Ok(self.ram[(rambank * 0x2000) | (address & 0x1FFF)])
     }
 
     fn set_ram(&mut self, address: usize, data: u8) -> Result<(), Error> {
@@ -83,7 +83,7 @@ impl Mbc for Mbc1 {
             return Ok(());
         }
         let rambank = if self.ram_mode { self.rambank } else { 0 };
-        self.ram[(rambank * 0x2000) | ((address & 0x1FFF) as usize)] = data;
+        self.ram[(rambank * 0x2000) | (address & 0x1FFF)] = data;
         Ok(())
     }
 }

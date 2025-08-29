@@ -1,15 +1,10 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Color {
     White,
     LightGray,
     DarkGray,
+    #[default]
     Black,
-}
-
-impl Default for Color {
-    fn default() -> Self {
-        Color::Black
-    }
 }
 
 impl From<Color> for [u8; 4] {

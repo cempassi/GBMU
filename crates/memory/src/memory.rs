@@ -38,7 +38,7 @@ impl Default for Memory {
         Memory {
             state: state::State::Bios,
             bios: Rc::new(RefCell::new(Box::new(Bios::new()))),
-            wram: Rc::new(RefCell::new(Box::new(Ram::default()))),
+            wram: Rc::new(RefCell::new(Box::<Ram>::default())),
             ppu,
             rom: Rom::default(),
             io,
@@ -196,15 +196,13 @@ impl Memory {
             //Cartridge::Mbc5 => Mbc5::new(data),
             _ => unimplemented!(),
         }));
-        // Init state
-        let state = state;
 
         // Init Bios
         let bios: Box<dyn MemoryBus> = Box::new(Bios::new());
         let bios = Rc::new(RefCell::new(bios));
 
         // Init Wram
-        let wram: Box<dyn MemoryBus> = Box::new(Ram::default());
+        let wram: Box<dyn MemoryBus> = Box::<Ram>::default();
         let wram = Rc::new(RefCell::new(wram));
 
         // Init Interrupts first as several IO need them

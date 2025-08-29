@@ -54,7 +54,7 @@ impl<T> Hexdump<T> {
                     _ => ascii_str.push(AsciiChar::Dot),
                 }
             }
-            let line = format!("{:#08X}", i * 0x10) + &byte_str + &ascii_str.to_string();
+            let line = format!("{:#08X}", i * 0x10) + &byte_str + ascii_str.as_ref();
             row = row.push(Text::new(line).light(TEXT_SIZE));
             hexdump = hexdump.push(row);
         }

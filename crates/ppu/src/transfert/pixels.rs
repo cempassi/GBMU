@@ -58,12 +58,11 @@ impl Row {
 
     /// Get the data of a row in a tile from tile id
     pub async fn try_new(ppu: &'_ Ppu, id: u8) -> Result<Self, Error> {
-        let p = ppu.borrow();
-        let data_area = p.registers.control.data_area;
-        let tile_line = p.registers.coordinates.tile_line();
+        let data_area = ppu.borrow().registers.control.data_area;
+        let tile_line = ppu.borrow().registers.coordinates.tile_line();
+
         let address = Self::row_address(tile_line, data_area, id);
 
-        drop(p);
         let (byte0, _) = Fetch::new(ppu, address).await?;
         //println!("[FETCHER] byte0 fetched");
         let (byte1, _) = Fetch::new(ppu, address + 1).await?;
@@ -91,10 +90,8 @@ mod test_tiles {
     fn setup_ppu(ly: u8) -> Ppu {
         let interrupts = Interrupts::default();
         let ppu = Ppu::new(interrupts, true);
-        let tile = vec![
-            0x04, 0x04, 0x04, 0x04, 0x0a, 0x0a, 0x12, 0x12, 0x66, 0x00, 0x99, 0x77, 0x99, 0x77,
-            0x66, 0x66,
-        ];
+        let tile = [0x04, 0x04, 0x04, 0x04, 0x0a, 0x0a, 0x12, 0x12, 0x66, 0x00, 0x99, 0x77, 0x99, 0x77,
+            0x66, 0x66];
         let mut p = ppu.borrow_mut();
         p.vram_lock = true;
         for (index, data) in tile.iter().enumerate() {

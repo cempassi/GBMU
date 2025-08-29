@@ -24,9 +24,7 @@ impl DerefMut for Ppu {
 
 impl Ppu {
     pub fn new(interrupts: Interrupts, bios: bool) -> Self {
-        Self {
-            0: Rc::new(RefCell::new(super::ppu::Ppu::new(interrupts, bios))),
-        }
+        Self(Rc::new(RefCell::new(super::ppu::Ppu::new(interrupts, bios))))
     }
 }
 
