@@ -26,7 +26,7 @@ all: requirements clean
 
 ci: roms fonts $(BIOS)
 
-requirements: roms blarg fonts $(BIOS)
+requirements: blarg fonts $(BIOS)
 
 ### Fonts ###
 
@@ -56,12 +56,6 @@ $(BIOS_PATH):
 
 ### Roms ###
 
-roms: roms.zip
-	unzip -o $< 'roms/*' -x '*/.DS_Store'
-
-roms.zip:
-	curl -L $(ROMS_URL) > $@
-
 blarg:
 	git clone git@github.com:retrio/gb-test-roms.git ./ressources/test_roms
 
@@ -89,4 +83,4 @@ fclean: clean
 	cargo cache -a
 	rm -rf roms ressources
 
-.PHONY: requirement roms hasklig check lint format.all format clean fclean
+.PHONY: requirement hasklig check lint format.all format clean fclean
